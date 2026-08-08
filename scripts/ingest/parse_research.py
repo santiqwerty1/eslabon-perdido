@@ -90,7 +90,7 @@ def _parse_repo(base: Path) -> tuple[dict, Hallazgos]:
     import json as _json
 
     man = _json.loads((base / "manifest.json").read_text(encoding="utf-8"))
-    trozos = [f"Fecha de corte bibliografico: {man.get('fecha_de_corte_bibliografico', '')}", ""]
+    trozos = [f"Fecha de corte bibliográfico: {man.get('fecha_de_corte_bibliografico', '')}", ""]
 
     def volcar(f: Path) -> None:
         with f.open(encoding="utf-8", newline="") as fh:
