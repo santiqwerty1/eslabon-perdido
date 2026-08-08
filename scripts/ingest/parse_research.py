@@ -450,26 +450,17 @@ def _parse_texto(texto: str) -> tuple[dict, Hallazgos]:
         # Se comprueban TODAS las claves, no solo la primera, y sin la puntuacion
         # pegada. `BN-` son busquedas negativas, no fuentes: una afirmacion puede
         # citarlas legitimamente para decir que se busco y no se encontro.
-        # Solo cuenta como clave lo que ABRE un segmento: «S108 Results; suppl.
-        # figs. S2-S3» cita una fuente, no tres. S1/S2/S3 dentro del localizador
-        # son material suplementario, que es la notacion estandar en literatura
-        # cientifica y no tiene nada que ver con nuestras claves.
-        validas = 0
-        for segmento in re.split(r"[;,]", a["source_ref"] or ""):
-            m = re.match(r"\s*(S\d+)\b", segmento)
-            ref = m.group(1) if m else None
-            if not ref:
-                continue
-            if ref in claves:
-                validas += 1
-                continue
-            if validas:
-                # Ya cita una fuente buena; lo que sigue es casi seguro un
-                # localizador de material suplementario («S126 Results; S3 table»),
-                # no otra fuente. Se avisa, no se bloquea.
-                h.aviso(f"{a['local_id']}: «{ref}» tras una fuente válida; "
-                        "parece localizador suplementario y no una clave")
-            else:
+        # Las claves del apendice A son S01..S479: SIEMPRE dos o tres digitos.
+        # Un `S` seguido de un solo digito no es ni puede ser una clave; es
+        # material suplementario del propio trabajo citado —«suppl. figs. S2-S3»,
+        # «S1 Data»—, que es notacion estandar en literatura cientifica.
+        #
+        # Distinguirlos por el ancho es exacto, no heuristico. La version
+        # anterior degradaba a aviso cualquier clave desconocida que viniera
+        # tras una valida, y eso habria tapado una referencia colgante de
+        # verdad: exactamente el fallo que §4.5 existe para impedir.
+        for ref in re.findall(r"\bS\d{2,}\b", a["source_ref"] or ""):
+            if ref not in claves:
                 h.error(f"{a['local_id']}: cita la fuente {ref}, que no está en el apéndice A")
         if a["attribution"].startswith("sintesis") or a["attribution"].startswith("síntesis"):
             for r in a["attribution_refs"]:
