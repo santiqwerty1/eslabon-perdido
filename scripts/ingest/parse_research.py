@@ -53,6 +53,16 @@ VIGENCIA = {"vigente": "current", "histórica": "historical",
             "superada": "superseded", "rechazada": "rejected"}
 ATRIBUCION = {"expresa", "sintesis", "síntesis", "glosa"}
 
+# Apéndices tabulares del prompt, reconocidos por su primera columna.
+# El documento real trae ocho; leer sólo tres dejaría fuera eventos, fechas,
+# hipótesis y magnitudes, que son la mitad del contenido estructurado.
+APENDICES = {
+    "clave":              None,      # A fuentes / C eventos / E hipótesis: se afina por columnas
+    "etiqueta preferida": "entities",
+    "a qué se aplica":    "dates",
+    "magnitud":           None,      # F magnitudes / H recuento: se afina por columnas
+}
+
 TIPO_FUENTE = {
     "investigación primaria": "primary_research",
     "revisión": "review",
@@ -128,6 +138,10 @@ def parse(path: Path) -> tuple[dict, Hallazgos]:
     afirmaciones: list[dict] = []
     fuentes: list[dict] = []
     entidades: list[dict] = []
+    eventos: list[dict] = []
+    hipotesis: list[dict] = []
+    fechas: list[dict] = []
+    magnitudes: list[dict] = []
     control: dict[str, str] = {}
     etiquetas: set[str] = set()
 
@@ -180,7 +194,8 @@ def parse(path: Path) -> tuple[dict, Hallazgos]:
                         "historical_status": VIGENCIA.get(vig, "current"),
                     },
                 })
-        elif cab and cab[0].lower() == "clave":
+        elif cab and cab[0].lower() == "clave" and "tipo" in [c.lower() for c in cab] and any(
+                c.lower().startswith("autor") for c in cab):
             for f in filas:
                 d = dict(zip(cab, f))
                 tipo = d.get("tipo", "").lower()
@@ -198,6 +213,35 @@ def parse(path: Path) -> tuple[dict, Hallazgos]:
         elif cab and cab[0].lower().startswith("etiqueta"):
             for f in filas:
                 entidades.append(dict(zip(cab, f)))
+        elif cab and cab[0].lower() == "clave" and any("participante" in c.lower() for c in cab):
+            for f in filas:
+                d = dict(zip(cab, f))
+                eventos.append(d)
+                papeles = d.get("participantes con su papel", "") or d.get("participantes", "")
+                if papeles and ":" not in papeles and "—" not in papeles and "-" not in papeles:
+                    h.error(f"evento {d.get('clave')}: participantes sin papel declarado. "
+                            "«A y B participaron» no dice quién entró en quién (§13.2)")
+        elif cab and cab[0].lower() == "clave" and any("sostiene" in c.lower() for c in cab):
+            for f in filas:
+                hipotesis.append(dict(zip(cab, f)))
+        elif cab and cab[0].lower().startswith("a qué se aplica"):
+            for f in filas:
+                d = dict(zip(cab, f))
+                fechas.append(d)
+                unidad = (d.get("unidad explícita") or d.get("unidad") or "").strip()
+                if not unidad or unidad in ("n/a", "-"):
+                    h.error(f"fecha «{f[0][:40]}»: sin unidad explícita. Entre 1,5 y 2,5 "
+                            "la ambigüedad Ma/Ga es real y un intervalo sin unidad no sirve")
+                obs = (d.get("observado o inferido") or "").strip().lower()
+                if obs and obs not in ("observado", "inferido"):
+                    h.error(f"fecha «{f[0][:40]}»: «{obs}» no es ni observado ni inferido (§11)")
+        elif cab and cab[0].lower() == "magnitud" and len(cab) > 3:
+            for f in filas:
+                d = dict(zip(cab, f))
+                magnitudes.append(d)
+                if not (d.get("unidad original") or "").strip():
+                    h.error(f"magnitud «{f[0][:40]}»: sin unidad original. §10.7 prohíbe "
+                            "convertir medidas distintas a una escala común")
         elif cab and cab[0].lower() == "magnitud":
             for f in filas:
                 if len(f) >= 2:
@@ -220,20 +264,40 @@ def parse(path: Path) -> tuple[dict, Hallazgos]:
         h.aviso("no se encontró el apéndice H de recuento de control")
 
     claves = {f["key"] for f in fuentes}
+    # El conjunto se calcula UNA vez. Reconstruirlo dentro del bucle hacía el
+    # coste cuadrático en el número de afirmaciones: irrelevante a 1.593 filas
+    # (33 ms), pero el documento sigue creciendo y el arreglo es una línea.
+    locales_ref = {a["local_id"] for a in afirmaciones}
     for a in afirmaciones:
         ref = a["source_ref"].split()[0] if a["source_ref"] else ""
         if ref and ref not in claves and ref not in ("n/a", "-"):
             h.error(f"{a['local_id']}: cita la fuente {ref!r}, que no está en el apéndice A")
         if a["attribution"].startswith("sintesis") or a["attribution"].startswith("síntesis"):
             for r in a["attribution_refs"]:
-                if r not in {x["local_id"] for x in afirmaciones}:
+                if r not in locales_ref:
                     h.error(f"{a['local_id']}: su síntesis cita {r}, que no existe en el registro")
+
+    # Toda clave que un apéndice cite debe existir en el registro (§4.5).
+    locales = locales_ref
+    for coleccion, nombre in ((eventos, "evento"), (hipotesis, "hipótesis"),
+                              (fechas, "fecha"), (magnitudes, "magnitud")):
+        for d in coleccion:
+            for celda in d.values():
+                if not isinstance(celda, str):
+                    continue
+                for ref in re.findall(r"\bC-\d+\b", celda):
+                    if ref not in locales:
+                        h.error(f"{nombre} cita {ref}, que no existe en el registro de afirmaciones")
 
     return {
         "cutoff": corte.group(1).strip() if corte else None,
         "claims": afirmaciones,
         "sources": fuentes,
         "entities": entidades,
+        "events": eventos,
+        "hypotheses": hipotesis,
+        "dates": fechas,
+        "magnitudes": magnitudes,
         "labels": sorted(etiquetas),
         "control": control,
     }, h
@@ -258,6 +322,10 @@ def main() -> int:
     print(f"  afirmaciones         {len(datos['claims'])}")
     print(f"  fuentes              {len(datos['sources'])}")
     print(f"  entidades declaradas {len(datos['entities'])}")
+    print(f"  eventos              {len(datos['events'])}")
+    print(f"  hipótesis            {len(datos['hypotheses'])}")
+    print(f"  fechas               {len(datos['dates'])}")
+    print(f"  magnitudes           {len(datos['magnitudes'])}")
     print(f"  etiquetas distintas  {len(datos['labels'])}")
 
     reparto: dict[str, int] = {}
