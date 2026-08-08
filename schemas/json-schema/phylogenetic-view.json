@@ -9,7 +9,10 @@
       "type": "string",
       "pattern": "^PHYVIEW-[0-9]{6}$"
     },
-    "name": { "type": "string", "minLength": 1 },
+    "name": {
+      "type": "string",
+      "minLength": 1
+    },
     "cutoff_date": {
       "type": "string",
       "format": "date",
@@ -17,56 +20,103 @@
     },
     "hypothesis_ids": {
       "type": "array",
-      "items": { "type": "string", "pattern": "^HYP-[0-9]{6}$" },
+      "items": {
+        "type": "string",
+        "pattern": "^HYP-[0-9]{6}$"
+      },
       "description": "Hipótesis que la vista materializa. Las hipótesis excluidas siguen existiendo en el dataset."
     },
     "selected_claim_ids": {
       "type": "array",
-      "items": { "type": "string", "pattern": "^CLAIM-[0-9]{6}$" }
+      "items": {
+        "type": "string",
+        "pattern": "^CLAIM-[0-9]{6}$"
+      }
     },
     "excluded_claim_ids": {
       "type": "array",
-      "items": { "type": "string", "pattern": "^CLAIM-[0-9]{6}$" },
+      "items": {
+        "type": "string",
+        "pattern": "^CLAIM-[0-9]{6}$"
+      },
       "description": "Afirmaciones descartadas al construirla, con sus motivos en 'editorial_criteria'."
     },
     "event_ids": {
       "type": "array",
-      "items": { "type": "string", "pattern": "^EVENT-[0-9]{6}$" },
+      "items": {
+        "type": "string",
+        "pattern": "^EVENT-[0-9]{6}$"
+      },
       "description": "Eventos reticulados representados (§13). Una red no se aplana a árbol sin declararlo como simplificación."
     },
     "editorial_criteria": {
       "type": "array",
-      "items": { "type": "string" },
+      "items": {
+        "type": "string"
+      },
       "minItems": 1,
       "description": "§15.4: la vista debe declarar sus criterios."
     },
     "simplifications": {
       "type": "array",
-      "items": { "type": "string" }
+      "items": {
+        "type": "string"
+      }
     },
     "topology": {
-      "type": ["object", "null"],
+      "type": [
+        "object",
+        "null"
+      ],
       "description": "§15.3. El formato definitivo queda ABIERTO hasta la fase de vistas; se admiten los candidatos previstos.",
       "properties": {
         "format": {
           "type": "string",
-          "enum": ["newick", "extended_newick", "clade_list", "event_graph", "claim_set"]
+          "enum": [
+            "newick",
+            "extended_newick",
+            "clade_list",
+            "event_graph",
+            "claim_set"
+          ]
         },
-        "content": { "type": ["string", "null"] },
-        "content_path": { "type": ["string", "null"] },
+        "content": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "content_path": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
         "content_hash": {
-          "oneOf": [{ "$ref": "common.json#/$defs/content_hash" }, { "type": "null" }]
+          "oneOf": [
+            {
+              "$ref": "common.json#/$defs/content_hash"
+            },
+            {
+              "type": "null"
+            }
+          ]
         },
         "reticulation": {
           "type": "boolean",
           "description": "Si la vista representa reticulación. Un formato de árbol no puede expresarla sin pérdida."
         }
       },
-      "required": ["format"],
+      "required": [
+        "format"
+      ],
       "additionalProperties": false
     },
     "scale": {
-      "type": ["string", "null"],
+      "type": [
+        "string",
+        "null"
+      ],
       "description": "Alcance de la vista, por ejemplo 'campaign-01-eukarya'."
     },
     "generated_artifacts": {
@@ -76,14 +126,34 @@
         "properties": {
           "artifact_type": {
             "type": "string",
-            "enum": ["graphviz_dot", "svg", "png", "newick", "json_export", "report"]
+            "enum": [
+              "graphviz_dot",
+              "svg",
+              "png",
+              "newick",
+              "json_export",
+              "report"
+            ]
           },
-          "path": { "type": "string", "minLength": 1 },
+          "path": {
+            "type": "string",
+            "minLength": 1
+          },
           "content_hash": {
-            "oneOf": [{ "$ref": "common.json#/$defs/content_hash" }, { "type": "null" }]
+            "oneOf": [
+              {
+                "$ref": "common.json#/$defs/content_hash"
+              },
+              {
+                "type": "null"
+              }
+            ]
           }
         },
-        "required": ["artifact_type", "path"],
+        "required": [
+          "artifact_type",
+          "path"
+        ],
         "additionalProperties": false
       }
     },
@@ -92,13 +162,27 @@
       "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$",
       "description": "§16.5, versión de la vista derivada."
     },
-    "built_from_dataset_revision": { "$ref": "common.json#/$defs/dataset_revision" },
+    "built_from_dataset_revision": {
+      "$ref": "common.json#/$defs/dataset_revision"
+    },
     "issue_ids": {
       "type": "array",
-      "items": { "$ref": "common.json#/$defs/issue_id" }
+      "items": {
+        "$ref": "common.json#/$defs/issue_id"
+      }
     },
-    "notes": { "$ref": "common.json#/$defs/notes" },
-    "record_status": { "$ref": "common.json#/$defs/record_status" }
+    "notes": {
+      "$ref": "common.json#/$defs/notes"
+    },
+    "record_status": {
+      "$ref": "common.json#/$defs/record_status"
+    },
+    "superseded_by": {
+      "$ref": "common.json#/$defs/superseded_by"
+    },
+    "merged_into": {
+      "$ref": "common.json#/$defs/merged_into"
+    }
   },
   "required": [
     "id",

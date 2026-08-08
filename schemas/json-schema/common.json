@@ -6,13 +6,25 @@
   "$defs": {
     "id": {
       "type": "string",
-      "pattern": "^(SEC|PASSAGE|MENTION|SRC|NAME|TAXCONCEPT|CLADE|LINEAGE|POP|SPECIMEN|SITE|REGION|OCC|TRAIT|TRAITOBS|GENE|ALLELE|EVENT|CLAIM|EVID|DATASET|ANALYSIS|RESULT|HYP|TAXVIEW|PHYVIEW|CAMP|CHAPTER|MECH|GAME|ISSUE|TERM|TIME)-[0-9]{6}$",
+      "pattern": "^(SEC|PASSAGE|MENTION|SRC|NAME|TAXCONCEPT|CLADE|LINEAGE|POP|SPECIMEN|SITE|REGION|OCC|TRAIT|TRAITOBS|GENE|ALLELE|EVENT|CLAIM|EVID|DATASET|ANALYSIS|RESULT|HYP|TAXVIEW|PHYVIEW|CAMP|CHAPTER|MECH|GAME|ISSUE|TERM|TIME|TECH|ECOSYS|METHOD|RESEARCHER|CONFLICT)-[0-9]{6}$",
       "description": "Prefijo de §16.3 más seis dígitos (DEC-052). Opaco: no deriva del nombre canónico."
     },
-    "section_id": { "type": "string", "pattern": "^SEC-[0-9]{6}$" },
-    "passage_id": { "type": "string", "pattern": "^PASSAGE-[0-9]{6}$" },
-    "source_id": { "type": "string", "pattern": "^SRC-[0-9]{6}$" },
-    "issue_id": { "type": "string", "pattern": "^ISSUE-[0-9]{6}$" },
+    "section_id": {
+      "type": "string",
+      "pattern": "^SEC-[0-9]{6}$"
+    },
+    "passage_id": {
+      "type": "string",
+      "pattern": "^PASSAGE-[0-9]{6}$"
+    },
+    "source_id": {
+      "type": "string",
+      "pattern": "^SRC-[0-9]{6}$"
+    },
+    "issue_id": {
+      "type": "string",
+      "pattern": "^ISSUE-[0-9]{6}$"
+    },
     "content_hash": {
       "type": "string",
       "pattern": "^sha256:[0-9a-f]{64}$"
@@ -22,10 +34,19 @@
       "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$",
       "description": "SemVer del contrato de datos (§16.5). No sube por ingestión."
     },
-    "dataset_revision": { "type": "string", "pattern": "^REV-[0-9]{6}$" },
+    "dataset_revision": {
+      "type": "string",
+      "pattern": "^REV-[0-9]{6}$"
+    },
     "record_status": {
       "type": "string",
-      "enum": ["active", "deprecated", "merged", "superseded", "archived"],
+      "enum": [
+        "active",
+        "deprecated",
+        "merged",
+        "superseded",
+        "archived"
+      ],
       "description": "§10.6. Ciclo de vida del REGISTRO, no de la idea."
     },
     "epistemic_dimensions": {
@@ -34,52 +55,147 @@
       "properties": {
         "acceptance": {
           "type": "string",
-          "enum": ["broad_consensus", "majority_acceptance", "mixed_acceptance", "minority_position", "not_assessed"]
+          "enum": [
+            "broad_consensus",
+            "majority_acceptance",
+            "mixed_acceptance",
+            "minority_position",
+            "not_assessed"
+          ]
         },
         "evidence_strength": {
           "type": "string",
-          "enum": ["high", "medium", "low", "unknown"]
+          "enum": [
+            "high",
+            "medium",
+            "low",
+            "unknown"
+          ]
         },
         "evidence_strength_reason": {
-          "type": ["string", "null"],
+          "type": [
+            "string",
+            "null"
+          ],
           "description": "§10.3 exige razón breve. Obligatoria si evidence_strength no es 'unknown'."
         },
         "resolution": {
           "type": "string",
-          "enum": ["resolved", "partially_resolved", "unresolved", "insufficient_information"]
+          "enum": [
+            "resolved",
+            "partially_resolved",
+            "unresolved",
+            "insufficient_information"
+          ]
         },
         "historical_status": {
           "type": "string",
-          "enum": ["current", "historical", "superseded", "rejected"],
+          "enum": [
+            "current",
+            "historical",
+            "superseded",
+            "rejected"
+          ],
           "description": "§10.5. Vigencia de la IDEA. No confundir con record_status."
         }
       },
-      "required": ["acceptance", "evidence_strength", "resolution", "historical_status"],
+      "required": [
+        "acceptance",
+        "evidence_strength",
+        "resolution",
+        "historical_status"
+      ],
       "additionalProperties": false
     },
     "provenance": {
       "type": "object",
       "description": "§4.5. La cadena completa: sección, mención, fuente, operación y revisión.",
       "properties": {
-        "section_ids": { "type": "array", "items": { "$ref": "#/$defs/section_id" } },
-        "passage_ids": { "type": "array", "items": { "$ref": "#/$defs/passage_id" } },
-        "source_ids": { "type": "array", "items": { "$ref": "#/$defs/source_id" } },
-        "operation_id": { "type": ["string", "null"] },
-        "dataset_revision": { "$ref": "#/$defs/dataset_revision" },
+        "section_ids": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/section_id"
+          }
+        },
+        "passage_ids": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/passage_id"
+          }
+        },
+        "source_ids": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/source_id"
+          }
+        },
+        "operation_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "dataset_revision": {
+          "$ref": "#/$defs/dataset_revision"
+        },
         "origin": {
           "type": "string",
-          "enum": ["ingestion", "audit", "editorial", "derived"],
+          "enum": [
+            "ingestion",
+            "audit",
+            "editorial",
+            "derived"
+          ],
           "description": "§18. 'audit' marca lo incorporado desde literatura externa, no desde la sección."
         }
       },
-      "required": ["section_ids", "origin"],
+      "required": [
+        "section_ids",
+        "origin"
+      ],
       "additionalProperties": false
     },
     "severity": {
       "type": "string",
-      "enum": ["ERROR", "WARNING", "INFO"],
+      "enum": [
+        "ERROR",
+        "WARNING",
+        "INFO"
+      ],
       "description": "§19.1."
     },
-    "notes": { "type": "array", "items": { "type": "string" } }
+    "notes": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "conflict_group_id": {
+      "type": "string",
+      "pattern": "^CONFLICT-[0-9]{6}$",
+      "description": "Grupo de afirmaciones o hipótesis mutuamente excluyentes (§15.2)."
+    },
+    "superseded_by": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/id"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Registro que reemplaza a éste. §19.2 exige «deprecaciones con reemplazo o razón»: sin este campo sólo se podía marcar, no enlazar."
+    },
+    "merged_into": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/id"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Registro con el que se fusionó éste. La fusión conserva la redirección (§19.2); no se borra el original."
+    }
   }
 }

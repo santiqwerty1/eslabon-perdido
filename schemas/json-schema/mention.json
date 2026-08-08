@@ -5,43 +5,146 @@
   "description": "Aparición textual exacta. Apéndice E.2. §8.1: toda mención relevante se registra, no toda se promueve a entidad.",
   "type": "object",
   "properties": {
-    "id": { "$ref": "common.json#/$defs/id" },
-    "section_id": { "$ref": "common.json#/$defs/section_id" },
-    "passage_id": { "$ref": "common.json#/$defs/passage_id" },
-    "original_text": { "type": "string", "minLength": 1 },
-    "normalized_form": { "type": ["string", "null"] },
+    "id": {
+      "$ref": "common.json#/$defs/id"
+    },
+    "section_id": {
+      "$ref": "common.json#/$defs/section_id"
+    },
+    "passage_id": {
+      "$ref": "common.json#/$defs/passage_id"
+    },
+    "original_text": {
+      "type": "string",
+      "minLength": 1
+    },
+    "normalized_form": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
     "mention_type": {
       "type": "string",
-      "enum": ["unresolved", "taxonomic_name", "clade", "fossil", "specimen", "site", "date", "range", "region", "event", "trait", "gene", "technology", "behaviour", "controversy", "hypothesis", "source", "author", "method", "historical_term", "common_name"]
+      "enum": [
+        "unresolved",
+        "taxonomic_name",
+        "clade",
+        "fossil",
+        "specimen",
+        "site",
+        "date",
+        "range",
+        "region",
+        "event",
+        "trait",
+        "gene",
+        "technology",
+        "behaviour",
+        "controversy",
+        "hypothesis",
+        "source",
+        "author",
+        "method",
+        "historical_term",
+        "common_name"
+      ]
     },
     "character_offsets": {
       "type": "object",
       "properties": {
-        "start": { "type": "integer", "minimum": 0 },
-        "end": { "type": "integer", "minimum": 0 }
+        "start": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "end": {
+          "type": "integer",
+          "minimum": 0
+        }
       },
-      "required": ["start", "end"],
+      "required": [
+        "start",
+        "end"
+      ],
       "additionalProperties": false
     },
     "resolution": {
       "type": "object",
       "properties": {
-        "status": { "type": "string", "enum": ["pending", "resolved", "unresolved"] },
-        "target_ids": { "type": "array", "items": { "$ref": "common.json#/$defs/id" } },
-        "reason": { "type": ["string", "null"] }
+        "status": {
+          "type": "string",
+          "enum": [
+            "pending",
+            "resolved",
+            "unresolved"
+          ]
+        },
+        "target_ids": {
+          "type": "array",
+          "items": {
+            "$ref": "common.json#/$defs/id"
+          }
+        },
+        "reason": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
       },
-      "required": ["status", "target_ids"],
+      "required": [
+        "status",
+        "target_ids"
+      ],
       "additionalProperties": false
     },
     "disposition": {
-      "type": ["string", "null"],
-      "enum": ["new_entity", "alias", "evidence", "contextual_attribute", "event_part", "pending_question", "repetition", "preserved_typo", "discarded_with_reason", null],
+      "type": [
+        "string",
+        "null"
+      ],
+      "enum": [
+        "new_entity",
+        "alias",
+        "evidence",
+        "contextual_attribute",
+        "event_part",
+        "pending_question",
+        "repetition",
+        "preserved_typo",
+        "discarded_with_reason",
+        null
+      ],
       "description": "§8.1. Destino de la mención. La auditoría de cobertura (§17 paso 10) exige que ninguna quede sin destino."
     },
-    "issue_ids": { "type": "array", "items": { "$ref": "common.json#/$defs/issue_id" } },
-    "notes": { "$ref": "common.json#/$defs/notes" },
-    "record_status": { "$ref": "common.json#/$defs/record_status" }
+    "issue_ids": {
+      "type": "array",
+      "items": {
+        "$ref": "common.json#/$defs/issue_id"
+      }
+    },
+    "notes": {
+      "$ref": "common.json#/$defs/notes"
+    },
+    "record_status": {
+      "$ref": "common.json#/$defs/record_status"
+    },
+    "superseded_by": {
+      "$ref": "common.json#/$defs/superseded_by"
+    },
+    "merged_into": {
+      "$ref": "common.json#/$defs/merged_into"
+    }
   },
-  "required": ["id", "section_id", "passage_id", "original_text", "mention_type", "character_offsets", "resolution", "record_status"],
+  "required": [
+    "id",
+    "section_id",
+    "passage_id",
+    "original_text",
+    "mention_type",
+    "character_offsets",
+    "resolution",
+    "record_status"
+  ],
   "additionalProperties": false
 }

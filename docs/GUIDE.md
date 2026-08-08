@@ -818,6 +818,18 @@ El sistema nunca debe confundir:
 - fuente;
 - publicación.
 
+## 7.1.1. Tres cosas que suelen mezclarse
+
+Antes de las distinciones concretas, la que las fundamenta a todas:
+
+1. **Nombre nomenclaturalmente disponible** — fue publicado cumpliendo las reglas del código aplicable.
+2. **Taxón aceptado** — una base taxonómica o una comunidad de especialistas decide utilizarlo.
+3. **Clado filogenéticamente respaldado** — un análisis lo recupera como monofilético.
+
+Son independientes. Un nombre puede existir sin taxón aceptado, un clado puede estar bien respaldado sin nombre formal, y un taxón aceptado puede no corresponder a ningún clado. Es la razón de que §7.2 y §7.5 existan por separado y de que el modelo sea claim-centric: sin esta distinción, el sistema no puede representar por qué un nombre no contiene una circunscripción.
+
+*Procedencia: `knowledge/corpus/inbox/Filogenia.md`, §1. Pendiente de reingestar por el protocolo de §17 (`ISSUE-000020`).*
+
 ## 7.2. Nombre taxonómico
 
 Representa una denominación nomenclatural, su grafía y autoría cuando esté disponible.
@@ -902,7 +914,9 @@ Esto permite conservar incertidumbre, preservación parcial y homología discuti
 
 La implementación inicial debe permitir estos tipos. No todos necesitan una interfaz completa en la primera fase.
 
-| Tipo | Responsabilidad | Fase mínima |
+La columna **Nivel** es un orden de construcción propio de este catálogo y **no son las fases de §24**. Se llamaba «fase mínima» y se confundía con ellas: `Section` es de nivel 1 pero se implementa en la Fase 2 de la hoja de ruta, y los tipos de identidad son de nivel 2 y llegan en la Fase 3. El desfase ronda una unidad pero no es constante (`ISSUE-000006`).
+
+| Tipo | Responsabilidad | Nivel |
 |---|---|---:|
 | `Section` | Unidad de investigación ingresada | 1 |
 | `Passage` | Fragmento localizable dentro de una sección o fuente | 1 |
@@ -977,7 +991,10 @@ Estructura conceptual:
   "provenance": {
     "section_ids": ["SEC-000001"],
     "passage_ids": ["PASSAGE-000991"],
-    "source_ids": ["SRC-000017"]
+    "source_ids": ["SRC-000017"],
+    "operation_id": null,
+    "dataset_revision": "REV-000001",
+    "origin": "ingestion"
   },
   "epistemic_dimensions": {
     "acceptance": "mixed_acceptance",
@@ -1499,9 +1516,12 @@ No se utilizará un único archivo gigantesco como fuente de verdad. Tampoco se 
 │   │   ├── results.jsonl
 │   │   ├── events.jsonl
 │   │   ├── hypotheses.jsonl
-│   │   └── issues.jsonl
+│   │   ├── issues.jsonl
+│   │   └── temporal-expressions.jsonl
 │   ├── classifications/
 │   ├── views/
+│   │   ├── classification-views.jsonl
+│   │   ├── phylogenetic-views.jsonl
 │   │   └── campaigns/
 │   ├── deltas/
 │   └── snapshots/
@@ -1588,6 +1608,13 @@ Prefijos consolidados:
 | `ISSUE-` | cuestión pendiente |
 | `TERM-` | término no resuelto |
 | `TIME-` | expresión temporal reutilizable |
+| `TECH-` | tecnología |
+| `ECOSYS-` | estado de ecosistema |
+| `METHOD-` | método |
+| `RESEARCHER-` | investigador |
+| `CONFLICT-` | grupo de conflicto entre hipótesis |
+
+Los cinco últimos se añadieron el 8 de agosto de 2026 al detectar que §6.2 y §15.2 introducen entidades y grupos de conflicto sin prefijo, de modo que no podían tener identificador válido (`ISSUE-000034`, `ISSUE-000036`).
 
 `EDGE-` se reserva para aristas materializadas en una exportación o vista. No será la identidad canónica de una afirmación científica.
 
@@ -1852,7 +1879,7 @@ El delta debe incluir solo cambios reales:
 
 ## Paso 14. Generar informe humano
 
-El informe no debe repetir todo el JSON. Debe contener:
+El informe no debe repetir todo el JSON. Su especificación completa está en el **Apéndice F.1**, que lo detalla en trece apartados; lo que sigue es su resumen y no debe implementarse en su lugar (`ISSUE-000008`). Debe contener:
 
 1. identificación de la sección;
 2. síntesis científica;
@@ -4084,8 +4111,28 @@ Una decisión de Eucaria puede especializar un módulo, pero no debe convertir s
 - integración condicionada;
 - extinción terminal;
 - múltiples trayectorias;
+- **distribución razonable de resultados**: no basta con que existan dos desenlaces distintos; hay que mirar la forma de la distribución, que es donde se detectaría una simulación teleológica (`ISSUE-000027`);
 - ausencia de teleología;
 - exportación correcta de eventos al grafo.
+
+### 27.7.1. Especificación de la prueba de ausencia de teleología
+
+`ISSUE-000011`. Es la contrapartida ejecutable del riesgo §29.15 y el único que ninguna regla textual puede evitar: la teleología puede colarse por la **dinámica** aunque el vocabulario la prohíba. Una prueba que no se define no se ejecuta, así que se define aquí.
+
+**Diseño.** Se ejecutan N partidas con condiciones iniciales equivalentes y semillas distintas, y se examina la **distribución** de los desenlaces, no su existencia.
+
+**Comprobaciones:**
+
+1. **Ningún desenlace domina por construcción.** La integración endosimbiótica no ocurre en una fracción cercana a 1 de las partidas. Si sale en el 97 % de los casos, no es contingente: es guionizado con ruido.
+2. **La extinción es un desenlace real y alcanzable**, con frecuencia no despreciable. §21.9 la admite como resultado científicamente significativo; si nunca ocurre, la simulación tiene un suelo que la protege.
+3. **Persistir sin integrarse es viable.** Debe existir una fracción de partidas que llegan al final con poblaciones estables y sin haber completado la integración.
+4. **Ninguna variable crece monótonamente con el tiempo por construcción.** Complejidad, tamaño y número de rasgos deben poder bajar. Una magnitud que sólo sube es una escalera con otro nombre.
+5. **La ventaja de un rasgo depende del ambiente.** El mismo rasgo debe resultar favorable en unas condiciones y costoso en otras. Si un rasgo es siempre bueno, es una mejora comprable disfrazada (§23.2).
+6. **Sensibilidad a la semilla, no al guion.** Dos semillas con el mismo ambiente deben poder producir desenlaces cualitativamente distintos.
+
+**Criterio de fallo.** Cualquier comprobación que no se cumpla es `ERROR` y bloquea el lanzamiento, no advertencia. Los umbrales concretos se fijan en la Fase 9 junto con `OPEN-012`, que decide el nivel de determinismo y aleatoriedad: no pueden fijarse antes porque dependen del modelo poblacional.
+
+**Lo que esta prueba NO comprueba.** Que el contenido sea científicamente correcto. Comprueba que la dinámica no impone un destino. Un sistema puede pasar las seis y seguir contando algo falso; para eso está la revisión humana de §27.12.
 
 ## 27.8. Pruebas de campaña
 
@@ -4465,20 +4512,20 @@ Eukaryota
         └── Opisthokonta
             └── Holozoa
                 └── Filozoa
-                    └── Choanozoa sensu stricto / Apoikozoa según uso
+                    └── Choanozoa sensu stricto / Apoikozoa ⚠ conflicto de circunscripción, no preferencia de autor
                         └── Metazoa = Animalia
-                            └── ParaHoxozoa
+                            └── ParaHoxozoa ⚠
                                 └── Planulozoa
                                     └── Bilateria
                                         └── Nephrozoa
-                                            └── Deuterostomia, monofilia discutida
+                                            └── Deuterostomia ⚠ monofilia discutida
                                                 └── Chordata
                                                     └── Olfactores
                                                         └── Vertebrata ≈ Craniata
                                                             └── Gnathostomata
                                                                 └── Euteleostomi ≈ Osteichthyes crown
                                                                     └── Sarcopterygii
-                                                                        └── Rhipidistia ≈ Dipnotetrapodomorpha según definición
+                                                                        └── Rhipidistia ≈ Dipnotetrapodomorpha ⚠ según definición
                                                                             └── Tetrapodomorpha
                                                                                 └── Eotetrapodiformes
                                                                                     └── Elpistostegalia
@@ -4491,7 +4538,7 @@ Eukaryota
                                                                                                                 └── Sphenacodontia
                                                                                                                     └── Sphenacodontoidea
                                                                                                                         └── Therapsida
-                                                                                                                            └── Eutherapsida, uso no universal
+                                                                                                                            └── Eutherapsida ⚠ uso no universal
                                                                                                                                 └── Neotherapsida
                                                                                                                                     └── Theriodontia
                                                                                                                                         └── Eutheriodontia
@@ -4503,18 +4550,18 @@ Eukaryota
                                                                                                                                                                 └── Mammaliamorpha
                                                                                                                                                                     └── Mammaliaformes
                                                                                                                                                                         └── Mammalia
-                                                                                                                                                                            └── Theriiformes, definición variable
-                                                                                                                                                                                └── Holotheria, definición variable
+                                                                                                                                                                            └── Theriiformes ⚠ definición variable
+                                                                                                                                                                                └── Holotheria ⚠ definición variable
                                                                                                                                                                                     └── Trechnotheria
                                                                                                                                                                                         └── Cladotheria
                                                                                                                                                                                             └── Zatheria
-                                                                                                                                                                                                └── Boreosphenida / Tribosphenida según definición
+                                                                                                                                                                                                └── Boreosphenida / Tribosphenida ⚠ según definición
                                                                                                                                                                                                     └── Theria
                                                                                                                                                                                                         └── Eutheria
                                                                                                                                                                                                             └── Placentalia
                                                                                                                                                                                                                 └── Boreoeutheria
                                                                                                                                                                                                                     └── Euarchontoglires
-                                                                                                                                                                                                                        └── Euarchonta, posición de Scandentia variable
+                                                                                                                                                                                                                        └── Euarchonta ⚠ posición de Scandentia variable
                                                                                                                                                                                                                             └── Primatomorpha
                                                                                                                                                                                                                                 └── Primates
                                                                                                                                                                                                                                     └── Haplorhini / Haplorrhini
@@ -4523,10 +4570,14 @@ Eukaryota
                                                                                                                                                                                                                                                 └── Hominoidea
                                                                                                                                                                                                                                                     └── Hominidae
                                                                                                                                                                                                                                                         └── Homininae
-                                                                                                                                                                                                                                                            └── Hominini, circunscripción dependiente de clasificación
+                                                                                                                                                                                                                                                            └── Hominini ⚠ circunscripción dependiente de clasificación
                                                                                                                                                                                                                                                                 └── Homo
                                                                                                                                                                                                                                                                     └── Homo sapiens
 ```
+
+La marca `⚠` señala posición, contenido o validez discutidos, y `≈` nombres cuya equivalencia depende de la definición adoptada. Se aplican **nodo a nodo**: una lista de marcas en A.1 sin aplicación concreta no informa de nada (`ISSUE-000018`).
+
+Este backbone es una cadena de nodos y **no una marcha**. Cada nivel tuvo ramas hermanas que persisten hoy, y ninguna divergencia estaba orientada hacia la siguiente. Presentarlo en columna es una comodidad de lectura, no una afirmación sobre la dirección del proceso (§4.2).
 
 ## A.3. Ramas hermanas relevantes del backbone
 
@@ -5054,7 +5105,7 @@ Grupos previstos:
 - †*Nakalipithecus*;
 - †*Samburupithecus*;
 - †*Chororapithecus*;
-- †*Masripithecus*, propuesta reciente que requiere auditoría formal.
+- †*Masripithecus*, propuesta reciente pendiente de auditoría formal; conservar la fecha de propuesta al ingerir.
 
 ### Europa
 
@@ -5570,7 +5621,10 @@ Los datos temporales, geográficos, filogenéticos o epistemológicos no se colo
   "provenance": {
     "section_ids": ["SEC-000001"],
     "passage_ids": ["PASSAGE-000001"],
-    "source_ids": ["SRC-000001"]
+    "source_ids": ["SRC-000001"],
+    "operation_id": null,
+    "dataset_revision": "REV-000001",
+    "origin": "ingestion"
   },
   "epistemic_dimensions": {
     "acceptance": "not_assessed",

@@ -24,19 +24,31 @@
       "description": "Los ocho tipos separados de §11.1. No son intercambiables: un rango observado no es una duración inferida."
     },
     "label": {
-      "type": ["string", "null"],
+      "type": [
+        "string",
+        "null"
+      ],
       "description": "Etiqueta legible opcional. No sustituye al intervalo."
     },
     "interval": {
-      "type": ["object", "null"],
+      "type": [
+        "object",
+        "null"
+      ],
       "description": "§11.2. Todo intervalo declara sus dos límites y su unidad. Un límite nulo significa extremo abierto, no cero.",
       "properties": {
         "oldest_bound": {
-          "type": ["number", "null"],
+          "type": [
+            "number",
+            "null"
+          ],
           "description": "Límite más antiguo en la unidad declarada. Null si el intervalo queda abierto por ese extremo."
         },
         "youngest_bound": {
-          "type": ["number", "null"],
+          "type": [
+            "number",
+            "null"
+          ],
           "description": "Límite más reciente en la unidad declarada. Null si el intervalo queda abierto por ese extremo."
         },
         "unit": {
@@ -53,23 +65,42 @@
         },
         "reference_point": {
           "type": "string",
-          "enum": ["before_present", "before_2000_ce", "calendar", "relative_to_event", "not_stated"],
+          "enum": [
+            "before_present",
+            "before_2000_ce",
+            "calendar",
+            "relative_to_event",
+            "not_stated"
+          ],
           "description": "Origen de la cuenta. 'not_stated' conserva la ambigüedad de la fuente en vez de inventar un origen."
         },
         "geological_interval": {
-          "type": ["string", "null"],
+          "type": [
+            "string",
+            "null"
+          ],
           "description": "Nombre cronoestratigráfico tal como aparece en la fuente, cuando unit es 'geological_interval' o cuando la fuente lo cita además del valor numérico."
         },
         "original_expression": {
-          "type": ["string", "null"],
+          "type": [
+            "string",
+            "null"
+          ],
           "description": "§11.4: las conversiones conservan el valor original y no redondean en silencio. Aquí se guarda la expresión tal cual la escribió la fuente."
         }
       },
-      "required": ["oldest_bound", "youngest_bound", "unit"],
+      "required": [
+        "oldest_bound",
+        "youngest_bound",
+        "unit"
+      ],
       "additionalProperties": false
     },
     "calendar_date": {
-      "type": ["string", "null"],
+      "type": [
+        "string",
+        "null"
+      ],
       "format": "date",
       "description": "Fecha de calendario, para 'publication_date' y para períodos de validez de una clasificación. Alternativa a interval, no sustituto de él en tiempo profundo."
     },
@@ -89,18 +120,43 @@
             "unknown"
           ]
         },
-        "plus_minus": { "type": ["number", "null"] },
-        "lower": { "type": ["number", "null"] },
-        "upper": { "type": ["number", "null"] },
+        "plus_minus": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "lower": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "upper": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
         "level": {
-          "type": ["number", "null"],
+          "type": [
+            "number",
+            "null"
+          ],
           "minimum": 0,
           "maximum": 1,
           "description": "Nivel del intervalo cuando kind es credible_interval o confidence_interval (por ejemplo 0.95)."
         },
-        "description": { "type": ["string", "null"] }
+        "description": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
       },
-      "required": ["kind"],
+      "required": [
+        "kind"
+      ],
       "additionalProperties": false
     },
     "calibration": {
@@ -120,20 +176,33 @@
           ]
         },
         "curve_or_timescale": {
-          "type": ["string", "null"],
+          "type": [
+            "string",
+            "null"
+          ],
           "description": "Curva de calibración o escala cronoestratigráfica citada por la fuente."
         },
-        "notes": { "$ref": "common.json#/$defs/notes" }
+        "notes": {
+          "$ref": "common.json#/$defs/notes"
+        }
       },
-      "required": ["system"],
+      "required": [
+        "system"
+      ],
       "additionalProperties": false
     },
     "method": {
-      "type": ["string", "null"],
+      "type": [
+        "string",
+        "null"
+      ],
       "description": "Método tal como lo describe la fuente. No se infiere cuando la fuente no lo dice."
     },
     "method_type": {
-      "type": ["string", "null"],
+      "type": [
+        "string",
+        "null"
+      ],
       "enum": [
         "radiometric",
         "radiocarbon",
@@ -152,21 +221,43 @@
     },
     "determination": {
       "type": "string",
-      "enum": ["observed", "inferred", "modelled", "reported_without_basis", "unknown"],
+      "enum": [
+        "observed",
+        "inferred",
+        "modelled",
+        "reported_without_basis",
+        "unknown"
+      ],
       "description": "§11.2–§11.3. Distingue lo datado directamente de lo estimado. §11.3 prohíbe presentar una inferencia como observación sin marcarla."
     },
     "source_ids": {
       "type": "array",
-      "items": { "$ref": "common.json#/$defs/source_id" },
+      "items": {
+        "$ref": "common.json#/$defs/source_id"
+      },
       "description": "§11.2, fuente de la datación. Vacío sólo si la sección la aportó sin referencia; en tal caso la fuente 'section_provided' correspondiente queda pendiente de verificación (§17 paso 7)."
     },
-    "provenance": { "$ref": "common.json#/$defs/provenance" },
+    "provenance": {
+      "$ref": "common.json#/$defs/provenance"
+    },
     "issue_ids": {
       "type": "array",
-      "items": { "$ref": "common.json#/$defs/issue_id" }
+      "items": {
+        "$ref": "common.json#/$defs/issue_id"
+      }
     },
-    "notes": { "$ref": "common.json#/$defs/notes" },
-    "record_status": { "$ref": "common.json#/$defs/record_status" }
+    "notes": {
+      "$ref": "common.json#/$defs/notes"
+    },
+    "record_status": {
+      "$ref": "common.json#/$defs/record_status"
+    },
+    "superseded_by": {
+      "$ref": "common.json#/$defs/superseded_by"
+    },
+    "merged_into": {
+      "$ref": "common.json#/$defs/merged_into"
+    }
   },
   "required": [
     "id",
@@ -181,12 +272,24 @@
   "additionalProperties": false,
   "anyOf": [
     {
-      "properties": { "interval": { "type": "object" } },
-      "required": ["interval"]
+      "properties": {
+        "interval": {
+          "type": "object"
+        }
+      },
+      "required": [
+        "interval"
+      ]
     },
     {
-      "properties": { "calendar_date": { "type": "string" } },
-      "required": ["calendar_date"]
+      "properties": {
+        "calendar_date": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "calendar_date"
+      ]
     }
   ],
   "allOf": [
@@ -204,22 +307,42 @@
             ]
           }
         },
-        "required": ["temporal_type"]
+        "required": [
+          "temporal_type"
+        ]
       },
       "then": {
-        "properties": { "interval": { "type": "object" } },
-        "required": ["interval"],
+        "properties": {
+          "interval": {
+            "type": "object"
+          }
+        },
+        "required": [
+          "interval"
+        ],
         "description": "Los tipos de tiempo profundo exigen intervalo con unidad; una fecha de calendario no los expresa."
       }
     },
     {
       "if": {
-        "properties": { "temporal_type": { "const": "publication_date" } },
-        "required": ["temporal_type"]
+        "properties": {
+          "temporal_type": {
+            "const": "publication_date"
+          }
+        },
+        "required": [
+          "temporal_type"
+        ]
       },
       "then": {
-        "properties": { "calendar_date": { "type": "string" } },
-        "required": ["calendar_date"]
+        "properties": {
+          "calendar_date": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "calendar_date"
+        ]
       }
     }
   ]

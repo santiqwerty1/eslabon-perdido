@@ -24,26 +24,39 @@
       "properties": {
         "included_entity_ids": {
           "type": "array",
-          "items": { "$ref": "common.json#/$defs/id" }
+          "items": {
+            "$ref": "common.json#/$defs/id"
+          }
         },
         "excluded_entity_ids": {
           "type": "array",
-          "items": { "$ref": "common.json#/$defs/id" },
+          "items": {
+            "$ref": "common.json#/$defs/id"
+          },
           "description": "Las exclusiones expresas son información, no ausencia de información (§9.2)."
         },
         "definition_text": {
-          "type": ["string", "null"],
+          "type": [
+            "string",
+            "null"
+          ],
           "description": "Definición literal de la fuente, cuando la da."
         }
       },
-      "required": ["included_entity_ids", "excluded_entity_ids"],
+      "required": [
+        "included_entity_ids",
+        "excluded_entity_ids"
+      ],
       "additionalProperties": false
     },
     "rank_assignment": {
       "type": "object",
       "properties": {
         "rank": {
-          "type": ["string", "null"],
+          "type": [
+            "string",
+            "null"
+          ],
           "enum": [
             "domain",
             "kingdom",
@@ -75,16 +88,25 @@
           "description": "Rango dentro de esta clasificación. El rango es una convención de la fuente, no una propiedad del grupo."
         },
         "parent_concept_id": {
-          "type": ["string", "null"],
+          "type": [
+            "string",
+            "null"
+          ],
           "pattern": "^TAXCONCEPT-[0-9]{6}$",
           "description": "Padre dentro de la misma clasificación. La jerarquía completa se materializa en una ClassificationView, no aquí."
         }
       },
-      "required": ["rank", "parent_concept_id"],
+      "required": [
+        "rank",
+        "parent_concept_id"
+      ],
       "additionalProperties": false
     },
     "taxonomic_status": {
-      "type": ["string", "null"],
+      "type": [
+        "string",
+        "null"
+      ],
       "enum": [
         "accepted",
         "synonym",
@@ -100,8 +122,18 @@
       "description": "Estado dentro de la clasificación de la fuente citada, no un veredicto del proyecto."
     },
     "phylogenetic_interpretation": {
-      "type": ["string", "null"],
-      "enum": ["monophyletic", "paraphyletic", "polyphyletic", "undetermined", "not_assessed", null],
+      "type": [
+        "string",
+        "null"
+      ],
+      "enum": [
+        "monophyletic",
+        "paraphyletic",
+        "polyphyletic",
+        "undetermined",
+        "not_assessed",
+        null
+      ],
       "description": "§7.4: no se infiere que un taxón formal sea monofilético. 'not_assessed' es la opción honesta por defecto."
     },
     "relation_to_other_concepts": {
@@ -110,41 +142,82 @@
       "items": {
         "type": "object",
         "properties": {
-          "other_concept_id": { "type": "string", "pattern": "^TAXCONCEPT-[0-9]{6}$" },
+          "other_concept_id": {
+            "type": "string",
+            "pattern": "^TAXCONCEPT-[0-9]{6}$"
+          },
           "relation": {
             "type": "string",
-            "enum": ["congruent", "included_in", "includes", "overlapping", "incompatible", "conceptual_homonym"]
+            "enum": [
+              "congruent",
+              "included_in",
+              "includes",
+              "overlapping",
+              "incompatible",
+              "conceptual_homonym"
+            ]
           },
           "claim_id": {
-            "type": ["string", "null"],
+            "type": [
+              "string",
+              "null"
+            ],
             "pattern": "^CLAIM-[0-9]{6}$"
           }
         },
-        "required": ["other_concept_id", "relation"],
+        "required": [
+          "other_concept_id",
+          "relation"
+        ],
         "additionalProperties": false
       }
     },
     "validity_period_id": {
-      "type": ["string", "null"],
+      "type": [
+        "string",
+        "null"
+      ],
       "pattern": "^TIME-[0-9]{6}$",
       "description": "Expresión temporal de tipo 'classification_validity_period' (§11.1), cuando corresponda."
     },
     "claim_ids": {
       "type": "array",
-      "items": { "type": "string", "pattern": "^CLAIM-[0-9]{6}$" }
+      "items": {
+        "type": "string",
+        "pattern": "^CLAIM-[0-9]{6}$"
+      }
     },
     "issue_ids": {
       "type": "array",
-      "items": { "$ref": "common.json#/$defs/issue_id" }
+      "items": {
+        "$ref": "common.json#/$defs/issue_id"
+      }
     },
     "first_introduced_in": {
       "oneOf": [
-        { "$ref": "common.json#/$defs/section_id" },
-        { "type": "null" }
+        {
+          "$ref": "common.json#/$defs/section_id"
+        },
+        {
+          "type": "null"
+        }
       ]
     },
-    "notes": { "$ref": "common.json#/$defs/notes" },
-    "record_status": { "$ref": "common.json#/$defs/record_status" }
+    "notes": {
+      "$ref": "common.json#/$defs/notes"
+    },
+    "record_status": {
+      "$ref": "common.json#/$defs/record_status"
+    },
+    "superseded_by": {
+      "$ref": "common.json#/$defs/superseded_by"
+    },
+    "merged_into": {
+      "$ref": "common.json#/$defs/merged_into"
+    },
+    "epistemic_dimensions": {
+      "$ref": "common.json#/$defs/epistemic_dimensions"
+    }
   },
   "required": [
     "id",

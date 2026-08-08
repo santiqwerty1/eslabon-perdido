@@ -16,15 +16,23 @@
     },
     "original_spellings": {
       "type": "array",
-      "items": { "type": "string" },
+      "items": {
+        "type": "string"
+      },
       "description": "Grafías atestiguadas, incluidas erratas conservadas (§8.1, 'preserved_typo'). No se corrigen en silencio."
     },
     "authorship": {
-      "type": ["string", "null"],
+      "type": [
+        "string",
+        "null"
+      ],
       "description": "Autoría y año tal como los da la fuente. Null cuando no consta: no se reconstruye de memoria."
     },
     "nomenclatural_status": {
-      "type": ["string", "null"],
+      "type": [
+        "string",
+        "null"
+      ],
       "enum": [
         "available",
         "unavailable",
@@ -43,7 +51,10 @@
       "description": "Estado según el código nomenclatural o la fuente. 'not_stated' cuando la sección no lo declara."
     },
     "rank_when_established": {
-      "type": ["string", "null"],
+      "type": [
+        "string",
+        "null"
+      ],
       "enum": [
         "domain",
         "kingdom",
@@ -76,22 +87,45 @@
     },
     "source_ids": {
       "type": "array",
-      "items": { "$ref": "common.json#/$defs/source_id" }
+      "items": {
+        "$ref": "common.json#/$defs/source_id"
+      }
     },
     "first_introduced_in": {
       "oneOf": [
-        { "$ref": "common.json#/$defs/section_id" },
-        { "type": "null" }
+        {
+          "$ref": "common.json#/$defs/section_id"
+        },
+        {
+          "type": "null"
+        }
       ],
       "description": "Sección que introdujo el registro en el dataset, o null si no procede de una ingestión."
     },
     "issue_ids": {
       "type": "array",
-      "items": { "$ref": "common.json#/$defs/issue_id" }
+      "items": {
+        "$ref": "common.json#/$defs/issue_id"
+      }
     },
-    "notes": { "$ref": "common.json#/$defs/notes" },
-    "record_status": { "$ref": "common.json#/$defs/record_status" }
+    "notes": {
+      "$ref": "common.json#/$defs/notes"
+    },
+    "record_status": {
+      "$ref": "common.json#/$defs/record_status"
+    },
+    "superseded_by": {
+      "$ref": "common.json#/$defs/superseded_by"
+    },
+    "merged_into": {
+      "$ref": "common.json#/$defs/merged_into"
+    }
   },
-  "required": ["id", "canonical_spelling", "source_ids", "record_status"],
+  "required": [
+    "id",
+    "canonical_spelling",
+    "source_ids",
+    "record_status"
+  ],
   "additionalProperties": false
 }

@@ -30,15 +30,37 @@
         "other"
       ]
     },
-    "description": { "type": ["string", "null"] },
+    "description": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
     "value": {
-      "type": ["number", "string", "null"],
+      "type": [
+        "number",
+        "string",
+        "null"
+      ],
       "description": "Valor puntual cuando lo hay. Se conserva la expresión de la fuente si no es numérica."
     },
-    "unit": { "type": ["string", "null"] },
-    "scale": { "type": ["string", "null"] },
+    "unit": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "scale": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
     "support": {
-      "type": ["object", "null"],
+      "type": [
+        "object",
+        "null"
+      ],
       "description": "Soporte estadístico asociado. Escalas distintas no se comparan como si fueran una sola (§10.7).",
       "properties": {
         "measure_type": {
@@ -54,55 +76,125 @@
             "other"
           ]
         },
-        "value": { "type": ["number", "string"] },
-        "scale": { "type": ["string", "null"] }
+        "value": {
+          "type": [
+            "number",
+            "string"
+          ]
+        },
+        "scale": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
       },
-      "required": ["measure_type", "value"],
+      "required": [
+        "measure_type",
+        "value"
+      ],
       "additionalProperties": false
     },
     "topology": {
-      "type": ["object", "null"],
+      "type": [
+        "object",
+        "null"
+      ],
       "description": "§15.3. El formato técnico definitivo queda ABIERTO hasta la fase de vistas; el registro admite los candidatos ya previstos.",
       "properties": {
         "format": {
           "type": "string",
-          "enum": ["newick", "extended_newick", "clade_list", "event_graph", "claim_set"]
+          "enum": [
+            "newick",
+            "extended_newick",
+            "clade_list",
+            "event_graph",
+            "claim_set"
+          ]
         },
-        "content": { "type": ["string", "null"] },
-        "content_path": { "type": ["string", "null"] },
+        "content": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "content_path": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
         "content_hash": {
-          "oneOf": [{ "$ref": "common.json#/$defs/content_hash" }, { "type": "null" }]
+          "oneOf": [
+            {
+              "$ref": "common.json#/$defs/content_hash"
+            },
+            {
+              "type": "null"
+            }
+          ]
         }
       },
-      "required": ["format"],
+      "required": [
+        "format"
+      ],
       "additionalProperties": false
     },
     "temporal_expression_ids": {
       "type": "array",
-      "items": { "type": "string", "pattern": "^TIME-[0-9]{6}$" },
+      "items": {
+        "type": "string",
+        "pattern": "^TIME-[0-9]{6}$"
+      },
       "description": "Estimaciones temporales producidas por el análisis, con su incertidumbre (§11.2)."
     },
     "applies_to_ids": {
       "type": "array",
-      "items": { "$ref": "common.json#/$defs/id" },
+      "items": {
+        "$ref": "common.json#/$defs/id"
+      },
       "description": "Nodos o relaciones a los que se refiere el resultado."
     },
     "source_ids": {
       "type": "array",
-      "items": { "$ref": "common.json#/$defs/source_id" }
+      "items": {
+        "$ref": "common.json#/$defs/source_id"
+      }
     },
     "limitations": {
       "type": "array",
-      "items": { "type": "string" }
+      "items": {
+        "type": "string"
+      }
     },
     "issue_ids": {
       "type": "array",
-      "items": { "$ref": "common.json#/$defs/issue_id" }
+      "items": {
+        "$ref": "common.json#/$defs/issue_id"
+      }
     },
-    "provenance": { "$ref": "common.json#/$defs/provenance" },
-    "notes": { "$ref": "common.json#/$defs/notes" },
-    "record_status": { "$ref": "common.json#/$defs/record_status" }
+    "provenance": {
+      "$ref": "common.json#/$defs/provenance"
+    },
+    "notes": {
+      "$ref": "common.json#/$defs/notes"
+    },
+    "record_status": {
+      "$ref": "common.json#/$defs/record_status"
+    },
+    "superseded_by": {
+      "$ref": "common.json#/$defs/superseded_by"
+    },
+    "merged_into": {
+      "$ref": "common.json#/$defs/merged_into"
+    }
   },
-  "required": ["id", "analysis_id", "result_type", "provenance", "record_status"],
+  "required": [
+    "id",
+    "analysis_id",
+    "result_type",
+    "provenance",
+    "record_status"
+  ],
   "additionalProperties": false
 }

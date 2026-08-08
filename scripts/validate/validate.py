@@ -27,7 +27,8 @@ MANIFEST = ROOT / "knowledge" / "corpus" / "manifests" / "dataset.json"
 ID_RE = re.compile(
     r"^(SEC|PASSAGE|MENTION|SRC|NAME|TAXCONCEPT|CLADE|LINEAGE|POP|SPECIMEN|SITE|"
     r"REGION|OCC|TRAIT|TRAITOBS|GENE|ALLELE|EVENT|CLAIM|EVID|DATASET|ANALYSIS|"
-    r"RESULT|HYP|TAXVIEW|PHYVIEW|CAMP|CHAPTER|MECH|GAME|ISSUE|TERM|TIME)-[0-9]{6}$"
+    r"RESULT|HYP|TAXVIEW|PHYVIEW|CAMP|CHAPTER|MECH|GAME|ISSUE|TERM|TIME|"
+    r"TECH|ECOSYS|METHOD|RESEARCHER|CONFLICT)-[0-9]{6}$"
 )
 
 # Fichero JSONL -> esquema. Cubre los veintiún ficheros de knowledge/records/
@@ -36,11 +37,9 @@ ID_RE = re.compile(
 # prefijo del identificador concuerde con él.
 #
 # Tres esquemas no aparecen aquí porque su registro no vive en records/:
-#   - temporal-expression.json  las expresiones TIME- se referencian desde
-#     claims, eventos y observaciones; §16.2 no les asigna fichero propio;
-#   - classification-view.json y phylogenetic-view.json  las vistas se
-#     construyen en knowledge/views/ (§16.2), no en el libro mayor;
 #   - game-projection.json  la capa 8 vive en game/projections/ (§6.8).
+# Las expresiones temporales y las vistas ya tienen fichero desde que se
+# resolvio ISSUE-000033.
 SCHEMA_BY_FILE = {
     "mentions.jsonl": "mention.json",
     "sources.jsonl": "source.json",
@@ -63,6 +62,9 @@ SCHEMA_BY_FILE = {
     "results.jsonl": "result.json",
     "events.jsonl": "event.json",
     "hypotheses.jsonl": "hypothesis.json",
+    "temporal-expressions.jsonl": "temporal-expression.json",
+    "classification-views.jsonl": "classification-view.json",
+    "phylogenetic-views.jsonl": "phylogenetic-view.json",
 }
 
 # Orden canónico de §19.2. Las familias se cargan desde families/.

@@ -9,7 +9,10 @@
       "type": "string",
       "pattern": "^TAXVIEW-[0-9]{6}$"
     },
-    "name": { "type": "string", "minLength": 1 },
+    "name": {
+      "type": "string",
+      "minLength": 1
+    },
     "cutoff_date": {
       "type": "string",
       "format": "date",
@@ -17,49 +20,76 @@
     },
     "according_to_source_ids": {
       "type": "array",
-      "items": { "$ref": "common.json#/$defs/source_id" },
+      "items": {
+        "$ref": "common.json#/$defs/source_id"
+      },
       "description": "Clasificaciones de referencia que la vista sigue. Una vista sin fuente es una opinión sin procedencia."
     },
     "taxon_concept_ids": {
       "type": "array",
-      "items": { "type": "string", "pattern": "^TAXCONCEPT-[0-9]{6}$" },
+      "items": {
+        "type": "string",
+        "pattern": "^TAXCONCEPT-[0-9]{6}$"
+      },
       "description": "Conceptos incluidos. La jerarquía se materializa recorriendo 'member_of' entre estos conceptos, no duplicando el árbol aquí."
     },
     "root_concept_id": {
-      "type": ["string", "null"],
+      "type": [
+        "string",
+        "null"
+      ],
       "pattern": "^TAXCONCEPT-[0-9]{6}$"
     },
     "selected_claim_ids": {
       "type": "array",
-      "items": { "type": "string", "pattern": "^CLAIM-[0-9]{6}$" }
+      "items": {
+        "type": "string",
+        "pattern": "^CLAIM-[0-9]{6}$"
+      }
     },
     "excluded_claim_ids": {
       "type": "array",
-      "items": { "type": "string", "pattern": "^CLAIM-[0-9]{6}$" },
+      "items": {
+        "type": "string",
+        "pattern": "^CLAIM-[0-9]{6}$"
+      },
       "description": "Lo excluido se declara. Una vista que sólo enumera lo que muestra oculta sus decisiones."
     },
     "editorial_criteria": {
       "type": "array",
-      "items": { "type": "string" },
+      "items": {
+        "type": "string"
+      },
       "minItems": 1,
       "description": "§15.4: la vista debe declarar sus criterios."
     },
     "simplifications": {
       "type": "array",
-      "items": { "type": "string" },
+      "items": {
+        "type": "string"
+      },
       "description": "Reducciones aplicadas para hacerla legible, con su coste."
     },
     "validity_period_id": {
-      "type": ["string", "null"],
+      "type": [
+        "string",
+        "null"
+      ],
       "pattern": "^TIME-[0-9]{6}$",
       "description": "Expresión temporal de tipo 'classification_validity_period' (§11.1), para clasificaciones históricas."
     },
     "rank_system": {
-      "type": ["string", "null"],
+      "type": [
+        "string",
+        "null"
+      ],
       "description": "Sistema de rangos empleado, cuando la vista usa rangos. Los rangos son convención, no propiedad de los grupos."
     },
     "scale": {
-      "type": ["string", "null"],
+      "type": [
+        "string",
+        "null"
+      ],
       "description": "Alcance de la vista, por ejemplo el módulo de campaña al que sirve."
     },
     "generated_artifacts": {
@@ -69,14 +99,34 @@
         "properties": {
           "artifact_type": {
             "type": "string",
-            "enum": ["graphviz_dot", "svg", "png", "newick", "json_export", "report"]
+            "enum": [
+              "graphviz_dot",
+              "svg",
+              "png",
+              "newick",
+              "json_export",
+              "report"
+            ]
           },
-          "path": { "type": "string", "minLength": 1 },
+          "path": {
+            "type": "string",
+            "minLength": 1
+          },
           "content_hash": {
-            "oneOf": [{ "$ref": "common.json#/$defs/content_hash" }, { "type": "null" }]
+            "oneOf": [
+              {
+                "$ref": "common.json#/$defs/content_hash"
+              },
+              {
+                "type": "null"
+              }
+            ]
           }
         },
-        "required": ["artifact_type", "path"],
+        "required": [
+          "artifact_type",
+          "path"
+        ],
         "additionalProperties": false
       }
     },
@@ -85,13 +135,27 @@
       "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$",
       "description": "§16.5, versión de la vista derivada. Independiente de schema_version y de dataset_revision."
     },
-    "built_from_dataset_revision": { "$ref": "common.json#/$defs/dataset_revision" },
+    "built_from_dataset_revision": {
+      "$ref": "common.json#/$defs/dataset_revision"
+    },
     "issue_ids": {
       "type": "array",
-      "items": { "$ref": "common.json#/$defs/issue_id" }
+      "items": {
+        "$ref": "common.json#/$defs/issue_id"
+      }
     },
-    "notes": { "$ref": "common.json#/$defs/notes" },
-    "record_status": { "$ref": "common.json#/$defs/record_status" }
+    "notes": {
+      "$ref": "common.json#/$defs/notes"
+    },
+    "record_status": {
+      "$ref": "common.json#/$defs/record_status"
+    },
+    "superseded_by": {
+      "$ref": "common.json#/$defs/superseded_by"
+    },
+    "merged_into": {
+      "$ref": "common.json#/$defs/merged_into"
+    }
   },
   "required": [
     "id",

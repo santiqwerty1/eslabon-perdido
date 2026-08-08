@@ -55,7 +55,10 @@
       "description": "Los cuatro grupos de §13.3: evolutivos y demográficos, reticulados, de caracteres, y ecológicos y culturales. Los dos últimos grupos pueden empezar como afirmaciones simples y promocionarse a evento cuando el material exija participantes, tiempo y lugar."
     },
     "label": {
-      "type": ["string", "null"],
+      "type": [
+        "string",
+        "null"
+      ],
       "description": "Etiqueta legible del episodio concreto."
     },
     "participants": {
@@ -65,7 +68,9 @@
       "items": {
         "type": "object",
         "properties": {
-          "entity_id": { "$ref": "common.json#/$defs/id" },
+          "entity_id": {
+            "$ref": "common.json#/$defs/id"
+          },
           "role": {
             "type": "string",
             "enum": [
@@ -101,34 +106,53 @@
             "description": "Papeles de §13.2 y E.8, ampliados con los que exigen los tipos de §13.3 y la endosimbiosis del Apéndice I paso 17. 'participant' es el papel neutro cuando la fuente no lo especifica; no se adivina."
           },
           "proportion": {
-            "type": ["number", "null"],
+            "type": [
+              "number",
+              "null"
+            ],
             "minimum": 0,
             "maximum": 1,
             "description": "§13.1, porcentajes o direcciones parciales. Null cuando la fuente no cuantifica."
           },
-          "notes": { "$ref": "common.json#/$defs/notes" }
+          "notes": {
+            "$ref": "common.json#/$defs/notes"
+          }
         },
-        "required": ["entity_id", "role"],
+        "required": [
+          "entity_id",
+          "role"
+        ],
         "additionalProperties": false
       }
     },
     "result_entity_ids": {
       "type": "array",
-      "items": { "$ref": "common.json#/$defs/id" },
+      "items": {
+        "$ref": "common.json#/$defs/id"
+      },
       "description": "Entidades resultantes, cuando el evento produce alguna (por ejemplo un linaje de origen híbrido)."
     },
     "temporal_expression_ids": {
       "type": "array",
-      "items": { "type": "string", "pattern": "^TIME-[0-9]{6}$" },
+      "items": {
+        "type": "string",
+        "pattern": "^TIME-[0-9]{6}$"
+      },
       "description": "Fechas de tipo 'event_date' (§11.1). En plural: dataciones alternativas conviven sin promediarse."
     },
     "region_ids": {
       "type": "array",
-      "items": { "type": "string", "pattern": "^REGION-[0-9]{6}$" }
+      "items": {
+        "type": "string",
+        "pattern": "^REGION-[0-9]{6}$"
+      }
     },
     "site_ids": {
       "type": "array",
-      "items": { "type": "string", "pattern": "^SITE-[0-9]{6}$" }
+      "items": {
+        "type": "string",
+        "pattern": "^SITE-[0-9]{6}$"
+      }
     },
     "episodes": {
       "type": "array",
@@ -136,48 +160,94 @@
       "items": {
         "type": "object",
         "properties": {
-          "label": { "type": "string", "minLength": 1 },
+          "label": {
+            "type": "string",
+            "minLength": 1
+          },
           "temporal_expression_ids": {
             "type": "array",
-            "items": { "type": "string", "pattern": "^TIME-[0-9]{6}$" }
+            "items": {
+              "type": "string",
+              "pattern": "^TIME-[0-9]{6}$"
+            }
           },
           "region_ids": {
             "type": "array",
-            "items": { "type": "string", "pattern": "^REGION-[0-9]{6}$" }
+            "items": {
+              "type": "string",
+              "pattern": "^REGION-[0-9]{6}$"
+            }
           },
-          "notes": { "$ref": "common.json#/$defs/notes" }
+          "notes": {
+            "$ref": "common.json#/$defs/notes"
+          }
         },
-        "required": ["label"],
+        "required": [
+          "label"
+        ],
         "additionalProperties": false
       }
     },
     "claim_ids": {
       "type": "array",
-      "items": { "type": "string", "pattern": "^CLAIM-[0-9]{6}$" }
+      "items": {
+        "type": "string",
+        "pattern": "^CLAIM-[0-9]{6}$"
+      }
     },
     "evidence_ids": {
       "type": "array",
-      "items": { "type": "string", "pattern": "^EVID-[0-9]{6}$" }
+      "items": {
+        "type": "string",
+        "pattern": "^EVID-[0-9]{6}$"
+      }
     },
     "counterevidence_ids": {
       "type": "array",
-      "items": { "type": "string", "pattern": "^EVID-[0-9]{6}$" }
+      "items": {
+        "type": "string",
+        "pattern": "^EVID-[0-9]{6}$"
+      }
     },
     "hypothesis_ids": {
       "type": "array",
-      "items": { "type": "string", "pattern": "^HYP-[0-9]{6}$" },
+      "items": {
+        "type": "string",
+        "pattern": "^HYP-[0-9]{6}$"
+      },
       "description": "Hipótesis dentro de las cuales el evento se sostiene. Un evento puede pertenecer a una hipótesis y no a su alternativa."
     },
     "issue_ids": {
       "type": "array",
-      "items": { "$ref": "common.json#/$defs/issue_id" }
+      "items": {
+        "$ref": "common.json#/$defs/issue_id"
+      }
     },
     "first_introduced_in": {
-      "oneOf": [{ "$ref": "common.json#/$defs/section_id" }, { "type": "null" }]
+      "oneOf": [
+        {
+          "$ref": "common.json#/$defs/section_id"
+        },
+        {
+          "type": "null"
+        }
+      ]
     },
-    "provenance": { "$ref": "common.json#/$defs/provenance" },
-    "notes": { "$ref": "common.json#/$defs/notes" },
-    "record_status": { "$ref": "common.json#/$defs/record_status" }
+    "provenance": {
+      "$ref": "common.json#/$defs/provenance"
+    },
+    "notes": {
+      "$ref": "common.json#/$defs/notes"
+    },
+    "record_status": {
+      "$ref": "common.json#/$defs/record_status"
+    },
+    "superseded_by": {
+      "$ref": "common.json#/$defs/superseded_by"
+    },
+    "merged_into": {
+      "$ref": "common.json#/$defs/merged_into"
+    }
   },
   "required": [
     "id",

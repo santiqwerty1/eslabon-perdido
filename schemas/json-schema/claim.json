@@ -11,7 +11,13 @@
     },
     "claim_type": {
       "type": "string",
-      "enum": ["relational", "temporal", "quantitative", "categorical", "structured"],
+      "enum": [
+        "relational",
+        "temporal",
+        "quantitative",
+        "categorical",
+        "structured"
+      ],
       "description": "Naturaleza del objeto según §9.1: otra entidad, una fecha o intervalo, un valor, una categoría o una expresión estructurada."
     },
     "subject_id": {
@@ -77,38 +83,84 @@
       "description": "§9.1. Exactamente una forma de objeto por afirmación.",
       "oneOf": [
         {
-          "properties": { "entity_id": { "$ref": "common.json#/$defs/id" } },
-          "required": ["entity_id"],
-          "additionalProperties": false
-        },
-        {
-          "properties": { "temporal_expression_id": { "type": "string", "pattern": "^TIME-[0-9]{6}$" } },
-          "required": ["temporal_expression_id"],
+          "properties": {
+            "entity_id": {
+              "$ref": "common.json#/$defs/id"
+            }
+          },
+          "required": [
+            "entity_id"
+          ],
           "additionalProperties": false
         },
         {
           "properties": {
-            "value": { "type": "number" },
-            "unit": { "type": ["string", "null"] },
-            "scale": { "type": ["string", "null"] }
+            "temporal_expression_id": {
+              "type": "string",
+              "pattern": "^TIME-[0-9]{6}$"
+            }
           },
-          "required": ["value"],
+          "required": [
+            "temporal_expression_id"
+          ],
           "additionalProperties": false
         },
         {
           "properties": {
-            "category": { "type": "string", "minLength": 1 },
-            "vocabulary": { "type": ["string", "null"] }
+            "value": {
+              "type": "number"
+            },
+            "unit": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "scale": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
           },
-          "required": ["category"],
+          "required": [
+            "value"
+          ],
           "additionalProperties": false
         },
         {
           "properties": {
-            "structured_expression": { "type": "object" },
-            "expression_format": { "type": ["string", "null"] }
+            "category": {
+              "type": "string",
+              "minLength": 1
+            },
+            "vocabulary": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
           },
-          "required": ["structured_expression"],
+          "required": [
+            "category"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "structured_expression": {
+              "type": "object"
+            },
+            "expression_format": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          "required": [
+            "structured_expression"
+          ],
           "additionalProperties": false
         }
       ]
@@ -119,61 +171,132 @@
       "properties": {
         "hypothesis_ids": {
           "type": "array",
-          "items": { "type": "string", "pattern": "^HYP-[0-9]{6}$" }
+          "items": {
+            "type": "string",
+            "pattern": "^HYP-[0-9]{6}$"
+          }
         },
         "classification_view_ids": {
           "type": "array",
-          "items": { "type": "string", "pattern": "^TAXVIEW-[0-9]{6}$" }
+          "items": {
+            "type": "string",
+            "pattern": "^TAXVIEW-[0-9]{6}$"
+          }
         },
         "temporal_expression_ids": {
           "type": "array",
-          "items": { "type": "string", "pattern": "^TIME-[0-9]{6}$" }
+          "items": {
+            "type": "string",
+            "pattern": "^TIME-[0-9]{6}$"
+          }
         },
         "region_ids": {
           "type": "array",
-          "items": { "type": "string", "pattern": "^REGION-[0-9]{6}$" }
+          "items": {
+            "type": "string",
+            "pattern": "^REGION-[0-9]{6}$"
+          }
         }
       },
-      "required": ["hypothesis_ids", "classification_view_ids", "temporal_expression_ids", "region_ids"],
+      "required": [
+        "hypothesis_ids",
+        "classification_view_ids",
+        "temporal_expression_ids",
+        "region_ids"
+      ],
       "additionalProperties": false
     },
-    "provenance": { "$ref": "common.json#/$defs/provenance" },
-    "epistemic_dimensions": { "$ref": "common.json#/$defs/epistemic_dimensions" },
+    "provenance": {
+      "$ref": "common.json#/$defs/provenance"
+    },
+    "epistemic_dimensions": {
+      "$ref": "common.json#/$defs/epistemic_dimensions"
+    },
     "quantitative_support": {
       "type": "array",
       "description": "§10.7. Las medidas conservan su escala y su método; no se convierten a una escala común ficticia.",
       "items": {
         "type": "object",
         "properties": {
-          "measure_type": { "type": "string", "minLength": 1 },
-          "value": { "type": ["number", "string"] },
-          "scale": { "type": ["string", "null"] },
-          "method": { "type": ["string", "null"] },
+          "measure_type": {
+            "type": "string",
+            "minLength": 1
+          },
+          "value": {
+            "type": [
+              "number",
+              "string"
+            ]
+          },
+          "scale": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "method": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
           "applies_to": {
-            "type": ["string", "null"],
+            "type": [
+              "string",
+              "null"
+            ],
             "description": "Nodo o relación a la que aplica la medida."
           },
           "source_id": {
-            "oneOf": [{ "$ref": "common.json#/$defs/source_id" }, { "type": "null" }]
+            "oneOf": [
+              {
+                "$ref": "common.json#/$defs/source_id"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
-          "locator": { "type": ["string", "null"] },
-          "analysis_conditions": { "type": ["string", "null"] }
+          "locator": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "analysis_conditions": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
         },
-        "required": ["measure_type", "value"],
+        "required": [
+          "measure_type",
+          "value"
+        ],
         "additionalProperties": false
       }
     },
     "evidence_ids": {
       "type": "array",
-      "items": { "type": "string", "pattern": "^EVID-[0-9]{6}$" }
+      "items": {
+        "type": "string",
+        "pattern": "^EVID-[0-9]{6}$"
+      }
     },
     "counterevidence_ids": {
       "type": "array",
-      "items": { "type": "string", "pattern": "^EVID-[0-9]{6}$" },
+      "items": {
+        "type": "string",
+        "pattern": "^EVID-[0-9]{6}$"
+      },
       "description": "La contraevidencia viaja con la afirmación, no en un apéndice aparte."
     },
     "derivation": {
-      "type": ["object", "null"],
+      "type": [
+        "object",
+        "null"
+      ],
       "description": "§9.4. Sólo para afirmaciones calculadas. Una derivada no se confunde con lo que una fuente afirma expresamente.",
       "properties": {
         "rule": {
@@ -183,23 +306,43 @@
         },
         "depends_on_ids": {
           "type": "array",
-          "items": { "$ref": "common.json#/$defs/id" },
+          "items": {
+            "$ref": "common.json#/$defs/id"
+          },
           "description": "Afirmaciones, eventos, ocurrencias o vistas de las que depende."
         },
         "derived_in_view_id": {
-          "type": ["string", "null"],
+          "type": [
+            "string",
+            "null"
+          ],
           "pattern": "^(TAXVIEW|PHYVIEW)-[0-9]{6}$"
         }
       },
-      "required": ["rule", "depends_on_ids"],
+      "required": [
+        "rule",
+        "depends_on_ids"
+      ],
       "additionalProperties": false
     },
     "issue_ids": {
       "type": "array",
-      "items": { "$ref": "common.json#/$defs/issue_id" }
+      "items": {
+        "$ref": "common.json#/$defs/issue_id"
+      }
     },
-    "notes": { "$ref": "common.json#/$defs/notes" },
-    "record_status": { "$ref": "common.json#/$defs/record_status" }
+    "notes": {
+      "$ref": "common.json#/$defs/notes"
+    },
+    "record_status": {
+      "$ref": "common.json#/$defs/record_status"
+    },
+    "superseded_by": {
+      "$ref": "common.json#/$defs/superseded_by"
+    },
+    "merged_into": {
+      "$ref": "common.json#/$defs/merged_into"
+    }
   },
   "required": [
     "id",
@@ -215,24 +358,109 @@
   "additionalProperties": false,
   "allOf": [
     {
-      "if": { "properties": { "claim_type": { "const": "relational" } }, "required": ["claim_type"] },
-      "then": { "properties": { "object": { "required": ["entity_id"] } } }
+      "if": {
+        "properties": {
+          "claim_type": {
+            "const": "relational"
+          }
+        },
+        "required": [
+          "claim_type"
+        ]
+      },
+      "then": {
+        "properties": {
+          "object": {
+            "required": [
+              "entity_id"
+            ]
+          }
+        }
+      }
     },
     {
-      "if": { "properties": { "claim_type": { "const": "temporal" } }, "required": ["claim_type"] },
-      "then": { "properties": { "object": { "required": ["temporal_expression_id"] } } }
+      "if": {
+        "properties": {
+          "claim_type": {
+            "const": "temporal"
+          }
+        },
+        "required": [
+          "claim_type"
+        ]
+      },
+      "then": {
+        "properties": {
+          "object": {
+            "required": [
+              "temporal_expression_id"
+            ]
+          }
+        }
+      }
     },
     {
-      "if": { "properties": { "claim_type": { "const": "quantitative" } }, "required": ["claim_type"] },
-      "then": { "properties": { "object": { "required": ["value"] } } }
+      "if": {
+        "properties": {
+          "claim_type": {
+            "const": "quantitative"
+          }
+        },
+        "required": [
+          "claim_type"
+        ]
+      },
+      "then": {
+        "properties": {
+          "object": {
+            "required": [
+              "value"
+            ]
+          }
+        }
+      }
     },
     {
-      "if": { "properties": { "claim_type": { "const": "categorical" } }, "required": ["claim_type"] },
-      "then": { "properties": { "object": { "required": ["category"] } } }
+      "if": {
+        "properties": {
+          "claim_type": {
+            "const": "categorical"
+          }
+        },
+        "required": [
+          "claim_type"
+        ]
+      },
+      "then": {
+        "properties": {
+          "object": {
+            "required": [
+              "category"
+            ]
+          }
+        }
+      }
     },
     {
-      "if": { "properties": { "claim_type": { "const": "structured" } }, "required": ["claim_type"] },
-      "then": { "properties": { "object": { "required": ["structured_expression"] } } }
+      "if": {
+        "properties": {
+          "claim_type": {
+            "const": "structured"
+          }
+        },
+        "required": [
+          "claim_type"
+        ]
+      },
+      "then": {
+        "properties": {
+          "object": {
+            "required": [
+              "structured_expression"
+            ]
+          }
+        }
+      }
     }
   ]
 }

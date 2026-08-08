@@ -40,71 +40,128 @@
       "description": "Qué muestra la evidencia, en los términos de la fuente."
     },
     "source_id": {
-      "oneOf": [{ "$ref": "common.json#/$defs/source_id" }, { "type": "null" }],
+      "oneOf": [
+        {
+          "$ref": "common.json#/$defs/source_id"
+        },
+        {
+          "type": "null"
+        }
+      ],
       "description": "Fuente que aporta la evidencia. Null sólo si aún no se ha resuelto; en ese caso corresponde una cuestión pendiente 'missing_source' (E.12)."
     },
     "locator": {
-      "type": ["string", "null"],
+      "type": [
+        "string",
+        "null"
+      ],
       "description": "§6.4: localizador dentro de la fuente (página, figura, tabla, material suplementario)."
     },
     "passage_ids": {
       "type": "array",
-      "items": { "$ref": "common.json#/$defs/passage_id" }
+      "items": {
+        "$ref": "common.json#/$defs/passage_id"
+      }
     },
     "specimen_ids": {
       "type": "array",
-      "items": { "type": "string", "pattern": "^SPECIMEN-[0-9]{6}$" },
+      "items": {
+        "type": "string",
+        "pattern": "^SPECIMEN-[0-9]{6}$"
+      },
       "description": "§6.4, muestra sobre la que se apoya."
     },
     "dataset_ids": {
       "type": "array",
-      "items": { "type": "string", "pattern": "^DATASET-[0-9]{6}$" }
+      "items": {
+        "type": "string",
+        "pattern": "^DATASET-[0-9]{6}$"
+      }
     },
     "analysis_ids": {
       "type": "array",
-      "items": { "type": "string", "pattern": "^ANALYSIS-[0-9]{6}$" }
+      "items": {
+        "type": "string",
+        "pattern": "^ANALYSIS-[0-9]{6}$"
+      }
     },
     "result_ids": {
       "type": "array",
-      "items": { "type": "string", "pattern": "^RESULT-[0-9]{6}$" },
+      "items": {
+        "type": "string",
+        "pattern": "^RESULT-[0-9]{6}$"
+      },
       "description": "Eslabón 'resultado' de la cadena de §6.4."
     },
     "supports_claim_ids": {
       "type": "array",
-      "items": { "type": "string", "pattern": "^CLAIM-[0-9]{6}$" }
+      "items": {
+        "type": "string",
+        "pattern": "^CLAIM-[0-9]{6}$"
+      }
     },
     "challenges_claim_ids": {
       "type": "array",
-      "items": { "type": "string", "pattern": "^CLAIM-[0-9]{6}$" }
+      "items": {
+        "type": "string",
+        "pattern": "^CLAIM-[0-9]{6}$"
+      }
     },
     "limitations": {
       "type": "array",
-      "items": { "type": "string" },
+      "items": {
+        "type": "string"
+      },
       "description": "§6.4. Lo que la evidencia no permite concluir. Se registra aunque la fuente sea entusiasta."
     },
     "quality_notes": {
       "type": "array",
-      "items": { "type": "string" }
+      "items": {
+        "type": "string"
+      }
     },
     "temporal_expression_ids": {
       "type": "array",
-      "items": { "type": "string", "pattern": "^TIME-[0-9]{6}$" }
+      "items": {
+        "type": "string",
+        "pattern": "^TIME-[0-9]{6}$"
+      }
     },
     "region_ids": {
       "type": "array",
-      "items": { "type": "string", "pattern": "^REGION-[0-9]{6}$" }
+      "items": {
+        "type": "string",
+        "pattern": "^REGION-[0-9]{6}$"
+      }
     },
     "site_ids": {
       "type": "array",
-      "items": { "type": "string", "pattern": "^SITE-[0-9]{6}$" }
+      "items": {
+        "type": "string",
+        "pattern": "^SITE-[0-9]{6}$"
+      }
     },
     "issue_ids": {
       "type": "array",
-      "items": { "$ref": "common.json#/$defs/issue_id" }
+      "items": {
+        "$ref": "common.json#/$defs/issue_id"
+      }
     },
-    "provenance": { "$ref": "common.json#/$defs/provenance" },
-    "notes": { "$ref": "common.json#/$defs/notes" },
-    "record_status": { "$ref": "common.json#/$defs/record_status" }
+    "provenance": {
+      "$ref": "common.json#/$defs/provenance"
+    },
+    "notes": {
+      "$ref": "common.json#/$defs/notes"
+    },
+    "record_status": {
+      "$ref": "common.json#/$defs/record_status"
+    },
+    "superseded_by": {
+      "$ref": "common.json#/$defs/superseded_by"
+    },
+    "merged_into": {
+      "$ref": "common.json#/$defs/merged_into"
+    }
   },
   "required": [
     "id",

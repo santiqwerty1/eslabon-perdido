@@ -64,38 +64,38 @@ Valores previstos para `issue_type`: `schema_inconsistency`, `documentation_ambi
 | `ISSUE-000003` | ERROR | `schema_inconsistency` | El `Event` cambia de nombre de campo y de cardinalidad — **resuelta** | — |
 | `ISSUE-000004` | WARNING | `schema_inconsistency` | E.6 anida las dimensiones epistémicas y E.9 las deja planas — **resuelta** | — |
 | `ISSUE-000005` | ERROR | `documentation_ambiguity` | Las tres listas de familias de validación no coinciden — **resuelta** | — |
-| `ISSUE-000006` | WARNING | `documentation_ambiguity` | Dos numeraciones distintas se llaman «fase» | Fase 0 |
+| `ISSUE-000006` | WARNING | `documentation_ambiguity` | Dos numeraciones distintas se llaman «fase» — **resuelta** | — |
 | `ISSUE-000007` | WARNING | `documentation_ambiguity` | `superseded` designa dos cosas diferentes | Fase 4 |
-| `ISSUE-000008` | INFO | `documentation_ambiguity` | El informe humano está especificado con 9 y con 13 apartados | Fase 6 |
+| `ISSUE-000008` | INFO | `documentation_ambiguity` | El informe humano está especificado con 9 y con 13 apartados — **resuelta** | — |
 | `ISSUE-000009` | ERROR | `schema_inconsistency` | No existe esquema mínimo para `Issue` — **resuelta** | — |
 | `ISSUE-000010` | WARNING | `content_gap` | No hay catálogo terminológico para el ámbito de la Campaña 1 | Fase 1 |
-| `ISSUE-000011` | WARNING | `unspecified_requirement` | La prueba de «ausencia de teleología» no está especificada | Fase 9 |
-| `ISSUE-000012` | INFO | `unspecified_requirement` | `evidence_strength` carece de rúbrica | Fase 4 |
+| `ISSUE-000011` | WARNING | `unspecified_requirement` | La prueba de «ausencia de teleología» no está especificada — **resuelta** | — |
+| `ISSUE-000012` | INFO | `unspecified_requirement` | `evidence_strength` carece de rúbrica — **resuelta** | — |
 | `ISSUE-000013` | WARNING | `pending_decision` | `OPEN-016` ya tiene respuesta de facto y sigue abierta | Fase 1 |
 | `ISSUE-000014` | WARNING | `pending_decision` | La ingestión debe partir de `Filogenia.md`, no del Apéndice A | Fase 2 |
 | `ISSUE-000015` | INFO | `documentation_ambiguity` | Nombre del fixture hominino — **resuelta**, se conserva por trazabilidad | — |
 | `ISSUE-000016` | ERROR | `content_gap` | Afirmación sin procedencia en C.16: flujo génico sapiens–denisovano | Fase 2 |
 | `ISSUE-000017` | ERROR | `content_gap` | La capa de procedencia entera se perdió en la destilación | Fase 2 |
-| `ISSUE-000018` | WARNING | `content_gap` | La convención de marcado `⚠` se perdió: 17 usos en la fuente, 0 en la guía | Fase 1 |
-| `ISSUE-000019` | WARNING | `unspecified_requirement` | `crown` / `stem` / `total group` se listan como marcas y nunca se definen | Fase 3 |
-| `ISSUE-000020` | WARNING | `content_gap` | Falta la distinción nombre disponible / taxón aceptado / clado respaldado | Fase 3 |
+| `ISSUE-000018` | WARNING | `content_gap` | La convención de marcado `⚠` se perdió: 17 usos en la fuente, 0 en la guía — **resuelta** | — |
+| `ISSUE-000019` | WARNING | `unspecified_requirement` | `crown` / `stem` / `total group` se listan como marcas y nunca se definen — **resuelta** | — |
+| `ISSUE-000020` | WARNING | `content_gap` | Falta la distinción nombre disponible / taxón aceptado / clado respaldado — **resuelta** | — |
 | `ISSUE-000021` | WARNING | `content_gap` | Contenido científico de la Campaña 1 ausente en los apéndices | Fase 1 |
-| `ISSUE-000022` | WARNING | `documentation_ambiguity` | Reformulaciones que cambian el sentido del original | Fase 1 |
+| `ISSUE-000022` | WARNING | `documentation_ambiguity` | Reformulaciones que cambian el sentido del original — **resuelta** | — |
 | `ISSUE-000023` | INFO | `unspecified_requirement` | Las 34 fuentes son de calidad muy desigual | Fase 4 |
 | `ISSUE-000024` | ERROR | `documentation_ambiguity` | `DEC-016` y `DEC-017` se reescribieron en el sitio sin marcarse `SUPERSEDIDO` — **resuelta** | — |
 | `ISSUE-000025` | ERROR | `unspecified_requirement` | La prueba de preservación §27.11 está codificada en duro — **resuelta** | — |
 | `ISSUE-000026` | WARNING | `content_gap` | La reproducción sexual y el origen de la meiosis desaparecen sin exclusión ni disparador | Fase 1 |
-| `ISSUE-000027` | WARNING | `unspecified_requirement` | §27.7 perdió la exigencia de evaluar la forma de la distribución de resultados | Fase 9 |
+| `ISSUE-000027` | WARNING | `unspecified_requirement` | §27.7 perdió la exigencia de evaluar la forma de la distribución de resultados — **resuelta** | — |
 | `ISSUE-000028` | WARNING | `documentation_ambiguity` | Debilitamientos normativos no documentados como simplificaciones | Fase 0 |
-| `ISSUE-000030` | ERROR | `schema_inconsistency` | `provenance.origin` es obligatorio en `common.json` y no existe en E.6 ni §9.1 | Fase 4 |
-| `ISSUE-000031` | ERROR | `schema_inconsistency` | Ningún esquema tiene campo para el reemplazo de un registro deprecado | Fase 4 |
-| `ISSUE-000032` | WARNING | `schema_inconsistency` | `taxon-concept.json` no admite `epistemic_dimensions` | Fase 3 |
-| `ISSUE-000033` | WARNING | `documentation_ambiguity` | §16.2 no asigna fichero JSONL ni a `TIME-` ni a las vistas | Fase 4 |
-| `ISSUE-000034` | WARNING | `documentation_ambiguity` | Cuatro `entity_type` sin prefijo consolidado en §16.3 | Fase 3 |
+| `ISSUE-000030` | ERROR | `schema_inconsistency` | `provenance.origin` es obligatorio en `common.json` y no existe en E.6 ni §9.1 — **resuelta** | — |
+| `ISSUE-000031` | ERROR | `schema_inconsistency` | Ningún esquema tiene campo para el reemplazo de un registro deprecado — **resuelta** | — |
+| `ISSUE-000032` | WARNING | `schema_inconsistency` | `taxon-concept.json` no admite `epistemic_dimensions` — **resuelta** | — |
+| `ISSUE-000033` | WARNING | `documentation_ambiguity` | §16.2 no asigna fichero JSONL ni a `TIME-` ni a las vistas — **resuelta** | — |
+| `ISSUE-000034` | WARNING | `documentation_ambiguity` | Cuatro `entity_type` sin prefijo consolidado en §16.3 — **resuelta** | — |
 | `ISSUE-000035` | WARNING | `schema_inconsistency` | `Occurrence` viaja por `entity.json`, que es delgada y no admite tiempo ni lugar | Fase 4 |
 | `ISSUE-000036` | WARNING | `documentation_ambiguity` | `conflict_group_ids` son cadenas libres, no identificadores opacos | Fase 5 |
 | `ISSUE-000037` | INFO | `content_gap` | El eje `acceptance` no tiene valor para «ya no la sostiene nadie» | Fase 4 |
-| `ISSUE-000038` | INFO | `schema_inconsistency` | `game-projection.json` no cubre «efectos» ni «condiciones de aparición» de §6.8 | Fase 8 |
+| `ISSUE-000038` | INFO | `schema_inconsistency` | `game-projection.json` no cubre «efectos» ni «condiciones de aparición» de §6.8 — **resuelta** | — |
 
 ---
 

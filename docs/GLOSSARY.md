@@ -80,3 +80,22 @@ Y cuando algo no puede ubicarse con seguridad:
 `incertae_sedis` · `ubicación no resuelta` · `afinidad incierta` · `posible miembro de` · `posible grupo hermano de` · `posible ancestro` · `posición dependiente de hipótesis`
 
 Ninguna de estas etiquetas recibe nombre científico inventado. La ausencia de ubicación es información válida.
+
+## Rúbrica de fuerza de evidencia
+
+`evidence_strength` es el eje más blando de §10: los otros cinco son enumeraciones sobre estados del mundo, y éste es un juicio. La razón escrita que exige §10.3 lo mitiga, pero sin criterio común dos personas —o la misma en dos momentos— divergen. Esta rúbrica no lo vuelve cuantitativo; lo vuelve reproducible.
+
+| Valor | Cuándo |
+|---|---|
+| `high` | Replicado por **métodos independientes** que podrían haber discrepado y no lo hicieron. En filogenómica: topología estable ante cambios de modelo, muestreo y recodificación. En registro fósil: varios especímenes, varias localidades, datación por más de un método. |
+| `medium` | Un solo tipo de evidencia, bien ejecutado, sin réplica independiente. O varias líneas que coinciden pero comparten un supuesto que podría fallar a la vez. |
+| `low` | Un único espécimen, una única secuencia, un único análisis; o evidencia indirecta cuya interpretación admite alternativas que la fuente no descarta. |
+| `unknown` | No se ha evaluado, o la fuente no da elementos para hacerlo. **No es sinónimo de débil.** |
+
+Tres reglas al aplicarla:
+
+- **La fuerza es de la afirmación, no del trabajo.** Un artículo en una revista prestigiosa puede sostener una afirmación central con evidencia alta y una secundaria con evidencia baja. Se etiqueta cada una por lo que la respalda.
+- **El prestigio no es evidencia.** Una revisión en una revista de primer nivel sigue siendo una revisión, y su fuerza es la de los trabajos que resume.
+- **La razón debe nombrar el mecanismo, no repetir la etiqueta.** «Replicado en tres filogenómicas con muestreos distintos» sirve; «evidencia sólida» no dice nada y no se puede auditar.
+
+Registrada como resolución de `ISSUE-000012`.

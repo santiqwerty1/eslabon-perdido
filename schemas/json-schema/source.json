@@ -5,24 +5,102 @@
   "description": "Publicación, documento o material de procedencia. §17 paso 7: no se inventan referencias ausentes.",
   "type": "object",
   "properties": {
-    "id": { "$ref": "common.json#/$defs/source_id" },
-    "citation_key": { "type": ["string", "null"] },
-    "authors": { "type": "array", "items": { "type": "string" } },
-    "year": { "type": ["integer", "null"] },
-    "title": { "type": "string", "minLength": 1 },
-    "container": { "type": ["string", "null"], "description": "Revista, repositorio o editorial." },
-    "doi": { "type": ["string", "null"] },
-    "url": { "type": ["string", "null"] },
+    "id": {
+      "$ref": "common.json#/$defs/source_id"
+    },
+    "citation_key": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "authors": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "year": {
+      "type": [
+        "integer",
+        "null"
+      ]
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1
+    },
+    "container": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Revista, repositorio o editorial."
+    },
+    "doi": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "url": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
     "source_type": {
       "type": "string",
-      "enum": ["primary_research", "review", "taxonomic_database", "preprint", "book_or_chapter", "thesis", "popular_or_blog", "section_provided", "other"],
+      "enum": [
+        "primary_research",
+        "review",
+        "taxonomic_database",
+        "preprint",
+        "book_or_chapter",
+        "thesis",
+        "popular_or_blog",
+        "section_provided",
+        "other"
+      ],
       "description": "'section_provided' marca una afirmación sin fuente externa, conservada como procedente de la sección y pendiente de verificación (§17 paso 7)."
     },
-    "quality_notes": { "type": "array", "items": { "type": "string" } },
-    "consulted_at": { "type": ["string", "null"], "format": "date" },
-    "verification_status": { "type": "string", "enum": ["verified", "pending_verification", "unresolvable"] },
-    "record_status": { "$ref": "common.json#/$defs/record_status" }
+    "quality_notes": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "consulted_at": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date"
+    },
+    "verification_status": {
+      "type": "string",
+      "enum": [
+        "verified",
+        "pending_verification",
+        "unresolvable"
+      ]
+    },
+    "record_status": {
+      "$ref": "common.json#/$defs/record_status"
+    },
+    "superseded_by": {
+      "$ref": "common.json#/$defs/superseded_by"
+    },
+    "merged_into": {
+      "$ref": "common.json#/$defs/merged_into"
+    }
   },
-  "required": ["id", "title", "source_type", "verification_status", "record_status"],
+  "required": [
+    "id",
+    "title",
+    "source_type",
+    "verification_status",
+    "record_status"
+  ],
   "additionalProperties": false
 }

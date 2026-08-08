@@ -5,21 +5,54 @@
   "description": "Fragmento localizable dentro de una sección. §17 paso 2: toda mención y afirmación debe poder volver al pasaje exacto.",
   "type": "object",
   "properties": {
-    "id": { "$ref": "common.json#/$defs/passage_id" },
-    "section_id": { "$ref": "common.json#/$defs/section_id" },
-    "ordinal": { "type": "integer", "minimum": 0 },
-    "text": { "type": "string" },
+    "id": {
+      "$ref": "common.json#/$defs/passage_id"
+    },
+    "section_id": {
+      "$ref": "common.json#/$defs/section_id"
+    },
+    "ordinal": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "text": {
+      "type": "string"
+    },
     "character_offsets": {
       "type": "object",
       "properties": {
-        "start": { "type": "integer", "minimum": 0 },
-        "end": { "type": "integer", "minimum": 0 }
+        "start": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "end": {
+          "type": "integer",
+          "minimum": 0
+        }
       },
-      "required": ["start", "end"],
+      "required": [
+        "start",
+        "end"
+      ],
       "additionalProperties": false
     },
-    "record_status": { "$ref": "common.json#/$defs/record_status" }
+    "record_status": {
+      "$ref": "common.json#/$defs/record_status"
+    },
+    "superseded_by": {
+      "$ref": "common.json#/$defs/superseded_by"
+    },
+    "merged_into": {
+      "$ref": "common.json#/$defs/merged_into"
+    }
   },
-  "required": ["id", "section_id", "ordinal", "text", "character_offsets", "record_status"],
+  "required": [
+    "id",
+    "section_id",
+    "ordinal",
+    "text",
+    "character_offsets",
+    "record_status"
+  ],
   "additionalProperties": false
 }
