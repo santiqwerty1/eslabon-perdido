@@ -1,0 +1,22 @@
+{
+  "id": "CAMP-000001",
+  "module_id": "c01-eukarya",
+  "working_title": "Eucaria: una célula dentro de otra",
+  "status": "planning",
+  "order": 1,
+  "corridor": {
+    "from": "Eukaryota",
+    "to": "Holozoa",
+    "nodes": ["Eukaryota", "Amorphea", "Obazoa", "Opisthokonta", "Holozoa"],
+    "prologue": "eucariogénesis"
+  },
+  "simulation_scale": "cellular-populations",
+  "playable_role": "population",
+  "continuity_policy": "atlas-and-narrative",
+  "next_campaign": "Animales: construir un cuerpo",
+  "scientific_scope_ref": "scientific-scope.json",
+  "dossier_ref": "../../../docs/campaigns/C01-EUKARYA.md",
+  "schema_version": "1.0.0",
+  "dataset_revision": "REV-000000",
+  "record_status": "active"
+}

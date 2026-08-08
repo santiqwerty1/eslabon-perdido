@@ -1,0 +1,3637 @@
+diff --git a/mnt/data/Guia_Maestra_Red_Evolutiva_v1.0.0_ARCHIVO.md b/mnt/data/Guia_Maestra_Red_Evolutiva_v1.1.0.md
+index eec568f..5d7f8ad 100644
+--- a/mnt/data/Guia_Maestra_Red_Evolutiva_v1.0.0_ARCHIVO.md
++++ b/mnt/data/Guia_Maestra_Red_Evolutiva_v1.1.0.md
+@@ -1,10 +1,36 @@
+ # Guía maestra de desarrollo
+-## Red evolutiva humana, base de conocimiento científico y juego
++## Red evolutiva desde Eukaryota hasta la historia humana, base de conocimiento científico y juego
+ 
+-**Estado:** documento rector inicial  
+-**Fecha de consolidación:** 5 de agosto de 2026  
+-**Versión de la guía:** 1.0.0  
+-**Alcance:** arquitectura científica, modelo de datos, flujo de investigación, visualización, validación, hoja de ruta y diseño preliminar del juego.
++**Estado:** documento rector activo  
++**Fecha de consolidación original:** 5 de agosto de 2026  
++**Fecha de revisión estratégica:** 5 de agosto de 2026  
++**Versión de la guía:** 1.1.0  
++**Alcance:** arquitectura científica, modelo de datos, flujo de investigación, visualización, validación, desarrollo cronológico por campañas y diseño progresivo del juego.  
++**Primera campaña decidida:** Eukaryota → Holozoa.  
++**Campaña culminante prevista:** Hominini → *Homo sapiens*, conservando el diseño paleoantropológico ya desarrollado.
++**SHA-256 de la guía archivada `1.0.0`:** `6f17b038e9b15fef6f3040b458bcda638ad32b6b4bc82187abd7216c19d7aa88`
++
++## Historial de revisiones
++
++| Versión | Estado | Cambio principal |
++|---|---|---|
++| `1.0.0` | ARCHIVADA | Arquitectura claim-centric completa, inventario científico y hoja de ruta inicial orientada a un piloto hominino de 400.000–40.000 años. |
++| `1.1.0` | ACTIVA | Invierte el orden de producción: el juego se desarrolla y publica cronológicamente por campañas, comenzando en Eukaryota. Reubica, sin eliminar, el trabajo de homininos como especificación de destino, prueba de estrés y campaña culminante. |
++
++## Regla de conservación de trabajo previo
++
++Esta revisión es una **migración no destructiva**. La versión `1.0.0` se conserva íntegra como archivo histórico y ninguna decisión científica, modelo de datos, inventario taxonómico, escenario hominino o sistema futuro se elimina por cambiar el orden de desarrollo.
++
++Cada elemento previo debe quedar en uno de estos estados:
++
++- vigente e implementable en la campaña actual;
++- vigente como capacidad compartida del núcleo;
++- reubicado en una campaña posterior;
++- retenido como prueba de arquitectura;
++- pospuesto con un disparador explícito;
++- supersedido únicamente como prioridad u orden de ejecución, nunca borrado silenciosamente.
++
++La matriz completa de preservación se encuentra en el Apéndice J.
+ 
+ ---
+ 
+@@ -53,27 +79,64 @@
+ - [G. Inicialización](#apéndice-g-inicialización-del-proyecto)
+ - [H. Checklist completo](#apéndice-h-checklist-operativo-completo)
+ - [I. Próximo orden de trabajo](#apéndice-i-próximo-orden-de-trabajo-recomendado)
++- [J. Preservación y migración](#apéndice-j-matriz-de-preservación-y-migración-del-plan-anterior)
+ 
+ ---
+ 
+ # 0. Propósito de esta guía
+ 
+-Esta guía consolida todo lo discutido hasta ahora sobre el proyecto y organiza las decisiones en un orden que pueda implementarse. No es un prompt operativo ni una especificación cerrada de producto. Es el documento rector que explica:
++Esta guía consolida todo lo discutido hasta ahora sobre el proyecto y organiza las decisiones en un orden implementable. No es un prompt operativo ni una especificación cerrada de producto. Es el documento rector que explica:
+ 
+ 1. qué se está construyendo;
+-2. qué problemas debe resolver;
++2. qué problemas científicos y técnicos debe resolver;
+ 3. qué decisiones ya se adoptaron;
+ 4. qué propuestas se conservan como dirección de diseño;
+ 5. qué alternativas se rechazaron;
+-6. qué trabajo se pospuso;
++6. qué trabajo se pospuso y bajo qué condición debe retomarse;
+ 7. qué decisiones siguen abiertas;
+ 8. en qué orden debe desarrollarse el sistema;
+ 9. cómo comprobar que cada etapa está terminada;
+-10. cómo conectar la base científica con el juego sin deformar ninguna de las dos.
++10. cómo conectar la base científica con el juego sin deformar ninguna de las dos;
++11. cómo publicar el juego campaña por campaña sin perder la capacidad de representar los casos más complejos del final;
++12. cómo conservar el trabajo anterior cuando cambie una prioridad estratégica.
+ 
+-La guía debe mantenerse versionada. Cualquier cambio importante en identidad de entidades, semántica de campos, tratamiento de hipótesis, persistencia, visualización o mecánicas debe registrarse mediante una decisión arquitectónica explícita y no mediante una modificación silenciosa.
++La guía debe mantenerse versionada. Cualquier cambio importante en identidad de entidades, semántica de campos, tratamiento de hipótesis, persistencia, visualización, orden de campañas o mecánicas debe registrarse mediante una decisión arquitectónica explícita y no mediante una modificación silenciosa.
+ 
+----
++## 0.1. Principio de migración no destructiva
++
++El cambio de una hoja de ruta no autoriza a reescribir retrospectivamente el proyecto como si nunca hubiera existido una estrategia anterior. Por tanto:
++
++- la guía `1.0.0` se conserva íntegra;
++- las decisiones históricas permanecen en el registro;
++- las decisiones reemplazadas se marcan como `SUPERSEDIDO` y señalan su reemplazo;
++- el trabajo hominino se mantiene como contenido científico, especificación funcional y conjunto de fixtures futuros;
++- los sistemas que ya no pertenecen al primer lanzamiento pasan a una fase posterior con criterios claros de activación;
++- ningún inventario o apéndice científico se elimina por no pertenecer a la primera campaña;
++- toda simplificación del primer lanzamiento debe documentar qué capacidad futura protege o posterga.
++
++## 0.2. Nuevo principio de producción
++
++El juego se desarrollará siguiendo el corredor evolutivo en orden cronológico general:
++
++```text
++Eukaryota
++→ animales
++→ cordados y tetrápodos
++→ sinápsidos
++→ mamíferos
++→ primates
++→ homininos
++```
++
++Cada campaña debe ser simultáneamente:
++
++- una experiencia jugable completa;
++- una ampliación científica del Atlas;
++- una prueba de una nueva escala evolutiva;
++- una extensión controlada del núcleo técnico compartido;
++- un paso hacia la campaña final de homininos.
++
++La secuencia cronológica no implica progreso teleológico. Es un orden de exposición y producción centrado en el corredor que conduce a la humanidad, no una jerarquía de organismos superiores e inferiores.
+ 
+ # 1. Cómo interpretar el estado de una decisión
+ 
+@@ -81,15 +144,22 @@ Cada decisión de esta guía utiliza uno de estos estados:
+ 
+ | Estado | Significado |
+ |---|---|
+-| **DECIDIDO** | Forma parte de la arquitectura actual y debe implementarse salvo que una decisión posterior la reemplace. |
+-| **RETENIDO** | Es una propuesta de diseño valiosa que se conserva, pero debe validarse mediante prototipo antes de tratarla como definitiva. |
+-| **POSPUESTO** | Está contemplado por la arquitectura, pero no debe implementarse todavía. Incluye el criterio que habilitará retomarlo. |
++| **DECIDIDO** | Forma parte de la arquitectura o estrategia actual y debe implementarse salvo que una decisión posterior la reemplace. |
++| **RETENIDO** | Es una propuesta valiosa que se conserva, pero debe validarse mediante prototipo antes de tratarla como definitiva. |
++| **POSPUESTO** | Está contemplado por la arquitectura, pero no debe implementarse todavía. Debe incluir el criterio que habilitará retomarlo. |
+ | **RECHAZADO** | No debe utilizarse porque contradice los objetivos científicos, técnicos o de diseño. |
+-| **ABIERTO** | Hace falta decidirlo en una fase posterior, cuando existan datos suficientes. |
++| **ABIERTO** | Hace falta decidirlo en una fase posterior, cuando existan datos y requisitos suficientes. |
++| **SUPERSEDIDO** | Fue una decisión válida en una versión anterior, pero una decisión posterior reemplazó su prioridad, alcance u orden. Se conserva por trazabilidad y debe enlazar su reemplazo. |
+ 
+-Una idea puede ser científicamente válida y, aun así, estar pospuesta por costo o falta de dependencias. Posponer no equivale a descartar. Ese matiz evita que el backlog se convierta en un cementerio donde todas las ideas figuran como “quizá algún día”, la forma corporativa de la vida después de la muerte.
++Una idea puede ser científicamente válida y, aun así, estar pospuesta por costo o falta de dependencias. Posponer no equivale a descartar. Del mismo modo, superseder el antiguo orden de lanzamiento no invalida el trabajo realizado para homininos: cambia su momento de implementación.
+ 
+----
++## 1.1. Reglas para cambiar estados
++
++- `DECIDIDO → SUPERSEDIDO` exige una nueva decisión identificada.
++- `POSPUESTO → DECIDIDO` exige que se cumpla su disparador.
++- `RETENIDO → DECIDIDO` exige evidencia de prototipo o una decisión explícita.
++- `RECHAZADO` solo puede reabrirse mediante un ADR que explique qué premisa cambió.
++- Nunca se elimina una fila histórica para hacer que el registro parezca más ordenado.
+ 
+ # 2. Resumen ejecutivo de las decisiones actuales
+ 
+@@ -152,17 +222,19 @@ PROYECCIONES PARA EL JUEGO
+ 
+ Los árboles, redes y clasificaciones serán vistas derivadas de conjuntos de afirmaciones compatibles y fechadas.
+ 
+-## 2.4. La población será la unidad principal del juego
++## 2.4. La población será la unidad principal de simulación
+ 
+-**DECIDIDO para la dirección de diseño:** el jugador no controlará especies como unidades rígidas ni comprará mutaciones en un árbol de habilidades. Controlará, observará o reconstruirá **poblaciones**.
++**DECIDIDO como dirección transversal:** el jugador no controlará especies como unidades rígidas ni comprará mutaciones en un árbol de habilidades. Controlará, observará o reconstruirá **poblaciones biológicas contextualizadas en una escala concreta**.
+ 
+-Las especies, taxones y clados serán:
++En la primera campaña serán poblaciones de organismos unicelulares o protoeucariotas. En campañas posteriores podrán ser poblaciones animales, mamalianas, primates o humanas. La implementación concreta cambia por escala, pero se conserva la idea común:
+ 
+-- entidades científicas;
+-- agrupaciones interpretativas;
+-- resultados emergentes de procesos poblacionales;
+-- unidades de navegación o presentación;
+-- nunca niveles de poder.
++- las poblaciones se reproducen, varían, interactúan y cambian de frecuencia;
++- los linajes registran continuidad histórica;
++- las especies y taxones son conceptos científicos o agrupaciones emergentes;
++- los clados organizan ascendencia, no poder;
++- los individuos solo se modelan cuando la campaña los necesita.
++
++La palabra `Population` no obliga a usar el mismo modelo demográfico desde células hasta homininos. Define una interfaz conceptual común, no un simulador universal idéntico.
+ 
+ ## 2.5. Tres niveles de realidad
+ 
+@@ -170,48 +242,128 @@ Las especies, taxones y clados serán:
+ 
+ ```text
+ HISTORIA BIOLÓGICA OCURRIDA
+-        ↓ deja restos parciales
+-REGISTRO FÓSIL, ARQUEOLÓGICO Y GENÉTICO
++        ↓ deja señales o restos parciales
++REGISTRO OBSERVABLE
+         ↓ es interpretado
+ HIPÓTESIS DEL JUGADOR O DE LA COMUNIDAD CIENTÍFICA
+ ```
+ 
+-Esta separación permite que una misma infraestructura alimente una simulación evolutiva, un modo de reconstrucción científica y un atlas educativo.
++El tipo de registro cambia según la campaña:
+ 
+-## 2.6. Estrategia de implementación
++- señales genómicas, comparativas y celulares en historia profunda;
++- anatomía, fósiles y estratigrafía en campañas animales;
++- genética de poblaciones, arqueología y cultura en homininos.
+ 
+-**DECIDIDO:** se desarrollará primero el núcleo científico y sus herramientas de validación. Después se construirán, en este orden recomendado:
++La arquitectura se conserva aunque cambien los medios de observación.
+ 
+-1. un explorador o Atlas;
+-2. un prototipo de Reconstrucción;
+-3. el núcleo de simulación poblacional;
+-4. el modo Evolución completo;
+-5. campañas de escala profunda.
++## 2.6. Estrategia de implementación por campañas
+ 
+-El orden reduce el riesgo de desarrollar una simulación gigantesca sobre datos sin identidad estable. La humanidad ya ha producido suficientes sistemas complejos cuya base es “por ahora funciona”.
++**DECIDIDO:** el proyecto se desarrollará y publicará siguiendo el corredor evolutivo en campañas cronológicas. La plataforma crecerá junto con el contenido, en vez de intentar implementar primero el caso paleoantropológico más complejo.
+ 
+-## 2.7. Primer recorte vertical
++Orden general:
+ 
+-**RETENIDO y recomendado:** utilizar como piloto el período aproximado entre **400.000 y 40.000 años**, centrado en:
++1. preservar y versionar el núcleo científico mínimo;
++2. definir el alcance exacto de la Campaña 1;
++3. construir el dataset científico acotado de Eukaryota → Holozoa;
++4. crear el Atlas y la red temporal necesarios para esa campaña;
++5. implementar su módulo de simulación celular y poblacional;
++6. integrar una lente científica ligera para comparar evidencia e hipótesis;
++7. producir y lanzar una campaña completa;
++8. revisar el núcleo después del lanzamiento;
++9. extenderlo únicamente con las capacidades exigidas por la siguiente campaña;
++10. llegar a homininos con sistemas probados, sin perder los requisitos complejos ya documentados.
+ 
+-- *Homo sapiens*;
+-- neandertales;
+-- denisovanos;
+-- poblaciones arcaicas no identificadas;
+-- *Homo floresiensis*;
+-- *Homo luzonensis*;
+-- fósiles asiáticos de asignación discutida;
+-- migración, aislamiento, introgresión, extinción, absorción y evidencia incompleta.
++El Atlas sigue siendo la primera superficie compartida que debe funcionar, pero no necesita lanzarse como producto aislado antes de toda jugabilidad. Formará parte del primer lanzamiento.
+ 
+-Este recorte contiene casi todos los problemas difíciles del proyecto sin exigir simular cuatro mil millones de años en la primera versión.
++El modo Reconstrucción completo se conserva, pero deja de ser el primer prototipo jugable obligatorio. La primera campaña tendrá una **lente científica** más pequeña: consulta de evidencia, comparación de hipótesis y cambio de vistas.
+ 
+----
++## 2.7. Primer recorte vertical y primer lanzamiento
++
++**DECIDIDO:** el primer recorte vertical será la campaña provisionalmente titulada **Eucaria: una célula dentro de otra**, con este corredor:
++
++```text
++prólogo de eucariogénesis
++→ Eukaryota
++→ Amorphea
++→ Obazoa
++→ Opisthokonta
++→ Holozoa
++```
++
++Debe cubrir, con el nivel mínimo suficiente:
++
++- poblaciones ancestrales reconstruidas sin nombres inventados;
++- origen e integración mitocondrial como evento reticulado;
++- cooperación y conflicto intracelular;
++- transferencia genética abstracta cuando sea necesaria;
++- diversificación eucariota temprana;
++- ramas hermanas indispensables para comprender cada divergencia;
++- al menos una controversia o hipótesis alternativa real;
++- rasgos, costos, evidencia y procedencia;
++- una campaña jugable con principio, desarrollo y final;
++- un Atlas inicial y una red temporal navegable.
++
++La campaña termina en Holozoa, en el umbral de la historia animal. No intentará poblar exhaustivamente todos los eucariotas conocidos.
++
++## 2.8. Cono de foco
++
++**DECIDIDO:** cada campaña controla su alcance mediante cuatro anillos:
++
++1. **Corredor principal:** se modela con la mayor resolución necesaria para la campaña.
++2. **Ramas hermanas inmediatas:** se incluyen para explicar las divergencias del corredor.
++3. **Grupos externos representativos:** se añaden solo si aclaran un rasgo, hipótesis, interacción o comparación.
++4. **Diversidad periférica:** se registra como expansión futura y no bloquea el lanzamiento.
++
++La exhaustividad significa que nada relevante dentro del alcance declarado se omite, no que la primera campaña deba convertirse en un catálogo completo de la diversidad eucariota.
++
++## 2.9. Conservación del recorte hominino anterior
++
++**RETENIDO y reubicado:** el período aproximado entre **400.000 y 40.000 años**, centrado en *Homo sapiens*, neandertales, denisovanos y otros humanos, deja de ser el primer recorte de producción. Se conserva como:
++
++- capítulo avanzado de la campaña final de homininos;
++- caso de prueba de máxima complejidad para la arquitectura;
++- futuro piloto del modo Reconstrucción completo;
++- fixture para taxonomías incompatibles, linajes sin nombre estable, especímenes, paleogenómica, migración e introgresión;
++- referencia para evitar que el núcleo temprano cierre posibilidades necesarias después.
++
++No se elimina ningún inventario, escenario, bucle o requisito desarrollado para ese período.
++
++## 2.10. Modularidad y continuidad
++
++**DECIDIDO:** habrá un núcleo compartido y módulos de campaña.
++
++El núcleo compartido gestiona:
++
++- identidad;
++- afirmaciones;
++- evidencia;
++- eventos;
++- tiempo;
++- hipótesis;
++- vistas;
++- Atlas;
++- versionado;
++- guardado y procedencia.
++
++Cada módulo de campaña define:
++
++- escala temporal;
++- unidad poblacional concreta;
++- variables de simulación;
++- ambiente;
++- rasgos;
++- eventos;
++- interfaz especializada;
++- objetivos y condiciones de cierre;
++- simplificaciones científicas.
++
++La continuidad inicial entre campañas será narrativa, enciclopédica y de desbloqueos en el Atlas. Transferir una única partida biológica desde Eukaryota hasta *Homo sapiens* se pospone como `Modo Gran Linaje`.
+ 
+ # 3. Visión del producto
+ 
+ ## 3.1. Nombre provisional
+ 
+-**RAMAS: Una historia de la humanidad** es el título provisional. No está adoptado como nombre comercial y puede cambiar.
++**RAMAS: Una historia de la humanidad** se conserva como título provisional histórico. Al comenzar en Eukaryota, probablemente necesite un subtítulo o un nombre comercial más amplio, por ejemplo “Desde la célula hasta nosotros”. La decisión permanece abierta hasta que el primer prototipo establezca tono, audiencia y alcance narrativo.
+ 
+ ## 3.2. Tesis del proyecto
+ 
+@@ -243,15 +395,13 @@ La experiencia debe permitir comprender que:
+ 
+ ## 3.4. Vistas principales del producto
+ 
+-**RETENIDO:** tres vistas sincronizadas:
++**RETENIDO:** tres vistas sincronizadas y adaptables a la escala:
+ 
+-1. **Mundo:** geografía, clima, biomas, recursos, barreras, migraciones y poblaciones.
+-2. **Red evolutiva:** divergencias, persistencias, extinciones, reticulaciones y cambios de interpretación.
+-3. **Tablero científico:** especímenes, fuentes, dataciones, caracteres, análisis, hipótesis y controversias.
++1. **Mundo o entorno:** condiciones físicas, recursos, hábitats, barreras, regiones y poblaciones. En Eucaria puede representar microambientes y condiciones celulares; en homininos, geografía y clima continental.
++2. **Red evolutiva:** divergencias, persistencias, extinciones, reticulaciones, eventos y cambios de interpretación.
++3. **Tablero científico:** fuentes, señales, dataciones, caracteres, análisis, hipótesis, controversias y, cuando corresponda, especímenes.
+ 
+-Cada modo podrá priorizar una vista, pero las tres deben compartir la misma identidad de entidades.
+-
+----
++Cada modo podrá priorizar una vista, pero las tres deben compartir la misma identidad de entidades. No se obliga a que toda campaña tenga la misma densidad ni las mismas herramientas en cada vista.
+ 
+ # 4. Principios no negociables
+ 
+@@ -351,7 +501,20 @@ La ausencia de ubicación es información válida. Una rama arbitraria solo cons
+ 
+ Los nombres alternativos, grafías originales, recombinaciones, errores de transcripción y sinonimias propuestas deben conservarse. Solo se fusionan identidades cuando la equivalencia está confirmada según los criterios del proyecto. Una sinonimia disputada se modela como afirmación, no como borrado.
+ 
+----
++## 4.10. Conservar requisitos futuros sin implementarlos prematuramente
++
++La Campaña 1 debe ser simple en alcance, no simplista en arquitectura. Cada decisión temprana debe comprobar que no impide representar después:
++
++- conceptos taxonómicos incompatibles;
++- linajes sin nombre formal consensuado;
++- especímenes con asignaciones alternativas;
++- poblaciones y flujo génico;
++- paleogenómica;
++- arqueología y cultura;
++- historias ocultas y evidencia parcial;
++- la campaña hominina completa.
++
++Esta compatibilidad se garantiza mediante interfaces, fixtures y decisiones documentadas. No exige implementar ahora todos esos sistemas.
+ 
+ # 5. Alcance científico
+ 
+@@ -398,20 +561,39 @@ La fuente de verdad no será una imagen gigantesca. Cada nivel será una vista f
+ 
+ ## 5.3. Alcance de la primera implementación
+ 
+-La primera versión no debe intentar representar exhaustivamente todos esos niveles. Debe demostrar que el modelo funciona con un caso que incluya:
+-
+-- conceptos taxonómicos alternativos;
+-- poblaciones;
+-- especímenes;
+-- fechas inciertas;
+-- flujo génico;
+-- varias fuentes;
+-- dos o más hipótesis incompatibles;
+-- una vista de consenso;
+-- una vista histórica;
+-- una proyección simple de juego.
++La primera implementación debe demostrar la arquitectura con un caso pequeño, pero estructuralmente representativo: Eukaryota → Holozoa.
++
++Debe incluir como mínimo:
++
++- el corredor principal de la Campaña 1;
++- ramas hermanas inmediatas necesarias;
++- un concepto taxonómico o cladal con interpretación alternativa;
++- poblaciones o linajes ancestrales explícitamente reconstruidos;
++- un evento de endosimbiosis con participantes y roles;
++- al menos un evento de divergencia;
++- rasgos y compensaciones;
++- intervalos temporales con incertidumbre;
++- varias fuentes y afirmaciones trazables;
++- una hipótesis principal y una alternativa incompatible o parcialmente incompatible;
++- una vista de trabajo fechada;
++- una vista histórica o de fuente;
++- una proyección de campaña;
++- una red temporal navegable;
++- un bucle jugable mínimo.
++
++No exige todavía:
++
++- especímenes fósiles individualizados;
++- yacimientos;
++- paleoproteómica;
++- arqueología;
++- cultura;
++- geografía continental detallada;
++- genes o alelos individuales;
++- genética de poblaciones humanas;
++- el modo Reconstrucción completo.
+ 
+----
++Además se mantendrá un **fixture de regresión futura hominino** pequeño, sin integrarlo al contenido jugable inicial, para comprobar que las decisiones del esquema no bloquean dos conceptos llamados Hominini, un linaje denisovano sin nombre estable y un evento de introgresión.
+ 
+ # 6. Arquitectura conceptual definitiva
+ 
+@@ -553,23 +735,51 @@ Cada vista debe declarar:
+ - elementos excluidos;
+ - versión.
+ 
+-## 6.8. Capa 8: proyección de juego
++## 6.8. Capa 8: proyección de juego y módulos de campaña
+ 
+ La proyección de juego referencia entidades, afirmaciones, eventos y vistas científicas, pero mantiene sus propios datos:
+ 
+ - rol jugable;
+ - abstracción utilizada;
+-- requisitos de campaña;
+-- variables de simulación;
++- campaña y capítulo;
++- escala temporal;
++- unidad de simulación;
++- variables activas;
+ - mecánicas;
+ - efectos;
+ - condiciones de aparición;
+ - simplificaciones;
+ - advertencias científicas;
+-- justificación de diseño.
++- justificación de diseño;
++- política de continuidad con campañas anteriores y posteriores.
+ 
+ No se almacenará dentro de cada nodo científico.
+ 
++La capa se divide en:
++
++```text
++NÚCLEO COMPARTIDO DE JUEGO
++├── Atlas
++├── red temporal
++├── identidad y referencias científicas
++├── guardado y progresión
++├── interfaz común
++└── telemetría y validación
++
++MÓDULO DE CAMPAÑA
++├── reglas de simulación
++├── escala
++├── ambiente
++├── rasgos
++├── eventos
++├── contenido
++├── tutorial
++├── objetivos
++└── interfaz especializada
++```
++
++Una campaña puede usar solo una parte del modelo científico. Esa selección debe registrarse como proyección, no como eliminación de los datos restantes.
++
+ ## 6.9. Dirección y ciclos
+ 
+ El grafo completo contiene relaciones dirigidas, no dirigidas, simétricas, jerárquicas y epistemológicas. No debe imponerse una única semántica de dirección a todo el sistema.
+@@ -1242,7 +1452,12 @@ No se utilizará un único archivo gigantesco como fuente de verdad. Tampoco se
+ │   ├── VISUALIZATION.md
+ │   ├── GAME-DESIGN.md
+ │   ├── ROADMAP.md
++│   ├── PRESERVATION-AND-MIGRATION.md
+ │   ├── GLOSSARY.md
++│   ├── campaigns/
++│   │   ├── C01-EUKARYA.md
++│   │   ├── C02-ANIMALS.md
++│   │   └── FUTURE-CAMPAIGNS.md
+ │   └── adr/
+ ├── knowledge/
+ │   ├── corpus/
+@@ -1273,11 +1488,21 @@ No se utilizará un único archivo gigantesco como fuente de verdad. Tampoco se
+ │   │   └── issues.jsonl
+ │   ├── classifications/
+ │   ├── views/
++│   │   └── campaigns/
+ │   ├── deltas/
+ │   └── snapshots/
+ ├── game/
++│   ├── core/
+ │   ├── projections/
+ │   ├── campaigns/
++│   │   ├── c01-eukarya/
++│   │   │   ├── manifest.json
++│   │   │   ├── scientific-scope.json
++│   │   │   ├── chapters/
++│   │   │   ├── mechanics/
++│   │   │   ├── content/
++│   │   │   └── tests/
++│   │   └── future/
+ │   ├── mechanics/
+ │   └── prototypes/
+ ├── schemas/
+@@ -1287,20 +1512,26 @@ No se utilizará un único archivo gigantesco como fuente de verdad. Tampoco se
+ │   ├── ingest/
+ │   ├── validate/
+ │   ├── build-views/
++│   ├── build-campaign/
+ │   └── snapshot/
+ ├── tests/
+ │   ├── fixtures/
++│   │   ├── eukarya-minimal/
++│   │   └── future-hominin-regression/
+ │   ├── schema/
+ │   ├── validation/
+ │   ├── views/
++│   ├── campaigns/
+ │   └── simulation/
++├── archive/
++│   └── guides/
+ └── generated/
+     ├── reports/
+     ├── diagrams/
+     └── exports/
+ ```
+ 
+-La estructura puede simplificarse al inicio, pero las responsabilidades deben mantenerse separadas.
++La estructura puede simplificarse al inicio, pero las responsabilidades deben mantenerse separadas. El archivo `archive/guides/` conserva versiones rectoras anteriores; no es un basurero de documentos abandonados, sino parte de la trazabilidad.
+ 
+ ## 16.3. Identificadores
+ 
+@@ -1321,7 +1552,7 @@ Prefijos consolidados:
+ | `POP-` | población |
+ | `SPECIMEN-` | espécimen |
+ | `SITE-` | yacimiento |
+-| `REGION-` | región |
++| `REGION-` | región o ambiente |
+ | `OCC-` | ocurrencia |
+ | `TRAIT-` | rasgo |
+ | `TRAITOBS-` | observación de rasgo |
+@@ -1336,6 +1567,9 @@ Prefijos consolidados:
+ | `HYP-` | hipótesis |
+ | `TAXVIEW-` | vista taxonómica |
+ | `PHYVIEW-` | vista filogenética |
++| `CAMP-` | campaña |
++| `CHAPTER-` | capítulo de campaña |
++| `MECH-` | mecánica de juego |
+ | `GAME-` | proyección de juego |
+ | `ISSUE-` | cuestión pendiente |
+ | `TERM-` | término no resuelto |
+@@ -1343,6 +1577,8 @@ Prefijos consolidados:
+ 
+ `EDGE-` se reserva para aristas materializadas en una exportación o vista. No será la identidad canónica de una afirmación científica.
+ 
++Los IDs de campaña no codifican el nombre definitivo ni la posición eterna. `CAMP-000001` puede etiquetarse “Eucaria” aunque el título comercial cambie.
++
+ ## 16.4. Registro append-only
+ 
+ Cada sección genera operaciones explícitas:
+@@ -1870,54 +2106,87 @@ Debe elegirse una semántica por vista; el ancho no puede significar cuatro cosa
+ 
+ # 21. Diseño del juego consolidado
+ 
+-Esta sección conserva todo lo propuesto hasta ahora, indicando qué está decidido y qué necesita prototipo.
++Esta sección conserva el diseño anterior y lo reorganiza para una producción cronológica por campañas. El cambio afecta prioridades y niveles de implementación, no elimina modos ni sistemas futuros.
+ 
+ ## 21.1. Premisa jugable
+ 
+-**DECIDIDO como dirección:** el juego no consiste en “subir” desde un organismo primitivo hasta el humano moderno. Consiste en producir, atravesar y reconstruir historias evolutivas poblacionales.
++**DECIDIDO como dirección:** el juego no consiste en “subir” desde un organismo primitivo hasta el humano moderno. Consiste en producir, atravesar, observar y reconstruir historias evolutivas poblacionales.
+ 
+-## 21.2. Modos principales
++La secuencia de campañas sigue el corredor hacia la humanidad para dar continuidad pedagógica y productiva, pero ninguna campaña presenta su clado como un paso inferior destinado a generar el siguiente.
+ 
+-### Modo Evolución
++## 21.2. Producto campaña por campaña
+ 
+-**RETENIDO.** El jugador guía poblaciones mediante decisiones ecológicas, geográficas, sociales y culturales indirectas.
++**DECIDIDO:** cada campaña debe poder lanzarse como una experiencia completa y, al mismo tiempo, ampliar la plataforma común.
+ 
+-Puede influir en:
++Cada lanzamiento contiene:
+ 
+-- movilidad;
+-- elección de hábitat;
++- campaña jugable;
++- Atlas correspondiente;
++- red temporal y filogenética;
++- lente científica;
++- fuentes y procedencia;
++- contenido desbloqueable;
++- guardado y progresión;
++- documentación de simplificaciones;
++- compatibilidad con campañas futuras.
++
++No se desarrollará primero una simulación universal para después buscarle contenido. El núcleo compartido se extiende únicamente cuando una campaña introduce un requisito nuevo demostrado.
++
++## 21.3. Capacidades principales
++
++### 21.3.1. Modo Evolución
++
++**DECIDIDO para la Campaña 1 en una forma acotada; RETENIDO para expansiones más complejas.**
++
++El jugador influye indirectamente sobre poblaciones. No selecciona mutaciones concretas ni compra órganos. Las decisiones dependen de la escala.
++
++En Eucaria puede influir en:
++
++- explotación de recursos;
++- tolerancia ambiental;
++- contacto entre poblaciones;
++- asociación simbiótica;
++- estabilidad o ruptura de asociaciones;
++- ritmo reproductivo abstracto;
++- expansión o aislamiento;
++- inversión en mantenimiento, crecimiento o reproducción.
++
++En campañas posteriores podrán añadirse:
++
++- movilidad geográfica;
+ - dieta;
+-- estructura social;
+-- tolerancia o conflicto con otros grupos;
+-- reproducción;
+ - cuidado parental;
++- estructura social;
+ - aprendizaje;
+ - transmisión cultural;
+-- explotación de recursos;
++- herramientas;
+ - redes de intercambio.
+ 
+-No elige directamente mutaciones concretas. La variación aparece dentro de límites históricos, anatómicos, genéticos y ambientales.
++La variación aparece dentro de límites históricos, funcionales y ambientales. Toda ventaja debe tener costos, dependencias o contextos.
+ 
+-Posibles objetivos:
++### 21.3.2. Lente científica
+ 
+-- atravesar una crisis climática;
+-- mantener diversidad;
+-- colonizar una región;
+-- sostener varios linajes coexistentes;
+-- evitar absorción o extinción;
+-- producir redes culturales;
+-- persistir con una estrategia especializada;
+-- explorar historias contrafactuales.
++**DECIDIDO para el primer lanzamiento.** Es una versión pequeña del futuro modo Reconstrucción.
++
++Permite:
+ 
+-No existe obligación de producir *Homo sapiens*.
++- consultar por qué aparece una relación;
++- leer las afirmaciones y fuentes relevantes;
++- cambiar entre una síntesis de trabajo y una hipótesis alternativa;
++- distinguir observación, inferencia y especulación;
++- ver intervalos y nivel de resolución;
++- registrar cuestiones abiertas;
++- comparar cómo una decisión editorial modifica una vista.
+ 
+-### Modo Reconstrucción
++No incluye todavía excavaciones, laboratorios, presupuesto de análisis ni publicación académica simulada.
+ 
+-**RETENIDO y prioritario para el primer prototipo jugable.** El jugador investiga una historia oculta mediante evidencia incompleta.
++### 21.3.3. Modo Reconstrucción completo
+ 
+-Acciones previstas:
++**RETENIDO y reubicado.** El jugador investiga una historia oculta mediante evidencia incompleta.
+ 
+-- elegir regiones o colecciones;
++Acciones previstas para campañas que dispongan de registros adecuados:
++
++- elegir regiones, yacimientos o colecciones;
+ - excavar o revisar especímenes;
+ - datar;
+ - medir;
+@@ -1940,41 +2209,279 @@ El sistema debe premiar:
+ - parsimonia sin simplificación abusiva;
+ - reconocimiento de información insuficiente.
+ 
+-No debe premiar únicamente acertar el árbol oculto.
++El período 400.000–40.000 años continúa siendo el candidato más fuerte para su primer escenario completo.
+ 
+-### Atlas evolutivo
++### 21.3.4. Atlas evolutivo
+ 
+-**DECIDIDO como primer producto visible.** Permite navegar entidades, afirmaciones, eventos, hipótesis y vistas.
++**DECIDIDO como superficie compartida desde el primer lanzamiento.** Permite navegar entidades, afirmaciones, eventos, hipótesis y vistas.
+ 
+-Cada nodo puede mostrar:
++Cada ficha puede mostrar, cuando corresponda:
+ 
+ - definición;
+ - rango o función;
+ - edad observada e inferida;
+-- distribución;
++- distribución o ambiente;
+ - grupos incluidos;
+ - ramas hermanas dentro de una vista;
+ - caracteres;
+-- fósiles;
++- señales, fósiles o especímenes;
+ - nombres alternativos;
+ - controversias;
+ - fuentes;
+ - confianza y aceptación por dimensión;
+-- historia de cambios.
++- historia de cambios;
++- campaña en la que se introduce;
++- nivel de detalle desbloqueado.
+ 
+-## 21.3. Tres vistas sincronizadas
++## 21.4. Tres vistas sincronizadas y adaptables
+ 
+-| Vista | Contenido |
+-|---|---|
+-| Mundo | clima, regiones, biomas, barreras, recursos, rutas y poblaciones |
+-| Red | divergencia, persistencia, extinción, reticulación, eventos y vistas alternativas |
+-| Ciencia | fósiles, muestras, dataciones, análisis, publicaciones, hipótesis y debates |
++| Vista | Campaña temprana | Campaña tardía |
++|---|---|---|
++| Entorno | microambientes, recursos, oxígeno, estabilidad, asociaciones | geografía, clima, biomas, barreras, rutas y poblaciones |
++| Red | divergencia, endosimbiosis, transferencia, persistencia y extinción | divergencia, migración, flujo génico, absorción y extinción |
++| Ciencia | señales comparativas, moleculares y celulares; hipótesis | fósiles, muestras, dataciones, análisis, publicaciones y debates |
++
++La identidad de entidades y afirmaciones es compartida; la interfaz y densidad se adaptan a la escala.
++
++## 21.5. Variables por escala
++
++No existirá una tabla universal de variables obligatorias. Se utilizará un catálogo del que cada campaña selecciona módulos.
++
++| Dimensión | Eucaria | Homininos y campañas tardías |
++|---|---|---|
++| Demografía | tamaño poblacional abstracto, reproducción, persistencia, deriva | tamaño efectivo, estructura etaria, natalidad, mortalidad, cuellos de botella |
++| Ambiente | nutrientes, oxígeno, temperatura, estabilidad | clima, hábitat, estacionalidad, corredores, recursos |
++| Ecología | competencia, simbiosis, parasitismo, nicho metabólico | dieta, depredación, patógenos, competencia, construcción de nicho |
++| Herencia | variación abstracta, transferencia, integración, recombinación | diversidad, flujo génico, ancestría, carga y loci cuando corresponda |
++| Organización | compartimentación, regulación, cooperación intracelular | anatomía, desarrollo, fisiología, conducta social |
++| Cultura | no aplicable salvo analogías explícitamente evitadas | herramientas, fuego, aprendizaje, tradición, simbolismo |
++| Registro | señales moleculares y comparativas | fosilización, ADN, proteínas, arqueología, sesgo de muestreo |
++
++## 21.6. Bucle universal del modo Evolución
++
++Cada campaña adapta seis fases:
++
++1. **Cambio de condiciones:** el entorno altera posibilidades y costos.
++2. **Respuesta poblacional:** el jugador orienta estrategias indirectas.
++3. **Variación:** aparecen variantes condicionadas por la historia previa.
++4. **Cambio de frecuencias:** selección, deriva, transmisión y azar modifican poblaciones.
++5. **Divergencia, contacto o integración:** las poblaciones se separan, interactúan, intercambian material o forman asociaciones.
++6. **Registro:** la historia se guarda en el grafo y produce señales observables según la campaña.
++
++La especiación, la integración y las innovaciones no son botones de compra. Emergen de estados, eventos y probabilidades trazables.
++
++## 21.7. Bucle específico de Eucaria
++
++Una ronda o intervalo de la primera campaña puede seguir:
++
++### 1. Ambiente
++
++Cambian:
++
++- recursos;
++- disponibilidad de aceptores de electrones;
++- oxígeno;
++- temperatura;
++- estabilidad;
++- densidad de competidores;
++- oportunidades de asociación.
++
++### 2. Estrategia poblacional
++
++El jugador orienta:
++
++- expansión;
++- aislamiento;
++- explotación de recursos;
++- tolerancia;
++- contacto con otros linajes;
++- mantenimiento o ruptura de una asociación;
++- inversión energética.
++
++### 3. Variación
++
++Surgen variantes:
+ 
+-## 21.4. Variables poblacionales previstas
++- metabólicas;
++- estructurales;
++- regulatorias;
++- reproductivas;
++- ecológicas.
+ 
+-| Dimensión | Variables posibles |
++### 4. Selección y deriva
++
++Las frecuencias cambian según:
++
++- costo energético;
++- eficiencia;
++- tamaño poblacional;
++- estabilidad ambiental;
++- conflicto entre participantes;
++- azar.
++
++### 5. Integración o conflicto
++
++Una interacción puede conducir a:
++
++- competencia;
++- parasitismo;
++- cooperación temporal;
++- asociación estable;
++- transferencia genética abstracta;
++- dependencia mutua;
++- integración heredable.
++
++### 6. Divergencia y registro
++
++Las poblaciones pueden persistir, separarse, extinguirse o producir nuevos linajes. El Atlas registra los eventos y la lente científica muestra qué parte es consenso, reconstrucción o hipótesis.
++
++## 21.8. Taxonomía dentro del juego
++
++Los rangos sirven para:
++
++- navegación;
++- organización;
++- comparación;
++- explicación histórica;
++- objetivos didácticos;
++- desbloqueo de herramientas de análisis;
++- definición de campañas.
++
++No sirven como:
++
++- niveles de poder;
++- etapas de progreso;
++- mejoras acumulativas;
++- indicador de superioridad.
++
++## 21.9. Condiciones de éxito
++
++**ABIERTO en detalle.** Principios establecidos:
++
++- no existe una única victoria llamada “producir humanos”;
++- completar una campaña no significa que su linaje haya sido inevitable;
++- la supervivencia no equivale siempre a éxito;
++- una extinción puede formar parte de un resultado científicamente significativo;
++- mantener diversidad, estabilidad, integración o resiliencia puede ser un objetivo;
++- la lente científica premia comprensión y calibración, no memorización;
++- cada campaña debe tener condiciones propias y múltiples resultados válidos.
++
++## 21.10. Historia oculta y evidencia generada
++
++**RETENIDO como arquitectura fuerte y desarrollado por etapas:** una partida puede generar:
++
++1. una historia poblacional completa y oculta;
++2. un módulo de preservación o señal que decide qué queda observable;
++3. un módulo de descubrimiento que decide qué recibe el jugador;
++4. un espacio de hipótesis construido a partir de esa evidencia.
++
++En Eucaria se implementará una versión reducida basada en señales y vistas. La tafonomía, los especímenes y la arqueología se activarán en campañas posteriores.
++
++## 21.11. Escenarios de referencia conservados
++
++### Escenario inicial: asociación e integración
++
++Dos poblaciones ancestrales interactúan bajo condiciones ambientales cambiantes. La asociación puede romperse, estabilizarse o profundizarse. El jugador gestiona costos, conflicto y dependencia sin pulsar “crear mitocondria”. El resultado se registra como evento reticulado y no como una bifurcación ordinaria.
++
++### Escenario hominino preservado: África oriental, 2,8 Ma
++
++Se conservan:
++
++- población australopiteca flexible;
++- población aislada;
++- formas robustas tempranas;
++- *Homo* temprano escaso;
++- fragmentación ambiental;
++- especialización;
++- desaparición sin registro;
++- dientes como evidencia parcial;
++- interpretaciones alternativas de variación, dimorfismo o especies.
++
++Este escenario sigue siendo válido para la campaña final y para el futuro modo Reconstrucción. No forma parte del primer lanzamiento.
++
++## 21.12. Continuidad entre campañas
++
++### Primera etapa
++
++La continuidad se expresa mediante:
++
++- orden narrativo;
++- Atlas acumulativo;
++- conceptos y herramientas desbloqueados;
++- historial de campañas completadas;
++- logros de comprensión;
++- opciones de visualización adicionales.
++
++### Etapa futura
++
++El `Modo Gran Linaje` podrá evaluar transferencia de estados, rasgos o historias contrafactuales entre campañas. No es requisito del primer lanzamiento ni del segundo.
++
++## 21.13. Contenido mínimo del primer lanzamiento
++
++Debe incluir:
++
++- campaña completa Eukaryota → Holozoa;
++- capítulos y tutorial;
++- red temporal;
++- evento de endosimbiosis;
++- divergencias principales;
++- Atlas inicial;
++- lente científica;
++- al menos dos vistas incompatibles o parcialmente incompatibles;
++- fuentes consultables;
++- guardado;
++- accesibilidad básica;
++- rejugabilidad limitada pero real;
++- final que conecte con la campaña de animales sin afirmar inevitabilidad.
++
++Puede posponer:
++
++- modo Reconstrucción completo;
++- fósiles y excavaciones;
++- genética molecular de loci;
++- geografía continental;
++- cultura;
++- continuidad biológica literal entre campañas.
++
++## 21.14. Requisitos avanzados preservados para campañas tardías
++
++Los siguientes elementos pertenecían al diseño original centrado en homininos. Se conservan como especificación funcional para Primates, Homininos y cualquier campaña que alcance una complejidad poblacional equivalente.
++
++### 21.14.1. Influencias indirectas disponibles
++
++El jugador podrá influir, según la campaña, en:
++
++- movilidad;
++- elección de hábitat;
++- dieta;
++- estructura social;
++- tolerancia o conflicto con otros grupos;
++- reproducción;
++- cuidado parental;
++- aprendizaje;
++- transmisión cultural;
++- explotación de recursos;
++- redes de intercambio.
++
++No elegirá mutaciones concretas. La variación seguirá limitada por anatomía, genética, desarrollo, ambiente e historia previa.
++
++### 21.14.2. Objetivos posibles preservados
++
++- atravesar una crisis climática;
++- mantener diversidad genética o cultural;
++- colonizar una región;
++- sostener varios linajes coexistentes;
++- evitar absorción o extinción;
++- producir redes culturales extensas;
++- persistir mediante una estrategia especializada;
++- explorar historias contrafactuales;
++- sobrevivir sin desarrollar rasgos asociados popularmente con “progreso”.
++
++### 21.14.3. Variables poblacionales avanzadas
++
++| Dimensión | Variables previstas |
+ |---|---|
+-| Demografía | tamaño efectivo, edad, natalidad, mortalidad, densidad, cuellos de botella |
++| Demografía | tamaño efectivo, estructura etaria, natalidad, mortalidad, densidad, cuellos de botella |
+ | Geografía | territorio, movilidad, conectividad, aislamiento, corredores |
+ | Ecología | dieta, hábitat, estacionalidad, depredación, patógenos, competencia |
+ | Genética | diversidad, deriva, flujo génico, carga, ancestría |
+@@ -1983,13 +2490,11 @@ Cada nodo puede mostrar:
+ | Cultura | herramientas, fuego, aprendizaje, tradición, simbolismo |
+ | Registro futuro | fosilización, preservación, detectabilidad, sesgo de muestreo |
+ 
+-No todas se implementarán en la primera simulación.
++Estas variables no forman una lista obligatoria para todas las campañas. Cada módulo activa únicamente las que necesita.
+ 
+-## 21.5. Bucle del modo Evolución
++### 21.14.4. Ambiente y respuesta en campañas tardías
+ 
+-### 1. Cambio ambiental
+-
+-Posibles factores:
++Factores preservados:
+ 
+ - ciclos glaciales;
+ - aridificación;
+@@ -1999,11 +2504,7 @@ Posibles factores:
+ - corredores migratorios;
+ - fauna, competidores y patógenos.
+ 
+-El clima modifica posibilidades, no prescribe mutaciones.
+-
+-### 2. Respuesta poblacional
+-
+-La población puede:
++Respuestas posibles:
+ 
+ - permanecer;
+ - migrar;
+@@ -2014,9 +2515,9 @@ La población puede:
+ - intercambiar;
+ - evitar otros grupos.
+ 
+-### 3. Variación
++El clima modifica posibilidades, no prescribe mutaciones.
+ 
+-Las variantes tienen beneficios y costos. Ejemplos de compensaciones:
++### 21.14.5. Compensaciones evolutivas preservadas
+ 
+ - mayor cerebro frente a costo energético y desarrollo prolongado;
+ - bipedalismo frente a restricciones anatómicas;
+@@ -2024,9 +2525,9 @@ Las variantes tienen beneficios y costos. Ejemplos de compensaciones:
+ - cooperación frente a vulnerabilidad a explotación;
+ - infancia prolongada frente a mayor dependencia.
+ 
+-### 4. Cambio de frecuencias
++El catálogo debe ampliarse por campaña y nunca convertirse en una escala universal de superioridad.
+ 
+-Mecanismos:
++### 21.14.6. Mecanismos de cambio de frecuencias
+ 
+ - selección natural;
+ - selección sexual;
+@@ -2036,24 +2537,24 @@ Mecanismos:
+ - herencia cultural;
+ - aprendizaje social.
+ 
+-### 5. Divergencia y reconexión
++### 21.14.7. Divergencia y reconexión avanzadas
+ 
+-Se evalúan:
++El modelo podrá considerar:
+ 
+ - aislamiento;
+ - distancia;
+-- compatibilidad;
++- compatibilidad reproductiva;
+ - contacto;
+ - diferenciación ecológica;
+-- tamaño;
+-- cultura;
+-- duración.
++- tamaño poblacional;
++- divergencia cultural;
++- duración del aislamiento.
+ 
+-La especiación emerge; no se activa con un botón.
++La especiación emerge del proceso. No se activa mediante un botón.
+ 
+-### 6. Producción de registro
++### 21.14.8. Producción de registro en campañas fósiles y humanas
+ 
+-Las poblaciones dejan rastros con probabilidad desigual:
++Las poblaciones podrán dejar, con probabilidades desiguales:
+ 
+ - huesos;
+ - dientes;
+@@ -2065,9 +2566,9 @@ Las poblaciones dejan rastros con probabilidad desigual:
+ - ADN;
+ - modificaciones de fauna.
+ 
+-La mayoría se pierde.
++La mayoría del registro se perderá o permanecerá sin descubrir.
+ 
+-## 21.6. Bucle del modo Reconstrucción
++### 21.14.9. Bucle completo de Reconstrucción preservado
+ 
+ 1. formular una pregunta;
+ 2. asignar recursos;
+@@ -2078,109 +2579,240 @@ La mayoría se pierde.
+ 7. recibir revisión y nueva evidencia;
+ 8. revisar, fusionar, dividir o abandonar conceptos.
+ 
+-## 21.7. Taxonomía dentro del juego
++Este bucle no se reduce a acertar una topología oculta. Debe premiar evidencia, reproducibilidad e incertidumbre calibrada.
+ 
+-Los rangos sirven para:
++---
+ 
+-- navegación;
+-- organización;
+-- comparación;
+-- herencia histórica de restricciones;
+-- objetivos didácticos;
+-- desbloqueo de herramientas de análisis;
+-- definición de campañas.
++# 22. Campañas y escalas de juego
+ 
+-No sirven como:
++## 22.1. Principio general
+ 
+-- niveles de poder;
+-- etapas de progreso;
+-- mejoras acumulativas;
+-- indicador de superioridad.
++No se usarán las mismas reglas con idéntica resolución desde los primeros eucariotas hasta *Homo sapiens*. Cada campaña introduce una escala, preguntas y mecánicas nuevas, apoyándose en el núcleo compartido.
+ 
+-## 21.8. Condiciones de éxito
++## 22.2. Cono de foco operativo
+ 
+-**ABIERTO en detalle.** Principios ya establecidos:
++Para cada campaña se documentan:
+ 
+-- no debe existir una única victoria llamada “producir humanos”;
+-- la supervivencia no equivale siempre a éxito;
+-- una extinción puede formar parte de una campaña científicamente significativa;
+-- la reconstrucción debe premiar incertidumbre bien calibrada;
+-- el modo Evolución puede evaluar persistencia, diversidad, expansión, resiliencia o historia producida.
++### A. Corredor principal
+ 
+-## 21.9. Historia oculta y evidencia generada
++Se incluye con resolución suficiente para sostener la experiencia y la continuidad histórica.
+ 
+-**RETENIDO como arquitectura fuerte del juego:** una partida puede generar:
++### B. Ramas hermanas inmediatas
+ 
+-1. una historia poblacional completa y oculta;
+-2. un módulo tafonómico que decide qué rastros sobreviven;
+-3. un módulo de descubrimiento que decide qué evidencia encuentra el jugador;
+-4. un espacio de hipótesis construido a partir de esa evidencia.
++Se representan para que cada divergencia tenga contexto y no parezca una escalera aislada.
+ 
+-Esto convierte la base científica en parte del diseño, no en una enciclopedia pegada al menú.
++### C. Grupos externos representativos
+ 
+-## 21.10. Ejemplo de escenario de diseño
++Se añaden cuando son necesarios para explicar una comparación, hipótesis, rasgo o interacción.
+ 
+-África oriental, alrededor de 2,8 millones de años:
++### D. Diversidad diferida
+ 
+-- población australopiteca flexible;
+-- población aislada;
+-- formas robustas tempranas;
+-- *Homo* temprano escaso.
++Se conserva en el backlog científico y puede incorporarse al Atlas, pero no bloquea el lanzamiento.
+ 
+-Una aridificación fragmenta hábitats. Algunas poblaciones intercambian genes, otras se especializan, una desaparece sin registro y otra deja solo dientes. En el modo Reconstrucción, el jugador debe evaluar si los restos representan variación, dimorfismo, varias especies o información insuficiente.
++## 22.3. Arquitectura de campañas
+ 
+-Este escenario es una referencia conceptual, no el primer recorte técnico obligatorio.
++```text
++PLATAFORMA COMPARTIDA
++├── núcleo científico
++├── identidad y procedencia
++├── afirmaciones y evidencia
++├── eventos e hipótesis
++├── vistas
++├── Atlas
++├── red temporal
++├── guardado
++└── accesibilidad
++
++CAMPAÑA N
++├── dossier científico
++├── alcance y exclusiones
++├── módulo de simulación
++├── contenido
++├── capítulos
++├── interfaz especializada
++├── tutorial
++├── pruebas
++└── criterios de lanzamiento
++```
+ 
+----
++## 22.4. Secuencia prevista y complejidad progresiva
+ 
+-# 22. Campañas y escalas de juego
++| Orden | Campaña provisional | Corredor principal | Sistemas nuevos dominantes |
++|---:|---|---|---|
++| 1 | **Eucaria: una célula dentro de otra** | Eukaryota → Holozoa | linajes, poblaciones celulares, selección, deriva, endosimbiosis, integración, hipótesis |
++| 2 | **Animales: construir un cuerpo** | Holozoa → Bilateria | multicelularidad, diferenciación, desarrollo, planes corporales, homología |
++| 3 | **Cordados: abandonar el agua** | Bilateria → Tetrapoda | anatomía, locomoción, respiración, nichos, transición acuática-terrestre |
++| 4 | **Sinápsidos: heredar la noche** | Amniota/Synapsida → Mammalia | reproducción terrestre, termorregulación, dentición, extinciones masivas |
++| 5 | **Mamíferos: radiaciones y cuidados** | Mammalia → Primatomorpha | historia de vida, lactancia, cuidado parental, nichos, radiaciones ecológicas |
++| 6 | **Primates: manos, ojos y sociedades** | Primates → Hominidae | prensión, visión, locomoción arbórea, dieta, sociabilidad, aprendizaje |
++| 7 | **Homininos: humanidades entrelazadas** | Hominini → *Homo sapiens* | poblaciones detalladas, fósiles, herramientas, cultura, migración, arqueología, hibridación e introgresión |
+ 
+-No se usarán las mismas reglas con idéntica resolución desde los primeros eucariotas hasta *Homo sapiens*.
++Las fronteras exactas pueden ajustarse mediante ADR sin alterar el orden general.
+ 
+-## Campaña I. Simbiosis
++## 22.5. Campaña 1: Eucaria
+ 
+-**POSPUESTA.** Desde la evolución eucariota hasta la multicelularidad.
++### Estado
+ 
+-Mecánicas potenciales:
++**DECIDIDA como primer lanzamiento.**
+ 
+-- endosimbiosis;
+-- transferencia horizontal;
+-- cooperación celular;
+-- conflicto intracelular;
+-- diferenciación;
+-- reproducción sexual.
++### Título provisional
+ 
+-## Campaña II. Cuerpos
++**Eucaria: una célula dentro de otra.**
+ 
+-**POSPUESTA.** Desde Metazoa hasta Tetrapoda.
++### Inicio científico
+ 
+-Mecánicas potenciales:
++Un prólogo sobre poblaciones ancestrales y procesos previos a la consolidación de Eukaryota. No se inventará un taxón concreto cuando la identidad sea incierta. Se usarán conceptos como:
+ 
+-- planes corporales;
+-- desarrollo;
+-- locomoción;
+-- respiración;
+-- transición acuática-terrestre;
+-- redes ecológicas;
+-- extinciones masivas.
++- linaje hospedador ancestral reconstruido;
++- simbionte bacteriano ancestral;
++- poblaciones protoeucariotas;
++- ancestro común no muestreado.
+ 
+-## Campaña III. Herencia sinápsida
++### Núcleo
+ 
+-**POSPUESTA.** Desde Synapsida hasta los primeros primates.
++```text
++eucariogénesis
++→ integración mitocondrial
++→ diversificación eucariota temprana
++→ Eukaryota
++→ Amorphea
++→ Obazoa
++→ Opisthokonta
++→ Holozoa
++```
+ 
+-Mecánicas potenciales:
++### Final
+ 
+-- termorregulación;
+-- dentición;
++La campaña termina en Holozoa, preparando la transición a animales sin implementar todavía Metazoa en profundidad.
++
++### Backbone mínimo de contenido
++
++Debe incluir, si el corpus científico seleccionado lo respalda:
++
++- Eukaryota;
++- Amorphea;
++- Amoebozoa como rama hermana relevante;
++- Obazoa;
++- Apusomonadida y Breviatea en la resolución necesaria;
++- Opisthokonta;
++- Holomycota como rama hermana;
++- Holozoa;
++- Filozoa u otros nodos intermedios únicamente si el dossier científico los requiere para cerrar la campaña;
++- poblaciones o linajes ancestrales estructurales;
++- evento de endosimbiosis mitocondrial;
++- hipótesis alternativas seleccionadas.
++
++La lista no es una licencia para agregar taxones por memoria. Todo contenido canónico entra mediante fuentes y afirmaciones.
++
++### Preguntas científicas jugables
++
++- ¿Qué hace estable una asociación inicialmente conflictiva?
++- ¿Cómo cambian los costos y beneficios con el ambiente?
++- ¿Cuándo una dependencia se vuelve heredable?
++- ¿Qué distingue divergencia, transferencia e integración?
++- ¿Cómo puede la misma evidencia apoyar reconstrucciones diferentes?
++- ¿Qué rasgos son observados y cuáles inferidos?
++
++### Mecánicas iniciales
++
++- recursos y energía abstractos;
++- tamaño y estabilidad poblacional;
++- variación y deriva;
++- competencia;
++- contacto;
++- simbiosis;
++- conflicto intracelular abstracto;
++- integración;
++- transferencia genética abstracta;
++- divergencia;
++- extinción;
++- desbloqueo de vistas científicas.
++
++### Capítulos conceptuales
++
++1. **Antes del eucariota:** ambiente, poblaciones y oportunidades de contacto.
++2. **La asociación:** cooperación, parasitismo y conflicto.
++3. **La integración:** dependencia, herencia y transferencia.
++4. **Energía y organización:** costos, regulación y nuevas posibilidades.
++5. **Diversificación:** separación de grandes linajes.
++6. **Hacia Holozoa:** cierre del corredor y transición a animales.
++
++### Exclusiones explícitas del primer lanzamiento
++
++- todos los supergrupos y taxones eucariotas en resolución exhaustiva;
++- origen detallado del núcleo como mecanismo jugable si el corpus no permite una representación responsable;
++- genes y proteínas individuales;
++- redes metabólicas bioquímicas completas;
++- simulación celular físicamente continua;
++- multicelularidad animal profunda;
++- modo Gran Linaje.
++
++## 22.6. Campaña 2: Animales
++
++**SIGUIENTE CAMPAÑA PREVISTA.** Desde Holozoa y formas unicelulares relacionadas hasta Bilateria.
++
++Mecánicas potenciales:
++
++- multicelularidad;
++- adhesión;
++- diferenciación celular;
++- regulación del desarrollo;
++- cooperación y conflicto celular;
++- planes corporales;
+ - reproducción;
++- señales ecológicas;
++- primeras homologías complejas.
++
++No debe iniciarse hasta que la Campaña 1 se haya lanzado y se haya realizado una revisión postmortem del núcleo.
++
++## 22.7. Campaña 3: Cordados
++
++**PLANIFICADA.** Desde Bilateria hasta Tetrapoda.
++
++Mecánicas potenciales:
++
++- anatomía y módulos corporales;
++- locomoción;
++- respiración;
++- depredación;
++- nichos;
++- transición acuática-terrestre;
++- redes ecológicas;
++- registro fósil más explícito.
++
++## 22.8. Campaña 4: Sinápsidos
++
++**PLANIFICADA.** Desde Amniota/Synapsida hasta Mammalia.
++
++Mecánicas potenciales:
++
++- reproducción terrestre;
++- termorregulación;
++- dentición;
++- postura;
+ - desarrollo;
+ - nichos nocturnos;
+-- radiación mamaliana;
+-- vida arbórea.
++- extinciones masivas;
++- continuidad de caracteres mosaico.
++
++## 22.9. Campaña 5: Mamíferos
++
++**PLANIFICADA.** Desde Mammalia hasta Primatomorpha.
+ 
+-## Campaña IV. Primates
++Mecánicas potenciales:
++
++- lactancia;
++- cuidado parental;
++- historia de vida;
++- sentidos;
++- radiaciones ecológicas;
++- dispersión;
++- arborealidad;
++- competencia tras extinciones.
++
++## 22.10. Campaña 6: Primates
+ 
+-**POSPUESTA.** Desde primates tempranos hasta Hominoidea.
++**PLANIFICADA.** Desde primates tempranos hasta Hominidae.
+ 
+ Mecánicas potenciales:
+ 
+@@ -2189,11 +2821,17 @@ Mecánicas potenciales:
+ - dieta;
+ - locomoción arbórea;
+ - sociabilidad;
+-- biogeografía.
++- aprendizaje;
++- historia biogeográfica;
++- clasificación por familias, subfamilias, tribus y subtribus.
+ 
+-## Campaña V. Homininos
++El inventario detallado del Apéndice B se conserva como especificación científica de esta campaña.
+ 
+-**RETENIDA como campaña principal futura.** Capítulos conceptuales:
++## 22.11. Campaña 7: Homininos
++
++**RETENIDA como campaña culminante.** Integra el trabajo paleoantropológico ya desarrollado.
++
++Capítulos conceptuales conservados:
+ 
+ 1. **El último ancestro común**, 8–5 Ma.
+ 2. **El mosaico australopiteco**, 4,5–2,8 Ma.
+@@ -2202,9 +2840,36 @@ Mecánicas potenciales:
+ 5. **Humanidades entrelazadas**, 800.000–40.000 años.
+ 6. **Una humanidad superviviente**, 300.000 años–presente.
+ 
+-El capítulo 5 es el candidato recomendado para el primer recorte jugable.
++El capítulo 5 conserva el recorte 400.000–40.000 años como:
+ 
+----
++- escenario de Reconstrucción completo;
++- prueba de introgresión;
++- prueba de taxonomía y linajes;
++- prueba de fósiles y genomas;
++- vertical slice interno de máxima complejidad.
++
++La campaña puede dividirse en dos productos si el volumen lo exige:
++
++```text
++Homininos tempranos
++Humanidades entrelazadas
++```
++
++La decisión se mantiene abierta hasta que las campañas previas permitan estimar costos reales.
++
++## 22.12. Modo Gran Linaje
++
++**POSPUESTO:** una única historia jugable conectada desde Eukaryota hasta homininos.
++
++La primera arquitectura solo garantiza:
++
++- compatibilidad de identidad;
++- Atlas acumulativo;
++- progresión narrativa;
++- desbloqueos;
++- posibilidad futura de importar estados resumidos.
++
++El modo continuo se evaluará después de completar al menos tres campañas y conocer qué variables pueden transferirse sin forzar una simulación universal superficial.
+ 
+ # 23. Qué no se hará
+ 
+@@ -2214,6 +2879,7 @@ El capítulo 5 es el candidato recomendado para el primer recorte jugable.
+ 
+ - una escalera lineal de progreso;
+ - “pez → anfibio → reptil → mamífero → mono → humano” como secuencia literal;
++- presentar la secuencia de campañas como destino biológico;
+ - chimpancés modernos como antepasados humanos;
+ - taxones como equivalentes automáticos de clados;
+ - especies fósiles como ancestros directos por defecto;
+@@ -2221,21 +2887,29 @@ El capítulo 5 es el candidato recomendado para el primer recorte jugable.
+ - razas humanas modernas como ramas taxonómicas discretas;
+ - categorías históricas presentadas como vigentes;
+ - convergencia dibujada como ascendencia;
+-- hibridación confundida con incertidumbre topológica.
++- hibridación confundida con incertidumbre topológica;
++- endosimbiosis dibujada como una bifurcación ordinaria;
++- inventar un “primer eucariota” nombrado para llenar un hueco;
++- tratar la primera evidencia conocida como origen real del rasgo.
+ 
+ ## 23.2. Rechazos de diseño
+ 
+ **RECHAZADO:**
+ 
+-- barra universal de inteligencia;
+-- mutaciones compradas como mejoras lineales;
++- barra universal de inteligencia o complejidad;
++- mutaciones, núcleos, mitocondrias u órganos comprados como mejoras lineales;
+ - especies como personajes rígidos;
+ - *Homo sapiens* como victoria obligatoria;
+ - “primitivo” como sinónimo de inferior;
+ - rangos taxonómicos como niveles;
+ - un único árbol mostrado como verdad;
+ - cada fósil como una nueva especie;
+-- usar complejidad científica solo como decoración.
++- usar complejidad científica solo como decoración;
++- exigir que la primera partida continúe literalmente durante miles de millones de años;
++- usar exactamente las mismas reglas de simulación en todas las campañas;
++- lanzar Eucaria como prólogo técnico incompleto sin arco jugable propio;
++- intentar representar todos los eucariotas antes de publicar;
++- antropomorfizar células de forma que convierta cooperación, conflicto o herencia en intenciones humanas literales.
+ 
+ ## 23.3. Rechazos técnicos
+ 
+@@ -2251,62 +2925,101 @@ El capítulo 5 es el candidato recomendado para el primer recorte jugable.
+ - utilizar el chat como almacenamiento principal;
+ - mezclar ingestión y auditoría externa;
+ - sobrescribir o eliminar información sin historial;
+-- dibujar todas las hipótesis incompatibles en una sola topología.
+-
+----
++- dibujar todas las hipótesis incompatibles en una sola topología;
++- construir un motor universal antes de tener una campaña concreta;
++- acoplar el núcleo científico a las variables particulares de Eucaria;
++- eliminar tipos futuros porque la primera campaña no los usa;
++- implementar tipos complejos sin fixture ni caso de uso.
+ 
+ # 24. Hoja de ruta de desarrollo
+ 
+-La hoja de ruta está organizada por dependencias. No debe saltarse una fase solo porque la interfaz posterior resulte más entretenida.
++La hoja de ruta sigue dependencias científicas y de producto. El objetivo no es completar una ontología antes de jugar ni improvisar un juego sin datos trazables. Cada fase termina con un artefacto verificable.
+ 
+-## Fase 0. Constitución del proyecto
++## Fase 0. Migración estratégica y constitución del proyecto
+ 
+ ### Objetivo
+ 
+-Crear el marco de trabajo y fijar el vocabulario mínimo.
++Preservar el trabajo anterior, fijar la estrategia por campañas y crear el marco de trabajo.
+ 
+ ### Tareas
+ 
+-1. crear repositorio;
+-2. incorporar esta guía;
+-3. crear registro de decisiones arquitectónicas;
+-4. definir convenciones de IDs;
+-5. definir formato de secciones y fuentes;
+-6. elegir lenguaje para herramientas iniciales;
+-7. configurar validación y pruebas básicas;
+-8. crear un glosario inicial;
+-9. definir política de contribución y revisión científica.
++1. archivar la guía `1.0.0` con hash;
++2. incorporar esta guía `1.1.0` como documento activo;
++3. crear ADR-001: afirmaciones como fuente de verdad;
++4. crear ADR-002: desarrollo cronológico por campañas;
++5. crear ADR-003: núcleo compartido + módulos de campaña;
++6. crear registro de decisiones y migraciones;
++7. definir convenciones de IDs;
++8. elegir lenguaje para tooling inicial;
++9. configurar validación, pruebas y CI;
++10. definir licencia y política de fuentes;
++11. crear el glosario inicial;
++12. crear la matriz de preservación del plan hominino.
+ 
+ ### Entregables
+ 
++- repositorio;
++- guía activa y archivo histórico;
++- ADR-001 a ADR-003;
+ - estructura de carpetas;
+ - `README`;
+-- guía versionada;
+-- ADR inicial;
+-- plantilla de sección;
+-- plantilla de fuente;
+-- esquema mínimo de IDs;
+-- comando de validación vacío pero ejecutable.
++- manifiesto de dataset vacío;
++- primer snapshot;
++- comando de validación ejecutable;
++- registro de decisiones.
+ 
+ ### Criterios de aceptación
+ 
++- los hashes del archivo histórico coinciden con la versión preservada;
++- ninguna decisión antigua desaparece;
+ - el repositorio puede clonarse y validarse;
+-- las decisiones abiertas están registradas;
+ - no existe dependencia del motor de juego;
+-- se puede crear una sección vacía válida.
++- se puede crear una sección y una campaña vacías válidas.
+ 
+-### No incluye
++## Fase 1. Dossier de la Campaña 1 y frontera de contenido
+ 
+-- taxonomía real;
+-- interfaz;
+-- base de datos;
+-- simulación.
++### Objetivo
++
++Definir exactamente qué significa Eukaryota → Holozoa antes de cargar datos o programar mecánicas.
++
++### Tareas
++
++1. formular la pregunta central de campaña;
++2. fijar inicio, final y capítulos;
++3. seleccionar corredor principal;
++4. seleccionar ramas hermanas inmediatas;
++5. listar grupos externos representativos;
++6. crear lista explícita de exclusiones;
++7. identificar controversias obligatorias;
++8. identificar el evento de endosimbiosis y sus requisitos;
++9. seleccionar corpus científico inicial;
++10. definir fecha de corte bibliográfico;
++11. establecer criterios de aceptación científica;
++12. definir presupuesto máximo de entidades, afirmaciones y vistas para el vertical slice;
++13. crear `CAMP-000001` y su manifiesto.
++
++### Entregables
++
++- `docs/campaigns/C01-EUKARYA.md`;
++- manifiesto de campaña;
++- matriz de alcance;
++- inventario de fuentes candidatas;
++- backlog de diversidad diferida;
++- lista de riesgos y cuestiones abiertas.
++
++### Criterios de aceptación
++
++- todo contenido está clasificado como obligatorio, contextual o diferido;
++- no hay una exigencia implícita de cubrir todos los eucariotas;
++- el final Holozoa está definido;
++- el dossier distingue hechos, hipótesis y reconstrucciones;
++- existe una explicación de cómo conecta con Campaña 2.
+ 
+-## Fase 1. Corpus y menciones
++## Fase 2. Corpus, menciones, fuentes y estado reproducible
+ 
+ ### Objetivo
+ 
+-Conservar fielmente investigación incremental y demostrar cobertura exhaustiva.
++Conservar fielmente la investigación incremental y demostrar cobertura exhaustiva.
+ 
+ ### Tareas
+ 
+@@ -2316,7 +3029,9 @@ Conservar fielmente investigación incremental y demostrar cobertura exhaustiva.
+ 4. implementar tabla de cobertura;
+ 5. crear operaciones y deltas;
+ 6. construir validadores de IDs, esquema y cobertura;
+-7. crear primer fixture artificial.
++7. crear fixture artificial mínimo;
++8. implementar snapshots y reconstrucción;
++9. separar ingestión de auditoría externa.
+ 
+ ### Entregables
+ 
+@@ -2331,261 +3046,549 @@ Conservar fielmente investigación incremental y demostrar cobertura exhaustiva.
+ - toda mención del fixture tiene destino;
+ - una corrección conserva el original;
+ - el delta puede aplicarse y revertirse;
+-- el snapshot se reconstruye desde cero.
++- el snapshot se reconstruye desde cero;
++- ninguna herramienta añade conocimiento externo sin marcarlo.
+ 
+-## Fase 2. Identidad biológica y taxonómica
++## Fase 3. Identidad biológica y taxonómica mínima
+ 
+ ### Objetivo
+ 
+-Resolver la separación entre nombres, conceptos, clados, linajes, poblaciones y especímenes.
++Representar nombres, conceptos, clados, linajes y poblaciones sin construir todavía todos los tipos futuros.
+ 
+ ### Tareas
+ 
+-1. implementar tipos de entidad;
+-2. implementar alias y nombres originales;
+-3. modelar conceptos taxonómicos según fuente;
+-4. permitir rangos contextualizados;
+-5. registrar sinonimias propuestas;
+-6. implementar fusiones reversibles;
+-7. crear validadores de homónimos y duplicados;
+-8. crear una pequeña clasificación de prueba con dos usos incompatibles del mismo nombre.
++1. implementar `TaxonomicName`;
++2. implementar `TaxonConcept`;
++3. implementar `CladeConcept`;
++4. implementar `Lineage`;
++5. implementar `Population` con interfaz mínima y especialización por campaña;
++6. implementar `Trait`;
++7. modelar alias y nombres originales;
++8. permitir rangos contextualizados;
++9. registrar sinonimias propuestas;
++10. implementar fusiones reversibles;
++11. validar homónimos y duplicados;
++12. crear fixture Eukaryota con dos conceptos o circunscripciones incompatibles;
++13. mantener un fixture hominino futuro con dos usos de Hominini.
+ 
+ ### Entregables
+ 
+-- esquemas de entidades;
+-- resolutor de identidad asistido;
+-- informe de posibles duplicados;
+-- fixture de taxonomías alternativas.
++- esquemas de identidad;
++- resolutor asistido;
++- informe de duplicados;
++- fixtures temprano y futuro.
+ 
+ ### Criterios de aceptación
+ 
+-- un mismo nombre puede referir a dos conceptos;
++- nombre, concepto, clado y linaje no se confunden;
+ - un concepto puede cambiar de rango entre vistas;
+ - una fusión no destruye referencias;
+-- un espécimen no puede convertirse accidentalmente en taxón.
++- el modelo poblacional temprano no obliga a usar variables homininas;
++- el fixture Hominini continúa siendo representable.
+ 
+-## Fase 3. Afirmaciones, evidencia y análisis
++## Fase 4. Afirmaciones, evidencia, tiempo y análisis
+ 
+ ### Objetivo
+ 
+-Convertir el sistema en una base de conocimiento trazable.
++Convertir el corpus en conocimiento trazable y temporalmente explícito.
+ 
+ ### Tareas
+ 
+ 1. implementar `Claim`;
+ 2. implementar dimensiones epistemológicas;
+-3. implementar evidencia, datasets, análisis y resultados;
++3. implementar `EvidenceItem`, `Dataset`, `Analysis`, `Result`;
+ 4. vincular afirmaciones a pasajes;
+ 5. almacenar soporte cuantitativo exacto;
+ 6. modelar afirmaciones negativas y conflictos;
+ 7. distinguir afirmaciones expresas de derivadas;
+-8. crear consultas de procedencia.
++8. implementar tipos de fecha;
++9. modelar intervalos e incertidumbre;
++10. distinguir evidencia mínima, origen inferido y fecha de divergencia;
++11. implementar ambientes o regiones abstractas;
++12. crear consultas de procedencia.
+ 
+ ### Entregables
+ 
+ - esquemas;
+ - validador de procedencia;
+ - informe “por qué aparece esta relación”;
+-- fixture con dos fuentes en conflicto.
++- fixture con fuentes en conflicto;
++- primera línea temporal.
+ 
+ ### Criterios de aceptación
+ 
+-- toda relación visible puede explicarse mediante afirmaciones;
++- toda relación visible puede explicarse;
+ - una fuente puede apoyar una afirmación y cuestionar otra;
+ - no existe confianza sin razón;
+-- un cambio de aceptación no altera la identidad de la entidad.
++- observado e inferido no se confunden;
++- una fecha profunda puede expresarse como intervalo y método.
+ 
+-## Fase 4. Tiempo, geografía y ocurrencias
++## Fase 5. Eventos, reticulación, hipótesis y vistas
+ 
+ ### Objetivo
+ 
+-Representar presencia, rangos y compatibilidad temporal sin confundir evidencia y origen.
++Representar eucariogénesis, divergencias y alternativas como estructuras coherentes.
+ 
+ ### Tareas
+ 
+-1. implementar tipos de fecha;
+-2. intervalos e incertidumbre;
+-3. ocurrencias;
+-4. yacimientos y regiones;
+-5. validación de coexistencia;
+-6. advertencias por inversión de rangos observados;
+-7. unidades y conversiones;
+-8. primera línea temporal generada.
++1. implementar eventos y roles;
++2. implementar divergencia;
++3. implementar asociación, simbiosis, transferencia e integración;
++4. implementar extinción;
++5. validar participantes y temporalidad;
++6. implementar `Hypothesis`;
++7. implementar grupos de conflicto;
++8. implementar escenarios compatibles;
++9. implementar `ClassificationView` y `PhylogeneticView`;
++10. crear backbone fechado;
++11. crear vista histórica o de fuente;
++12. exportar Graphviz;
++13. conservar fixture futuro de introgresión hominina.
+ 
+ ### Entregables
+ 
+-- esquema temporal;
+-- esquema geográfico mínimo;
+-- validadores;
+-- visualización temporal.
++- esquema de eventos;
++- evento de endosimbiosis completo;
++- dos vistas alternativas;
++- reporte de diferencias;
++- diagrama reproducible.
+ 
+ ### Criterios de aceptación
+ 
+-- observado e inferido no se confunden;
+-- una divergencia puede ser intervalo;
+-- el sistema no rechaza automáticamente un ancestro por sesgo fósil;
+-- las ubicaciones inciertas están marcadas.
++- la endosimbiosis no se representa como padre-hijo simple;
++- un evento admite varios participantes y roles;
++- ninguna vista mezcla afirmaciones incompatibles;
++- cada arista visible tiene procedencia;
++- cambiar hipótesis reconstruye la vista sin modificar datos primarios.
+ 
+-## Fase 5. Eventos y reticulación
++## Fase 6. Pipeline de ingestión y validación end-to-end
+ 
+ ### Objetivo
+ 
+-Representar procesos n-arios y no arbóreos.
++Procesar una sección real de principio a fin sin depender del chat como memoria.
+ 
+ ### Tareas
+ 
+-1. implementar eventos y roles;
+-2. divergencia;
+-3. migración;
+-4. hibridación e introgresión;
+-5. extinción y absorción;
+-6. relaciones derivadas;
+-7. validación de participantes, tiempo y lugar;
+-8. exportación visual de eventos.
++1. comando `ingest:section`;
++2. extracción asistida de menciones;
++3. propuesta de normalización;
++4. propuesta de afirmaciones;
++5. revisión humana;
++6. creación de eventos e hipótesis;
++7. delta;
++8. validación;
++9. informe humano;
++10. snapshot;
++11. rollback;
++12. reconstrucción de vistas afectadas.
+ 
+ ### Entregables
+ 
+-- esquema de eventos;
+-- fixture de introgresión;
+-- diagrama reticulado;
+-- validador temporal.
++- flujo end-to-end;
++- interfaz de revisión mínima;
++- logs;
++- documentación;
++- fixtures automatizados.
+ 
+ ### Criterios de aceptación
+ 
+-- un evento admite varios participantes;
+-- roles producen relaciones derivadas coherentes;
+-- el evento puede estar disputado sin duplicar entidades;
+-- una hibridación no se confunde con una topología alternativa.
++- ninguna propuesta automática se acepta sin trazabilidad;
++- las ambigüedades no centrales producen issues y no bloquean todo;
++- los errores bloqueantes detienen el commit;
++- el estado es reproducible;
++- una vista puede reconstruirse desde cero.
+ 
+-## Fase 6. Hipótesis y vistas
++## Fase 7. Dataset científico canónico de la Campaña 1
+ 
+ ### Objetivo
+ 
+-Construir topologías y clasificaciones coherentes a partir de afirmaciones.
++Construir el conjunto de conocimiento real, acotado y auditado que alimentará el juego.
+ 
+ ### Tareas
+ 
+-1. implementar `Hypothesis`;
+-2. grupos de conflicto;
+-3. escenarios compatibles;
+-4. `ClassificationView`;
+-5. `PhylogeneticView`;
+-6. backbone fechado;
+-7. vistas históricas;
+-8. invalidación y reconstrucción de vistas;
+-9. exportación Graphviz y formatos filogenéticos.
++1. ingresar el corpus seleccionado;
++2. normalizar entidades;
++3. registrar afirmaciones y evidencia;
++4. modelar el evento endosimbiótico;
++5. construir el backbone;
++6. construir al menos una alternativa;
++7. registrar cuestiones abiertas;
++8. auditar con fuentes externas cuando el modo lo permita;
++9. congelar un snapshot de contenido;
++10. generar un informe de cobertura del cono de foco.
+ 
+-### Entregables
++### Criterios de aceptación
+ 
+-- dos topologías incompatibles del mismo fixture;
+-- vista de trabajo;
+-- vista histórica;
+-- reporte de diferencias.
++- el corredor Eukaryota → Holozoa no requiere hacks semánticos;
++- la diversidad periférica omitida está documentada;
++- todas las relaciones del backbone tienen explicación;
++- el evento de integración es temporal y conceptualmente coherente;
++- las controversias no se aplanan;
++- el snapshot es estable para construir interfaz y juego.
++
++## Fase 8. Atlas y red temporal como vertical slice
++
++### Objetivo
++
++Crear la primera interfaz útil y comprobar que la ciencia es navegable.
++
++### Funciones mínimas
++
++- búsqueda;
++- ficha de entidad;
++- línea temporal;
++- vista de entorno abstracto;
++- red filogenética y reticulada;
++- selector de hipótesis;
++- procedencia;
++- historial de conceptos;
++- filtros por evidencia y capítulo;
++- zoom semántico;
++- accesibilidad sin depender solo del color.
+ 
+ ### Criterios de aceptación
+ 
+-- ninguna vista mezcla afirmaciones incompatibles;
+-- cada arista visible puede rastrearse;
+-- cambiar una hipótesis reconstruye la vista sin modificar datos primarios;
+-- el backbone declara criterios y fecha.
++- el usuario puede explicar por qué un nodo está en una posición;
++- puede distinguir divergencia de endosimbiosis;
++- puede cambiar de vista sin perder identidad;
++- puede acceder a fuentes;
++- la densidad es manejable en el alcance del primer lanzamiento.
+ 
+-## Fase 7. Pipeline de ingestión completo
++## Fase 9. Núcleo de simulación de Eucaria
+ 
+ ### Objetivo
+ 
+-Automatizar el protocolo de sección sin entregar decisiones científicas delicadas a una caja negra.
++Implementar un modelo pequeño de poblaciones celulares y asociaciones, no una simulación bioquímica total.
++
++### Variables mínimas
++
++- tamaño poblacional abstracto;
++- recursos;
++- energía;
++- reproducción;
++- estabilidad;
++- variación abstracta;
++- deriva;
++- competencia;
++- contacto;
++- estado de asociación;
++- costos y beneficios;
++- persistencia/extinción.
+ 
+ ### Tareas
+ 
+-1. comando `ingest:section`;
+-2. extracción asistida de menciones;
+-3. propuesta de normalización;
+-4. propuesta de afirmaciones;
+-5. revisión humana;
+-6. delta;
+-7. validación;
+-8. informe humano;
+-9. snapshot;
+-10. rollback.
++1. definir paso temporal abstracto;
++2. implementar actualización poblacional;
++3. implementar variación y deriva;
++4. implementar contacto;
++5. implementar asociación y ruptura;
++6. implementar conflicto y cooperación;
++7. implementar integración como resultado emergente condicionado;
++8. implementar divergencia;
++9. registrar historia completa;
++10. garantizar determinismo por semilla;
++11. exportar eventos al grafo.
+ 
+-### Entregables
++### Criterios de aceptación
+ 
+-- flujo end-to-end;
+-- interfaz de revisión mínima;
+-- logs;
+-- documentación.
++- la misma semilla reproduce la historia;
++- no existen tamaños o recursos inválidos;
++- la integración no es un botón automático;
++- varias estrategias pueden persistir;
++- la campaña puede terminar sin una única historia obligatoria;
++- los eventos producidos son compatibles con el Atlas.
++
++## Fase 10. Prototipo jugable completo de la Campaña 1
++
++### Objetivo
++
++Unir contenido, simulación, capítulos y objetivos en una experiencia de principio a fin.
++
++### Tareas
++
++1. implementar capítulos;
++2. diseñar tutorial;
++3. definir objetivos y resultados alternativos;
++4. integrar entorno, red y decisiones;
++5. crear eventos narrativos científicos;
++6. equilibrar costos y compensaciones;
++7. implementar guardado;
++8. registrar telemetría local de pruebas;
++9. crear final y transición a animales.
+ 
+ ### Criterios de aceptación
+ 
+-- ninguna propuesta automática se acepta sin trazabilidad;
+-- el sistema puede continuar ante ambigüedades no centrales;
+-- los errores bloqueantes detienen el commit;
+-- el estado es reproducible.
++- existe una partida completa;
++- el jugador comprende selección, deriva, simbiosis e integración sin menús enciclopédicos obligatorios;
++- no hay árbol de mejoras teleológico;
++- el final no afirma inevitabilidad;
++- las decisiones tienen consecuencias visibles y trazables;
++- el prototipo es comprensible sin conocer biología avanzada.
+ 
+-## Fase 8. Piloto científico real
++## Fase 11. Integración de la lente científica
+ 
+ ### Objetivo
+ 
+-Probar el sistema con un dominio acotado pero científicamente difícil.
++Conectar jugabilidad y conocimiento sin convertir el Atlas en decoración.
++
++### Tareas
++
++- desbloquear fichas desde eventos;
++- comparar dos hipótesis;
++- mostrar evidencia y procedencia;
++- separar historia de partida y conocimiento científico real;
++- registrar simplificaciones;
++- permitir revisión de decisiones editoriales;
++- construir tutorial de incertidumbre.
+ 
+-### Recorte recomendado
++### Criterios de aceptación
++
++- una mecánica nunca altera una afirmación científica;
++- el jugador puede distinguir simulación, evidencia e hipótesis;
++- las fuentes son accesibles sin interrumpir obligatoriamente el juego;
++- el sistema admite “sin resolver”.
++
++## Fase 12. Producción de contenido, arte, audio y experiencia de usuario
+ 
+-Sapiens, neandertales, denisovanos y humanos asiáticos del Pleistoceno medio/tardío.
++### Objetivo
++
++Transformar el prototipo en un producto publicable.
+ 
+ ### Tareas
+ 
+-1. seleccionar corpus;
+-2. ingresar fuentes y secciones;
+-3. modelar conceptos taxonómicos;
+-4. modelar poblaciones y especímenes;
+-5. registrar eventos de flujo génico;
+-6. construir al menos tres vistas;
+-7. auditar el resultado;
+-8. documentar fallas del esquema.
++- arte celular y ambiental;
++- lenguaje visual de eventos;
++- animaciones;
++- audio;
++- narrativa y textos;
++- localización;
++- accesibilidad;
++- onboarding;
++- rendimiento;
++- balance;
++- control de densidad científica;
++- pruebas con usuarios.
+ 
+ ### Criterios de aceptación
+ 
+-- el caso completo no requiere hacks semánticos;
+-- pueden coexistir denisovanos como linaje y varios nombres taxonómicos propuestos;
+-- Harbin u otro caso análogo puede tener asignaciones alternativas;
+-- la vista de consenso y las alternativas son comprensibles;
+-- la procedencia es suficiente para revisión científica.
++- la célula se representa de forma legible sin infantilizar la ciencia;
++- la campaña tiene identidad emocional y narrativa;
++- el Atlas no requiere leer paredes de texto para jugar;
++- la interfaz funciona con teclado y alternativas visuales;
++- el rendimiento cumple el objetivo elegido.
+ 
+-## Fase 9. Atlas MVP
++## Fase 13. Auditoría, preparación de lanzamiento y publicación
+ 
+ ### Objetivo
+ 
+-Crear la primera interfaz útil para navegar el conocimiento.
++Lanzar una campaña completa y científicamente defendible.
+ 
+-### Funciones mínimas
++### Tareas
+ 
+-- búsqueda;
+-- ficha de entidad;
+-- línea temporal;
+-- mapa básico;
+-- vista filogenética;
+-- selector de hipótesis;
+-- historial taxonómico;
+-- procedencia;
+-- comparación entre vistas;
+-- filtros por escala y evidencia.
++1. auditoría científica;
++2. auditoría de procedencia;
++3. auditoría de accesibilidad;
++4. pruebas de regresión;
++5. revisión de licencias;
++6. documentación pública;
++7. build reproducible;
++8. política de actualizaciones científicas;
++9. plan de soporte;
++10. publicación.
+ 
+ ### Criterios de aceptación
+ 
+-- el usuario puede responder por qué una entidad aparece en determinada posición;
+-- puede cambiar de clasificación sin perder identidad;
+-- puede distinguir hecho, inferencia, hipótesis y estado histórico;
+-- la interfaz no depende solo del color.
++- no quedan errores científicos críticos conocidos;
++- las simplificaciones están documentadas;
++- el build es reproducible;
++- el juego puede completarse;
++- las fuentes y créditos son correctos;
++- el producto funciona de manera autónoma, no como demostración técnica.
+ 
+-## Fase 10. Reconstrucción MVP
++## Fase 14. Revisión post-lanzamiento y estabilización de plataforma
+ 
+ ### Objetivo
+ 
+-Transformar el núcleo científico en una experiencia jugable de inferencia.
++Aprender del primer lanzamiento antes de ampliar la escala.
+ 
+-### Funciones mínimas
++### Tareas
++
++- analizar bugs y telemetría;
++- revisar comprensión del jugador;
++- evaluar deuda del esquema;
++- registrar migraciones necesarias;
++- clasificar mecánicas reutilizables;
++- identificar acoplamientos indebidos a Eucaria;
++- actualizar la guía y ADR;
++- fijar criterios de inicio de Campaña 2.
++
++### Criterios de aceptación
++
++- existe postmortem;
++- los cambios de esquema tienen migraciones;
++- el núcleo común está separado del módulo Eucaria;
++- el backlog de Campaña 2 tiene alcance controlado.
++
++## Fase 15. Campaña 2: Animales
++
++### Objetivo
+ 
+-- historia oculta predefinida;
++Aplicar el mismo ciclo de dossier → datos → prototipo → lanzamiento, agregando solo los sistemas necesarios para multicelularidad, desarrollo y planes corporales.
++
++### Regla
++
++No se comienza por “todos los animales”. Se aplica nuevamente el cono de foco desde Holozoa hasta Bilateria.
++
++## Fase 16. Campañas 3 a 6
++
++Cada campaña repite un ciclo formal:
++
++1. dossier;
++2. alcance;
++3. corpus;
++4. migración de esquema si hace falta;
++5. dataset;
++6. Atlas;
++7. módulo de simulación;
++8. prototipo;
++9. lente científica;
++10. producción;
++11. auditoría;
++12. lanzamiento;
++13. postmortem.
++
++Los sistemas se incorporan cuando aparecen:
++
++- anatomía y fósiles en Cordados;
++- extinciones y fisiología en Sinápsidos;
++- historia de vida y cuidado parental en Mamíferos;
++- sociabilidad y aprendizaje en Primates.
++
++## Fase 17. Campaña de Homininos y sistemas de máxima complejidad
++
++### Objetivo
++
++Implementar la campaña culminante utilizando el trabajo preservado.
++
++### Capacidades que deben activarse o completarse
++
++- especímenes;
++- yacimientos;
++- ocurrencias fósiles;
++- paleogeografía;
++- genética de poblaciones;
++- migración;
++- flujo génico e introgresión;
++- taxonomías rivales;
++- cultura y tecnologías;
++- arqueología;
++- tafonomía;
++- evidencia generada;
++- modo Reconstrucción completo.
++
++### Piloto interno conservado
++
++El período 400.000–40.000 años se utiliza como vertical slice interno antes de producir toda la campaña.
++
++### Criterios de aceptación
++
++- denisovanos pueden existir como linaje sin nombre taxonómico único;
++- Hominini puede tener circunscripciones alternativas;
++- Harbin u otro caso análogo admite asignaciones incompatibles;
++- flujo génico y topología alternativa no se confunden;
++- una partida puede producir evidencia parcial para Reconstrucción;
++- todos los capítulos conservados tienen un destino.
++
++## Fase 18. Sistemas transversales futuros
++
++Se evalúan después de varias campañas:
++
++- Modo Gran Linaje;
++- transferencia de estado entre campañas;
++- editor colaborativo;
++- razonamiento automático avanzado;
++- base de grafos o RDF;
++- inferencia probabilística jugable;
++- expansión exhaustiva del Atlas fuera del corredor principal.
++
++## 24.1. Matriz de migración de la hoja de ruta `1.0.0`
++
++| Fase anterior | Destino en `1.1.0` | Estado |
++|---|---|---|
++| Constitución | Fase 0 | Conservada y ampliada con archivado y ADR de campañas. |
++| Corpus y menciones | Fase 2 | Conservada. |
++| Identidad | Fase 3 | Conservada; implementación inicial reducida al caso actual. |
++| Afirmaciones y evidencia | Fase 4 | Conservada. |
++| Tiempo, geografía y ocurrencias | Fase 4 y campañas posteriores | Tiempo se implementa ahora; geografía/ocurrencias se especializan por escala. |
++| Eventos y reticulación | Fase 5 | Conservada; endosimbiosis reemplaza introgresión como primer fixture real. |
++| Hipótesis y vistas | Fase 5 | Conservada. |
++| Pipeline completo | Fase 6 | Conservada. |
++| Piloto hominino real | Fase 17 | Reubicado; sustituido por dataset Eucaria en Fase 7. |
++| Atlas MVP | Fase 8 | Conservado e integrado al primer lanzamiento. |
++| Reconstrucción MVP | Fase 11 en forma ligera y Fase 17 en forma completa | Reubicado, no eliminado. |
++| Núcleo poblacional | Fase 9 | Conservado y adaptado a poblaciones celulares. |
++| Tafonomía y evidencia | Fases 11 y 17 | Señales ligeras primero; tafonomía fósil después. |
++| Evolución MVP | Fase 10 | Conservado como campaña Eucaria. |
++| Integración de modos | Fase 11 y posteriores | Conservada de forma incremental. |
++| Expansión científica | Fases 15–17 | Se invierte el orden: avanza cronológicamente hacia homininos. |
++
++La versión original completa permanece archivada para consultar el detalle histórico de cada fase.
++
++## 24.2. Paquetes avanzados preservados de la hoja de ruta original
++
++Estos paquetes no pertenecen al primer lanzamiento, pero conservan el detalle operativo necesario para campañas posteriores. Deben activarse mediante las fases y disparadores indicados, no reconstruirse de memoria cuando llegue el momento.
++
++### 24.2.1. Tiempo, geografía, sitios y ocurrencias avanzadas
++
++#### Tareas preservadas
++
++- implementar yacimientos;
++- implementar regiones y paleorregiones;
++- crear ocurrencias vinculadas con entidad, tiempo, lugar y fuente;
++- validar coexistencia;
++- advertir inversiones aparentes de rangos observados;
++- gestionar unidades y conversiones;
++- producir líneas temporales y mapas;
++- separar localización observada, inferida y aproximada.
++
++#### Criterios de aceptación
++
++- observado e inferido no se confunden;
++- una divergencia puede expresarse como intervalo;
++- el sistema no rechaza automáticamente una relación por sesgo fósil;
++- las ubicaciones inciertas están marcadas;
++- la paleogeografía puede versionarse sin cambiar IDs biológicos.
++
++### 24.2.2. Piloto científico hominino preservado
++
++#### Alcance
++
++*Sapiens*, neandertales, denisovanos y humanos asiáticos del Pleistoceno medio y tardío.
++
++#### Tareas
++
++- seleccionar corpus;
++- ingresar fuentes y secciones;
++- modelar conceptos taxonómicos;
++- modelar poblaciones y especímenes;
++- registrar eventos de flujo génico;
++- construir al menos tres vistas;
++- auditar el resultado;
++- documentar fallas del esquema.
++
++#### Criterios de aceptación
++
++- denisovanos pueden existir como linaje y coexistir con varios nombres propuestos;
++- Harbin u otro caso análogo admite asignaciones alternativas;
++- consenso y alternativas son comprensibles;
++- la procedencia permite revisión científica;
++- el caso no requiere hacks semánticos.
++
++### 24.2.3. Modo Reconstrucción completo
++
++#### Funciones mínimas preservadas
++
++- historia oculta predefinida o simulada;
+ - conjunto limitado de especímenes;
+ - presupuesto o turnos;
+ - selección de análisis;
+@@ -2595,20 +3598,16 @@ Transformar el núcleo científico en una experiencia jugable de inferencia.
+ - aparición de nueva evidencia;
+ - revisión.
+ 
+-### Criterios de aceptación
++#### Criterios de aceptación
+ 
+-- el jugador puede conservar “sin resolver” como resultado válido;
++- “sin resolver” es un resultado válido;
+ - no existe una única acción óptima basada en desbloquear tecnología;
+ - la puntuación separa acierto, evidencia y calibración;
+ - el escenario es rejugable mediante evidencia parcial.
+ 
+-## Fase 11. Núcleo de simulación poblacional
+-
+-### Objetivo
+-
+-Simular poblaciones antes de construir un modo Evolución completo.
++### 24.2.4. Núcleo poblacional avanzado
+ 
+-### Variables mínimas recomendadas
++#### Variables mínimas preservadas
+ 
+ - tamaño efectivo;
+ - ubicación;
+@@ -2618,36 +3617,32 @@ Simular poblaciones antes de construir un modo Evolución completo.
+ - diversidad genética abstracta;
+ - contacto;
+ - flujo génico;
+-- persistencia/extinción.
++- persistencia y extinción.
+ 
+-### Tareas
++#### Tareas
+ 
+-1. modelo de tiempo;
+-2. actualización demográfica;
+-3. división;
+-4. migración;
+-5. contacto;
+-6. introgresión;
+-7. cuellos de botella;
+-8. registro de historia completa;
+-9. determinismo por semilla;
+-10. exportación al grafo científico.
++- modelo temporal por campaña;
++- actualización demográfica;
++- división;
++- migración;
++- contacto;
++- introgresión;
++- cuellos de botella;
++- registro de historia completa;
++- determinismo por semilla;
++- exportación al grafo científico.
+ 
+-### Criterios de aceptación
++#### Criterios de aceptación
+ 
+ - la misma semilla reproduce la historia;
+ - no aparecen ciclos temporales;
+ - la especiación no es un botón;
+-- el modelo produce historias diferentes sin violar invariantes;
++- el modelo produce historias distintas sin violar invariantes;
+ - los eventos pueden convertirse en evidencia parcial.
+ 
+-## Fase 12. Tafonomía y producción de evidencia
+-
+-### Objetivo
+-
+-Separar historia ocurrida de historia observable.
++### 24.2.5. Tafonomía y producción de evidencia
+ 
+-### Tareas
++#### Tareas preservadas
+ 
+ - probabilidad de preservación;
+ - sesgo por tejido y ambiente;
+@@ -2659,34 +3654,31 @@ Separar historia ocurrida de historia observable.
+ - generación de especímenes y ocurrencias;
+ - vinculación con historia oculta.
+ 
+-### Criterios de aceptación
++#### Criterios de aceptación
+ 
+ - el registro observable es incompleto y sesgado;
+ - una historia puede producir varias interpretaciones plausibles;
+-- el jugador no accede directamente a la verdad simulada.
+-
+-## Fase 13. Modo Evolución MVP
++- el jugador no accede directamente a la verdad simulada;
++- los errores y ausencias de evidencia son distinguibles de ausencia biológica.
+ 
+-### Objetivo
+-
+-Permitir intervención indirecta sobre poblaciones.
++### 24.2.6. Modo Evolución avanzado
+ 
+-### Alcance mínimo
++#### Alcance mínimo preservado
+ 
+-- una región;
++- una región o conjunto de regiones;
+ - varias poblaciones;
+-- clima abstracto;
++- clima abstracto o reconstruido;
+ - movilidad;
+ - recursos;
+ - contacto;
+-- cultura abstracta;
++- cultura abstracta cuando corresponda;
+ - reproducción;
+ - divergencia;
+ - mezcla;
+ - extinción;
+ - objetivos alternativos.
+ 
+-### Criterios de aceptación
++#### Criterios de aceptación
+ 
+ - no existe árbol de mejoras teleológico;
+ - toda ventaja tiene costos o contexto;
+@@ -2694,42 +3686,23 @@ Permitir intervención indirecta sobre poblaciones.
+ - el jugador influye, no diseña genomas;
+ - el resultado se registra como historia compatible con el Atlas.
+ 
+-## Fase 14. Integración de modos
++### 24.2.7. Integración completa de modos
+ 
+-### Objetivo
++#### Objetivo preservado
+ 
+ Usar una partida de Evolución como historia oculta para Reconstrucción y Atlas.
+ 
+-### Criterios de aceptación
++#### Criterios de aceptación
+ 
+-- la historia simulada produce corpus de evidencia;
++- la historia simulada produce un corpus de evidencia;
+ - Reconstrucción puede analizarlo;
+-- Atlas muestra verdad, evidencia e interpretación en capas separadas;
+-- las proyecciones no contaminan el núcleo científico real.
+-
+-## Fase 15. Expansión científica y campañas
+-
+-### Objetivo
+-
+-Extender escalas y mecánicas solo después de validar el núcleo.
+-
+-Orden sugerido:
+-
+-1. homininos;
+-2. hominoideos;
+-3. primates;
+-4. mamíferos y sinápsidos;
+-5. tetrápodos y vertebrados;
+-6. animales;
+-7. eucariogénesis y simbiosis.
+-
+-Cada expansión puede requerir un módulo de simulación distinto.
+-
+----
++- Atlas muestra verdad simulada, evidencia e interpretación en capas separadas;
++- las proyecciones no contaminan el núcleo científico real;
++- una actualización del conocimiento real no altera retrospectivamente la historia simulada sin migración.
+ 
+ # 25. Trabajo pospuesto
+ 
+-Esta sección es parte del plan. Nada de lo siguiente debe desaparecer del proyecto solo porque no entra en el MVP.
++Esta sección es parte del plan. Nada de lo siguiente debe desaparecer del proyecto solo porque no entra en el primer lanzamiento.
+ 
+ ## 25.1. Granularidad molecular fina
+ 
+@@ -2739,19 +3712,28 @@ Esta sección es parte del plan. Nada de lo siguiente debe desaparecer del proye
+ - alelos;
+ - haplotipos;
+ - regiones cromosómicas;
+-- genomas ancestrales;
+-- virus endógenos;
++- genomas ancestrales detallados;
++- proteínas individuales como sistemas completos;
++- virus endógenos específicos;
+ - transferencia bacteriana concreta;
+ - duplicaciones génicas detalladas;
+-- conflictos entre árboles génicos.
++- conflictos entre árboles génicos;
++- redes metabólicas bioquímicas completas.
++
++### Lo que sí entra en Eucaria
++
++- transferencia genética como evento abstracto cuando sea necesaria;
++- integración heredable;
++- costos y beneficios funcionales agregados;
++- evidencia molecular como categoría y afirmaciones trazables.
+ 
+ ### Motivo
+ 
+-Requiere identidad molecular, coordenadas, ensamblajes, versiones de referencia y modelos de herencia propios.
++La granularidad fina requiere coordenadas, ensamblajes, versiones de referencia, modelos de herencia y validaciones propios.
+ 
+ ### Disparador
+ 
+-Retomar cuando el piloto poblacional necesite explicar introgresión por regiones genómicas o una campaña de eucariogénesis.
++Retomar cuando una mecánica o afirmación científica no pueda representarse responsablemente mediante abstracción agregada y exista un corpus acotado para validarla.
+ 
+ ## 25.2. Cultura detallada
+ 
+@@ -2767,55 +3749,57 @@ Retomar cuando el piloto poblacional necesite explicar introgresión por regione
+ 
+ ### Motivo
+ 
+-La cultura necesita su propia identidad, eventos, herencia y relación con poblaciones. Modelarla como un atributo simple sería insuficiente.
++La cultura necesita identidad, eventos, herencia y relación con poblaciones. Modelarla como atributo simple sería insuficiente.
+ 
+ ### Disparador
+ 
+-Retomar después de que `Population`, `Event` y tiempo funcionen en el modo Evolución básico.
++Retomar durante Primates o Homininos, cuando `Population`, `Event`, tiempo y aprendizaje ya hayan sido probados.
+ 
+-## 25.3. Ecosistemas y paleogeografía dinámica
++## 25.3. Ecosistemas y paleogeografía dinámica completos
+ 
+ **POSPUESTO:**
+ 
+-- biomas detallados;
+-- redes tróficas;
++- biomas de alta resolución;
++- redes tróficas completas;
+ - paleocostas;
+ - tectónica;
+ - cambios de ríos;
+-- reconstrucción climática espacial;
+-- especies ecológicas no directamente vinculadas con la filogenia humana.
++- reconstrucción climática espacial continua;
++- simulación planetaria;
++- todas las especies ecológicas externas.
+ 
+-### Motivo
++### Lo que sí entra temprano
+ 
+-Aumenta enormemente el estado de simulación y puede desviar el proyecto hacia un simulador planetario antes de validar poblaciones.
++Cada campaña puede usar un ambiente abstracto suficiente para sus mecánicas. Eucaria necesita recursos, oxígeno, temperatura y estabilidad; no un planeta entero.
+ 
+ ### Disparador
+ 
+-Retomar cuando una campaña concreta necesite corredores, islas, recursos o interacción ecológica no representables mediante regiones abstractas.
++Retomar módulos concretos cuando una campaña necesite corredores, islas, recursos o interacción ecológica no representables mediante ambientes abstractos.
+ 
+-## 25.4. Historia completa de la vida
++## 25.4. Historia completa de la vida y diversidad periférica
+ 
+-**POSPUESTO como carga de datos, no como capacidad del esquema.**
++**POSPUESTO como carga exhaustiva de datos, no como capacidad del esquema.**
+ 
+-El esquema debe soportarla desde el diseño, pero la ingestión se hará por dominios. No se cargará cada taxón conocido antes del primer prototipo.
++El desarrollo por campañas incorpora el corredor principal en orden. No obliga a cargar cada taxón conocido de cada rama hermana.
+ 
+ ### Disparador
+ 
+-Completar una escala solo cuando exista:
++Ampliar una rama periférica cuando exista:
+ 
+ - objetivo científico;
+-- campaña;
+ - corpus;
++- uso en Atlas o campaña;
+ - responsable de revisión;
+-- prueba de que la interfaz puede mostrarla.
++- prueba de visualización;
++- presupuesto de mantenimiento.
+ 
+-## 25.5. Exhaustividad de todos los rangos
++## 25.5. Exhaustividad preventiva de todos los rangos
+ 
+-**POSPUESTO en ingestión inicial:** registrar desde el principio cualquier rango que aparezca, pero no poblar preventivamente cada infraorden, parvorden, cohorte, magnorden, tribu o subtribu del árbol de la vida.
++**POSPUESTO:** registrar cualquier rango que aparezca, pero no poblar preventivamente cada infraorden, parvorden, cohorte, magnorden, tribu o subtribu del árbol de la vida.
+ 
+ ### Disparador
+ 
+-Una fuente, vista o campaña requiere ese rango.
++Una fuente, vista o campaña requiere ese rango. La campaña de Primates será el primer gran caso de prueba para tribus, subtribus y subgéneros.
+ 
+ ## 25.6. Compatibilidad automática completa
+ 
+@@ -2823,15 +3807,15 @@ Una fuente, vista o campaña requiere ese rango.
+ 
+ ### Motivo
+ 
+-La compatibilidad puede depender de identidad, definición, tiempo, taxonomía y supuestos no formalizados.
++La compatibilidad depende de identidad, definición, tiempo, taxonomía y supuestos no siempre formalizados.
+ 
+ ### Disparador
+ 
+-Cuando los grupos de conflicto manuales ya no escalen y existan suficientes fixtures para especificar reglas.
++Cuando los grupos de conflicto manuales ya no escalen y existan fixtures suficientes para especificar reglas.
+ 
+-## 25.7. Inferencia probabilística
++## 25.7. Inferencia probabilística jugable
+ 
+-**POSPUESTO:** probabilidades bayesianas internas para hipótesis del juego o del sistema científico.
++**POSPUESTO:** probabilidades bayesianas internas para hipótesis del jugador o del sistema.
+ 
+ ### Motivo
+ 
+@@ -2839,7 +3823,7 @@ No deben confundirse con soporte publicado ni inventarse priors arbitrarios.
+ 
+ ### Disparador
+ 
+-Una mecánica de Reconstrucción requiere un modelo explícito y validado, separado de la aceptación científica real.
++El modo Reconstrucción completo requiere un modelo explícito, validado y separado de la aceptación científica real.
+ 
+ ## 25.8. Base de grafos, RDF y ontologías externas
+ 
+@@ -2847,11 +3831,11 @@ Una mecánica de Reconstrucción requiere un modelo explícito y validado, separ
+ 
+ ### Motivo
+ 
+-Primero debe estabilizarse la semántica. Una base sofisticada no rescata un concepto taxonómico mal identificado; solo permite consultarlo con mucha velocidad.
++Primero debe estabilizarse la semántica y probarse con campañas reales.
+ 
+ ### Disparador
+ 
+-Necesidades reales de consulta, interoperabilidad o razonamiento.
++Necesidades demostradas de consulta, interoperabilidad, razonamiento o edición concurrente.
+ 
+ ## 25.9. Editor colaborativo
+ 
+@@ -2859,13 +3843,87 @@ Necesidades reales de consulta, interoperabilidad o razonamiento.
+ 
+ ### Disparador
+ 
+-El proyecto deja de ser individual o la ingestión manual por Git se vuelve un cuello de botella.
++El proyecto deja de ser individual o la ingestión por Git se vuelve un cuello de botella.
+ 
+-## 25.10. Campañas de simbiosis, cuerpos, sinápsidos y primates
++## 25.10. Modo Reconstrucción completo
+ 
+-**POSPUESTAS** hasta validar el ciclo completo con homininos.
++**POSPUESTO, pero RETENIDO como modo principal futuro.**
+ 
+----
++La Campaña 1 implementa una lente científica ligera. Excavaciones, especímenes, selección de análisis, publicación y revisión jugable se activarán cuando exista un dominio con evidencia adecuada.
++
++### Disparador
++
++Al menos una campaña con especímenes u observaciones discretas, un módulo de historia oculta y un sistema de evidencia parcial estable. El vertical slice hominino 400.000–40.000 años continúa siendo el candidato principal.
++
++## 25.11. Tafonomía, especímenes y yacimientos completos
++
++**POSPUESTO para la Campaña 1.**
++
++Los tipos pueden existir en el esquema o como interfaces futuras, pero no necesitan implementación productiva hasta campañas con registro fósil relevante.
++
++### Disparador
++
++Cordados, Sinápsidos o una campaña posterior necesitan transformar historia simulada en fósiles y ocurrencias.
++
++## 25.12. Modo Gran Linaje
++
++**POSPUESTO:** una única partida conectada desde Eukaryota hasta *Homo sapiens*.
++
++### Motivo
++
++Las escalas temporales, unidades y mecánicas cambian demasiado. Forzar continuidad temprana produciría una simulación universal superficial.
++
++### Disparador
++
++Al menos tres campañas lanzadas, módulos estabilizados y una especificación explícita de qué estado puede transferirse entre escalas.
++
++## 25.13. Transferencia literal de estado entre campañas
++
++**POSPUESTO:** heredar automáticamente rasgos, poblaciones y resultados completos de una campaña a la siguiente.
++
++### Primera etapa
++
++Solo se transfieren:
++
++- progreso del jugador;
++- desbloqueos del Atlas;
++- historial narrativo;
++- configuraciones;
++- logros o marcas de campaña.
++
++### Disparador
++
++El Modo Gran Linaje define un contrato de interoperabilidad entre módulos.
++
++## 25.14. Diversidad eucariota exhaustiva
++
++**POSPUESTO:** incorporar todos los supergrupos, filos, clases y taxones eucariotas en la Campaña 1.
++
++### Motivo
++
++Contradice el cono de foco y bloquearía el lanzamiento.
++
++### Disparador
++
++Expansiones del Atlas o campañas laterales con propósito propio.
++
++## 25.15. Campañas laterales fuera del corredor humano
++
++**POSPUESTO, no rechazado:** campañas centradas en hongos, plantas, artrópodos, dinosaurios, cetáceos u otros linajes.
++
++### Disparador
++
++La plataforma ha demostrado que puede soportar campañas laterales sin desviar el corredor principal ni comprometer mantenimiento.
++
++## 25.16. Todos los sistemas homininos en el núcleo inicial
++
++**POSPUESTO como implementación, RETENIDO como especificación.**
++
++No se implementarán ahora cultura, arqueología, paleogenómica, taxonomía de especímenes y geografía humana detallada. Se mantienen como requisitos futuros y fixtures de regresión.
++
++### Disparador
++
++La hoja de ruta alcance Primates/Homininos o una decisión arquitectónica necesite probar anticipadamente un caso concreto.
+ 
+ # 26. Decisiones todavía abiertas
+ 
+@@ -2875,19 +3933,28 @@ Las siguientes decisiones no deben resolverse prematuramente. Cada una debe prod
+ |---|---|---|
+ | `OPEN-001` | Lenguaje principal de tooling | Fase 0 |
+ | `OPEN-002` | Formato definitivo de IDs opacos | Fase 0 |
+-| `OPEN-003` | Estilo bibliográfico y resolución de DOI | Fase 1–3 |
+-| `OPEN-004` | Representación de topologías: Newick, listas de clados o ambas | Fase 6 |
+-| `OPEN-005` | Framework del Atlas | Fase 9 |
+-| `OPEN-006` | Motor de juego | Antes de Fase 10–11 |
+-| `OPEN-007` | Base de datos de producción | Tras piloto real |
+-| `OPEN-008` | Semántica exacta del ancho de bandas | Fase 9 |
+-| `OPEN-009` | Sistema de puntuación de Reconstrucción | Fase 10 |
+-| `OPEN-010` | Modelo demográfico y paso temporal | Fase 11 |
+-| `OPEN-011` | Modelo de especie emergente | Fase 11–13 |
+-| `OPEN-012` | Nivel de determinismo y aleatoriedad | Fase 11 |
+-| `OPEN-013` | Condiciones de victoria | Fase 13 |
+-| `OPEN-014` | Nombre definitivo del juego | Después del prototipo |
+-| `OPEN-015` | Licencia de datos, código y contenido | Fase 0–1 |
++| `OPEN-003` | Estilo bibliográfico y resolución de DOI | Fases 1–4 |
++| `OPEN-004` | Representación de topologías: Newick, listas de clados o ambas | Fase 5 |
++| `OPEN-005` | Framework del Atlas | Fase 8 |
++| `OPEN-006` | Motor de juego | Antes de Fase 9 |
++| `OPEN-007` | Base de datos de producción | Después de Fase 7 o cuando haya métricas reales |
++| `OPEN-008` | Semántica exacta del ancho de bandas | Fase 8 y campañas poblacionales posteriores |
++| `OPEN-009` | Modelo de puntuación del modo Reconstrucción completo | Fase 17 |
++| `OPEN-010` | Modelo poblacional y paso temporal de Eucaria | Fase 9 |
++| `OPEN-011` | Criterio de divergencia o especiación emergente por campaña | Fases 9–10 y posteriores |
++| `OPEN-012` | Nivel de determinismo y aleatoriedad | Fase 9 |
++| `OPEN-013` | Condiciones exactas de éxito de Eucaria | Fase 10 |
++| `OPEN-014` | Nombre definitivo del juego y de Campaña 1 | Después del prototipo jugable |
++| `OPEN-015` | Licencia de datos, código y contenido | Fases 0–1 |
++| `OPEN-016` | Fecha de corte y corpus científico exacto de Eucaria | Fase 1 |
++| `OPEN-017` | Representación visual de célula, ambiente e integración | Fases 8–12 |
++| `OPEN-018` | Alcance exacto de Filozoa/Choanozoa dentro del cierre Holozoa | Fases 1 y 7 |
++| `OPEN-019` | Qué señales científicas usa la lente de la Campaña 1 | Fases 7–11 |
++| `OPEN-020` | Política de actualización del juego ante cambios científicos | Fase 13 |
++| `OPEN-021` | Contrato futuro de continuidad entre campañas | Después de tres campañas |
++| `OPEN-022` | Si Homininos será una campaña o dos productos | Antes de Fase 17 |
++| `OPEN-023` | Qué campaña introduce por primera vez tafonomía completa | Tras definir Cordados |
++| `OPEN-024` | Audiencia y nivel de abstracción educativa | Fases 1, 10 y pruebas de usuario |
+ 
+ ## 26.1. Criterio general
+ 
+@@ -2895,12 +3962,20 @@ Una decisión se toma cuando:
+ 
+ - existen dos o más alternativas reales;
+ - se conocen requisitos;
+-- puede evaluarse con un prototipo o benchmark;
+-- su costo de cambio comienza a crecer.
++- puede evaluarse con un prototipo, corpus o benchmark;
++- su costo de cambio comienza a crecer;
++- la campaña actual realmente la necesita.
+ 
+-No se decide por entusiasmo tecnológico ni por la majestuosidad del logo de una base de datos.
++No se decide por entusiasmo tecnológico ni para anticipar veinte campañas hipotéticas.
+ 
+----
++## 26.2. Restricción de decisiones tempranas
++
++Una decisión de Eucaria puede especializar un módulo, pero no debe convertir su necesidad local en una regla universal. Por ejemplo:
++
++- el paso temporal celular no define el paso temporal hominino;
++- el ambiente abstracto no elimina la geografía futura;
++- la ausencia de especímenes en Campaña 1 no elimina `Specimen` del modelo conceptual;
++- la señal molecular temprana no sustituye fósiles o arqueología en campañas posteriores.
+ 
+ # 27. Estrategia de pruebas
+ 
+@@ -2911,7 +3986,9 @@ No se decide por entusiasmo tecnológico ni por la majestuosidad del logo de una
+ - migraciones;
+ - compatibilidad entre versiones;
+ - enumeraciones;
+-- campos obligatorios.
++- campos obligatorios;
++- tipos futuros opcionales sin campos nulos obligatorios;
++- manifiestos de campaña.
+ 
+ ## 27.2. Pruebas de identidad
+ 
+@@ -2921,14 +3998,16 @@ No se decide por entusiasmo tecnológico ni por la majestuosidad del logo de una
+ - cambios de nombre;
+ - cambios de rango;
+ - conceptos con el mismo nombre y contenido distinto;
+-- fusiones y deshacer fusiones.
++- fusiones y deshacer fusiones;
++- linajes estructurales sin nombres inventados.
+ 
+ ## 27.3. Pruebas de procedencia
+ 
+ - toda afirmación llega a un pasaje;
+ - toda evidencia llega a una fuente;
+ - toda vista explica qué afirmaciones utiliza;
+-- registros externos están marcados como auditoría.
++- registros externos están marcados como auditoría;
++- cada simplificación jugable tiene justificación.
+ 
+ ## 27.4. Pruebas temporales
+ 
+@@ -2937,7 +4016,9 @@ No se decide por entusiasmo tecnológico ni por la majestuosidad del logo de una
+ - rangos observados frente a inferidos;
+ - eventos imposibles;
+ - ciclos de ascendencia;
+-- conversiones de unidades.
++- conversiones de unidades;
++- coexistencia de participantes en una asociación;
++- límites de campaña.
+ 
+ ## 27.5. Pruebas de hipótesis
+ 
+@@ -2945,7 +4026,9 @@ No se decide por entusiasmo tecnológico ni por la majestuosidad del logo de una
+ - afirmaciones mutuamente excluyentes;
+ - topologías alternativas;
+ - invalidación de vistas;
+-- reconstrucción determinista.
++- reconstrucción determinista;
++- backbone fechado;
++- una vista no mezcla endosimbiosis con divergencia.
+ 
+ ## 27.6. Pruebas de visualización
+ 
+@@ -2954,43 +4037,86 @@ No se decide por entusiasmo tecnológico ni por la majestuosidad del logo de una
+ - filtros;
+ - densidad;
+ - accesibilidad;
+-- equivalencia entre vista y afirmaciones seleccionadas.
++- equivalencia entre vista y afirmaciones seleccionadas;
++- zoom semántico;
++- legibilidad de eventos reticulados;
++- representación sin depender del color.
+ 
+-## 27.7. Pruebas de simulación
++## 27.7. Pruebas de simulación de Eucaria
+ 
+ - determinismo por semilla;
+ - conservación de invariantes;
+-- ausencia de tamaños negativos;
+-- migración temporalmente válida;
+-- introgresión con coexistencia;
++- poblaciones y recursos no negativos;
++- reproducción válida;
++- deriva;
++- contacto temporalmente válido;
++- asociación y ruptura;
++- integración condicionada;
+ - extinción terminal;
+-- reproducibilidad;
+-- distribución razonable de resultados.
++- múltiples trayectorias;
++- ausencia de teleología;
++- exportación correcta de eventos al grafo.
++
++## 27.8. Pruebas de campaña
+ 
+-## 27.8. Fixtures de referencia
++- inicio, capítulos y final alcanzables;
++- tutorial;
++- guardado y carga;
++- objetivos alternativos;
++- desbloqueos del Atlas;
++- continuidad narrativa;
++- contenido obligatorio completo;
++- diversidad diferida explícita;
++- ninguna dependencia accidental de contenido hominino;
++- campaña jugable sin consultar el Atlas de forma obligatoria.
++
++## 27.9. Fixtures de referencia
+ 
+ Mantener conjuntos pequeños y comprensibles:
+ 
+-1. taxonomía con homónimo conceptual;
+-2. árbol con dos topologías incompatibles;
+-3. evento de introgresión;
+-4. fósil con varias asignaciones;
+-5. rango observado posterior al origen inferido;
+-6. hipótesis histórica superada;
+-7. proyección de juego simplificada.
++1. `eukarya-minimal`: corredor y ramas hermanas;
++2. `endosymbiosis-event`: evento n-ario con roles;
++3. `two-deep-topologies`: dos hipótesis incompatibles;
++4. `observed-vs-inferred-time`: primera evidencia frente a origen;
++5. `historical-classification`: hipótesis superada;
++6. `game-projection-eukarya`: simplificación jugable;
++7. `future-hominini-homonym`: dos conceptos llamados Hominini;
++8. `future-denisovan-lineage`: linaje sin nombre taxonómico único;
++9. `future-introgression`: evento poblacional de flujo génico;
++10. `future-specimen-assignment`: fósil con varias asignaciones.
++
++Los fixtures `future-*` no son contenido de Campaña 1. Son pruebas de que la arquitectura conserva el trabajo posterior.
++
++## 27.10. Pruebas de separación entre núcleo y campaña
++
++- eliminar el módulo Eucaria no elimina datos científicos;
++- el núcleo no importa clases específicas de la simulación celular;
++- una nueva campaña puede declarar variables distintas;
++- los IDs científicos sobreviven a cambios de mecánicas;
++- un cambio de balance no modifica afirmaciones;
++- una actualización científica no reescribe partidas guardadas sin migración.
++
++## 27.11. Pruebas de preservación
+ 
+-## 27.9. Revisión científica humana
++- el archivo `1.0.0` conserva su hash;
++- DEC-018 y DEC-032 permanecen como decisiones supersedidas;
++- capítulos homininos continúan presentes;
++- apéndices A–D no pierden contenido;
++- cada sistema reubicado tiene una fase o disparador;
++- el diff de la guía se revisa antes de aceptar una migración.
+ 
+-La validación automática no determina si una interpretación paleontológica es correcta. Debe existir revisión humana para:
++## 27.12. Revisión científica humana
++
++La validación automática no determina si una interpretación es correcta. Debe existir revisión humana para:
+ 
+ - identidad dudosa;
+ - traducción de conceptos;
+ - calidad de evidencia;
+ - clasificación de aceptación;
+ - selección del backbone;
+-- simplificación jugable.
+-
+----
++- simplificación jugable;
++- selección del cono de foco;
++- actualización de controversias.
+ 
+ # 28. Definiciones de terminado
+ 
+@@ -3018,10 +4144,10 @@ Una sección está terminada cuando:
+ Una entidad no necesita estar científicamente “resuelta”. Está correctamente registrada cuando:
+ 
+ - posee identidad estable;
+-- tipo correcto;
+-- etiquetas y alias;
+-- procedencia;
+-- conflictos explícitos;
++- tiene tipo correcto;
++- conserva etiquetas y alias;
++- tiene procedencia;
++- explicita conflictos;
+ - no contiene afirmaciones presentadas como atributos incontrovertibles;
+ - sus cuestiones pendientes están vinculadas.
+ 
+@@ -3035,7 +4161,8 @@ Una entidad no necesita estar científicamente “resuelta”. Está correctamen
+ - fuentes;
+ - exclusiones;
+ - validación;
+-- exportación reproducible.
++- exportación reproducible;
++- alcance de campaña o escala declarado.
+ 
+ ## 28.4. Mecánica terminada
+ 
+@@ -3048,79 +4175,160 @@ Una entidad no necesita estar científicamente “resuelta”. Está correctamen
+ - límites científicos;
+ - pruebas;
+ - telemetría de prototipo;
+-- justificación de simplificaciones.
+-
+----
++- justificación de simplificaciones;
++- no modifica el núcleo científico.
++
++## 28.5. Dossier de campaña terminado
++
++- define pregunta central;
++- fija inicio y final;
++- enumera corredor principal;
++- enumera ramas hermanas;
++- define grupos externos;
++- contiene exclusiones;
++- identifica controversias;
++- identifica sistemas nuevos;
++- define presupuesto de contenido;
++- establece criterios de aceptación;
++- declara continuidad con campañas vecinas.
++
++## 28.6. Dataset de campaña terminado
++
++- cubre todo el alcance obligatorio;
++- registra contenido contextual y diferido;
++- todas las relaciones tienen procedencia;
++- las alternativas son coherentes;
++- los issues están clasificados;
++- existe snapshot congelado;
++- pasa auditoría científica;
++- puede alimentar vistas sin hacks.
++
++## 28.7. Campaña lista para lanzamiento
++
++- puede completarse de principio a fin;
++- tiene tutorial y final;
++- no depende de contenido pospuesto;
++- Atlas y lente científica funcionan;
++- guardado y carga funcionan;
++- accesibilidad mínima validada;
++- fuentes y licencias son correctas;
++- no quedan errores críticos;
++- las simplificaciones están documentadas;
++- existe plan de actualización;
++- funciona como producto completo.
++
++## 28.8. Migración estratégica terminada
++
++- la versión anterior está archivada;
++- su hash está registrado;
++- las decisiones supersedidas tienen reemplazo;
++- todo trabajo reubicado tiene destino;
++- los apéndices científicos permanecen;
++- la nueva hoja de ruta puede ejecutarse sin depender de memoria conversacional.
+ 
+ # 29. Riesgos y mitigaciones
+ 
+ ## 29.1. Expansión ilimitada del alcance
+ 
+-**Riesgo:** intentar cargar toda la evolución antes de validar una sección.
++**Riesgo:** interpretar “Eukaryota” como obligación de representar todos los eucariotas antes del lanzamiento.
+ 
+-**Mitigación:** recorte vertical, fases, criterios de aceptación y backlog pospuesto explícito.
++**Mitigación:** cono de foco, presupuesto de contenido, lista de exclusiones y backlog de diversidad diferida.
+ 
+ ## 29.2. Sobreingeniería ontológica
+ 
+-**Riesgo:** pasar años diseñando categorías sin usuarios ni prototipo.
++**Riesgo:** pasar años diseñando categorías futuras sin campaña jugable.
++
++**Mitigación:** esquema mínimo por fase, fixtures concretos y prohibición de implementar tipos sin caso de uso o prueba de compatibilidad.
++
++## 29.3. Motor universal prematuro
+ 
+-**Mitigación:** esquema mínimo por fase, fixtures concretos y prohibición de implementar tipos sin caso de uso.
++**Riesgo:** construir una simulación genérica para células, animales y humanos que no represente bien ninguna escala.
+ 
+-## 29.3. Mezcla de taxonomía y biología
++**Mitigación:** núcleo compartido pequeño, módulos por campaña e interfaces explícitas.
++
++## 29.4. Mezcla de taxonomía y biología
+ 
+ **Riesgo:** cambios de nombre alteran la historia representada.
+ 
+ **Mitigación:** nombre, concepto, clado, linaje y población separados.
+ 
+-## 29.4. Falsa precisión
++## 29.5. Falsa precisión
+ 
+ **Riesgo:** números de confianza o fechas aparentan más certeza de la disponible.
+ 
+ **Mitigación:** soporte cuantitativo solo desde fuentes, intervalos, categorías cualitativas justificadas y separación observado/inferido.
+ 
+-## 29.5. Alucinación durante ingestión asistida
++## 29.6. Alucinación durante ingestión asistida
+ 
+ **Riesgo:** una herramienta agrega taxones, citas o relaciones ausentes.
+ 
+ **Mitigación:** corpus inmutable, pasajes, propuestas revisables, cobertura, procedencia obligatoria y auditoría separada.
+ 
+-## 29.6. Duplicación de entidades
++## 29.7. Duplicación o fusión excesiva
+ 
+-**Riesgo:** alias, grafías o taxonomías alternativas crean nodos falsamente distintos.
++**Riesgo:** alias, grafías o taxonomías alternativas crean nodos falsos o eliminan diferencias reales.
+ 
+ **Mitigación:** libro de menciones, resolución conservadora, conceptos taxonómicos y fusiones reversibles.
+ 
+-## 29.7. Fusión excesiva
++## 29.8. Visualización ilegible
+ 
+-**Riesgo:** nombres parecidos o sinonimias propuestas eliminan diferencias reales.
++**Riesgo:** la red se vuelve incomprensible incluso en una campaña pequeña.
+ 
+-**Mitigación:** conservar ambos conceptos mientras exista disputa; la sinonimia es una afirmación, no una orden automática.
++**Mitigación:** vistas por escala, filtros, zoom semántico, capas, cono de foco y visualizaciones locales.
+ 
+-## 29.8. Visualización ilegible
++## 29.9. Acoplamiento con Eucaria
++
++**Riesgo:** el núcleo compartido incorpora supuestos celulares que bloquean campañas posteriores.
++
++**Mitigación:** contratos de módulo, pruebas `future-*`, revisión post-lanzamiento y separación de variables por campaña.
++
++## 29.10. Pérdida del trabajo hominino
++
++**Riesgo:** el nuevo orden se interpreta como descarte de escenarios, inventarios y requisitos anteriores.
++
++**Mitigación:** archivo `1.0.0`, Apéndice J, decisiones supersedidas, fixtures futuros y Fase 17 explícita.
++
++## 29.11. Abstracción visual y baja conexión emocional
++
++**Riesgo:** células y procesos profundos resultan menos intuitivos que animales o humanos.
++
++**Mitigación:** continuidad de linaje, crisis, asociaciones, transformaciones visibles, narrativa de dependencia y conflicto, diseño audiovisual y pruebas de usuario.
++
++## 29.12. Antropomorfización engañosa
++
++**Riesgo:** representar asociaciones celulares como decisiones conscientes humanas.
+ 
+-**Riesgo:** la red completa se vuelve un mapa extraterrestre de transporte público.
++**Mitigación:** lenguaje de sistemas, probabilidades y presiones; metáforas visuales claramente marcadas; revisión científica del guion.
+ 
+-**Mitigación:** vistas por escala, filtros, pequeños múltiplos, zoom semántico, capas y visualizaciones locales.
++## 29.13. Evidencia profunda demasiado indirecta
+ 
+-## 29.9. Acoplamiento con el juego
++**Riesgo:** el jugador confunde reconstrucción molecular con observación directa.
+ 
+-**Riesgo:** modificar ciencia para encajar en mecánicas.
++**Mitigación:** lente científica, capas de evidencia, etiquetas de inferencia y comparación de hipótesis.
+ 
+-**Mitigación:** proyección externa, IDs, registro de simplificaciones y pruebas de separación.
++## 29.14. Primera campaña convertida en tutorial incompleto
+ 
+-## 29.10. Simulación teleológica
++**Riesgo:** Eucaria existe solo para preparar campañas futuras y carece de arco propio.
+ 
+-**Riesgo:** el sistema favorece inevitablemente cerebros grandes, cultura humana o supervivencia de *H. sapiens*.
++**Mitigación:** criterios de lanzamiento, capítulos, objetivos alternativos, final y rejugabilidad real.
+ 
+-**Mitigación:** compensaciones, objetivos múltiples, contingencia, costos energéticos, escenarios contrafactuales y ausencia de progreso universal.
++## 29.15. Simulación teleológica
+ 
+-## 29.11. Dependencia del chat
++**Riesgo:** el sistema favorece inevitablemente integración, multicelularidad, cerebros grandes o *Homo sapiens*.
++
++**Mitigación:** costos, resultados alternativos, contingencia, extinciones válidas y ausencia de progreso universal.
++
++## 29.16. Dependencia del chat
+ 
+ **Riesgo:** pérdida de decisiones y estado acumulado.
+ 
+-**Mitigación:** archivos, Git, deltas, snapshots y guía versionada.
++**Mitigación:** archivos, Git, deltas, snapshots, ADR y guía versionada.
+ 
+----
++## 29.17. Actualizaciones científicas rompen partidas
++
++**Riesgo:** un cambio taxonómico o filogenético invalida contenido guardado.
++
++**Mitigación:** separar IDs de nombres, versionar vistas y contenido, migrar partidas y conservar la vista científica usada por cada partida.
+ 
+ # 30. Registro consolidado de decisiones
+ 
+@@ -3140,26 +4348,51 @@ Una entidad no necesita estar científicamente “resuelta”. Está correctamen
+ | `DEC-012` | DECIDIDO | La conversación no es fuente de verdad. |
+ | `DEC-013` | DECIDIDO | Separar ingestión de auditoría externa. |
+ | `DEC-014` | DECIDIDO | Separar núcleo científico y proyección de juego. |
+-| `DEC-015` | DECIDIDO | La población es la unidad principal de simulación y juego. |
+-| `DEC-016` | DECIDIDO | Atlas antes que simulación completa. |
+-| `DEC-017` | RETENIDO | Reconstrucción como primer modo jugable. |
+-| `DEC-018` | RETENIDO | Período 400.000–40.000 años como recorte vertical. |
+-| `DEC-019` | RETENIDO | Tres vistas sincronizadas: mundo, red y ciencia. |
++| `DEC-015` | DECIDIDO | La población es la unidad principal de simulación, especializada por campaña. |
++| `DEC-016` | DECIDIDO | El Atlas es la primera superficie compartida, integrada desde el primer lanzamiento. |
++| `DEC-017` | RETENIDO | Modo Reconstrucción completo; reubicado a campañas con evidencia adecuada. |
++| `DEC-018` | SUPERSEDIDO | Usar 400.000–40.000 años como primer recorte vertical. Reemplazado por `DEC-034`; contenido preservado por `DEC-035`. |
++| `DEC-019` | RETENIDO | Tres vistas sincronizadas: entorno, red y ciencia. |
+ | `DEC-020` | RETENIDO | Historia oculta → registro parcial → hipótesis del jugador. |
+-| `DEC-021` | RETENIDO | Bandas poblacionales en la visualización temporal. |
++| `DEC-021` | RETENIDO | Bandas poblacionales en la visualización temporal cuando la escala lo permita. |
+ | `DEC-022` | RECHAZADO | Un único estado epistemológico. |
+ | `DEC-023` | RECHAZADO | JSON monolítico. |
+ | `DEC-024` | RECHAZADO | Relaciones reticuladas como flechas binarias sin evento. |
+-| `DEC-025` | RECHAZADO | Mutaciones comprables y progreso lineal. |
++| `DEC-025` | RECHAZADO | Mutaciones u orgánulos comprables y progreso lineal. |
+ | `DEC-026` | RECHAZADO | *Homo sapiens* como victoria obligatoria. |
+ | `DEC-027` | POSPUESTO | Base de grafos o RDF. |
+ | `DEC-028` | POSPUESTO | Genes, alelos y transferencia molecular fina. |
+ | `DEC-029` | POSPUESTO | Cultura y lenguaje detallados. |
+ | `DEC-030` | POSPUESTO | Paleogeografía y ecosistemas completos. |
+ | `DEC-031` | POSPUESTO | Compatibilidad lógica automática exhaustiva. |
+-| `DEC-032` | POSPUESTO | Campañas anteriores a los homininos. |
+-
+----
++| `DEC-032` | SUPERSEDIDO | Posponer campañas anteriores hasta validar homininos. Reemplazado por `DEC-033` y `DEC-034`. |
++| `DEC-033` | DECIDIDO | Desarrollar y publicar campañas en orden cronológico general desde Eukaryota hacia homininos. |
++| `DEC-034` | DECIDIDO | La primera campaña y primer lanzamiento cubren Eukaryota → Holozoa. |
++| `DEC-035` | DECIDIDO | Conservar el trabajo hominino como especificación futura, prueba de estrés y campaña culminante. |
++| `DEC-036` | DECIDIDO | Aplicar cono de foco: corredor principal, hermanas inmediatas, externos representativos y diversidad diferida. |
++| `DEC-037` | DECIDIDO | Usar núcleo compartido y módulos de simulación por campaña. |
++| `DEC-038` | DECIDIDO | La continuidad inicial entre campañas es narrativa, enciclopédica y mediante desbloqueos. |
++| `DEC-039` | POSPUESTO | Modo Gran Linaje con una partida continua entre escalas. |
++| `DEC-040` | DECIDIDO | La primera campaña usa lente científica ligera; Reconstrucción completa se implementa después. |
++| `DEC-041` | DECIDIDO | La Campaña 1 termina en Holozoa y prepara la transición a animales. |
++| `DEC-042` | DECIDIDO | La diversidad eucariota exhaustiva no es requisito del primer lanzamiento. |
++| `DEC-043` | DECIDIDO | El primer lanzamiento debe ser una campaña completa, no un prólogo técnico. |
++| `DEC-044` | DECIDIDO | Eucariogénesis y endosimbiosis serán el primer caso real de reticulación. |
++| `DEC-045` | DECIDIDO | Implementar solo tipos y comportamientos necesarios ahora, manteniendo fixtures de compatibilidad futura. |
++| `DEC-046` | DECIDIDO | Archivar versiones rectoras y migrar estrategias de forma no destructiva. |
++| `DEC-047` | POSPUESTO | Transferencia literal de estado biológico entre campañas. |
++| `DEC-048` | RETENIDO | Campaña hominina con seis capítulos; puede dividirse en dos productos si el volumen lo exige. |
++
++## 30.1. Relación entre decisiones nuevas y anteriores
++
++Las decisiones `DEC-033` a `DEC-048` no invalidan la arquitectura `DEC-001` a `DEC-031`. Cambian:
++
++- el primer contenido;
++- el orden de desarrollo;
++- la profundidad inicial de los modos;
++- el momento de implementar sistemas paleoantropológicos.
++
++Los principios científicos, la estructura de conocimiento y los inventarios permanecen vigentes.
+ 
+ # Apéndice A. Inventario científico de partida
+ 
+@@ -4415,7 +5648,7 @@ Tipos previstos:
+   "excluded_claim_ids": [],
+   "editorial_criteria": [],
+   "simplifications": [],
+-  "scale": "hominins",
++  "scale": "campaign-01-eukarya",
+   "generated_artifacts": [],
+   "view_version": "1.0.0",
+   "built_from_dataset_revision": "REV-000001"
+@@ -4428,12 +5661,17 @@ Tipos previstos:
+ {
+   "id": "GAME-000001",
+   "scientific_reference_ids": [],
+-  "campaign_id": null,
+-  "playable_role": null,
++  "campaign_id": "CAMP-000001",
++  "chapter_id": null,
++  "module_id": "c01-eukarya",
++  "playable_role": "population",
++  "simulation_scale": "cellular-populations",
+   "abstraction": "",
+   "mechanic_hooks": [],
+   "scientific_constraints": [],
+   "simplifications": [],
++  "continuity_policy": "atlas-and-narrative",
++  "future_compatibility_notes": [],
+   "justification": "",
+   "status": "draft"
+ }
+@@ -4496,23 +5734,30 @@ Solo debe formularse una pregunta directa cuando no sea posible representar corr
+ La primera ejecución del sistema debe:
+ 
+ 1. crear repositorio vacío;
+-2. fijar `schema_version` inicial;
+-3. crear archivos JSONL vacíos válidos;
+-4. crear manifiesto del dataset;
+-5. crear leyenda visual básica;
+-6. crear glosario mínimo;
+-7. crear primer snapshot vacío;
+-8. ejecutar todas las validaciones;
+-9. no agregar taxones por conocimiento general;
+-10. procesar inmediatamente una sección solo cuando haya sido entregada como corpus.
++2. archivar la guía `1.0.0` y registrar su hash;
++3. fijar `schema_version` inicial;
++4. crear archivos JSONL vacíos válidos;
++5. crear manifiesto del dataset;
++6. crear `CAMP-000001` en estado `planning`;
++7. crear leyenda visual básica;
++8. crear glosario mínimo;
++9. crear primer snapshot vacío;
++10. ejecutar todas las validaciones;
++11. no agregar taxones por conocimiento general;
++12. crear fixtures artificiales separados del dataset científico;
++13. procesar una sección real solo cuando haya sido incorporada como corpus;
++14. mantener el fixture futuro hominino fuera del contenido de campaña.
+ 
+ Estado inicial conceptual:
+ 
+ ```json
+ {
++  "guide_version": "1.1.0",
+   "schema_version": "1.0.0",
+   "dataset_revision": "REV-000000",
+   "snapshot_id": "SNAP-000000",
++  "active_campaign": "CAMP-000001",
++  "campaign_status": "planning",
+   "counts": {
+     "sections": 0,
+     "mentions": 0,
+@@ -4534,8 +5779,11 @@ Estado inicial conceptual:
+ 
+ ## H.1. Antes de escribir código
+ 
+-- [ ] Incorporar esta guía al repositorio.
+-- [ ] Crear ADR-001 con la arquitectura claim-centric.
++- [ ] Archivar guía `1.0.0` y guardar hash.
++- [ ] Incorporar guía `1.1.0`.
++- [ ] Crear ADR-001 claim-centric.
++- [ ] Crear ADR-002 campañas cronológicas.
++- [ ] Crear ADR-003 núcleo + módulos.
+ - [ ] Confirmar estructura de carpetas.
+ - [ ] Elegir lenguaje de tooling.
+ - [ ] Definir convención de IDs.
+@@ -4547,6 +5795,8 @@ Estado inicial conceptual:
+ 
+ ## H.2. Antes de ingresar investigación real
+ 
++- [ ] Dossier C01 terminado.
++- [ ] Fecha de corte definida.
+ - [ ] Corpus inmutable implementado.
+ - [ ] Pasajes localizables.
+ - [ ] Menciones con offsets.
+@@ -4570,33 +5820,70 @@ Estado inicial conceptual:
+ - [ ] Tiempo observado/inferido.
+ - [ ] Validación de ciclos.
+ - [ ] Criterios de vista.
++- [ ] Alcance de campaña declarado.
+ 
+-## H.4. Antes de modelar flujo génico
++## H.4. Antes de modelar endosimbiosis
+ 
+-- [ ] Poblaciones identificadas.
+-- [ ] Eventos y roles.
+-- [ ] Coexistencia temporal.
+-- [ ] Contexto geográfico.
+-- [ ] Evidencia.
+-- [ ] Dirección o bidireccionalidad.
+-- [ ] Distinción entre evento y señal genética.
++- [ ] Participantes identificados o marcados como reconstruidos.
++- [ ] Evento y roles implementados.
++- [ ] Compatibilidad temporal.
++- [ ] Contexto ambiental.
++- [ ] Evidencia vinculada.
++- [ ] Distinción entre asociación, transferencia e integración.
+ - [ ] Relaciones derivadas.
++- [ ] Hipótesis alternativas.
++- [ ] Prueba de que no se dibuja como bifurcación simple.
+ 
+-## H.5. Antes del Atlas
++## H.5. Antes del Atlas de Eucaria
+ 
+-- [ ] Piloto científico real validado.
++- [ ] Dataset real validado.
+ - [ ] Vistas reproducibles.
+ - [ ] Procedencia navegable.
+ - [ ] Comparación de hipótesis.
+ - [ ] Leyenda accesible.
+ - [ ] Zoom semántico definido.
+ - [ ] Historial taxonómico.
++- [ ] Filtros por capítulo.
+ - [ ] Rendimiento medido.
+ 
+-## H.6. Antes de Reconstrucción
++## H.6. Antes del prototipo de Evolución de Eucaria
++
++- [ ] Modelo poblacional mínimo estable.
++- [ ] Tiempo determinista por semilla.
++- [ ] Ambiente abstracto.
++- [ ] Recursos y energía.
++- [ ] Variación y deriva.
++- [ ] Contacto.
++- [ ] Asociación y ruptura.
++- [ ] Integración condicionada.
++- [ ] Divergencia.
++- [ ] Extinción.
++- [ ] Costos y compensaciones.
++- [ ] Registro completo de eventos.
++- [ ] Exportación al Atlas.
++- [ ] Pruebas de teleología.
++
++## H.7. Antes del lanzamiento de Campaña 1
++
++- [ ] Campaña completa jugable.
++- [ ] Tutorial.
++- [ ] Guardado y carga.
++- [ ] Atlas integrado.
++- [ ] Lente científica.
++- [ ] Fuentes y licencias.
++- [ ] Accesibilidad.
++- [ ] Rendimiento.
++- [ ] Auditoría científica.
++- [ ] Simplificaciones documentadas.
++- [ ] Final y transición a Animales.
++- [ ] Plan de actualización.
++- [ ] Postmortem programado.
++
++## H.8. Antes del modo Reconstrucción completo
+ 
+ - [ ] Historia oculta definida.
+ - [ ] Evidencia separada.
++- [ ] Especímenes u observaciones discretas.
+ - [ ] Métodos y costos abstractos.
+ - [ ] Hipótesis construibles.
+ - [ ] Incertidumbre puntuable sin falsa probabilidad.
+@@ -4604,33 +5891,36 @@ Estado inicial conceptual:
+ - [ ] Final “sin resolver” válido.
+ - [ ] Escenario probado con usuarios.
+ 
+-## H.7. Antes de Evolución
+-
+-- [ ] Modelo poblacional estable.
+-- [ ] Tiempo determinista.
+-- [ ] Geografía mínima.
+-- [ ] Demografía.
+-- [ ] Migración.
+-- [ ] Contacto y flujo génico.
+-- [ ] Extinción.
+-- [ ] Costos y compensaciones.
+-- [ ] Registro completo de eventos.
+-- [ ] Exportación a evidencia.
+-- [ ] Pruebas de teleología.
+-
+-## H.8. Antes de una campaña nueva
++## H.9. Antes de una campaña nueva
+ 
++- [ ] Postmortem de campaña anterior.
+ - [ ] Pregunta central.
+-- [ ] escala temporal;
+-- [ ] escala geográfica;
+-- [ ] corpus;
+-- [ ] mecánicas necesarias;
+-- [ ] mecánicas reutilizables;
+-- [ ] simplificaciones;
+-- [ ] riesgos científicos;
+-- [ ] criterios de éxito;
+-- [ ] recorte de contenido;
+-- [ ] prueba vertical.
++- [ ] Escala temporal.
++- [ ] Escala espacial o ambiental.
++- [ ] Corredor principal.
++- [ ] Ramas hermanas.
++- [ ] Grupos externos.
++- [ ] Diversidad diferida.
++- [ ] Corpus.
++- [ ] Mecánicas nuevas.
++- [ ] Mecánicas reutilizables.
++- [ ] Migraciones de esquema.
++- [ ] Simplificaciones.
++- [ ] Riesgos científicos.
++- [ ] Criterios de éxito.
++- [ ] Presupuesto de contenido.
++- [ ] Prueba vertical.
++
++## H.10. Antes de modificar trabajo preservado
++
++- [ ] Consultar guía histórica.
++- [ ] Identificar decisión afectada.
++- [ ] Crear ADR o decisión nueva.
++- [ ] Marcar `SUPERSEDIDO`, no borrar.
++- [ ] Actualizar matriz de preservación.
++- [ ] Mantener fixtures futuros.
++- [ ] Verificar apéndices científicos.
++- [ ] Guardar snapshot previo.
+ 
+ ---
+ 
+@@ -4638,41 +5928,127 @@ Estado inicial conceptual:
+ 
+ La siguiente secuencia puede ejecutarse sin depender de decisiones lejanas:
+ 
+-1. crear el repositorio y guardar esta guía;
+-2. redactar ADR-001: “las afirmaciones son la fuente de verdad”;
+-3. implementar `Section`, `Passage`, `Mention`, `Source` e `Issue`;
+-4. implementar IDs, deltas y snapshots;
+-5. crear fixture artificial con cinco menciones;
+-6. demostrar cobertura completa;
+-7. implementar `TaxonomicName`, `TaxonConcept`, `CladeConcept`, `Lineage`, `Population` y `Specimen`;
+-8. crear fixture con dos conceptos llamados Hominini;
+-9. implementar `Claim`, `EvidenceItem`, `Analysis` y dimensiones epistemológicas;
+-10. crear dos fuentes ficticias en conflicto;
+-11. implementar tiempo, ocurrencias y regiones;
+-12. implementar `Event` con un caso de introgresión;
+-13. implementar `Hypothesis`, grupos de conflicto y dos vistas alternativas;
+-14. generar Graphviz reproducible;
+-15. completar el pipeline de ingestión;
+-16. seleccionar el corpus real del piloto;
+-17. procesar el piloto;
+-18. corregir el esquema solo mediante migraciones;
+-19. construir el Atlas MVP;
+-20. diseñar y probar Reconstrucción;
+-21. construir el núcleo poblacional;
+-22. generar evidencia desde simulación;
+-23. integrar los modos;
+-24. ampliar la filogenia por escalas.
+-
+-La primera meta tangible no es “tener todo el árbol humano”. Es poder tomar una sección pequeña, conservar cada mención, representar dos interpretaciones incompatibles, explicar toda relación mostrada y reconstruir el estado desde archivos. Una vez que eso funciona, el proyecto tiene cimientos. Antes de eso, solo tiene entusiasmo con sangría jerárquica.
++1. crear el repositorio;
++2. copiar `Guia_Maestra_Red_Evolutiva_v1.0.0_ARCHIVO.md` al archivo histórico;
++3. incorporar esta guía como `docs/GUIDE.md`;
++4. registrar hashes;
++5. crear ADR-001, ADR-002 y ADR-003;
++6. crear `CAMP-000001` y el dossier C01-EUKARYA;
++7. decidir fecha de corte y corpus inicial;
++8. fijar corredor, hermanas, externos y exclusiones;
++9. implementar `Section`, `Passage`, `Mention`, `Source` e `Issue`;
++10. implementar IDs, deltas y snapshots;
++11. demostrar cobertura con fixture artificial;
++12. implementar `TaxonomicName`, `TaxonConcept`, `CladeConcept`, `Lineage`, `Population` y `Trait`;
++13. crear fixture `eukarya-minimal`;
++14. conservar fixture `future-hominini-homonym`;
++15. implementar `Claim`, `EvidenceItem`, `Analysis` y dimensiones epistemológicas;
++16. implementar tiempo e incertidumbre;
++17. implementar `Event` con endosimbiosis;
++18. implementar `Hypothesis`, grupos de conflicto y dos vistas alternativas;
++19. generar Graphviz reproducible;
++20. completar el pipeline de ingestión;
++21. procesar el corpus real de Eucaria;
++22. congelar snapshot del dataset C01;
++23. construir el Atlas vertical slice;
++24. implementar simulación de poblaciones celulares;
++25. implementar asociación, conflicto e integración;
++26. construir los capítulos jugables;
++27. integrar la lente científica;
++28. probar con usuarios;
++29. producir arte, audio, textos y accesibilidad;
++30. auditar y lanzar Campaña 1;
++31. realizar postmortem;
++32. comenzar dossier de Campaña 2.
++
++La primera meta tangible es poder representar con procedencia un evento de endosimbiosis, dos topologías alternativas y un corredor Eukaryota → Holozoa, y luego convertir ese conjunto en una experiencia jugable completa. El caso hominino permanece como fixture de futuro y no bloquea este objetivo.
++
++---
++
++# Apéndice J. Matriz de preservación y migración del plan anterior
++
++## J.1. Objetivo
++
++Este apéndice demuestra que el cambio de orden de desarrollo no elimina el trabajo previo. Cada bloque de la guía `1.0.0` tiene un destino explícito.
++
++## J.2. Artefactos preservados
++
++| Artefacto o bloque previo | Estado en `1.1.0` | Destino |
++|---|---|---|
++| Arquitectura corpus → entidades → claims → evidencia → eventos → hipótesis → vistas → juego | Vigente | Núcleo compartido, secciones 6–20. |
++| Separación de nombre, concepto taxonómico, clado, linaje y población | Vigente | Secciones 7–9; requerida desde Campaña 1. |
++| Modelo epistemológico multidimensional | Vigente | Sección 10. |
++| Tiempo observado/inferido | Vigente | Sección 11 y Fase 4. |
++| Eventos n-arios y reticulación | Vigente | Sección 13; primer caso real: endosimbiosis. |
++| Hipótesis y vistas incompatibles | Vigente | Sección 15; se implementan antes del primer lanzamiento. |
++| JSON/JSONL, Git, deltas y snapshots | Vigente | Sección 16. |
++| Protocolo de ingestión | Vigente | Secciones 17–19. |
++| Atlas | Vigente y adelantado | Parte del primer lanzamiento. |
++| Modo Evolución | Vigente | Primera implementación acotada a Eucaria; se amplía por campaña. |
++| Modo Reconstrucción | Retenido y reubicado | Lente ligera primero; modo completo en campañas posteriores. |
++| Tres vistas mundo/red/ciencia | Vigente | Adaptadas a entorno/red/ciencia por escala. |
++| Historia oculta → registro → hipótesis | Retenida | Versión ligera en Eucaria; completa con tafonomía después. |
++| Población como unidad | Vigente y generalizada | Poblaciones celulares primero; humanas después. |
++| Campañas Simbiosis, Cuerpos, Sinápsidos y Primates | Activadas | Reordenadas como Campañas 1–6. |
++| Campaña Homininos | Preservada | Campaña 7 o dos productos finales. |
++| Capítulos homininos 1–6 | Preservados | Sección 22.11 y Fase 17. |
++| Recorte 400.000–40.000 años | Reubicado | Capítulo Humanidades entrelazadas, fixture complejo y primer Reconstrucción completo. |
++| Escenario África oriental 2,8 Ma | Preservado | Referencia de campaña hominina y reconstrucción. |
++| Inventario Eukaryota → *Homo sapiens* | Preservado | Apéndice A. |
++| Clasificación detallada de primates | Preservada | Apéndice B y Campaña 6. |
++| Inventario fósil y paleoantropológico | Preservado | Apéndice C y Campaña 7. |
++| Advertencias terminológicas | Preservadas | Apéndice D. |
++| Esquemas conceptuales | Preservados y ampliados | Apéndice E. |
++| Checklist, DoD y riesgos | Actualizados sin pérdida | Secciones 27–29 y Apéndice H. |
++
++## J.3. Decisiones supersedidas, no borradas
++
++### DEC-018
++
++Proponía 400.000–40.000 años como primer recorte. Se conserva en el registro como `SUPERSEDIDO`. `DEC-034` establece Eukaryota → Holozoa como primer lanzamiento; `DEC-035` conserva el contenido hominino.
++
++### DEC-032
++
++Posponía campañas profundas hasta validar homininos. Se conserva como `SUPERSEDIDO`. `DEC-033` invierte el orden y activa el desarrollo cronológico.
++
++## J.4. Capacidades protegidas mediante fixtures futuros
++
++Aunque no se implementen en Campaña 1, el esquema debe seguir pasando estos casos:
++
++- dos conceptos taxonómicos llamados Hominini;
++- un linaje denisovano sin nombre específico estable;
++- un espécimen con asignaciones alternativas;
++- un evento de introgresión entre poblaciones;
++- una taxonomía histórica superada;
++- un rango fósil observado distinto del rango inferido;
++- una vista de consenso y varias alternativas.
++
++## J.5. Regla para futuras revisiones
++
++Toda revisión estratégica debe incluir:
++
++1. archivo de la versión anterior;
++2. hash;
++3. decisiones nuevas;
++4. decisiones supersedidas;
++5. matriz de migración;
++6. actualización de fases;
++7. actualización del trabajo pospuesto;
++8. pruebas de preservación;
++9. explicación de qué no cambió.
+ 
+ ---
+ 
+ # Conclusión
+ 
+-La forma definitiva del proyecto es:
++La forma activa del proyecto es:
++
++> **Una base de conocimiento científico versionada y centrada en afirmaciones, capaz de generar múltiples redes evolutivas coherentes y de proyectarlas hacia un juego poblacional desarrollado cronológicamente por campañas.**
++
++El núcleo acepta incertidumbre, taxonomías rivales, evidencia parcial y procesos reticulados sin colapsarlos en un árbol único. El juego utiliza esa complejidad para producir decisiones, descubrimiento y narrativas emergentes, no para decorar una escalera de progreso.
+ 
+-> **Una base de conocimiento científico versionada y centrada en afirmaciones, capaz de generar múltiples redes evolutivas coherentes y de proyectarlas hacia un juego poblacional de evolución y reconstrucción.**
++El desarrollo comienza con una campaña completa entre Eukaryota y Holozoa. Esa campaña implementa el mínimo núcleo científico, el Atlas, la red temporal, una lente de evidencia y un bucle de evolución centrado en poblaciones celulares, simbiosis e integración. Después, cada campaña añade únicamente los sistemas necesarios para su escala.
+ 
+-El núcleo debe aceptar incertidumbre, taxonomías rivales, evidencia parcial y procesos reticulados sin colapsarlos en un árbol único. El juego debe utilizar esa complejidad para producir decisiones, descubrimiento y narrativas emergentes, no para decorar una escalera de progreso.
++El trabajo sobre homininos no se descarta ni se reduce. Permanece como especificación de destino, conjunto de pruebas, inventario científico y campaña culminante. Cuando el proyecto llegue allí, la plataforma ya habrá validado identidad, eventos, hipótesis, visualización, simulación, producción y lanzamiento en varias escalas anteriores.
+ 
+-El desarrollo comienza por identidad, procedencia y validación; continúa con hipótesis, eventos y vistas; produce primero un Atlas y un modo de Reconstrucción; y solo después aborda una simulación evolutiva completa. Todo lo pospuesto permanece contemplado por el esquema, pero no interfiere con el primer recorte vertical.
++El nuevo orden no reduce la ambición. La convierte en una secuencia ejecutable y verificable.

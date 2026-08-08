@@ -1,0 +1,28 @@
+# Corpus científico y datos — CC BY 4.0
+
+Copyright (c) 2026 Santiago Aguilar
+
+El contenido de `knowledge/` —corpus, entidades, afirmaciones, evidencia,
+eventos, hipótesis y vistas derivadas— se licencia bajo
+
+    Creative Commons Reconocimiento 4.0 Internacional (CC BY 4.0)
+    https://creativecommons.org/licenses/by/4.0/deed.es
+
+Eres libre de compartir y adaptar este material para cualquier finalidad,
+incluso comercial, siempre que des el crédito adecuado, aportes un enlace a la
+licencia e indiques si se han realizado cambios.
+
+## Sobre la procedencia
+
+Este corpus se construye mediante un protocolo que exige trazar cada afirmación
+hasta su fuente. La atribución que pide CC BY se refiere a **este trabajo de
+compilación**, y no sustituye la cita de las fuentes primarias, que están
+registradas en `knowledge/records/sources.jsonl` con su DOI o localizador.
+
+Si reutilizas una afirmación concreta, cita también su fuente original.
+
+## Sobre material de terceros
+
+Los hechos científicos no son objeto de copyright, pero las compilaciones sí
+pueden serlo. Todo material de terceros incorporado conserva su licencia
+original, registrada en el campo correspondiente de su `Source`.

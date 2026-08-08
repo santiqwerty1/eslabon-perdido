@@ -1,0 +1,48 @@
+{
+  "guide_version": "1.1.0",
+  "schema_version": "1.0.0",
+  "dataset_revision": "REV-000000",
+  "snapshot_id": "SNAP-000000",
+  "active_campaign": "CAMP-000001",
+  "campaign_status": "planning",
+  "counts": {
+    "sections": 0,
+    "passages": 0,
+    "mentions": 0,
+    "claims": 0,
+    "events": 0,
+    "hypotheses": 0,
+    "sources": 0,
+    "issues": 1,
+    "entities": 0,
+    "views": 0
+  },
+  "guides": {
+    "active": {
+      "path": "docs/GUIDE.md",
+      "version": "1.1.0",
+      "content_hash": "sha256:eb8079cd28fadb7bc15c7421f2d6e4f7ef44017e3a379f848e120913cd448c4a"
+    },
+    "archived": [
+      {
+        "path": "archive/guides/Guia_Maestra_Red_Evolutiva_v1.0.0_ARCHIVO.md",
+        "version": "1.0.0",
+        "content_hash": "sha256:6f17b038e9b15fef6f3040b458bcda638ad32b6b4bc82187abd7216c19d7aa88"
+      }
+    ]
+  },
+  "validation": "passed",
+  "id_allocation": {
+    "note": "docs/ISSUES.md reserva ISSUE-000001..ISSUE-000028 para su migración a issues.jsonl en la Fase 2. Los registros nuevos empiezan en ISSUE-000029 para no renumerar ninguno de los dos.",
+    "reserved": {
+      "ISSUE": {
+        "from": "ISSUE-000001",
+        "to": "ISSUE-000028",
+        "for": "docs/ISSUES.md"
+      }
+    },
+    "next": {
+      "ISSUE": "ISSUE-000030"
+    }
+  }
+}

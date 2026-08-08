@@ -1,0 +1,35 @@
+{
+  "campaign_id": "CAMP-000001",
+  "status": "pending_fase_1",
+  "note": "El alcance se fija en la Fase 1, tras ingerir el corpus. Los anillos siguen el cono de foco de §2.8. Nada de esto es canónico hasta pasar por el protocolo de §17.",
+  "focus_cone": {
+    "corridor": ["Eukaryota", "Amorphea", "Obazoa", "Opisthokonta", "Holozoa"],
+    "immediate_sisters": [
+      "Amoebozoa",
+      "Apusomonadida",
+      "Breviatea",
+      "Holomycota",
+      "Ichthyosporea",
+      "Pluriformea",
+      "Filasterea",
+      "Choanoflagellata"
+    ],
+    "representative_outgroups": ["Asgardarchaeota", "Alphaproteobacteria"],
+    "deferred_diversity": []
+  },
+  "mandatory_content": {
+    "reticulate_event": "endosimbiosis mitocondrial, con participantes y roles",
+    "minimum_controversies": 1,
+    "incompatible_views": 2
+  },
+  "exclusions": [],
+  "content_budget": {
+    "entities": null,
+    "claims": null,
+    "views": null,
+    "note": "Presupuesto máximo pendiente de fijar en la Fase 1 (§24, tarea 12)."
+  },
+  "bibliographic_cutoff": null,
+  "schema_version": "1.0.0",
+  "record_status": "active"
+}

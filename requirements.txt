@@ -1,0 +1,3 @@
+# Tooling del núcleo científico (DEC-051: Python).
+# El núcleo no depende del motor de juego (criterio de aceptación de la Fase 0).
+jsonschema>=4.21

@@ -1,0 +1,21 @@
+# Contenido de juego — Todos los derechos reservados
+
+Copyright (c) 2026 Santiago Aguilar. Todos los derechos reservados.
+
+Esta licencia cubre el contenido de `game/`: capítulos, textos narrativos,
+diseño de campaña, mecánicas, arte, audio y cualquier material producido para la
+experiencia jugable.
+
+No se concede permiso para copiar, distribuir, modificar ni crear obras
+derivadas de este contenido sin autorización expresa por escrito.
+
+## Qué NO cubre esta licencia
+
+- El código del tooling, bajo MIT (ver LICENSE).
+- El corpus científico y los datos, bajo CC BY 4.0 (ver LICENSE-DATA).
+
+La separación es deliberada y refleja la de §2.1 de la guía: el núcleo
+científico es un recurso citable y reutilizable; el producto que se construye
+sobre él, no. Las proyecciones de juego (`GameProjection`) referencian
+entidades científicas por identificador, de modo que la frontera de licencia
+coincide con la frontera arquitectónica.

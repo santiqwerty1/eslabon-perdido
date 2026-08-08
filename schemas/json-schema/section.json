@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://eslabon-perdido.local/schemas/section.json",
+  "title": "Section",
+  "description": "Unidad de investigación ingresada. Apéndice E.1. El original es inmutable (§6.1).",
+  "type": "object",
+  "properties": {
+    "id": { "$ref": "common.json#/$defs/section_id" },
+    "title": { "type": "string", "minLength": 1 },
+    "received_at": { "type": "string", "format": "date" },
+    "original_content_path": { "type": "string", "minLength": 1 },
+    "content_hash": { "$ref": "common.json#/$defs/content_hash" },
+    "approximate_period": { "type": ["string", "null"] },
+    "topics": { "type": "array", "items": { "type": "string" } },
+    "source_ids": { "type": "array", "items": { "$ref": "common.json#/$defs/source_id" } },
+    "schema_version": { "$ref": "common.json#/$defs/schema_version" },
+    "dataset_revision": { "$ref": "common.json#/$defs/dataset_revision" },
+    "record_status": { "$ref": "common.json#/$defs/record_status" }
+  },
+  "required": ["id", "title", "received_at", "original_content_path", "content_hash", "schema_version", "dataset_revision", "record_status"],
+  "additionalProperties": false
+}
