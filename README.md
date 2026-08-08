@@ -26,6 +26,7 @@ La primera campaña cubre **Eukaryota → Holozoa**. La última, **Hominini → 
 | [`docs/ISSUES.md`](docs/ISSUES.md) | Cuestiones pendientes. 28 registradas, 9 resueltas. |
 | [`docs/adr/`](docs/adr/) | Decisiones arquitectónicas con su razón y sus alternativas rechazadas. |
 | [`docs/campaigns/C01-EUKARYA.md`](docs/campaigns/C01-EUKARYA.md) | Dossier de la Campaña 1. Vacío por diseño hasta la Fase 1. |
+| [`docs/INGESTION-C01.md`](docs/INGESTION-C01.md) | **Qué hacer cuando llegue la investigación.** Paso a paso. |
 
 ## Estructura
 

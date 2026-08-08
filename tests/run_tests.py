@@ -109,7 +109,29 @@ def main() -> int:
             if not detectado:
                 fallos.append(f"{d.name} (el defecto pasó desapercibido)")
 
-    total = len(ordinarios) + len(ok_cases) + len(bad_cases)
+    # --- conformidad del formato de investigación --------------------------
+    fmt = FIXTURES / "research-format"
+    if fmt.is_dir():
+        import subprocess
+        print(f"\n{DIM}formato de la investigación — el correcto pasa, el defectuoso falla{RESET}")
+        for doc, debe_pasar in ((fmt / "SEC-SAMPLE.md", True), (fmt / "SEC-SAMPLE-BAD.md", False)):
+            if not doc.exists():
+                continue
+            r = subprocess.run(
+                [sys.executable, str(ROOT / "scripts" / "ingest" / "parse_research.py"), str(doc)],
+                capture_output=True, text=True)
+            paso = r.returncode == 0
+            bien = paso == debe_pasar
+            marca = f"{GREEN}{'PASA' if paso else 'DETECTA'}{RESET}" if bien else f"{RED}INESPERADO{RESET}"
+            n_err = r.stdout.count("ERROR")
+            print(f"  {marca}  {doc.name}  {DIM}({n_err} errores de conformidad){RESET}")
+            if not bien:
+                fallos.append(f"{doc.name} (conformidad inesperada)")
+        total_fmt = 2
+    else:
+        total_fmt = 0
+
+    total = len(ordinarios) + len(ok_cases) + len(bad_cases) + total_fmt
     print(f"\n{total} casos · {len(fallos)} fallos · {avisos} advertencias acumuladas")
     if fallos:
         print(f"{RED}FALLOS:{RESET} " + ", ".join(fallos))
