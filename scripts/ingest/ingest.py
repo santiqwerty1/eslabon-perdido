@@ -128,6 +128,38 @@ def extraer_menciones(pasaje: str, offset: int) -> list[dict]:
     return sorted(salida, key=lambda x: x["start"])
 
 
+def ids_en_uso(fichero: str, prefijo: str) -> set[str]:
+    """Identificadores ya presentes en el libro mayor.
+
+    Sin esto, cada sección reinicia la numeración en 000001 y el segundo delta
+    aborta con «ya existe». El manual manda una SEC- por sección de nivel 2, así
+    que ese caso no es raro: es el normal.
+    """
+    ruta = ROOT / "knowledge" / "records" / fichero
+    if not ruta.exists():
+        return set()
+    out = set()
+    for linea in ruta.read_text(encoding="utf-8").splitlines():
+        if linea.strip():
+            try:
+                rid = json.loads(linea).get("id", "")
+            except json.JSONDecodeError:
+                continue
+            if isinstance(rid, str) and rid.startswith(prefijo + "-"):
+                out.add(rid)
+    return out
+
+
+def siguiente_libre(prefijo: str, usados: set[str]) -> int:
+    n = 0
+    for i in usados:
+        try:
+            n = max(n, int(i.split("-")[1]))
+        except (IndexError, ValueError):
+            pass
+    return n + 1
+
+
 def ingerir(origen: Path, titulo: str | None, dry: bool) -> int:
     texto = origen.read_text(encoding="utf-8")
     manifest = json.loads(MANIFEST.read_text(encoding="utf-8")) if MANIFEST.exists() else {}
@@ -152,10 +184,30 @@ def ingerir(origen: Path, titulo: str | None, dry: bool) -> int:
         "record_status": "active",
     }
 
+    # ¿Es un documento con capa de registro? Si lo es, las menciones salen de
+    # ahí y NO del regex: el apéndice B y la tabla de afirmaciones ya traen las
+    # etiquetas reales con su fila como localizador. Regexear un documento
+    # estructurado produce prosa capturada —«Estudio», «Ninguna fuente»— que no
+    # coincide con ninguna entidad declarada, y la ingestión termina en verde
+    # habiendo versionado ruido.
+    estructurado = None
+    try:
+        sys.path.insert(0, str(Path(__file__).parent))
+        from parse_research import parse as parse_registro
+
+        datos, conformidad = parse_registro(origen)
+        if datos.get("claims"):
+            estructurado = (datos, conformidad)
+    except Exception:
+        estructurado = None
+
+    base_mention = siguiente_libre("MENTION", ids_en_uso("mentions.jsonl", "MENTION"))
+    base_passage = siguiente_libre("PASSAGE", ids_en_uso("mentions.jsonl", "PASSAGE"))
+
     # --- paso 2: segmentar en pasajes -------------------------------------
     pasajes, menciones = [], []
     for i, (ini, fin, cuerpo) in enumerate(segmentar(texto), 1):
-        pid = f"PASSAGE-{i:06d}"
+        pid = f"PASSAGE-{base_passage + i - 1:06d}"
         pasajes.append(
             {
                 "id": pid,
@@ -167,8 +219,10 @@ def ingerir(origen: Path, titulo: str | None, dry: bool) -> int:
             }
         )
         # --- pasos 3 y 4: extraer y normalizar ----------------------------
+        if estructurado is not None:
+            continue  # las menciones salen de la capa de registro, más abajo
         for cand in extraer_menciones(cuerpo, ini):
-            mid = f"MENTION-{len(menciones) + 1:06d}"
+            mid = f"MENTION-{base_mention + len(menciones):06d}"
             menciones.append(
                 {
                     "id": mid,
@@ -186,6 +240,65 @@ def ingerir(origen: Path, titulo: str | None, dry: bool) -> int:
                     "record_status": "active",
                 }
             )
+
+    # --- pasos 3 y 4 sobre la capa de registro -----------------------------
+    contraste: list[tuple[str, int, int]] = []
+    if estructurado is not None:
+        datos, conformidad = estructurado
+        por_pasaje = {p["ordinal"]: p["id"] for p in pasajes}
+        primero = por_pasaje.get(1, f"PASSAGE-{base_passage:06d}")
+
+        # Una mención por etiqueta distinta del registro, con su fila como
+        # localizador. La fila ES el pasaje: el prompt exige que cada afirmación
+        # se pueda ubicar, y `C-0042` la ubica mejor que un offset de carácter.
+        vistas: dict[str, dict] = {}
+        for c in datos["claims"]:
+            for campo, tipo in (("subject_label", "taxonomic_name"),
+                                ("object_label", "taxonomic_name")):
+                etq = (c.get(campo) or "").strip()
+                if not etq or etq in ("n/a", "-"):
+                    continue
+                if etq not in vistas:
+                    vistas[etq] = {"texto": etq, "tipo": tipo, "filas": []}
+                vistas[etq]["filas"].append(c["local_id"])
+
+        for e in datos.get("entities", []):
+            etq = (e.get("etiqueta preferida") or "").strip()
+            if etq and etq not in vistas:
+                vistas[etq] = {"texto": etq, "tipo": "taxonomic_name", "filas": []}
+
+        for n, (etq, info) in enumerate(sorted(vistas.items())):
+            menciones.append({
+                "id": f"MENTION-{base_mention + n:06d}",
+                "section_id": sec_id,
+                "passage_id": primero,
+                "original_text": etq,
+                "normalized_form": normalizar(etq),
+                "mention_type": info["tipo"],
+                "character_offsets": {"start": 0, "end": len(etq)},
+                "resolution": {"status": "pending", "target_ids": [], "reason": None},
+                "disposition": None,
+                "issue_ids": [],
+                "notes": [f"capa de registro, filas: {', '.join(info['filas'][:8])}"
+                          + ("…" if len(info["filas"]) > 8 else "")] if info["filas"] else [],
+                "record_status": "active",
+            })
+
+        # El contraste que puede parar una ingestión: declarado frente a extraído.
+        declaradas = len({(e.get("etiqueta preferida") or "").strip()
+                          for e in datos.get("entities", []) if e.get("etiqueta preferida")})
+        extraidas = len(vistas)
+        coinciden = len({(e.get("etiqueta preferida") or "").strip()
+                         for e in datos.get("entities", [])} & set(vistas))
+        contraste = [
+            ("afirmaciones del registro", len(datos["claims"]), len(datos["claims"])),
+            ("entidades del apéndice B", declaradas, coinciden),
+            ("fuentes del apéndice A", len(datos["sources"]), len(datos["sources"])),
+            ("eventos", len(datos["events"]), len(datos["events"])),
+            ("hipótesis", len(datos["hypotheses"]), len(datos["hypotheses"])),
+            ("fechas", len(datos["dates"]), len(datos["dates"])),
+            ("magnitudes", len(datos["magnitudes"]), len(datos["magnitudes"])),
+        ]
 
     # --- paso 10: auditar cobertura ---------------------------------------
     sin_destino = [m for m in menciones if m["disposition"] is None]
@@ -232,6 +345,24 @@ def ingerir(origen: Path, titulo: str | None, dry: bool) -> int:
         f"**Hash:** `{seccion['content_hash']}`  ",
         f"**Revisión:** {rev_antes} → {rev_despues}",
         "",
+        "## Contraste con lo que el documento declara",
+        "",
+        "**El apartado que puede parar una ingestión.** Si una fila no cuadra, no",
+        "se aplica el delta: se averigua por qué.",
+        "",
+    ] + ([
+        "| Lo que declara el documento | Declarado | Ingerido |",
+        "|---|---:|---:|",
+    ] + [
+        f"| {etq} | {dec} | {ing} |"
+        + ("  ⚠" if dec and ing != dec else "")
+        for etq, dec, ing in contraste
+    ] + [""] if contraste else [
+        "El documento **no trae capa de registro**: las menciones se han extraído",
+        "del texto con heurísticas, que capturan prosa además de nombres. Revisa",
+        "la lista de textos más frecuentes antes de aplicar nada.",
+        "",
+    ]) + [
         "## Cobertura y excepciones",
         "",
         f"- pasajes segmentados: **{len(pasajes)}**",
@@ -241,6 +372,17 @@ def ingerir(origen: Path, titulo: str | None, dry: bool) -> int:
         "| Tipo de mención | Nº |",
         "|---|---:|",
         *[f"| `{t}` | {n} |" for t, n in sorted(tipos.items(), key=lambda x: -x[1])],
+        "",
+        "### Los veinte textos más extraídos",
+        "",
+        "Si aquí aparecen palabras de prosa —«Estudio», «Sostiene que»— la",
+        "extracción capturó texto en vez de entidades y el delta es ruido.",
+        "",
+        "| Texto | Veces |",
+        "|---|---:|",
+        *[f"| `{t}` | {n} |" for t, n in sorted(
+            {m["original_text"]: sum(1 for x in menciones if x["original_text"] == m["original_text"])
+             for m in menciones[:400]}.items(), key=lambda x: -x[1])[:20]],
         "",
         "## Cuestiones pendientes",
         "",
@@ -267,6 +409,13 @@ def ingerir(origen: Path, titulo: str | None, dry: bool) -> int:
     print(f"{sec_id} · {len(pasajes)} pasajes · {len(menciones)} menciones")
     for t, n in sorted(tipos.items(), key=lambda x: -x[1]):
         print(f"    {t:20} {n}")
+    if contraste:
+        print("\n  contraste con lo declarado:")
+        for etq, dec, ing in contraste:
+            marca = "  <-- NO CUADRA" if dec and ing != dec else ""
+            print(f"    {etq:28} declarado {dec:5}  ingerido {ing:5}{marca}")
+    else:
+        print("\n  el documento no trae capa de registro: menciones por heurística")
     print(f"\n  sin destino: {len(sin_destino)} — la cobertura del paso 10 no se cumple todavía")
 
     if dry:

@@ -28,6 +28,7 @@ import argparse
 import json
 import re
 import sys
+from collections import Counter
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -73,6 +74,64 @@ TIPO_FUENTE = {
     "divulgación o blog": "popular_or_blog",
     "otro": "other",
 }
+
+
+def _parse_repo(base: Path) -> tuple[dict, Hallazgos]:
+    """Corpus servido como repositorio de CSV en vez de un solo Markdown.
+
+    La investigacion migro a CSV, y eso elimina de golpe tres riesgos del
+    formato anterior: una tabla no puede partirse en dos, las celdas con pipes o
+    enlaces no rompen el reparto de columnas, y el troceado por secciones que
+    §17 exige ya viene hecho. El contrato semantico no cambia —mismas columnas,
+    mismo orden— asi que se reconstruyen las tablas y se reutiliza intacta toda
+    la comprobacion de conformidad.
+    """
+    import csv
+    import json as _json
+
+    man = _json.loads((base / "manifest.json").read_text(encoding="utf-8"))
+    trozos = [f"Fecha de corte bibliografico: {man.get('fecha_de_corte_bibliografico', '')}", ""]
+
+    def volcar(f: Path) -> None:
+        with f.open(encoding="utf-8", newline="") as fh:
+            filas = list(csv.reader(fh))
+        if len(filas) < 2:
+            return
+        cab, cuerpo = filas[0], filas[1:]
+        limpia = lambda c: c.replace("|", "\\|").replace("\n", " ")
+        trozos.append("| " + " | ".join(limpia(c) for c in cab) + " |")
+        trozos.append("|" + "---|" * len(cab))
+        for fila in cuerpo:
+            fila = (fila + [""] * len(cab))[: len(cab)]
+            trozos.append("| " + " | ".join(limpia(c) for c in fila) + " |")
+        trozos.append("")
+
+    afirm = sorted((base / "data" / "afirmaciones").glob("*.csv"))
+    for f in afirm:
+        volcar(f)
+    for f in sorted((base / "data" / "apendices").glob("*.csv")):
+        volcar(f)
+
+    datos, h = _parse_texto("\n".join(trozos))
+    if not afirm:
+        h.error(f"no hay ficheros de afirmaciones en {base}/data/afirmaciones/")
+    datos["manifest"] = man
+    datos["secciones"] = [f.stem for f in afirm]
+
+    estado = str(man.get("estado", ""))
+    if "provisional" in estado or "faltan" in estado:
+        h.aviso(f"el manifiesto declara el corpus incompleto: «{estado}». "
+                "Ingerir ahora fijaria un estado que va a cambiar")
+
+    cuentas = man.get("counts") or {}
+    for clave, real in (("afirmaciones", len(datos["claims"])), ("fuentes", len(datos["sources"])),
+                        ("entidades", len(datos["entities"])), ("eventos", len(datos["events"])),
+                        ("hipotesis", len(datos["hypotheses"])), ("fechas", len(datos["dates"])),
+                        ("magnitudes", len(datos["magnitudes"]))):
+        d = cuentas.get(clave)
+        if isinstance(d, int) and d != real:
+            h.error(f"el manifiesto declara {d} en «{clave}» y se leen {real}")
+    return datos, h
 
 
 class Hallazgos:
@@ -125,8 +184,44 @@ def comprobar_registro(cab: list[str], h: Hallazgos) -> None:
             h.error(f"registro: columnas en orden distinto del pedido\n  esperado: {COLUMNAS}\n  recibido: {cab}")
 
 
+def _leer_csv(path: Path) -> tuple[list[str], list[list[str]]]:
+    import csv
+    with path.open(encoding="utf-8", newline="") as fh:
+        filas = list(csv.reader(fh))
+    return (filas[0], filas[1:]) if filas else ([], [])
+
+
+def tablas_repo(base: Path, h: Hallazgos) -> list[tuple[list[str], list[list[str]]]]:
+    """Lee el corpus servido como repositorio de CSV en vez de un solo Markdown.
+
+    La investigacion migro a CSV (`0.5.0-csv-migration`) y eso resuelve de golpe
+    tres riesgos que el formato Markdown traia: una tabla no puede partirse en
+    dos, las celdas con pipes o enlaces no rompen el reparto de columnas, y el
+    troceado por secciones que §17 exige ya viene hecho por el propio corpus.
+    El contrato semantico no cambia: las columnas son las mismas y en el mismo
+    orden, asi que toda la comprobacion de conformidad se reutiliza tal cual.
+    """
+    salida = []
+    afirm = sorted((base / "data" / "afirmaciones").glob("*.csv"))
+    if not afirm:
+        h.error(f"no hay ficheros de afirmaciones en {base}/data/afirmaciones/")
+    for f in afirm:
+        cab, filas = _leer_csv(f)
+        salida.append((cab, filas))
+    for f in sorted((base / "data" / "apendices").glob("*.csv")):
+        cab, filas = _leer_csv(f)
+        salida.append((cab, filas))
+    return salida
+
+
 def parse(path: Path) -> tuple[dict, Hallazgos]:
-    texto = path.read_text(encoding="utf-8")
+    # Un directorio con manifest.json es el corpus servido como repositorio.
+    if path.is_dir() and (path / "manifest.json").exists():
+        return _parse_repo(path)
+    return _parse_texto(path.read_text(encoding="utf-8"))
+
+
+def _parse_texto(texto: str) -> tuple[dict, Hallazgos]:
     h = Hallazgos()
 
     corte = re.search(r"[Ff]echa de corte bibliográfico[:\s]*\**\s*([0-9]{4}-[0-9]{2}-[0-9]{2})", texto)
@@ -142,11 +237,35 @@ def parse(path: Path) -> tuple[dict, Hallazgos]:
     hipotesis: list[dict] = []
     fechas: list[dict] = []
     magnitudes: list[dict] = []
+    no_encajado: list[dict] = []
     control: dict[str, str] = {}
     etiquetas: set[str] = set()
+    # Toda tabla que ninguna rama reclame se pierde sin dejar rastro. Contarlas
+    # y decir cuáles son convierte la pérdida silenciosa en un aviso legible.
+    tablas_por_clase: dict[str, int] = {}
+    sin_reconocer: list[tuple[list[str], int]] = []
 
-    for cab, filas in tablas(texto):
+    def clasificada(nombre: str) -> None:
+        tablas_por_clase[nombre] = tablas_por_clase.get(nombre, 0) + 1
+
+    encontradas = tablas(texto)
+    # Una tabla partida en dos —por un salto de página, un párrafo intercalado o
+    # una línea en blanco— deja su segunda mitad sin cabecera ni separador, y el
+    # escáner deja de verla como tabla: las filas no se pierden en una rama, se
+    # pierden antes de llegar a ninguna. Contar las líneas que empiezan por «|» y
+    # restar las que quedaron dentro de alguna tabla las saca a la luz sin tener
+    # que adivinar dónde estaba el corte. En los tres documentos correctos que hay
+    # hoy la diferencia es exactamente 0, así que no admite falso positivo barato.
+    lineas_pipe = sum(1 for ln in texto.splitlines() if ln.strip().startswith("|"))
+    lineas_en_tabla = sum(2 + len(filas) for _, filas in encontradas)
+    if lineas_pipe > lineas_en_tabla:
+        h.error(f"{lineas_pipe - lineas_en_tabla} líneas empiezan por «|» y no pertenecen "
+                "a ninguna tabla: son filas huérfanas de una tabla partida en dos, y "
+                "no se ha leído ninguna. Vuelve a unirla o reemite cabecera y separador")
+
+    for cab, filas in encontradas:
         if es_registro(cab):
+            clasificada("registro")
             comprobar_registro(cab, h)
             idx = {c: i for i, c in enumerate(cab)}
 
@@ -156,6 +275,12 @@ def parse(path: Path) -> tuple[dict, Hallazgos]:
 
             for f in filas:
                 num = col(f, "#")
+                # Una fila con menos celdas que la cabecera no es una fila corta:
+                # es una fila cuyos últimos ejes epistémicos se rellenan solos con
+                # el valor por defecto. Sin este aviso la pérdida es invisible.
+                if len(f) < len(cab):
+                    h.error(f"{num or '(sin #)'}: la fila trae {len(f)} celdas y la cabecera "
+                            f"{len(cab)}; las columnas {cab[len(f):]} se darían por vacías")
                 atrib = col(f, "Atribución").lower()
                 base = atrib.split("(")[0].strip()
                 if base not in ATRIBUCION:
@@ -196,6 +321,7 @@ def parse(path: Path) -> tuple[dict, Hallazgos]:
                 })
         elif cab and cab[0].lower() == "clave" and "tipo" in [c.lower() for c in cab] and any(
                 c.lower().startswith("autor") for c in cab):
+            clasificada("A fuentes")
             for f in filas:
                 d = dict(zip(cab, f))
                 tipo = d.get("tipo", "").lower()
@@ -211,20 +337,28 @@ def parse(path: Path) -> tuple[dict, Hallazgos]:
                                 "quality_notes": d.get("notas de calidad"),
                                 "consulted_at": d.get("fecha de consulta")})
         elif cab and cab[0].lower().startswith("etiqueta"):
+            clasificada("B entidades")
             for f in filas:
                 entidades.append(dict(zip(cab, f)))
         elif cab and cab[0].lower() == "clave" and any("participante" in c.lower() for c in cab):
+            clasificada("C eventos")
             for f in filas:
                 d = dict(zip(cab, f))
                 eventos.append(d)
                 papeles = d.get("participantes con su papel", "") or d.get("participantes", "")
-                if papeles and ":" not in papeles and "—" not in papeles and "-" not in papeles:
+                # El papel puede ir entre parentesis —«Eukaryota (linaje
+                # resultante)»— o tras dos puntos o guion. El prompt no fijo el
+                # separador, asi que se admiten los tres: lo que importa es que
+                # el papel ESTE, no como se escriba (§13.2).
+                if papeles and not re.search(r"[(\[:\u2014-]", papeles):
                     h.error(f"evento {d.get('clave')}: participantes sin papel declarado. "
                             "«A y B participaron» no dice quién entró en quién (§13.2)")
         elif cab and cab[0].lower() == "clave" and any("sostiene" in c.lower() for c in cab):
+            clasificada("E hipótesis")
             for f in filas:
                 hipotesis.append(dict(zip(cab, f)))
         elif cab and cab[0].lower().startswith("a qué se aplica"):
+            clasificada("D fechas")
             for f in filas:
                 d = dict(zip(cab, f))
                 fechas.append(d)
@@ -236,28 +370,62 @@ def parse(path: Path) -> tuple[dict, Hallazgos]:
                 if obs and obs not in ("observado", "inferido"):
                     h.error(f"fecha «{f[0][:40]}»: «{obs}» no es ni observado ni inferido (§11)")
         elif cab and cab[0].lower() == "magnitud" and len(cab) > 3:
+            clasificada("F magnitudes")
             for f in filas:
                 d = dict(zip(cab, f))
                 magnitudes.append(d)
                 if not (d.get("unidad original") or "").strip():
                     h.error(f"magnitud «{f[0][:40]}»: sin unidad original. §10.7 prohíbe "
                             "convertir medidas distintas a una escala común")
-        elif cab and cab[0].lower() == "magnitud":
+        elif cab and cab[0].lower() in ("magnitud", "control"):
+            # El apéndice H se titula «magnitud|valor» en el molde Markdown y
+            # «control|valor» en el corpus servido como CSV. Es el mismo apéndice.
+            clasificada("H recuento")
             for f in filas:
                 if len(f) >= 2:
                     control[f[0]] = f[1]
+        elif cab and cab[0].lower() == "material":
+            # Apéndice G, material no encajado. No se lee como dato, pero cuenta
+            # para saber cuánto quedó fuera de la estructura.
+            clasificada("G material no encajado")
+            for f in filas:
+                no_encajado.append(dict(zip(cab, f)))
+        else:
+            sin_reconocer.append((cab, len(filas)))
 
     if not afirmaciones:
         h.error("no se encontró ninguna tabla de registro de afirmaciones")
     if not fuentes:
         h.error("no se encontró el apéndice A de fuentes")
 
+    # Una tabla que ninguna rama reclama no produce error: produce silencio, que
+    # es peor. Basta con que una cabecera diga «actores» donde el prompt dice
+    # «participantes» para que un apéndice entero desaparezca. Estas dos listas
+    # no juzgan el contenido, sólo hacen visible lo que el lector NO leyó.
+    for cab, n in sin_reconocer:
+        h.aviso(f"tabla no reconocida ({n} filas), no se ha leído nada de ella: "
+                f"{cab}")
+    # Cada apéndice es una tabla. Cero significa que se perdió o cambió de nombre;
+    # más de una, que el documento llegó por partes o que otra se coló en su sitio.
+    for nombre in ("A fuentes", "B entidades", "C eventos", "D fechas",
+                   "E hipótesis", "F magnitudes", "H recuento"):
+        n = tablas_por_clase.get(nombre, 0)
+        if n == 0:
+            h.aviso(f"apéndice {nombre}: ninguna tabla lo reconoce; o falta o su "
+                    "primera columna no se llama como pide §17")
+        elif n > 1:
+            h.aviso(f"apéndice {nombre}: {n} tablas distintas encajan aquí; "
+                    "si el documento llegó por partes, sus filas están duplicadas")
+
     # El recuento de control es un autoinforme: comprobarlo es barato y detecta
     # que el documento se generó por partes o se truncó.
     if control:
         pares = [("filas del registro", len(afirmaciones)), ("fuentes distintas", len(fuentes))]
         for etiqueta, real in pares:
-            declarado = next((v for k, v in control.items() if etiqueta in k.lower()), None)
+            declarado = next((v for k, v in control.items()
+                              if etiqueta in k.lower()
+                              or (etiqueta == "filas del registro" and "filas del registro" in k.lower())
+                              or (etiqueta == "fuentes distintas" and "fuentes distintas" in k.lower())), None)
             if declarado and declarado.strip().isdigit() and int(declarado) != real:
                 h.error(f"recuento de control: declara {declarado} en «{etiqueta}» y se cuentan {real}")
     else:
@@ -268,10 +436,41 @@ def parse(path: Path) -> tuple[dict, Hallazgos]:
     # coste cuadrático en el número de afirmaciones: irrelevante a 1.593 filas
     # (33 ms), pero el documento sigue creciendo y el arreglo es una línea.
     locales_ref = {a["local_id"] for a in afirmaciones}
+    # El `#` es la clave con la que los ocho apéndices apuntan al registro y con
+    # la que aguas abajo se indexa por diccionario. Repetido, una de las dos filas
+    # desaparece sin ruido; hoy sólo se notaba de rebote y con otro mensaje.
+    if len(locales_ref) != len(afirmaciones):
+        cuenta = Counter(a["local_id"] for a in afirmaciones)
+        repetidos = sorted(k for k, n in cuenta.items() if n > 1)
+        h.error(f"el registro repite {len(repetidos)} identificadores locales; "
+                f"§16 pide que el `#` sea correlativo y no se reinicie por sección. "
+                f"Primeros: {repetidos[:8]}")
     for a in afirmaciones:
-        ref = a["source_ref"].split()[0] if a["source_ref"] else ""
-        if ref and ref not in claves and ref not in ("n/a", "-"):
-            h.error(f"{a['local_id']}: cita la fuente {ref!r}, que no está en el apéndice A")
+        # El campo puede traer varias claves y localizadores: «S412; S395 fig. 2».
+        # Se comprueban TODAS las claves, no solo la primera, y sin la puntuacion
+        # pegada. `BN-` son busquedas negativas, no fuentes: una afirmacion puede
+        # citarlas legitimamente para decir que se busco y no se encontro.
+        # Solo cuenta como clave lo que ABRE un segmento: «S108 Results; suppl.
+        # figs. S2-S3» cita una fuente, no tres. S1/S2/S3 dentro del localizador
+        # son material suplementario, que es la notacion estandar en literatura
+        # cientifica y no tiene nada que ver con nuestras claves.
+        validas = 0
+        for segmento in re.split(r"[;,]", a["source_ref"] or ""):
+            m = re.match(r"\s*(S\d+)\b", segmento)
+            ref = m.group(1) if m else None
+            if not ref:
+                continue
+            if ref in claves:
+                validas += 1
+                continue
+            if validas:
+                # Ya cita una fuente buena; lo que sigue es casi seguro un
+                # localizador de material suplementario («S126 Results; S3 table»),
+                # no otra fuente. Se avisa, no se bloquea.
+                h.aviso(f"{a['local_id']}: «{ref}» tras una fuente válida; "
+                        "parece localizador suplementario y no una clave")
+            else:
+                h.error(f"{a['local_id']}: cita la fuente {ref}, que no está en el apéndice A")
         if a["attribution"].startswith("sintesis") or a["attribution"].startswith("síntesis"):
             for r in a["attribution_refs"]:
                 if r not in locales_ref:
@@ -279,8 +478,11 @@ def parse(path: Path) -> tuple[dict, Hallazgos]:
 
     # Toda clave que un apéndice cite debe existir en el registro (§4.5).
     locales = locales_ref
+    # `entidades` faltaba: sus 1.335 filas citan el registro por su columna `#`
+    # (§17 B) y ninguna se comprobaba.
     for coleccion, nombre in ((eventos, "evento"), (hipotesis, "hipótesis"),
-                              (fechas, "fecha"), (magnitudes, "magnitud")):
+                              (fechas, "fecha"), (magnitudes, "magnitud"),
+                              (entidades, "entidad")):
         for d in coleccion:
             for celda in d.values():
                 if not isinstance(celda, str):
@@ -298,6 +500,7 @@ def parse(path: Path) -> tuple[dict, Hallazgos]:
         "hypotheses": hipotesis,
         "dates": fechas,
         "magnitudes": magnitudes,
+        "unfiled": no_encajado,
         "labels": sorted(etiquetas),
         "control": control,
     }, h

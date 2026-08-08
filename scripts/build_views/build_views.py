@@ -189,14 +189,26 @@ def construir(base: Path, hyp_id: str, escala: str, salida_dot: bool,
     diagrams_dir = (base / "diagrams") if es_fixture else DIAGRAMS
     views_dir.mkdir(parents=True, exist_ok=True)
     diagrams_dir.mkdir(parents=True, exist_ok=True)
+    # `--records` puede apuntar fuera del repositorio: es justo lo que se hace
+    # para ensayar a escala sin tocar el dataset real. `relative_to(ROOT)`
+    # reventaba ahí con un ValueError sin capturar, y lo hacía DESPUÉS de
+    # escribir el .dot y ANTES de escribir la vista: quedaba un diagrama
+    # huérfano sin el registro que lo declara, que es exactamente el estado
+    # intermedio que §6.7 no admite.
+    def rotulo(p: Path) -> str:
+        try:
+            return str(p.relative_to(ROOT))
+        except ValueError:
+            return str(p)
+
     dot_path = diagrams_dir / f"{vista['id']}.dot"
     dot_path.write_text(dot, encoding="utf-8")
-    vista["generated_artifacts"] = [str(dot_path.relative_to(ROOT))]
+    vista["generated_artifacts"] = [rotulo(dot_path)]
     (views_dir / f"{vista['id']}.json").write_text(
         json.dumps(vista, indent=2, ensure_ascii=False) + "\n", encoding="utf-8"
     )
-    print(f"\n  vista    {(views_dir / (vista['id'] + '.json')).relative_to(ROOT)}")
-    print(f"  diagrama {dot_path.relative_to(ROOT)}")
+    print(f"\n  vista    {rotulo(views_dir / (vista['id'] + '.json'))}")
+    print(f"  diagrama {rotulo(dot_path)}")
     return 0
 
 

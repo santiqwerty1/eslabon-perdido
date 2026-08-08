@@ -99,6 +99,40 @@ class Report:
         return not self.errors
 
 
+# --- presentación -----------------------------------------------------------
+#
+# Una sección entera produce miles de hallazgos, y casi todos son el mismo
+# hallazgo repetido con otro identificador: 8.600 líneas de «MENTION-XXXXXX no
+# tiene destino» son un solo problema, no 8.600. Volcarlas una a una entierra lo
+# que sí es único —el aviso de que la guía activa no coincide con su hash quedaba
+# en la línea 8.601— y hace imposible triar. Se agrupan por plantilla, con el
+# recuento y tres ejemplos reales para poder ir al registro concreto.
+_ID_EN_MENSAJE = re.compile(r"\b[A-Z]{3,12}-[0-9]{6}\b")
+_LINEA_EN_MENSAJE = re.compile(r"(?<=\.jsonl):\d+")
+EJEMPLOS = 3
+
+
+def plantilla(msg: str) -> str:
+    return _LINEA_EN_MENSAJE.sub(":N", _ID_EN_MENSAJE.sub("<ID>", msg))
+
+
+def agrupar(mensajes: list[str]) -> list[str]:
+    """Colapsa los mensajes repetidos conservando el orden de aparición."""
+    grupos: dict[str, list[str]] = {}
+    for msg in mensajes:
+        grupos.setdefault(plantilla(msg), []).append(msg)
+    salida: list[str] = []
+    for patron, miembros in grupos.items():
+        if len(miembros) == 1:
+            salida.append(miembros[0])
+            continue
+        salida.append(f"×{len(miembros)}  {patron}")
+        paso = max(1, len(miembros) // EJEMPLOS)
+        for ej in miembros[::paso][:EJEMPLOS]:
+            salida.append(f"          p. ej. {ej}")
+    return salida
+
+
 def load_jsonl(path: Path, rep: Report) -> list[dict]:
     records = []
     if not path.exists():
@@ -143,19 +177,32 @@ def v_schema(data: dict[str, list[dict]], rep: Report) -> None:
     # Resolución de $ref entre esquemas. jsonschema >= 4.18 usa `referencing`;
     # las versiones anteriores, incluida la 4.10 que empaqueta Debian 12, usan
     # RefResolver. Se admiten ambas para no atar el proyecto a una distribución.
+    #
+    # El registro se construye UNA vez y se recorre por adelantado con `crawl()`.
+    # Los esquemas declaran `$id` absoluto, así que un `$ref` relativo como
+    # `common.json#/$defs/id` se resuelve a una URI que el registro sin recorrer
+    # no tiene indexada: `referencing` recorre entonces los veintidós esquemas
+    # enteros, y como el registro es inmutable, tira el resultado y lo repite en
+    # el siguiente `$ref`. Medido sobre mentions.jsonl: 28,9 ms por registro sin
+    # `crawl()` frente a 0,54 ms con él, y son cinco `$ref` por registro. A 8.600
+    # menciones eso es la diferencia entre 254 s y 5 s.
+    registry = None
+    try:
+        from referencing import Registry, Resource
+
+        registry = (
+            Registry()
+            .with_resources([(name, Resource.from_contents(doc)) for name, doc in docs.items()])
+            .crawl()
+        )
+    except ImportError:
+        from jsonschema import RefResolver
+
     def make_validator(schema: dict):
-        try:
-            from referencing import Registry, Resource
-
-            registry = Registry().with_resources(
-                [(name, Resource.from_contents(doc)) for name, doc in docs.items()]
-            )
+        if registry is not None:
             return Draft202012Validator(schema, registry=registry)
-        except ImportError:
-            from jsonschema import RefResolver
-
-            resolver = RefResolver(base_uri="", referrer=schema, store=dict(docs))
-            return Draft202012Validator(schema, resolver=resolver)
+        resolver = RefResolver(base_uri="", referrer=schema, store=dict(docs))
+        return Draft202012Validator(schema, resolver=resolver)
 
     for fname, schema_name in SCHEMA_BY_FILE.items():
         if schema_name not in docs:
@@ -317,12 +364,10 @@ def main() -> int:
 
     rep = run(names, records_dir)
 
-    for msg in rep.errors:
-        print(f"ERROR   {msg}")
-    for msg in rep.warnings:
-        print(f"WARNING {msg}")
-    for msg in rep.infos:
-        print(f"INFO    {msg}")
+    for sev, msgs in (("ERROR  ", rep.errors), ("WARNING", rep.warnings),
+                      ("INFO   ", rep.infos)):
+        for linea in agrupar(msgs):
+            print(f"{sev} {linea}")
 
     print(
         f"\n{len(rep.errors)} errores, {len(rep.warnings)} advertencias, "
