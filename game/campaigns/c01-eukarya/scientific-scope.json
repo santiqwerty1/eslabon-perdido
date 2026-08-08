@@ -3,7 +3,13 @@
   "status": "pending_fase_1",
   "note": "El alcance se fija en la Fase 1, tras ingerir el corpus. Los anillos siguen el cono de foco de §2.8. Nada de esto es canónico hasta pasar por el protocolo de §17.",
   "focus_cone": {
-    "corridor": ["Eukaryota", "Amorphea", "Obazoa", "Opisthokonta", "Holozoa"],
+    "corridor": [
+      "Eukaryota",
+      "Amorphea",
+      "Obazoa",
+      "Opisthokonta",
+      "Holozoa"
+    ],
     "immediate_sisters": [
       "Amoebozoa",
       "Apusomonadida",
@@ -14,13 +20,38 @@
       "Filasterea",
       "Choanoflagellata"
     ],
-    "representative_outgroups": ["Asgardarchaeota", "Alphaproteobacteria"],
+    "representative_outgroups": [
+      "Asgardarchaeota",
+      "Alphaproteobacteria"
+    ],
     "deferred_diversity": []
   },
   "mandatory_content": {
     "reticulate_event": "endosimbiosis mitocondrial, con participantes y roles",
-    "minimum_controversies": 1,
-    "incompatible_views": 2
+    "minimum_controversies": 2,
+    "incompatible_views": 2,
+    "sex_and_meiosis": {
+      "status": "in_scope",
+      "as": [
+        "atlas",
+        "mechanic"
+      ],
+      "includes": [
+        "recombinación",
+        "alternancia de ploidía",
+        "tipos de apareamiento",
+        "costo del sexo frente a la reproducción clonal"
+      ],
+      "excludes": [
+        "genética de poblaciones a nivel de locus (§25.1)"
+      ],
+      "decided": "2026-08-08",
+      "issue": "ISSUE-000026"
+    },
+    "incompatible_hypotheses": {
+      "count": 2,
+      "note": "Dos o más realmente incompatibles; la incompatibilidad parcial no basta (ISSUE-000028)."
+    }
   },
   "exclusions": [],
   "content_budget": {

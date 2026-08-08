@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://eslabon-perdido.local/schemas/occurrence.json",
+  "title": "Occurrence",
+  "description": "Presencia documentada o inferida de una entidad en un lugar y un intervalo temporal (§7.8). No es una excepción a la delgadez que E.5 exige de las entidades: es su contraparte. Una entidad no lleva tiempo ni lugar propios precisamente porque los expresa mediante ocurrencias, y una ocurrencia sin ambos no dice nada (ISSUE-000035).",
+  "type": "object",
+  "properties": {
+    "id": { "type": "string", "pattern": "^OCC-[0-9]{6}$" },
+    "entity_id": {
+      "$ref": "common.json#/$defs/id",
+      "description": "Entidad cuya presencia se registra: taxón, población, linaje o espécimen."
+    },
+    "temporal_expression_id": {
+      "oneOf": [{ "type": "string", "pattern": "^TIME-[0-9]{6}$" }, { "type": "null" }],
+      "description": "Intervalo de la presencia. Null sólo si la fuente no lo da; entonces evidence_basis debe decirlo."
+    },
+    "region_id": {
+      "oneOf": [{ "type": "string", "pattern": "^REGION-[0-9]{6}$" }, { "type": "null" }]
+    },
+    "site_id": {
+      "oneOf": [{ "type": "string", "pattern": "^SITE-[0-9]{6}$" }, { "type": "null" }],
+      "description": "Yacimiento concreto. §19.2 exige no confundir yacimiento con región: son campos distintos a propósito."
+    },
+    "location_precision": {
+      "type": "string",
+      "enum": ["point", "polygon", "regional", "approximate", "unknown", "inferred"],
+      "description": "Las seis clases de §12.2. 'unknown' es información válida: §4.8 prohíbe forzar una ubicación."
+    },
+    "evidence_basis": {
+      "type": "string",
+      "enum": ["observed", "inferred"],
+      "description": "§11. Una presencia inferida y una observada no son la misma afirmación."
+    },
+    "claim_ids": {
+      "type": "array",
+      "items": { "type": "string", "pattern": "^CLAIM-[0-9]{6}$" }
+    },
+    "evidence_ids": {
+      "type": "array",
+      "items": { "type": "string", "pattern": "^EVID-[0-9]{6}$" }
+    },
+    "issue_ids": {
+      "type": "array",
+      "items": { "$ref": "common.json#/$defs/issue_id" }
+    },
+    "notes": { "$ref": "common.json#/$defs/notes" },
+    "first_introduced_in": { "$ref": "common.json#/$defs/section_id" },
+    "superseded_by": { "$ref": "common.json#/$defs/superseded_by" },
+    "merged_into": { "$ref": "common.json#/$defs/merged_into" },
+    "record_status": { "$ref": "common.json#/$defs/record_status" }
+  },
+  "required": ["id", "entity_id", "location_precision", "evidence_basis", "record_status"],
+  "additionalProperties": false
+}

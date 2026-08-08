@@ -297,6 +297,7 @@ Debe cubrir, con el nivel mínimo suficiente:
 - cooperación y conflicto intracelular;
 - transferencia genética abstracta cuando sea necesaria;
 - diversificación eucariota temprana;
+- origen del sexo y de la meiosis, y su costo frente a la reproducción clonal;
 - ramas hermanas indispensables para comprender cada divergencia;
 - al menos una controversia o hipótesis alternativa real;
 - rasgos, costos, evidencia y procedencia;
@@ -574,7 +575,7 @@ Debe incluir como mínimo:
 - rasgos y compensaciones;
 - intervalos temporales con incertidumbre;
 - varias fuentes y afirmaciones trazables;
-- una hipótesis principal y una alternativa incompatible o parcialmente incompatible;
+- **dos o más hipótesis incompatibles** sobre el mismo conjunto de entidades, con sus afirmaciones, su evidencia y su contraevidencia. No basta con una alternativa parcialmente incompatible: la incompatibilidad parcial es un fenómeno distinto y no ejercita la prueba de estrés del modelo de hipótesis (`ISSUE-000028`);
 - una vista de trabajo fechada;
 - una vista histórica o de fuente;
 - una proyección de campaña;
@@ -896,6 +897,8 @@ Representa un objeto físico individual o muestra concreta. No debe convertirse 
 
 Representa la presencia documentada o inferida de una entidad en un lugar y un intervalo temporal. Separa la identidad del taxón o población de la evidencia de su presencia.
 
+Tiene **esquema propio** (Apéndice E.13) y no viaja por la entidad biológica común. No es una excepción a la delgadez que E.5 exige: es su contraparte. Una entidad no lleva tiempo ni lugar propios precisamente porque los expresa mediante ocurrencias, y una ocurrencia sin ambos no afirma nada (`ISSUE-000035`).
+
 ## 7.9. Rasgo y observación
 
 Un rasgo abstracto debe distinguirse de su observación en:
@@ -1132,9 +1135,11 @@ rejected
 active
 deprecated
 merged
-superseded
+replaced
 archived
 ```
+
+`replaced` se llamaba `superseded`. Se renombró porque compartía nombre con el valor de §10.5, que designa una **idea** reemplazada, mientras éste designa un **registro** sustituido. Eran dos afirmaciones muy distintas bajo la misma palabra (`ISSUE-000007`).
 
 ## 10.7. Soporte cuantitativo
 
@@ -2385,6 +2390,7 @@ Una interacción puede conducir a:
 - cooperación temporal;
 - asociación estable;
 - transferencia genética abstracta;
+- **recombinación por ciclo sexual**, que redistribuye variación dentro de un linaje sin transferirla entre linajes;
 - dependencia mutua;
 - integración heredable.
 
@@ -3857,6 +3863,16 @@ Ampliar una rama periférica cuando exista:
 ### Disparador
 
 Una fuente, vista o campaña requiere ese rango. La campaña de Primates será el primer gran caso de prueba para tribus, subtribus y subgéneros.
+
+## 25.5.1. Sexo y meiosis en la Campaña 1
+
+**Ya no está pospuesto.** El origen del sexo y de la meiosis entra en la Campaña 1 como contenido del Atlas **y** como mecánica del bucle, por decisión del 8 de agosto de 2026 (`ISSUE-000026`).
+
+Había desaparecido de la `1.1.0` sin figurar entre las exclusiones declaradas ni entre el trabajo pospuesto con disparador, que es lo que §1.1 exige. La omisión no era una decisión: era un hueco.
+
+**Entra:** recombinación, alternancia de ploidía, tipos de apareamiento, y el costo del sexo frente a la reproducción clonal. **No entra:** genética de poblaciones a nivel de locus, que sigue pospuesta en §25.1.
+
+Consecuencia declarada, como exige §0.1: amplía el alcance de la primera campaña frente al riesgo §29.1, y añade variables al módulo de simulación que §21.5 no listaba. Se acepta porque LECA era sexual y omitirlo dejaría un hueco visible en el Atlas justo en el corredor que la campaña recorre.
 
 ## 25.6. Compatibilidad automática completa
 

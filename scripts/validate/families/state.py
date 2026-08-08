@@ -44,8 +44,15 @@ SEMVER_RE = re.compile(r"^[0-9]+\.[0-9]+\.[0-9]+$")
 REV_RE = re.compile(r"^REV-([0-9]{6})$")
 
 # §10.6. Ciclo de vida del registro.
-CLOSED_STATUSES = ("deprecated", "merged", "superseded", "archived")
-NEEDS_SUCCESSOR = ("merged", "superseded")
+CLOSED_STATUSES = ("deprecated", "merged", "replaced", "archived")
+NEEDS_SUCCESSOR = ("merged", "replaced")
+
+# Guardia de migracion: `record_status: "superseded"` fue valido hasta el
+# 8 de agosto de 2026 y se renombro a `replaced` porque compartia nombre con
+# el valor homonimo de `historical_status`, que designa una IDEA reemplazada
+# y no un registro (ISSUE-000007). Un registro que aun lo use viene de antes
+# del renombrado o confunde los dos ejes.
+LEGACY_RECORD_STATUS = "superseded"
 
 # §10.1–§10.5. Ejes independientes y sus valores.
 AXIS_VALUES = {
@@ -459,7 +466,22 @@ def _check_axes(data, rep) -> None:
 
 # --- entrada -----------------------------------------------------------------
 
+def _check_legacy_status(data: dict[str, list[dict]], rep) -> None:
+    """Detecta el valor renombrado (ISSUE-000007)."""
+    for fname, recs in data.items():
+        for r in recs:
+            if isinstance(r, dict) and r.get("record_status") == LEGACY_RECORD_STATUS:
+                rep.error(
+                    f"estado: {fname}: {r.get('id')} usa record_status "
+                    f"'{LEGACY_RECORD_STATUS}', que se renombró a 'replaced'. Ese valor "
+                    "sigue existiendo en historical_status, donde designa una IDEA "
+                    "reemplazada, no un registro: usarlo aquí confunde dos ejes "
+                    "independientes de §10 (ISSUE-000007)"
+                )
+
+
 def check(data: dict[str, list[dict]], rep) -> None:
+    _check_legacy_status(data, rep)
     # Conservacion y migraciones necesitan snapshots, deltas y migraciones.
     # En el dataset real viven donde dice §16.2; un fixture trae los suyos junto
     # a sus registros, y ahi es donde hay que buscarlos. Comparar un fixture

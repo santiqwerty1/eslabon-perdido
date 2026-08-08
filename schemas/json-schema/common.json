@@ -44,10 +44,10 @@
         "active",
         "deprecated",
         "merged",
-        "superseded",
+        "replaced",
         "archived"
       ],
-      "description": "§10.6. Ciclo de vida del REGISTRO, no de la idea."
+      "description": "§10.6. Ciclo de vida del REGISTRO, no de la idea. `replaced` se llamaba `superseded` y se renombró el 8 de agosto de 2026: compartía nombre con el valor homónimo de `historical_status`, que designa una IDEA reemplazada, y dos agentes los confundieron al construir los fixtures (ISSUE-000007)."
     },
     "epistemic_dimensions": {
       "type": "object",

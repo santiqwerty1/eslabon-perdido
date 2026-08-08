@@ -17,14 +17,13 @@
         "specimen",
         "site",
         "region",
-        "occurrence",
         "trait",
         "technology",
         "ecosystem",
         "method",
         "researcher"
       ],
-      "description": "Discriminante de §7 y §8. Los ocho primeros tienen prefijo consolidado en §16.3 y fichero propio en knowledge/records/. Los cuatro últimos están previstos por el modelo pero todavía no tienen prefijo ni fichero canónico: no se almacenan hasta que §16.3 los incorpore."
+      "description": "Discriminante de §7 y §8. Los ocho primeros tienen prefijo consolidado en §16.3 y fichero propio en knowledge/records/. Los cuatro últimos están previstos por el modelo pero todavía no tienen prefijo ni fichero canónico: no se almacenan hasta que §16.3 los incorpore. `occurrence` se retiró: tiene esquema propio porque §7.8 la define por su tiempo y su lugar, y esta entidad es delgada por exigencia de E.5 (ISSUE-000035)."
     },
     "preferred_label": {
       "type": "string",

@@ -52,7 +52,7 @@ SCHEMA_BY_FILE = {
     "specimens.jsonl": "entity.json",
     "sites.jsonl": "entity.json",
     "regions.jsonl": "entity.json",
-    "occurrences.jsonl": "entity.json",
+    "occurrences.jsonl": "occurrence.json",
     "traits.jsonl": "entity.json",
     "trait-observations.jsonl": "trait-observation.json",
     "claims.jsonl": "claim.json",

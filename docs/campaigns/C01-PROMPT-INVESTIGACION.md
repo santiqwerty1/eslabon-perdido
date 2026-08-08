@@ -173,6 +173,8 @@ Deja explícito qué parte de la discrepancia es empírica y qué parte es una e
 
 ## 11. Sexo, meiosis y ciclo vital
 
+> **Sección obligatoria y de primer orden.** El origen del sexo entra en la Campaña 1 como contenido del Atlas y como mecánica jugable, así que este apartado alimenta directamente el diseño. No lo trates como contexto.
+
 - **¿Era sexual LECA?** El estado de la cuestión y su evidencia: presencia del kit génico meiótico (SPO11, DMC1, MSH4, MSH5, HOP1, MND1, REC8 y los que la literatura añada) en linajes que se creían asexuales, y qué grado de aceptación tiene la conclusión de que el sexo es ancestral y universal en eucariotas. Distingue meiosis de sexo, y ambos de recombinación.
 - **De dónde sale la meiosis**: relación con la mitosis y con la maquinaria bacteriana de reparación por recombinación homóloga (RecA/Rad51). Qué se propone como función original: reparación, purga de mutaciones, generación de variación, resolución de ploidía. Y separa las hipótesis sobre el **origen** de las hipótesis sobre el **mantenimiento**: no son lo mismo.
 - **Qué cuesta el sexo en un protista**: el coste doble clásico y por qué no se aplica igual en linajes isógamos; coste de encontrar pareja, de la fusión, del ciclo de ploidía y del tiempo.

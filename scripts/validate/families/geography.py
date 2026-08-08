@@ -109,6 +109,11 @@ def _check_entity_kinds(data: dict[str, list[dict]], index: dict[str, dict], rep
                     f"geografía: {rid} está en {fname}, que §16.2 reserva a {prefix}NNNNNN. "
                     "Yacimiento, región y ocurrencia no comparten fichero (§12.1)"
                 )
+            # `Occurrence` tiene esquema propio desde ISSUE-000035 y no lleva
+            # entity_type: su tipo lo fija el fichero y el prefijo, y lo que sí
+            # debe declarar es dónde y cuándo, que se comprueba más abajo.
+            if entity_type == "occurrence":
+                continue
             if rec.get("entity_type") != entity_type:
                 rep.error(
                     f"geografía: {rid} está en {fname} pero declara "
@@ -117,7 +122,7 @@ def _check_entity_kinds(data: dict[str, list[dict]], index: dict[str, dict], rep
 
     # El mismo desajuste visto desde el prefijo, para registros que no estén en
     # el fichero canónico (fixtures, ficheros agregados).
-    for prefix, entity_type in ((SITE, "site"), (REGION, "region"), (OCC, "occurrence")):
+    for prefix, entity_type in ((SITE, "site"), (REGION, "region")):
         for rec in _by_prefix(data, prefix):
             if rec.get("entity_type") != entity_type:
                 rep.error(
@@ -125,6 +130,29 @@ def _check_entity_kinds(data: dict[str, list[dict]], index: dict[str, dict], rep
                     f"entity_type={rec.get('entity_type')!r}: yacimiento y región son entidades "
                     "distintas, no dos etiquetas del mismo sitio (§12.1)"
                 )
+
+
+def _check_occurrences(data: dict[str, list[dict]], rep) -> None:
+    """La ocurrencia se define por su lugar y su intervalo (§7.8, ISSUE-000035)."""
+    for rec in data.get("occurrences.jsonl", []):
+        rid = rec.get("id", "?")
+        if not rec.get("region_id") and not rec.get("site_id"):
+            if rec.get("location_precision") != "unknown":
+                rep.error(
+                    f"geografía: {rid} no enlaza región ni yacimiento pero declara "
+                    f"location_precision={rec.get('location_precision')!r}. La ausencia "
+                    "de ubicación es información válida, pero hay que declararla como "
+                    "'unknown' en vez de dejarla implícita (§4.8)"
+                )
+        if rec.get("location_precision") == "inferred" and rec.get("evidence_basis") == "observed":
+            rep.warn(
+                f"geografía: {rid} tiene ubicación inferida y base de evidencia observada; "
+                "conviene revisar cuál de los dos ejes corresponde"
+            )
+        if not rec.get("temporal_expression_id") and rec.get("evidence_basis") == "observed":
+            rep.warn(
+                f"geografía: {rid} declara presencia observada sin intervalo temporal (§7.8)"
+            )
 
 
 def _check_geographic_fields(data: dict[str, list[dict]], index: dict[str, dict], rep) -> None:
@@ -416,6 +444,7 @@ def check(data: dict[str, list[dict]], rep) -> None:
         )
 
     _check_entity_kinds(data, index, rep)
+    _check_occurrences(data, rep)
     _check_geographic_fields(data, index, rep)
     _check_containment_direction(claims, index, rep)
     _check_inference_marks(claims, rep)

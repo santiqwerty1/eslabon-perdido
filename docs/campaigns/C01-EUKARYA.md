@@ -47,7 +47,7 @@ Registrados en `docs/ISSUES.md`:
 
 - `ISSUE-000010` — no hay catálogo terminológico eucariota («protista», «protozoo», «algas»). La fuente actual tampoco lo trae: exige investigación nueva.
 - `ISSUE-000021` — falta contenido científico del corredor: Archaea y Bacteria no aparecen nunca, pese a ser el arranque; se perdió el sinónimo Corallochytrea; no hay definiciones por contenido.
-- `ISSUE-000026` — la reproducción sexual y el origen de la meiosis desaparecieron sin exclusión declarada ni disparador. **Decisión pendiente en este dossier.**
+- ~~`ISSUE-000026`~~ — **resuelta el 8 de agosto de 2026**: el sexo y la meiosis **entran** en la Campaña 1, como contenido del Atlas y como mecánica. Ver §25.5.1 de la guía.
 - `ISSUE-000013` — `OPEN-016` tiene respuesta de facto y sigue abierta.
 
 ## Requisitos que el dataset debe demostrar
@@ -57,10 +57,10 @@ De §5.3, como banco de pruebas de la arquitectura:
 - poblaciones ancestrales reconstruidas **sin nombres inventados**;
 - origen e integración mitocondrial como **evento reticulado con participantes y roles**;
 - cooperación y conflicto intracelular;
-- al menos **una controversia o hipótesis alternativa real**;
+- al menos **dos controversias o hipótesis alternativas reales**;
 - rasgos, costos, evidencia y procedencia;
 - intervalos temporales con incertidumbre;
-- **dos vistas incompatibles o parcialmente incompatibles**;
+- **dos o más hipótesis realmente incompatibles**; la incompatibilidad parcial no basta (`ISSUE-000028`);
 - una vista de trabajo fechada y una vista histórica o de fuente.
 
 ## Conexión con la Campaña 2
