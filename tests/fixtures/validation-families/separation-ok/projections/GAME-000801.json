@@ -1,0 +1,28 @@
+{
+  "id": "GAME-000801",
+  "scientific_reference_ids": ["CLADE-000801", "CLADE-000802", "CLAIM-000802", "TAXVIEW-000801"],
+  "campaign_id": "CAMP-000001",
+  "chapter_id": null,
+  "module_id": "c01-eukarya",
+  "playable_role": "population",
+  "simulation_scale": "cellular-populations",
+  "temporal_scale": null,
+  "abstraction": "Dos grupos del corredor se presentan como dos poblaciones jugables. La proyección no dice nada sobre su relación: eso lo dice CLAIM-000802, que sigue siendo el único sitio donde vive esa afirmación.",
+  "active_variables": ["tamaño de población"],
+  "mechanic_hooks": [],
+  "scientific_constraints": [
+    "Nada de progreso lineal ni de escalas de valor entre linajes: ninguna población es la finalidad de otra.",
+    "La relación de grupo hermano se muestra como discutida, no como hecho."
+  ],
+  "simplifications": [
+    "Se agrupan en dos poblaciones jugables entidades que en el núcleo son dos clados con contenido muy distinto.",
+    "La incertidumbre de CLAIM-000802 se traduce en un signo de interrogación en la interfaz, no en una probabilidad."
+  ],
+  "continuity_policy": "atlas-and-narrative",
+  "future_compatibility_notes": [],
+  "justification": "La simplificación mantiene lo que la fuente sostiene y marca lo que no está resuelto; borrar el módulo de campaña no toca ningún registro científico.",
+  "status": "draft",
+  "issue_ids": [],
+  "notes": [],
+  "record_status": "active"
+}

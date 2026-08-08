@@ -1,0 +1,86 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://eslabon-perdido.local/schemas/dataset.json",
+  "title": "Dataset",
+  "description": "Matriz, secuencia, muestra o colección analizada (prefijo DATASET-, §16.3; fase mínima 3 en §8). Primer eslabón de la cadena de §6.4. Registrar el conjunto de datos aparte del análisis permite ver cuándo dos resultados discrepantes comparten los mismos datos y cuándo no.",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^DATASET-[0-9]{6}$"
+    },
+    "dataset_type": {
+      "type": "string",
+      "enum": [
+        "character_matrix",
+        "sequence_alignment",
+        "genome_assembly",
+        "proteome",
+        "specimen_collection",
+        "measurement_table",
+        "occurrence_table",
+        "geochronological_series",
+        "image_or_scan",
+        "literature_compilation",
+        "other"
+      ]
+    },
+    "title": { "type": "string", "minLength": 1 },
+    "description": { "type": ["string", "null"] },
+    "source_ids": {
+      "type": "array",
+      "items": { "$ref": "common.json#/$defs/source_id" }
+    },
+    "repository": {
+      "type": ["string", "null"],
+      "description": "Repositorio o colección donde se deposita, tal como lo cita la fuente."
+    },
+    "accession": {
+      "type": ["string", "null"],
+      "description": "Identificador externo. No se inventa cuando la fuente no lo da (§17 paso 7)."
+    },
+    "sampled_entity_ids": {
+      "type": "array",
+      "items": { "$ref": "common.json#/$defs/id" },
+      "description": "Entidades muestreadas. El muestreo condiciona el resultado y por eso se registra."
+    },
+    "specimen_ids": {
+      "type": "array",
+      "items": { "type": "string", "pattern": "^SPECIMEN-[0-9]{6}$" }
+    },
+    "size": {
+      "type": ["object", "null"],
+      "description": "Dimensiones declaradas por la fuente. Null cuando no constan.",
+      "properties": {
+        "n_taxa": { "type": ["integer", "null"], "minimum": 0 },
+        "n_characters": { "type": ["integer", "null"], "minimum": 0 },
+        "n_sequences": { "type": ["integer", "null"], "minimum": 0 },
+        "n_sites": { "type": ["integer", "null"], "minimum": 0 },
+        "n_specimens": { "type": ["integer", "null"], "minimum": 0 }
+      },
+      "additionalProperties": false
+    },
+    "sampling_notes": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Sesgos y huecos de muestreo conocidos. Un taxón ausente de la matriz no es un taxón ausente del mundo."
+    },
+    "limitations": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "passage_ids": {
+      "type": "array",
+      "items": { "$ref": "common.json#/$defs/passage_id" }
+    },
+    "issue_ids": {
+      "type": "array",
+      "items": { "$ref": "common.json#/$defs/issue_id" }
+    },
+    "provenance": { "$ref": "common.json#/$defs/provenance" },
+    "notes": { "$ref": "common.json#/$defs/notes" },
+    "record_status": { "$ref": "common.json#/$defs/record_status" }
+  },
+  "required": ["id", "dataset_type", "title", "source_ids", "provenance", "record_status"],
+  "additionalProperties": false
+}

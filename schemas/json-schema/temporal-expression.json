@@ -1,0 +1,226 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://eslabon-perdido.local/schemas/temporal-expression.json",
+  "title": "TemporalExpression",
+  "description": "Expresión temporal reutilizable (prefijo TIME-, §16.3). Materializa §11.1–§11.4: el tipo de fecha, el intervalo con unidad explícita, la incertidumbre, la calibración, el método, la fuente y la condición de observado o inferido. Ninguna afirmación guarda fechas planas: las referencia por identificador.",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^TIME-[0-9]{6}$"
+    },
+    "temporal_type": {
+      "type": "string",
+      "enum": [
+        "occurrence_date",
+        "observed_taxon_range",
+        "inferred_lineage_range",
+        "divergence_estimate",
+        "event_date",
+        "trait_evidence_date",
+        "publication_date",
+        "classification_validity_period"
+      ],
+      "description": "Los ocho tipos separados de §11.1. No son intercambiables: un rango observado no es una duración inferida."
+    },
+    "label": {
+      "type": ["string", "null"],
+      "description": "Etiqueta legible opcional. No sustituye al intervalo."
+    },
+    "interval": {
+      "type": ["object", "null"],
+      "description": "§11.2. Todo intervalo declara sus dos límites y su unidad. Un límite nulo significa extremo abierto, no cero.",
+      "properties": {
+        "oldest_bound": {
+          "type": ["number", "null"],
+          "description": "Límite más antiguo en la unidad declarada. Null si el intervalo queda abierto por ese extremo."
+        },
+        "youngest_bound": {
+          "type": ["number", "null"],
+          "description": "Límite más reciente en la unidad declarada. Null si el intervalo queda abierto por ese extremo."
+        },
+        "unit": {
+          "type": "string",
+          "enum": [
+            "years",
+            "thousand_years",
+            "million_years",
+            "calibrated_years",
+            "generations",
+            "geological_interval"
+          ],
+          "description": "§11.4. Obligatoria: un intervalo sin unidad explícita no es interpretable y por tanto no es válido."
+        },
+        "reference_point": {
+          "type": "string",
+          "enum": ["before_present", "before_2000_ce", "calendar", "relative_to_event", "not_stated"],
+          "description": "Origen de la cuenta. 'not_stated' conserva la ambigüedad de la fuente en vez de inventar un origen."
+        },
+        "geological_interval": {
+          "type": ["string", "null"],
+          "description": "Nombre cronoestratigráfico tal como aparece en la fuente, cuando unit es 'geological_interval' o cuando la fuente lo cita además del valor numérico."
+        },
+        "original_expression": {
+          "type": ["string", "null"],
+          "description": "§11.4: las conversiones conservan el valor original y no redondean en silencio. Aquí se guarda la expresión tal cual la escribió la fuente."
+        }
+      },
+      "required": ["oldest_bound", "youngest_bound", "unit"],
+      "additionalProperties": false
+    },
+    "calendar_date": {
+      "type": ["string", "null"],
+      "format": "date",
+      "description": "Fecha de calendario, para 'publication_date' y para períodos de validez de una clasificación. Alternativa a interval, no sustituto de él en tiempo profundo."
+    },
+    "uncertainty": {
+      "type": "object",
+      "description": "§11.2. La incertidumbre se declara siempre, aunque sea desconocida. Ausencia de dato no es precisión.",
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": [
+            "symmetric",
+            "asymmetric",
+            "range_only",
+            "credible_interval",
+            "confidence_interval",
+            "none_reported",
+            "unknown"
+          ]
+        },
+        "plus_minus": { "type": ["number", "null"] },
+        "lower": { "type": ["number", "null"] },
+        "upper": { "type": ["number", "null"] },
+        "level": {
+          "type": ["number", "null"],
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Nivel del intervalo cuando kind es credible_interval o confidence_interval (por ejemplo 0.95)."
+        },
+        "description": { "type": ["string", "null"] }
+      },
+      "required": ["kind"],
+      "additionalProperties": false
+    },
+    "calibration": {
+      "type": "object",
+      "description": "§11.2, calibración o sistema cronológico. Una fecha sin calibrar y otra calibrada no se comparan como si fueran lo mismo.",
+      "properties": {
+        "system": {
+          "type": "string",
+          "enum": [
+            "calibrated",
+            "uncalibrated",
+            "geological_timescale",
+            "molecular_clock",
+            "stratigraphic",
+            "not_applicable",
+            "unknown"
+          ]
+        },
+        "curve_or_timescale": {
+          "type": ["string", "null"],
+          "description": "Curva de calibración o escala cronoestratigráfica citada por la fuente."
+        },
+        "notes": { "$ref": "common.json#/$defs/notes" }
+      },
+      "required": ["system"],
+      "additionalProperties": false
+    },
+    "method": {
+      "type": ["string", "null"],
+      "description": "Método tal como lo describe la fuente. No se infiere cuando la fuente no lo dice."
+    },
+    "method_type": {
+      "type": ["string", "null"],
+      "enum": [
+        "radiometric",
+        "radiocarbon",
+        "luminescence",
+        "electron_spin_resonance",
+        "paleomagnetic",
+        "biostratigraphic",
+        "tephrochronology",
+        "molecular_clock",
+        "stratigraphic_correlation",
+        "literature_report",
+        "not_stated",
+        "other",
+        null
+      ]
+    },
+    "determination": {
+      "type": "string",
+      "enum": ["observed", "inferred", "modelled", "reported_without_basis", "unknown"],
+      "description": "§11.2–§11.3. Distingue lo datado directamente de lo estimado. §11.3 prohíbe presentar una inferencia como observación sin marcarla."
+    },
+    "source_ids": {
+      "type": "array",
+      "items": { "$ref": "common.json#/$defs/source_id" },
+      "description": "§11.2, fuente de la datación. Vacío sólo si la sección la aportó sin referencia; en tal caso la fuente 'section_provided' correspondiente queda pendiente de verificación (§17 paso 7)."
+    },
+    "provenance": { "$ref": "common.json#/$defs/provenance" },
+    "issue_ids": {
+      "type": "array",
+      "items": { "$ref": "common.json#/$defs/issue_id" }
+    },
+    "notes": { "$ref": "common.json#/$defs/notes" },
+    "record_status": { "$ref": "common.json#/$defs/record_status" }
+  },
+  "required": [
+    "id",
+    "temporal_type",
+    "uncertainty",
+    "calibration",
+    "determination",
+    "source_ids",
+    "provenance",
+    "record_status"
+  ],
+  "additionalProperties": false,
+  "anyOf": [
+    {
+      "properties": { "interval": { "type": "object" } },
+      "required": ["interval"]
+    },
+    {
+      "properties": { "calendar_date": { "type": "string" } },
+      "required": ["calendar_date"]
+    }
+  ],
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "temporal_type": {
+            "enum": [
+              "occurrence_date",
+              "observed_taxon_range",
+              "inferred_lineage_range",
+              "divergence_estimate",
+              "event_date",
+              "trait_evidence_date"
+            ]
+          }
+        },
+        "required": ["temporal_type"]
+      },
+      "then": {
+        "properties": { "interval": { "type": "object" } },
+        "required": ["interval"],
+        "description": "Los tipos de tiempo profundo exigen intervalo con unidad; una fecha de calendario no los expresa."
+      }
+    },
+    {
+      "if": {
+        "properties": { "temporal_type": { "const": "publication_date" } },
+        "required": ["temporal_type"]
+      },
+      "then": {
+        "properties": { "calendar_date": { "type": "string" } },
+        "required": ["calendar_date"]
+      }
+    }
+  ]
+}

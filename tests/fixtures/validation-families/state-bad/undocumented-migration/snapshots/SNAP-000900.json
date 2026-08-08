@@ -1,0 +1,7 @@
+{
+  "snapshot_id": "SNAP-000900",
+  "label": "fixture: contrato de datos 1.0.0",
+  "schema_version": "1.0.0",
+  "dataset_revision": "REV-000001",
+  "counts": {"claims": 1}
+}

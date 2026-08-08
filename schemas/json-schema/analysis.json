@@ -1,0 +1,98 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://eslabon-perdido.local/schemas/analysis.json",
+  "title": "Analysis",
+  "description": "Método aplicado a un conjunto de datos (prefijo ANALYSIS-, §16.3; fase mínima 3 en §8). Segundo eslabón de §6.4. Conserva método, modelo y parámetros porque dos análisis del mismo conjunto de datos con modelos distintos pueden dar topologías distintas, y eso es información, no ruido.",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^ANALYSIS-[0-9]{6}$"
+    },
+    "analysis_type": {
+      "type": "string",
+      "enum": [
+        "parsimony",
+        "maximum_likelihood",
+        "bayesian_inference",
+        "distance_based",
+        "phylogenetic_network",
+        "molecular_clock_dating",
+        "ancestral_state_reconstruction",
+        "morphometric",
+        "population_genetic",
+        "admixture_inference",
+        "statistical_test",
+        "stratigraphic_correlation",
+        "geochronological_dating",
+        "comparative_qualitative",
+        "other"
+      ]
+    },
+    "method": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Método tal como lo describe la fuente."
+    },
+    "software": { "type": ["string", "null"] },
+    "software_version": { "type": ["string", "null"] },
+    "model": {
+      "type": ["string", "null"],
+      "description": "Modelo evolutivo o estadístico aplicado, cuando la fuente lo declara."
+    },
+    "parameters": {
+      "type": "array",
+      "description": "Parámetros declarados, en pares nombre/valor para no abrir el registro a claves arbitrarias.",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string", "minLength": 1 },
+          "value": { "type": ["string", "number", "boolean", "null"] }
+        },
+        "required": ["name", "value"],
+        "additionalProperties": false
+      }
+    },
+    "dataset_ids": {
+      "type": "array",
+      "items": { "type": "string", "pattern": "^DATASET-[0-9]{6}$" },
+      "minItems": 1,
+      "description": "Un análisis sin conjunto de datos no es reproducible ni contrastable."
+    },
+    "result_ids": {
+      "type": "array",
+      "items": { "type": "string", "pattern": "^RESULT-[0-9]{6}$" }
+    },
+    "source_ids": {
+      "type": "array",
+      "items": { "$ref": "common.json#/$defs/source_id" }
+    },
+    "calibration_ids": {
+      "type": "array",
+      "items": { "type": "string", "pattern": "^TIME-[0-9]{6}$" },
+      "description": "Puntos de calibración usados por dataciones y relojes moleculares (§11.2)."
+    },
+    "assumptions": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Supuestos del método. Se registran aunque la fuente los dé por evidentes."
+    },
+    "limitations": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "passage_ids": {
+      "type": "array",
+      "items": { "$ref": "common.json#/$defs/passage_id" }
+    },
+    "issue_ids": {
+      "type": "array",
+      "items": { "$ref": "common.json#/$defs/issue_id" }
+    },
+    "provenance": { "$ref": "common.json#/$defs/provenance" },
+    "notes": { "$ref": "common.json#/$defs/notes" },
+    "record_status": { "$ref": "common.json#/$defs/record_status" }
+  },
+  "required": ["id", "analysis_type", "method", "dataset_ids", "provenance", "record_status"],
+  "additionalProperties": false
+}

@@ -1,0 +1,1 @@
+{"id": "RESULT-000301", "analysis_id": "ANALYSIS-000301", "result_type": "support_value", "description": "Soporte del nodo de prueba.", "value": 92, "scale": "0-100", "support": {"measure_type": "bootstrap", "value": 92, "scale": "0-100"}, "source_ids": ["SRC-000001"], "provenance": {"section_ids": ["SEC-000001"], "origin": "ingestion"}, "record_status": "active"}

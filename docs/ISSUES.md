@@ -87,6 +87,15 @@ Valores previstos para `issue_type`: `schema_inconsistency`, `documentation_ambi
 | `ISSUE-000026` | WARNING | `content_gap` | La reproducción sexual y el origen de la meiosis desaparecen sin exclusión ni disparador | Fase 1 |
 | `ISSUE-000027` | WARNING | `unspecified_requirement` | §27.7 perdió la exigencia de evaluar la forma de la distribución de resultados | Fase 9 |
 | `ISSUE-000028` | WARNING | `documentation_ambiguity` | Debilitamientos normativos no documentados como simplificaciones | Fase 0 |
+| `ISSUE-000030` | ERROR | `schema_inconsistency` | `provenance.origin` es obligatorio en `common.json` y no existe en E.6 ni §9.1 | Fase 4 |
+| `ISSUE-000031` | ERROR | `schema_inconsistency` | Ningún esquema tiene campo para el reemplazo de un registro deprecado | Fase 4 |
+| `ISSUE-000032` | WARNING | `schema_inconsistency` | `taxon-concept.json` no admite `epistemic_dimensions` | Fase 3 |
+| `ISSUE-000033` | WARNING | `documentation_ambiguity` | §16.2 no asigna fichero JSONL ni a `TIME-` ni a las vistas | Fase 4 |
+| `ISSUE-000034` | WARNING | `documentation_ambiguity` | Cuatro `entity_type` sin prefijo consolidado en §16.3 | Fase 3 |
+| `ISSUE-000035` | WARNING | `schema_inconsistency` | `Occurrence` viaja por `entity.json`, que es delgada y no admite tiempo ni lugar | Fase 4 |
+| `ISSUE-000036` | WARNING | `documentation_ambiguity` | `conflict_group_ids` son cadenas libres, no identificadores opacos | Fase 5 |
+| `ISSUE-000037` | INFO | `content_gap` | El eje `acceptance` no tiene valor para «ya no la sostiene nadie» | Fase 4 |
+| `ISSUE-000038` | INFO | `schema_inconsistency` | `game-projection.json` no cubre «efectos» ni «condiciones de aparición» de §6.8 | Fase 8 |
 
 ---
 
@@ -529,7 +538,92 @@ Este hallazgo refuerza y precisa `ISSUE-000011`: la formulación anterior era me
 
 ---
 
+# H. Detectadas al construir las fases 2 a 6
+
+Salieron al implementar los esquemas, los fixtures y las familias de validación contra datos artificiales. Que aparecieran ahora y no al ingerir el corpus real es exactamente para lo que sirve construir el fixture antes que el dataset.
+
+### `ISSUE-000030` · `provenance.origin` es obligatorio en el esquema y no existe en los ejemplos
+
+- **Severidad:** `ERROR` · **Bloquea:** Fase 4 · **Afecta:** `common.json`, E.6, §9.1
+
+`common.json#/$defs/provenance` declara `origin` como requerido —con valores `ingestion`, `audit`, `editorial`, `derived`— porque §18.2 exige que toda incorporación externa se marque como procedente de auditoría. Pero ni el ejemplo de E.6 ni el de §9.1 lo llevan, así que un `Claim` copiado literalmente del Apéndice E **no valida**.
+
+**Resolución propuesta:** añadir `origin` a los ejemplos de la guía. El campo es correcto y necesario; lo que falta es que el apéndice lo refleje.
+
+---
+
+### `ISSUE-000031` · No hay campo para el reemplazo de un registro deprecado
+
+- **Severidad:** `ERROR` · **Bloquea:** Fase 4 · **Afecta:** todos los esquemas de registro
+
+§16.4 define `DEPRECATE_RECORD` y `SUPERSEDE_RECORD`, y §19.2 exige «deprecaciones con reemplazo o razón». Pero ningún esquema tiene `superseded_by`, `replaced_by` ni `merged_into`, y todos son `additionalProperties: false`. Hoy se puede marcar un registro como superado pero **no se puede decir por cuál**.
+
+Es el mismo defecto que `ISSUE-000024` encontró en el registro de decisiones, ahora en el modelo de datos: marcar sin enlazar deja la trazabilidad a medias.
+
+**Resolución propuesta:** añadir `superseded_by` y `merged_into` opcionales a `common.json` y referenciarlos desde cada esquema de registro.
+
+---
+
+### `ISSUE-000032` · `taxon-concept.json` no admite dimensiones epistémicas
+
+- **Severidad:** `WARNING` · **Bloquea:** Fase 3
+
+Un concepto taxonómico no puede llevar `historical_status: superseded`, que es justo lo que hace falta para conservar una circunscripción abandonada (§4.9). El fixture `historical-classification` lo rodea marcando la afirmación en vez del concepto, lo cual funciona pero desplaza la vigencia de la idea a un registro distinto del que la encarna.
+
+---
+
+### `ISSUE-000033` · §16.2 no asigna fichero a las expresiones temporales ni a las vistas
+
+- **Severidad:** `WARNING` · **Bloquea:** Fase 4
+
+`TIME-` tiene prefijo en §16.3 y esquema propio, pero ningún fichero en el árbol de §16.2. Lo mismo con `TAXVIEW-` y `PHYVIEW-`, que §16.2 sitúa en `knowledge/views/` sin nombrar ficheros. Los fixtures lo han resuelto cada uno a su manera, que es precisamente lo que hay que evitar antes de ingerir.
+
+---
+
+### `ISSUE-000034` · Cuatro tipos de entidad sin prefijo consolidado
+
+- **Severidad:** `WARNING` · **Bloquea:** Fase 3
+
+`entity.json` admite `technology`, `ecosystem`, `method` y `researcher` porque §6.2 los lista como entidades, pero §16.3 no les da prefijo, así que no tienen identificador válido.
+
+---
+
+### `ISSUE-000035` · `Occurrence` no puede llevar tiempo ni lugar
+
+- **Severidad:** `WARNING` · **Bloquea:** Fase 4
+
+§7.8 define la ocurrencia como «presencia documentada o inferida **en un lugar y un intervalo temporal**», pero viaja por `entity.json`, que E.5 exige delgada. El resultado es que un registro `OCC-` no puede expresar lo único que lo define.
+
+Es una tensión real entre E.5 y §7.8, no un error de implementación. Conviene decidir si `Occurrence` merece esquema propio.
+
+---
+
+### `ISSUE-000036` · Los grupos de conflicto no son identificadores opacos
+
+- **Severidad:** `WARNING` · **Bloquea:** Fase 5
+
+§15.2 introduce los grupos de conflicto como mecanismo central de compatibilidad, pero §16.3 no les da prefijo, así que hoy son cadenas libres del tipo `CONFLICT-EUKARYOTE-ROOT-2026-08`. Legibles, pero fuera del sistema de identidad y sin comprobación referencial.
+
+---
+
+### `ISSUE-000037` · Falta un valor de aceptación para lo abandonado
+
+- **Severidad:** `INFO` · **Bloquea:** Fase 4
+
+El eje `acceptance` de §10.1 no tiene valor para «ya no la sostiene nadie». `minority_position` sugiere que alguien todavía la defiende y `not_assessed` que no se ha mirado. La vigencia se puede expresar con `historical_status: rejected`, pero entonces dos ejes independientes se usan de forma acoplada.
+
+---
+
+### `ISSUE-000038` · La proyección de juego no cubre dos campos de §6.8
+
+- **Severidad:** `INFO` · **Bloquea:** Fase 8
+
+§6.8 enumera «efectos» y «condiciones de aparición» entre los datos propios de la capa 8, y `game-projection.json` no los tiene.
+
+---
+
 ## Notas que no son cuestiones pendientes
+
 
 **Las controversias obligatorias de la Campaña 1 ya están identificadas y con fuente.** §5.3 exige «al menos una controversia o hipótesis alternativa real»; `Filogenia.md` documenta tres dentro del corredor Eukaryota → Holozoa:
 

@@ -1,0 +1,193 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://eslabon-perdido.local/schemas/event.json",
+  "title": "Event",
+  "description": "Proceso temporal con participantes y papeles. Apéndice E.8 y §13. Un evento no es un par de nodos: admite n participantes con papeles distintos, intervalos, regiones, descendencia resultante y evidencia contradictoria. Los plurales de 'result_entity_ids' y 'temporal_expression_ids' son deliberados: un mismo proceso puede tener varios episodios y varias dataciones incompatibles.",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^EVENT-[0-9]{6}$"
+    },
+    "event_type": {
+      "type": "string",
+      "enum": [
+        "divergence",
+        "speciation",
+        "extinction",
+        "adaptive_radiation",
+        "bottleneck",
+        "founder_effect",
+        "expansion",
+        "contraction",
+        "isolation",
+        "reconnection",
+        "migration",
+        "dispersal",
+        "partial_replacement",
+        "population_absorption",
+        "hybridization",
+        "introgression",
+        "gene_flow",
+        "hybrid_origin",
+        "horizontal_transfer",
+        "vector_mediated_transfer",
+        "viral_integration",
+        "endosymbiosis",
+        "organelle_capture",
+        "trait_acquisition",
+        "trait_loss",
+        "trait_reversal",
+        "duplication",
+        "convergence",
+        "parallelism",
+        "innovation",
+        "competition",
+        "predation",
+        "host_pathogen_relationship",
+        "niche_construction",
+        "selective_pressure",
+        "coevolution",
+        "cultural_transmission",
+        "intergroup_learning",
+        "technological_replacement"
+      ],
+      "description": "Los cuatro grupos de §13.3: evolutivos y demográficos, reticulados, de caracteres, y ecológicos y culturales. Los dos últimos grupos pueden empezar como afirmaciones simples y promocionarse a evento cuando el material exija participantes, tiempo y lugar."
+    },
+    "label": {
+      "type": ["string", "null"],
+      "description": "Etiqueta legible del episodio concreto."
+    },
+    "participants": {
+      "type": "array",
+      "minItems": 1,
+      "description": "§13.1–§13.2. Cada participante lleva su papel: es lo que distingue donante de receptor, o hospedador de simbionte, sin imponer dirección al grafo entero.",
+      "items": {
+        "type": "object",
+        "properties": {
+          "entity_id": { "$ref": "common.json#/$defs/id" },
+          "role": {
+            "type": "string",
+            "enum": [
+              "participant",
+              "host",
+              "symbiont",
+              "endosymbiont",
+              "donor",
+              "recipient",
+              "parental_population",
+              "ancestral_population",
+              "descendant_population",
+              "source_population",
+              "receiving_population",
+              "diverging_lineage",
+              "migrating_population",
+              "resident_population",
+              "absorbing_population",
+              "absorbed_population",
+              "replacing_population",
+              "replaced_population",
+              "competitor",
+              "predator",
+              "prey",
+              "pathogen",
+              "host_organism",
+              "trait_bearer",
+              "transferred_element",
+              "vector",
+              "transmitting_group",
+              "receiving_group"
+            ],
+            "description": "Papeles de §13.2 y E.8, ampliados con los que exigen los tipos de §13.3 y la endosimbiosis del Apéndice I paso 17. 'participant' es el papel neutro cuando la fuente no lo especifica; no se adivina."
+          },
+          "proportion": {
+            "type": ["number", "null"],
+            "minimum": 0,
+            "maximum": 1,
+            "description": "§13.1, porcentajes o direcciones parciales. Null cuando la fuente no cuantifica."
+          },
+          "notes": { "$ref": "common.json#/$defs/notes" }
+        },
+        "required": ["entity_id", "role"],
+        "additionalProperties": false
+      }
+    },
+    "result_entity_ids": {
+      "type": "array",
+      "items": { "$ref": "common.json#/$defs/id" },
+      "description": "Entidades resultantes, cuando el evento produce alguna (por ejemplo un linaje de origen híbrido)."
+    },
+    "temporal_expression_ids": {
+      "type": "array",
+      "items": { "type": "string", "pattern": "^TIME-[0-9]{6}$" },
+      "description": "Fechas de tipo 'event_date' (§11.1). En plural: dataciones alternativas conviven sin promediarse."
+    },
+    "region_ids": {
+      "type": "array",
+      "items": { "type": "string", "pattern": "^REGION-[0-9]{6}$" }
+    },
+    "site_ids": {
+      "type": "array",
+      "items": { "type": "string", "pattern": "^SITE-[0-9]{6}$" }
+    },
+    "episodes": {
+      "type": "array",
+      "description": "§13.1, múltiples episodios de un mismo proceso. Cada episodio referencia sus fechas y regiones sin duplicar el evento.",
+      "items": {
+        "type": "object",
+        "properties": {
+          "label": { "type": "string", "minLength": 1 },
+          "temporal_expression_ids": {
+            "type": "array",
+            "items": { "type": "string", "pattern": "^TIME-[0-9]{6}$" }
+          },
+          "region_ids": {
+            "type": "array",
+            "items": { "type": "string", "pattern": "^REGION-[0-9]{6}$" }
+          },
+          "notes": { "$ref": "common.json#/$defs/notes" }
+        },
+        "required": ["label"],
+        "additionalProperties": false
+      }
+    },
+    "claim_ids": {
+      "type": "array",
+      "items": { "type": "string", "pattern": "^CLAIM-[0-9]{6}$" }
+    },
+    "evidence_ids": {
+      "type": "array",
+      "items": { "type": "string", "pattern": "^EVID-[0-9]{6}$" }
+    },
+    "counterevidence_ids": {
+      "type": "array",
+      "items": { "type": "string", "pattern": "^EVID-[0-9]{6}$" }
+    },
+    "hypothesis_ids": {
+      "type": "array",
+      "items": { "type": "string", "pattern": "^HYP-[0-9]{6}$" },
+      "description": "Hipótesis dentro de las cuales el evento se sostiene. Un evento puede pertenecer a una hipótesis y no a su alternativa."
+    },
+    "issue_ids": {
+      "type": "array",
+      "items": { "$ref": "common.json#/$defs/issue_id" }
+    },
+    "first_introduced_in": {
+      "oneOf": [{ "$ref": "common.json#/$defs/section_id" }, { "type": "null" }]
+    },
+    "provenance": { "$ref": "common.json#/$defs/provenance" },
+    "notes": { "$ref": "common.json#/$defs/notes" },
+    "record_status": { "$ref": "common.json#/$defs/record_status" }
+  },
+  "required": [
+    "id",
+    "event_type",
+    "participants",
+    "result_entity_ids",
+    "temporal_expression_ids",
+    "region_ids",
+    "provenance",
+    "record_status"
+  ],
+  "additionalProperties": false
+}

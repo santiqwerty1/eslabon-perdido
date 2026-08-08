@@ -13,7 +13,5 @@ jobs:
         with:
           python-version: "3.11"
       - run: pip install -r requirements.txt
-      - name: Validación completa (§19.2)
-        run: python scripts/validate/validate.py all
-      - name: Integridad del snapshot (§16.6)
-        run: python scripts/snapshot/snapshot.py verify
+      - name: Validación, integridad y fixtures
+        run: make check

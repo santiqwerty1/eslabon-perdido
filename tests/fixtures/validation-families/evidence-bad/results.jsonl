@@ -1,0 +1,1 @@
+{"id": "RESULT-000401", "analysis_id": "ANALYSIS-000401", "result_type": "support_value", "value": 0.99, "support": {"measure_type": "posterior_probability", "value": 0.99}, "source_ids": [], "provenance": {"section_ids": ["SEC-000001"], "origin": "ingestion"}, "record_status": "active"}

@@ -1,0 +1,102 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://eslabon-perdido.local/schemas/entity.json",
+  "title": "Entity",
+  "description": "Entidad biológica común. Apéndice E.5. Es deliberadamente delgada: identidad, etiqueta y enlaces. Los datos temporales, geográficos, filogenéticos o epistemológicos NO se colocan aquí como verdades planas; viajan en ocurrencias y afirmaciones, donde llevan procedencia, alcance y contraevidencia. Cubre clades.jsonl, lineages.jsonl, populations.jsonl, specimens.jsonl, sites.jsonl, regions.jsonl, occurrences.jsonl y traits.jsonl.",
+  "type": "object",
+  "properties": {
+    "id": { "$ref": "common.json#/$defs/id" },
+    "entity_type": {
+      "type": "string",
+      "enum": [
+        "biological_lineage",
+        "clade",
+        "population",
+        "specimen",
+        "site",
+        "region",
+        "occurrence",
+        "trait",
+        "technology",
+        "ecosystem",
+        "method",
+        "researcher"
+      ],
+      "description": "Discriminante de §7 y §8. Los ocho primeros tienen prefijo consolidado en §16.3 y fichero propio en knowledge/records/. Los cuatro últimos están previstos por el modelo pero todavía no tienen prefijo ni fichero canónico: no se almacenan hasta que §16.3 los incorpore."
+    },
+    "preferred_label": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Etiqueta de trabajo legible. No es identidad ni nombre nomenclatural: el identificador es opaco (§16.3) y el nombre vive en TaxonomicName."
+    },
+    "alias_ids": {
+      "type": "array",
+      "items": { "$ref": "common.json#/$defs/id" },
+      "description": "Nombres, conceptos o menciones que designan esta misma entidad. Fusionar identidades exige la operación MERGE_CONFIRMED_IDENTITIES de §16.4, nunca un borrado."
+    },
+    "description": {
+      "type": ["string", "null"],
+      "description": "Descripción breve y no teleológica. Nada de jerarquías de valor entre linajes ni de finalidad evolutiva."
+    },
+    "claim_ids": {
+      "type": "array",
+      "items": { "type": "string", "pattern": "^CLAIM-[0-9]{6}$" },
+      "description": "Afirmaciones que tienen esta entidad por sujeto u objeto. Es el único lugar del que sale lo que se sabe de ella."
+    },
+    "issue_ids": {
+      "type": "array",
+      "items": { "$ref": "common.json#/$defs/issue_id" }
+    },
+    "first_introduced_in": {
+      "oneOf": [
+        { "$ref": "common.json#/$defs/section_id" },
+        { "type": "null" }
+      ],
+      "description": "Sección que introdujo la entidad, o null si no procede de una ingestión."
+    },
+    "last_modified_in": {
+      "oneOf": [
+        { "$ref": "common.json#/$defs/section_id" },
+        { "type": "null" }
+      ]
+    },
+    "notes": { "$ref": "common.json#/$defs/notes" },
+    "record_status": { "$ref": "common.json#/$defs/record_status" }
+  },
+  "required": ["id", "entity_type", "preferred_label", "first_introduced_in", "record_status"],
+  "additionalProperties": false,
+  "allOf": [
+    {
+      "if": { "properties": { "entity_type": { "const": "biological_lineage" } }, "required": ["entity_type"] },
+      "then": { "properties": { "id": { "pattern": "^LINEAGE-[0-9]{6}$" } } }
+    },
+    {
+      "if": { "properties": { "entity_type": { "const": "clade" } }, "required": ["entity_type"] },
+      "then": { "properties": { "id": { "pattern": "^CLADE-[0-9]{6}$" } } }
+    },
+    {
+      "if": { "properties": { "entity_type": { "const": "population" } }, "required": ["entity_type"] },
+      "then": { "properties": { "id": { "pattern": "^POP-[0-9]{6}$" } } }
+    },
+    {
+      "if": { "properties": { "entity_type": { "const": "specimen" } }, "required": ["entity_type"] },
+      "then": { "properties": { "id": { "pattern": "^SPECIMEN-[0-9]{6}$" } } }
+    },
+    {
+      "if": { "properties": { "entity_type": { "const": "site" } }, "required": ["entity_type"] },
+      "then": { "properties": { "id": { "pattern": "^SITE-[0-9]{6}$" } } }
+    },
+    {
+      "if": { "properties": { "entity_type": { "const": "region" } }, "required": ["entity_type"] },
+      "then": { "properties": { "id": { "pattern": "^REGION-[0-9]{6}$" } } }
+    },
+    {
+      "if": { "properties": { "entity_type": { "const": "occurrence" } }, "required": ["entity_type"] },
+      "then": { "properties": { "id": { "pattern": "^OCC-[0-9]{6}$" } } }
+    },
+    {
+      "if": { "properties": { "entity_type": { "const": "trait" } }, "required": ["entity_type"] },
+      "then": { "properties": { "id": { "pattern": "^TRAIT-[0-9]{6}$" } } }
+    }
+  ]
+}

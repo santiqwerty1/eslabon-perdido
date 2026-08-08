@@ -47,14 +47,23 @@ archive/        versiones rectoras anteriores — trazabilidad, no basurero
 ## Uso
 
 ```bash
-pip install -r requirements.txt
-python scripts/validate/validate.py all
-python scripts/snapshot/snapshot.py verify
+make setup      # entorno virtual y dependencias
+make check      # validación + integridad del snapshot + fixtures
 ```
+
+`make help` lista todos los objetivos. Usa el entorno virtual si existe y el Python del sistema si no.
 
 `validate.py` implementa las once familias obligatorias. Las que dependen de tipos aún no implementados se declaran **pendientes con su fase** en vez de pasar en verde por vacuidad.
 
-> **Entorno:** el Python del sistema de desarrollo no trae `pip`, así que la validación de esquema completa se ejecuta en CI. Registrado como `ISSUE-000029`.
+Todo el tooling funciona **sin dependencias**: si falta `jsonschema`, la familia `schema` avisa y comprueba sólo que el JSON esté bien formado, en lugar de fallar. El resto de familias no dependen de nada externo.
+
+> **Entorno WSL/Debian.** El Python del sistema está marcado como *externally managed* (PEP 668), así que `pip install` directo falla. El entorno virtual de arriba es el camino; necesita `sudo apt install python3-venv`.
+>
+> Si prefieres el paquete de la distribución, `python3-jsonschema` en Debian 12 es la 4.10, anterior a `referencing`. El validador admite ambas APIs, así que también funciona.
+>
+> **No ejecutes el tooling desde el Python de Windows** sobre `\\wsl.localhost\`: la conversión de finales de línea rompería la verificación de hashes, que es criterio de aceptación de la Fase 0. Por lo mismo, este repositorio usa `core.autocrlf=false`.
+>
+> Registrado como `ISSUE-000029`.
 
 ## Reglas que no se negocian
 

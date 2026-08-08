@@ -1,0 +1,23 @@
+{
+  "id": "TAXVIEW-000841",
+  "name": "Vista que aparenta no tener coste",
+  "cutoff_date": "2026-08-07",
+  "according_to_source_ids": [],
+  "taxon_concept_ids": [],
+  "root_concept_id": null,
+  "selected_claim_ids": ["CLAIM-000801"],
+  "excluded_claim_ids": ["CLAIM-000802", "CLAIM-000803"],
+  "editorial_criteria": [],
+  "simplifications": [],
+  "validity_period_id": null,
+  "rank_system": null,
+  "scale": null,
+  "generated_artifacts": [
+    {"artifact_type": "svg", "path": "generated/diagrams/TAXVIEW-000841.svg", "content_hash": null}
+  ],
+  "view_version": "1.0.0",
+  "built_from_dataset_revision": "REV-000001",
+  "issue_ids": [],
+  "notes": ["VIOLACIÓN: excluye dos afirmaciones, dibuja un artefacto y no declara ni criterios ni simplificaciones."],
+  "record_status": "active"
+}

@@ -1,0 +1,238 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://eslabon-perdido.local/schemas/claim.json",
+  "title": "Claim",
+  "description": "Afirmación científica atómica. Apéndice E.6 y §9. Es la unidad de verdad del sistema: árboles, redes y clasificaciones son vistas derivadas de conjuntos de afirmaciones, nunca al revés. Una afirmación expresa una sola proposición verificable o disputable, lleva procedencia y no se borra al incorporar otra que la contradiga (§9.2).",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^CLAIM-[0-9]{6}$"
+    },
+    "claim_type": {
+      "type": "string",
+      "enum": ["relational", "temporal", "quantitative", "categorical", "structured"],
+      "description": "Naturaleza del objeto según §9.1: otra entidad, una fecha o intervalo, un valor, una categoría o una expresión estructurada."
+    },
+    "subject_id": {
+      "$ref": "common.json#/$defs/id",
+      "description": "Entidad de la que se afirma algo."
+    },
+    "predicate": {
+      "type": "string",
+      "enum": [
+        "assigned_to",
+        "descends_from",
+        "possible_ancestor_of",
+        "possible_sampled_ancestor_of",
+        "sister_group_of",
+        "diverges_from",
+        "member_of",
+        "contains",
+        "stem_lineage_of",
+        "crown_group_of",
+        "chronological_continuation_of",
+        "hybridizes_with",
+        "receives_gene_flow_from",
+        "introgression_from",
+        "contributes_ancestry_to",
+        "transfers_gene_to",
+        "integrates_viral_material_from",
+        "endosymbiosis_with",
+        "originates_hybrid_lineage_with",
+        "acquires_trait",
+        "loses_trait",
+        "retains_trait",
+        "shows_evidence_of",
+        "converges_with",
+        "inherits_trait_from",
+        "develops_independently",
+        "competes_with",
+        "preys_on",
+        "is_host_of",
+        "modifies_niche_of",
+        "transmits_culture_to",
+        "exerts_selective_pressure_on",
+        "coexists_with",
+        "may_have_coexisted_with",
+        "temporally_overlaps_with",
+        "partially_replaces",
+        "proposed_by",
+        "supported_by",
+        "questioned_by",
+        "incompatible_with",
+        "alternative_to",
+        "proposed_synonym_of",
+        "classified_as_by",
+        "historically_classified_as",
+        "requires_verification",
+        "rejects_claim",
+        "occurs_in",
+        "dated_to"
+      ],
+      "description": "Vocabulario cerrado de §14 más 'assigned_to' de E.6. Los predicados modales ('possible_ancestor_of') no se degradan nunca a ascendencia definitiva. Ampliarlo es un cambio de contrato y sube schema_version (§16.5)."
+    },
+    "object": {
+      "type": "object",
+      "description": "§9.1. Exactamente una forma de objeto por afirmación.",
+      "oneOf": [
+        {
+          "properties": { "entity_id": { "$ref": "common.json#/$defs/id" } },
+          "required": ["entity_id"],
+          "additionalProperties": false
+        },
+        {
+          "properties": { "temporal_expression_id": { "type": "string", "pattern": "^TIME-[0-9]{6}$" } },
+          "required": ["temporal_expression_id"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "value": { "type": "number" },
+            "unit": { "type": ["string", "null"] },
+            "scale": { "type": ["string", "null"] }
+          },
+          "required": ["value"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "category": { "type": "string", "minLength": 1 },
+            "vocabulary": { "type": ["string", "null"] }
+          },
+          "required": ["category"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "structured_expression": { "type": "object" },
+            "expression_format": { "type": ["string", "null"] }
+          },
+          "required": ["structured_expression"],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "scope": {
+      "type": "object",
+      "description": "§9.3. Una afirmación sin contexto no se generaliza automáticamente. Los ejes de fuente, conjunto de datos y método viajan en provenance y evidence_ids.",
+      "properties": {
+        "hypothesis_ids": {
+          "type": "array",
+          "items": { "type": "string", "pattern": "^HYP-[0-9]{6}$" }
+        },
+        "classification_view_ids": {
+          "type": "array",
+          "items": { "type": "string", "pattern": "^TAXVIEW-[0-9]{6}$" }
+        },
+        "temporal_expression_ids": {
+          "type": "array",
+          "items": { "type": "string", "pattern": "^TIME-[0-9]{6}$" }
+        },
+        "region_ids": {
+          "type": "array",
+          "items": { "type": "string", "pattern": "^REGION-[0-9]{6}$" }
+        }
+      },
+      "required": ["hypothesis_ids", "classification_view_ids", "temporal_expression_ids", "region_ids"],
+      "additionalProperties": false
+    },
+    "provenance": { "$ref": "common.json#/$defs/provenance" },
+    "epistemic_dimensions": { "$ref": "common.json#/$defs/epistemic_dimensions" },
+    "quantitative_support": {
+      "type": "array",
+      "description": "§10.7. Las medidas conservan su escala y su método; no se convierten a una escala común ficticia.",
+      "items": {
+        "type": "object",
+        "properties": {
+          "measure_type": { "type": "string", "minLength": 1 },
+          "value": { "type": ["number", "string"] },
+          "scale": { "type": ["string", "null"] },
+          "method": { "type": ["string", "null"] },
+          "applies_to": {
+            "type": ["string", "null"],
+            "description": "Nodo o relación a la que aplica la medida."
+          },
+          "source_id": {
+            "oneOf": [{ "$ref": "common.json#/$defs/source_id" }, { "type": "null" }]
+          },
+          "locator": { "type": ["string", "null"] },
+          "analysis_conditions": { "type": ["string", "null"] }
+        },
+        "required": ["measure_type", "value"],
+        "additionalProperties": false
+      }
+    },
+    "evidence_ids": {
+      "type": "array",
+      "items": { "type": "string", "pattern": "^EVID-[0-9]{6}$" }
+    },
+    "counterevidence_ids": {
+      "type": "array",
+      "items": { "type": "string", "pattern": "^EVID-[0-9]{6}$" },
+      "description": "La contraevidencia viaja con la afirmación, no en un apéndice aparte."
+    },
+    "derivation": {
+      "type": ["object", "null"],
+      "description": "§9.4. Sólo para afirmaciones calculadas. Una derivada no se confunde con lo que una fuente afirma expresamente.",
+      "properties": {
+        "rule": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Regla que la generó, por ejemplo 'contains ← inversa de member_of'."
+        },
+        "depends_on_ids": {
+          "type": "array",
+          "items": { "$ref": "common.json#/$defs/id" },
+          "description": "Afirmaciones, eventos, ocurrencias o vistas de las que depende."
+        },
+        "derived_in_view_id": {
+          "type": ["string", "null"],
+          "pattern": "^(TAXVIEW|PHYVIEW)-[0-9]{6}$"
+        }
+      },
+      "required": ["rule", "depends_on_ids"],
+      "additionalProperties": false
+    },
+    "issue_ids": {
+      "type": "array",
+      "items": { "$ref": "common.json#/$defs/issue_id" }
+    },
+    "notes": { "$ref": "common.json#/$defs/notes" },
+    "record_status": { "$ref": "common.json#/$defs/record_status" }
+  },
+  "required": [
+    "id",
+    "claim_type",
+    "subject_id",
+    "predicate",
+    "object",
+    "scope",
+    "provenance",
+    "epistemic_dimensions",
+    "record_status"
+  ],
+  "additionalProperties": false,
+  "allOf": [
+    {
+      "if": { "properties": { "claim_type": { "const": "relational" } }, "required": ["claim_type"] },
+      "then": { "properties": { "object": { "required": ["entity_id"] } } }
+    },
+    {
+      "if": { "properties": { "claim_type": { "const": "temporal" } }, "required": ["claim_type"] },
+      "then": { "properties": { "object": { "required": ["temporal_expression_id"] } } }
+    },
+    {
+      "if": { "properties": { "claim_type": { "const": "quantitative" } }, "required": ["claim_type"] },
+      "then": { "properties": { "object": { "required": ["value"] } } }
+    },
+    {
+      "if": { "properties": { "claim_type": { "const": "categorical" } }, "required": ["claim_type"] },
+      "then": { "properties": { "object": { "required": ["category"] } } }
+    },
+    {
+      "if": { "properties": { "claim_type": { "const": "structured" } }, "required": ["claim_type"] },
+      "then": { "properties": { "object": { "required": ["structured_expression"] } } }
+    }
+  ]
+}

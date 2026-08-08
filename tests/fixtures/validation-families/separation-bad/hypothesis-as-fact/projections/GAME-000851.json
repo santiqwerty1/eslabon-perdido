@@ -1,0 +1,16 @@
+{
+  "id": "GAME-000851",
+  "scientific_reference_ids": ["HYP-000851"],
+  "campaign_id": "CAMP-000001",
+  "module_id": "c01-eukarya",
+  "playable_role": "population",
+  "simulation_scale": "cellular-populations",
+  "abstraction": "La hipótesis se juega tal cual, como si fuera el mundo.",
+  "scientific_constraints": [],
+  "simplifications": [],
+  "continuity_policy": "atlas-only",
+  "justification": "",
+  "status": "draft",
+  "notes": ["VIOLACIÓN: proyecta una hipótesis discutida sin declarar simplificación, restricción ni justificación. Así es como una hipótesis se convierte en hecho (§4.4)."],
+  "record_status": "active"
+}

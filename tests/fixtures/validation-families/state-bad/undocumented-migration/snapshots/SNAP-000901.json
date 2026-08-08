@@ -1,0 +1,7 @@
+{
+  "snapshot_id": "SNAP-000901",
+  "label": "fixture: contrato de datos 2.0.0, sin documento que explique el salto",
+  "schema_version": "2.0.0",
+  "dataset_revision": "REV-000008",
+  "counts": {"claims": 1}
+}

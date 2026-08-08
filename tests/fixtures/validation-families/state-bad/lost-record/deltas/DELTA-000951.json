@@ -1,0 +1,18 @@
+{
+  "section_id": "SEC-000900",
+  "schema_version": "1.0.0",
+  "dataset_revision_before": "REV-000000",
+  "dataset_revision_after": "REV-000001",
+  "records_added": [],
+  "records_updated": [],
+  "claims_added": ["CLAIM-000951", "CLAIM-000952"],
+  "events_added": [],
+  "hypotheses_added": [],
+  "issues_added": [],
+  "issues_resolved": [],
+  "records_deprecated": [],
+  "records_removed": ["CLAIM-000952"],
+  "views_invalidated": [],
+  "views_built": [],
+  "validation_results": {}
+}

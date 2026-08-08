@@ -1,0 +1,13 @@
+{
+  "id": "PHYVIEW-000842",
+  "name": "Vista con simplificaciones en blanco",
+  "cutoff_date": "2026-08-07",
+  "selected_claim_ids": ["CLAIM-000801"],
+  "excluded_claim_ids": [],
+  "editorial_criteria": ["Se muestra el backbone de trabajo."],
+  "simplifications": ["", "   "],
+  "view_version": "1.0.0",
+  "built_from_dataset_revision": "REV-000001",
+  "notes": ["VIOLACIÓN: declarar una simplificación sin decir cuál no identifica nada."],
+  "record_status": "active"
+}

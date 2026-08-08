@@ -1,0 +1,5 @@
+{"id": "REGION-000010", "entity_type": "region", "preferred_label": "Región de prueba norte", "first_introduced_in": "SEC-000001", "record_status": "active"}
+{"id": "REGION-000020", "entity_type": "region", "preferred_label": "Región de prueba sur", "first_introduced_in": "SEC-000001", "record_status": "active"}
+{"id": "REGION-000030", "entity_type": "region", "preferred_label": "Región de prueba continental", "first_introduced_in": "SEC-000001", "record_status": "active"}
+{"id": "SITE-000002", "entity_type": "site", "preferred_label": "Yacimiento de prueba 2 en el fichero equivocado", "first_introduced_in": "SEC-000001", "record_status": "active"}
+{"id": "REGION-000040", "entity_type": "site", "preferred_label": "Región de prueba con tipo de yacimiento", "first_introduced_in": "SEC-000001", "record_status": "active"}

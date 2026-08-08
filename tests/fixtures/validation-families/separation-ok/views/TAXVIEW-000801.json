@@ -1,0 +1,26 @@
+{
+  "id": "TAXVIEW-000801",
+  "name": "Vista de trabajo del fixture de separación",
+  "cutoff_date": "2026-08-07",
+  "according_to_source_ids": [],
+  "taxon_concept_ids": [],
+  "root_concept_id": null,
+  "selected_claim_ids": ["CLAIM-000801"],
+  "excluded_claim_ids": ["CLAIM-000802"],
+  "editorial_criteria": [
+    "Se selecciona la afirmación de consenso amplio y se excluye la discutida, que sigue disponible en su propio registro."
+  ],
+  "simplifications": [
+    "La vista muestra un solo nivel de anidamiento: los grupos intermedios existen en el núcleo y no se dibujan aquí.",
+    "La alternativa excluida no se dibuja como incierta, se omite; quien mire esta vista no sabrá que existe si no lee excluded_claim_ids."
+  ],
+  "validity_period_id": null,
+  "rank_system": null,
+  "scale": null,
+  "generated_artifacts": [],
+  "view_version": "1.0.0",
+  "built_from_dataset_revision": "REV-000001",
+  "issue_ids": [],
+  "notes": [],
+  "record_status": "active"
+}

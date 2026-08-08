@@ -1,0 +1,19 @@
+{
+  "id": "CLAIM-000831",
+  "claim_type": "relational",
+  "subject_id": "CLADE-000802",
+  "predicate": "descends_from",
+  "object": {"entity_id": "CLADE-000801"},
+  "scope": {"hypothesis_ids": [], "classification_view_ids": [], "temporal_expression_ids": [], "region_ids": []},
+  "provenance": {"section_ids": ["SEC-000800"], "origin": "editorial"},
+  "epistemic_dimensions": {
+    "acceptance": "broad_consensus",
+    "evidence_strength": "unknown",
+    "evidence_strength_reason": null,
+    "resolution": "resolved",
+    "historical_status": "current"
+  },
+  "issue_ids": [],
+  "notes": ["VIOLACIÓN: una afirmación científica guardada en game/projections/. La capa 8 referencia; no almacena ciencia propia."],
+  "record_status": "active"
+}

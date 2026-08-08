@@ -1,0 +1,15 @@
+{
+  "snapshot_id": "SNAP-000900",
+  "label": "fixture: estado anterior a la migración de esquema",
+  "schema_version": "1.0.0",
+  "dataset_revision": "REV-000001",
+  "counts": {
+    "mentions": 0,
+    "claims": 2,
+    "events": 0,
+    "hypotheses": 0,
+    "sources": 0,
+    "issues": 0,
+    "entities": 2
+  }
+}

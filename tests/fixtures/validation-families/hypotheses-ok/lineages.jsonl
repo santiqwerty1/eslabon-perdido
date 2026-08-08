@@ -1,0 +1,3 @@
+{"id": "LINEAGE-000001", "entity_type": "biological_lineage", "preferred_label": "Linaje de prueba A", "first_introduced_in": "SEC-000001", "record_status": "active"}
+{"id": "LINEAGE-000002", "entity_type": "biological_lineage", "preferred_label": "Linaje de prueba B", "first_introduced_in": "SEC-000001", "record_status": "active"}
+{"id": "LINEAGE-000003", "entity_type": "biological_lineage", "preferred_label": "Linaje de prueba C", "first_introduced_in": "SEC-000001", "record_status": "active"}

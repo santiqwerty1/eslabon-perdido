@@ -1,0 +1,29 @@
+{
+  "id": "GAME-000831",
+  "scientific_reference_ids": ["CLAIM-000801"],
+  "campaign_id": "CAMP-000001",
+  "module_id": "c01-eukarya",
+  "playable_role": "population",
+  "simulation_scale": "cellular-populations",
+  "abstraction": "VIOLACIÓN: en vez de referenciar la afirmación, la proyección la vuelve a redactar a su gusto.",
+  "subject_id": "CLADE-000802",
+  "predicate": "descends_from",
+  "claim_text": "Opisthokonta desciende de Eukaryota, y en la campaña se cuenta así, sin matices.",
+  "based_on": {
+    "id": "CLAIM-000801",
+    "predicate": "member_of",
+    "epistemic_dimensions": {
+      "acceptance": "broad_consensus",
+      "evidence_strength": "high",
+      "evidence_strength_reason": "Copia embebida del registro científico.",
+      "resolution": "resolved",
+      "historical_status": "current"
+    }
+  },
+  "scientific_constraints": ["ninguna"],
+  "simplifications": ["se cuenta como descendencia directa"],
+  "continuity_policy": "atlas-only",
+  "justification": "Existe para probar que la reescritura se detecta.",
+  "status": "draft",
+  "record_status": "active"
+}

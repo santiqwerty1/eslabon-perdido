@@ -1,0 +1,114 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://eslabon-perdido.local/schemas/game-projection.json",
+  "title": "GameProjection",
+  "description": "Traducción independiente a contenido jugable (prefijo GAME-, §16.3; fase mínima 8 en §8). Apéndice E.11 y §6.8. La proyección referencia entidades, afirmaciones, eventos y vistas científicas, pero mantiene sus propios datos: nada de esto se almacena dentro de los nodos científicos. Que una campaña use sólo una parte del modelo se registra como proyección, nunca como eliminación de los datos restantes.",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^GAME-[0-9]{6}$"
+    },
+    "scientific_reference_ids": {
+      "type": "array",
+      "items": { "$ref": "common.json#/$defs/id" },
+      "description": "Entidades, afirmaciones, eventos, hipótesis o vistas de las que parte la proyección. Es el enlace de vuelta al Atlas."
+    },
+    "campaign_id": {
+      "type": "string",
+      "pattern": "^CAMP-[0-9]{6}$"
+    },
+    "chapter_id": {
+      "type": ["string", "null"],
+      "pattern": "^CHAPTER-[0-9]{6}$"
+    },
+    "module_id": {
+      "type": "string",
+      "pattern": "^c[0-9]{2}-[a-z0-9-]+$",
+      "description": "Módulo de campaña de §6.8 y §16.2, por ejemplo 'c01-eukarya'."
+    },
+    "playable_role": {
+      "type": "string",
+      "enum": ["population", "biological_lineage", "clade", "symbiotic_association", "researcher", "observer"],
+      "description": "§6.8, rol jugable. En la Campaña 1 la unidad es la población (§22.5)."
+    },
+    "simulation_scale": {
+      "type": "string",
+      "enum": [
+        "cellular-populations",
+        "organismal-populations",
+        "lineages",
+        "clades",
+        "deep-time"
+      ],
+      "description": "§6.8, unidad y escala de simulación. No hay una escala única para todas las campañas."
+    },
+    "temporal_scale": {
+      "type": ["string", "null"],
+      "description": "§6.8, escala temporal de la proyección."
+    },
+    "abstraction": {
+      "type": "string",
+      "description": "Qué abstrae la proyección respecto del registro científico, dicho sin rodeos."
+    },
+    "active_variables": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "§6.8 y §22.4: cada módulo activa sólo las variables que necesita. No existe una tabla universal obligatoria."
+    },
+    "mechanic_hooks": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Mecánicas y efectos a los que engancha. Los identificadores MECH- se referencian aquí cuando existan."
+    },
+    "scientific_constraints": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Lo que la jugabilidad no puede contradecir: nada de progreso lineal, escalas de valor entre linajes ni finalidad evolutiva."
+    },
+    "simplifications": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Simplificaciones asumidas y advertencias científicas asociadas (§6.8)."
+    },
+    "continuity_policy": {
+      "type": "string",
+      "enum": ["atlas-and-narrative", "atlas-only", "narrative-only", "isolated"],
+      "description": "§6.8, política de continuidad con campañas anteriores y posteriores."
+    },
+    "future_compatibility_notes": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Qué debe seguir siendo posible en campañas futuras pese a esta proyección."
+    },
+    "justification": {
+      "type": "string",
+      "description": "Justificación de diseño (§6.8). Una simplificación sin justificación registrada no se acepta."
+    },
+    "status": {
+      "type": "string",
+      "enum": ["draft", "reviewed", "approved", "implemented", "retired"]
+    },
+    "issue_ids": {
+      "type": "array",
+      "items": { "$ref": "common.json#/$defs/issue_id" }
+    },
+    "notes": { "$ref": "common.json#/$defs/notes" },
+    "record_status": { "$ref": "common.json#/$defs/record_status" }
+  },
+  "required": [
+    "id",
+    "scientific_reference_ids",
+    "campaign_id",
+    "module_id",
+    "playable_role",
+    "simulation_scale",
+    "abstraction",
+    "scientific_constraints",
+    "simplifications",
+    "continuity_policy",
+    "justification",
+    "status"
+  ],
+  "additionalProperties": false
+}

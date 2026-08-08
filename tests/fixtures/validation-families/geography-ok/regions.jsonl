@@ -1,0 +1,3 @@
+{"id": "REGION-000010", "entity_type": "region", "preferred_label": "Región de prueba norte", "first_introduced_in": "SEC-000001", "record_status": "active"}
+{"id": "REGION-000020", "entity_type": "region", "preferred_label": "Región de prueba sur", "first_introduced_in": "SEC-000001", "record_status": "active"}
+{"id": "REGION-000030", "entity_type": "region", "preferred_label": "Región de prueba continental", "first_introduced_in": "SEC-000001", "record_status": "active"}

@@ -1,0 +1,18 @@
+{
+  "section_id": "SEC-000900",
+  "schema_version": "1.1.0",
+  "dataset_revision_before": "REV-000001",
+  "dataset_revision_after": "REV-000002",
+  "records_added": ["CLADE-000903", "CLADE-000904"],
+  "records_updated": [],
+  "claims_added": [],
+  "events_added": [],
+  "hypotheses_added": ["HYP-000901"],
+  "issues_added": [],
+  "issues_resolved": [],
+  "records_deprecated": ["CLADE-000904"],
+  "views_invalidated": [],
+  "views_built": [],
+  "validation_results": {},
+  "operations": ["MERGE_CONFIRMED_IDENTITIES", "DEPRECATE_RECORD", "MIGRATE_SCHEMA"]
+}

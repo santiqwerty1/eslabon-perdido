@@ -1,0 +1,120 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://eslabon-perdido.local/schemas/evidence.json",
+  "title": "EvidenceItem",
+  "description": "Evidencia que respalda o cuestiona afirmaciones. Apéndice E.7 y §6.4, que fija la cadena fuente → conjunto de datos → método/análisis → resultado → afirmación. Los dos sentidos son simétricos: 'supports_claim_ids' y 'challenges_claim_ids' se registran con el mismo rango, porque la contraevidencia no es un apéndice opcional.",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^EVID-[0-9]{6}$"
+    },
+    "evidence_type": {
+      "type": "string",
+      "enum": [
+        "morphological",
+        "anatomical",
+        "fossil",
+        "stratigraphic",
+        "sedimentological",
+        "molecular",
+        "genomic",
+        "mitochondrial",
+        "chromosomal",
+        "paleoproteomic",
+        "archaeological",
+        "biogeographic",
+        "ecological",
+        "behavioural",
+        "linguistic",
+        "chronological",
+        "statistical",
+        "historical",
+        "nomenclatural",
+        "taxonomic"
+      ],
+      "description": "Los veinte tipos previstos en E.7."
+    },
+    "description": {
+      "type": "string",
+      "description": "Qué muestra la evidencia, en los términos de la fuente."
+    },
+    "source_id": {
+      "oneOf": [{ "$ref": "common.json#/$defs/source_id" }, { "type": "null" }],
+      "description": "Fuente que aporta la evidencia. Null sólo si aún no se ha resuelto; en ese caso corresponde una cuestión pendiente 'missing_source' (E.12)."
+    },
+    "locator": {
+      "type": ["string", "null"],
+      "description": "§6.4: localizador dentro de la fuente (página, figura, tabla, material suplementario)."
+    },
+    "passage_ids": {
+      "type": "array",
+      "items": { "$ref": "common.json#/$defs/passage_id" }
+    },
+    "specimen_ids": {
+      "type": "array",
+      "items": { "type": "string", "pattern": "^SPECIMEN-[0-9]{6}$" },
+      "description": "§6.4, muestra sobre la que se apoya."
+    },
+    "dataset_ids": {
+      "type": "array",
+      "items": { "type": "string", "pattern": "^DATASET-[0-9]{6}$" }
+    },
+    "analysis_ids": {
+      "type": "array",
+      "items": { "type": "string", "pattern": "^ANALYSIS-[0-9]{6}$" }
+    },
+    "result_ids": {
+      "type": "array",
+      "items": { "type": "string", "pattern": "^RESULT-[0-9]{6}$" },
+      "description": "Eslabón 'resultado' de la cadena de §6.4."
+    },
+    "supports_claim_ids": {
+      "type": "array",
+      "items": { "type": "string", "pattern": "^CLAIM-[0-9]{6}$" }
+    },
+    "challenges_claim_ids": {
+      "type": "array",
+      "items": { "type": "string", "pattern": "^CLAIM-[0-9]{6}$" }
+    },
+    "limitations": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "§6.4. Lo que la evidencia no permite concluir. Se registra aunque la fuente sea entusiasta."
+    },
+    "quality_notes": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "temporal_expression_ids": {
+      "type": "array",
+      "items": { "type": "string", "pattern": "^TIME-[0-9]{6}$" }
+    },
+    "region_ids": {
+      "type": "array",
+      "items": { "type": "string", "pattern": "^REGION-[0-9]{6}$" }
+    },
+    "site_ids": {
+      "type": "array",
+      "items": { "type": "string", "pattern": "^SITE-[0-9]{6}$" }
+    },
+    "issue_ids": {
+      "type": "array",
+      "items": { "$ref": "common.json#/$defs/issue_id" }
+    },
+    "provenance": { "$ref": "common.json#/$defs/provenance" },
+    "notes": { "$ref": "common.json#/$defs/notes" },
+    "record_status": { "$ref": "common.json#/$defs/record_status" }
+  },
+  "required": [
+    "id",
+    "evidence_type",
+    "description",
+    "source_id",
+    "supports_claim_ids",
+    "challenges_claim_ids",
+    "provenance",
+    "record_status"
+  ],
+  "additionalProperties": false
+}

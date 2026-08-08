@@ -1,0 +1,104 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://eslabon-perdido.local/schemas/trait-observation.json",
+  "title": "TraitObservation",
+  "description": "Observación o inferencia de un carácter en un portador concreto (prefijo TRAITOBS-, §16.3). §7.9 separa el rasgo abstracto (entity_type 'trait') de su observación, para conservar incertidumbre, preservación parcial y homología discutida. Una observación no convierte el rasgo en propiedad fija del linaje.",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^TRAITOBS-[0-9]{6}$"
+    },
+    "trait_id": {
+      "type": "string",
+      "pattern": "^TRAIT-[0-9]{6}$",
+      "description": "Carácter abstracto observado."
+    },
+    "bearer_id": {
+      "$ref": "common.json#/$defs/id",
+      "description": "Portador de la observación: espécimen, población, concepto taxonómico, clado, linaje o reconstrucción (§7.9)."
+    },
+    "bearer_type": {
+      "type": "string",
+      "enum": ["specimen", "population", "taxon_concept", "clade", "biological_lineage", "reconstruction", "analysis"],
+      "description": "Los cinco contextos de §7.9 más el análisis. Observar un rasgo en un espécimen no es observarlo en un taxón."
+    },
+    "observation_basis": {
+      "type": "string",
+      "enum": ["direct_observation", "measurement", "reconstruction", "phylogenetic_inference", "reported_by_source", "unknown"],
+      "description": "Cómo se obtuvo. Una inferencia filogenética no se presenta como observación directa (§11.3, §10)."
+    },
+    "state": {
+      "type": ["string", "null"],
+      "description": "Estado del carácter según la fuente, con su vocabulario. No se normaliza a una escala común ficticia (§10.7)."
+    },
+    "measurement": {
+      "type": ["object", "null"],
+      "properties": {
+        "value": { "type": ["number", "null"] },
+        "unit": { "type": ["string", "null"] },
+        "scale": { "type": ["string", "null"] },
+        "method": { "type": ["string", "null"] },
+        "original_expression": { "type": ["string", "null"] }
+      },
+      "required": ["value", "unit"],
+      "additionalProperties": false
+    },
+    "preservation": {
+      "type": ["string", "null"],
+      "enum": ["complete", "partial", "fragmentary", "absent", "not_applicable", "unknown", null],
+      "description": "Estado de preservación del material que sostiene la observación. Ausencia de preservación no es ausencia del rasgo."
+    },
+    "homology_assessment": {
+      "type": ["string", "null"],
+      "enum": ["homologous", "homoplastic", "disputed", "not_assessed", null],
+      "description": "§7.9. La homología es una hipótesis comparativa, no un dato de la medición."
+    },
+    "temporal_expression_ids": {
+      "type": "array",
+      "items": { "type": "string", "pattern": "^TIME-[0-9]{6}$" },
+      "description": "Fechas de tipo 'trait_evidence_date' (§11.1) asociadas a esta observación."
+    },
+    "region_ids": {
+      "type": "array",
+      "items": { "type": "string", "pattern": "^REGION-[0-9]{6}$" }
+    },
+    "site_ids": {
+      "type": "array",
+      "items": { "type": "string", "pattern": "^SITE-[0-9]{6}$" }
+    },
+    "dataset_ids": {
+      "type": "array",
+      "items": { "type": "string", "pattern": "^DATASET-[0-9]{6}$" }
+    },
+    "analysis_ids": {
+      "type": "array",
+      "items": { "type": "string", "pattern": "^ANALYSIS-[0-9]{6}$" }
+    },
+    "evidence_ids": {
+      "type": "array",
+      "items": { "type": "string", "pattern": "^EVID-[0-9]{6}$" }
+    },
+    "claim_ids": {
+      "type": "array",
+      "items": { "type": "string", "pattern": "^CLAIM-[0-9]{6}$" }
+    },
+    "issue_ids": {
+      "type": "array",
+      "items": { "$ref": "common.json#/$defs/issue_id" }
+    },
+    "provenance": { "$ref": "common.json#/$defs/provenance" },
+    "notes": { "$ref": "common.json#/$defs/notes" },
+    "record_status": { "$ref": "common.json#/$defs/record_status" }
+  },
+  "required": [
+    "id",
+    "trait_id",
+    "bearer_id",
+    "bearer_type",
+    "observation_basis",
+    "provenance",
+    "record_status"
+  ],
+  "additionalProperties": false
+}

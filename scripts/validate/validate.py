@@ -30,23 +30,46 @@ ID_RE = re.compile(
     r"RESULT|HYP|TAXVIEW|PHYVIEW|CAMP|CHAPTER|MECH|GAME|ISSUE|TERM|TIME)-[0-9]{6}$"
 )
 
-# Fichero JSONL -> esquema. Los tipos sin esquema todavía llegan en su fase.
+# Fichero JSONL -> esquema. Cubre los veintiún ficheros de knowledge/records/
+# listados en §16.2. Las ocho entidades biológicas comunes comparten entity.json
+# (Apéndice E.5): su entity_type discrimina, y el propio esquema exige que el
+# prefijo del identificador concuerde con él.
+#
+# Tres esquemas no aparecen aquí porque su registro no vive en records/:
+#   - temporal-expression.json  las expresiones TIME- se referencian desde
+#     claims, eventos y observaciones; §16.2 no les asigna fichero propio;
+#   - classification-view.json y phylogenetic-view.json  las vistas se
+#     construyen en knowledge/views/ (§16.2), no en el libro mayor;
+#   - game-projection.json  la capa 8 vive en game/projections/ (§6.8).
 SCHEMA_BY_FILE = {
     "mentions.jsonl": "mention.json",
     "sources.jsonl": "source.json",
     "issues.jsonl": "issue.json",
+    "taxonomic-names.jsonl": "taxonomic-name.json",
+    "taxon-concepts.jsonl": "taxon-concept.json",
+    "clades.jsonl": "entity.json",
+    "lineages.jsonl": "entity.json",
+    "populations.jsonl": "entity.json",
+    "specimens.jsonl": "entity.json",
+    "sites.jsonl": "entity.json",
+    "regions.jsonl": "entity.json",
+    "occurrences.jsonl": "entity.json",
+    "traits.jsonl": "entity.json",
+    "trait-observations.jsonl": "trait-observation.json",
+    "claims.jsonl": "claim.json",
+    "evidence.jsonl": "evidence.json",
+    "datasets.jsonl": "dataset.json",
+    "analyses.jsonl": "analysis.json",
+    "results.jsonl": "result.json",
+    "events.jsonl": "event.json",
+    "hypotheses.jsonl": "hypothesis.json",
 }
 
-# Familias de §19.2 que aún no pueden comprobarse, con la fase que las habilita.
-PENDING = {
-    "identity": "Fase 3 — requiere TaxonomicName, TaxonConcept, CladeConcept, Lineage",
-    "time": "Fase 4 — requiere expresiones temporales",
-    "geography": "Fase 4 — requiere Region y Occurrence",
-    "hypotheses": "Fase 5 — requiere Hypothesis y vistas",
-    "evidence": "Fase 4 — requiere EvidenceItem, Dataset, Analysis, Result",
-    "state": "Fase 4 — requiere registros con dimensiones epistemológicas",
-    "separation": "Fase 8 — requiere GameProjection",
-}
+# Orden canónico de §19.2. Las familias se cargan desde families/.
+FAMILY_ORDER = [
+    "schema", "references", "coverage", "identity", "time", "geography",
+    "hypotheses", "evidence", "provenance", "state", "separation",
+]
 
 
 @dataclass
@@ -54,6 +77,11 @@ class Report:
     errors: list[str] = field(default_factory=list)
     warnings: list[str] = field(default_factory=list)
     infos: list[str] = field(default_factory=list)
+    # Directorio de registros en curso. None = dataset real. Las familias que
+    # comparan contra el estado global (snapshots, manifiesto, guías) deben
+    # omitir esa comprobación cuando se está validando un fixture, que es un
+    # dataset independiente y no tiene por qué coincidir con el snapshot.
+    records_dir: object = None
 
     def error(self, msg: str) -> None:
         self.errors.append(msg)
@@ -84,8 +112,15 @@ def load_jsonl(path: Path, rep: Report) -> list[dict]:
     return records
 
 
-def all_records(rep: Report) -> dict[str, list[dict]]:
-    return {p.name: load_jsonl(p, rep) for p in sorted(RECORDS.glob("*.jsonl"))}
+def all_records(rep: Report, records_dir: Path | None = None) -> dict[str, list[dict]]:
+    """Carga los JSONL de un directorio de registros.
+
+    Por defecto el dataset real. Los fixtures de §27.9 son datasets completos e
+    independientes, asi que se validan apuntando aqui: sin esto, la herramienta
+    oficial no puede comprobar sus propios casos de prueba.
+    """
+    base = records_dir or RECORDS
+    return {p.name: load_jsonl(p, rep) for p in sorted(base.glob("*.jsonl"))}
 
 
 # --- familias ---------------------------------------------------------------
@@ -94,20 +129,37 @@ def v_schema(data: dict[str, list[dict]], rep: Report) -> None:
     """Campos requeridos, tipos, enumeraciones, versión compatible."""
     try:
         from jsonschema import Draft202012Validator
-        from referencing import Registry, Resource
     except ImportError:
-        rep.warn("schema: jsonschema no instalado; sólo se comprobó JSON bien formado")
+        rep.warn(
+            "schema: jsonschema no instalado; sólo se comprobó JSON bien formado. "
+            "Ver ISSUE-000029 y el README"
+        )
         return
 
-    resources = []
-    for f in SCHEMAS.glob("*.json"):
-        doc = json.loads(f.read_text(encoding="utf-8"))
-        resources.append((f.name, Resource.from_contents(doc)))
-    registry = Registry().with_resources(resources)
+    docs = {f.name: json.loads(f.read_text(encoding="utf-8")) for f in SCHEMAS.glob("*.json")}
+
+    # Resolución de $ref entre esquemas. jsonschema >= 4.18 usa `referencing`;
+    # las versiones anteriores, incluida la 4.10 que empaqueta Debian 12, usan
+    # RefResolver. Se admiten ambas para no atar el proyecto a una distribución.
+    def make_validator(schema: dict):
+        try:
+            from referencing import Registry, Resource
+
+            registry = Registry().with_resources(
+                [(name, Resource.from_contents(doc)) for name, doc in docs.items()]
+            )
+            return Draft202012Validator(schema, registry=registry)
+        except ImportError:
+            from jsonschema import RefResolver
+
+            resolver = RefResolver(base_uri="", referrer=schema, store=dict(docs))
+            return Draft202012Validator(schema, resolver=resolver)
 
     for fname, schema_name in SCHEMA_BY_FILE.items():
-        schema = json.loads((SCHEMAS / schema_name).read_text(encoding="utf-8"))
-        validator = Draft202012Validator(schema, registry=registry)
+        if schema_name not in docs:
+            rep.error(f"schema: falta el esquema {schema_name} declarado para {fname}")
+            continue
+        validator = make_validator(docs[schema_name])
         for i, rec in enumerate(data.get(fname, []), 1):
             for err in validator.iter_errors(rec):
                 loc = "/".join(str(p) for p in err.absolute_path) or "(raíz)"
@@ -168,30 +220,43 @@ def v_provenance(data: dict[str, list[dict]], rep: Report) -> None:
             rep.error(f"procedencia: {m.get('id')} no enlaza pasaje (§17 paso 2)")
 
 
-def v_pending(name: str, rep: Report) -> None:
-    rep.info(f"{name}: pendiente — {PENDING[name]}")
-
-
-FAMILIES = {
+BUILTIN = {
     "schema": v_schema,
     "references": v_references,
     "coverage": v_coverage,
-    "identity": None,
-    "time": None,
-    "geography": None,
-    "hypotheses": None,
-    "evidence": None,
     "provenance": v_provenance,
-    "state": None,
-    "separation": None,
 }
 
 
-def run(names: list[str]) -> Report:
-    rep = Report()
-    data = all_records(rep)
+def load_families() -> dict[str, object]:
+    """Carga las familias de families/ y las combina con las integradas."""
+    import importlib.util
 
-    if MANIFEST.exists():
+    out: dict[str, object] = dict(BUILTIN)
+    fam_dir = Path(__file__).parent / "families"
+    for f in sorted(fam_dir.glob("*.py")):
+        if f.stem.startswith("_"):
+            continue
+        spec = importlib.util.spec_from_file_location(f"families.{f.stem}", f)
+        if spec is None or spec.loader is None:
+            continue
+        mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(mod)
+        name = getattr(mod, "NAME", f.stem)
+        out[name] = mod
+    return out
+
+
+FAMILIES = load_families()
+
+
+def run(names: list[str], records_dir: Path | None = None) -> Report:
+    rep = Report()
+    rep.records_dir = records_dir
+    data = all_records(rep, records_dir)
+
+    # La preservacion de las guias solo aplica al dataset real, no a un fixture.
+    if records_dir is None and MANIFEST.exists():
         manifest = json.loads(MANIFEST.read_text(encoding="utf-8"))
         for label, entry in [("activa", manifest["guides"]["active"])] + [
             ("archivada", g) for g in manifest["guides"]["archived"]
@@ -206,15 +271,21 @@ def run(names: list[str]) -> Report:
             if digest != entry["content_hash"]:
                 sev = rep.error if label == "archivada" else rep.warn
                 sev(f"preservación: la guía {label} no coincide con su hash registrado")
-    else:
+    elif records_dir is None:
         rep.error("no existe el manifiesto del dataset")
 
     for name in names:
-        fn = FAMILIES[name]
-        if fn is None:
-            v_pending(name, rep)
+        fam = FAMILIES.get(name)
+        if fam is None:
+            rep.info(f"{name}: sin implementar todavía")
+        elif callable(fam):
+            fam(data, rep)
         else:
-            fn(data, rep)
+            phase = getattr(fam, "PHASE", None)
+            if phase:
+                rep.info(f"{name}: pendiente — {phase}")
+            else:
+                fam.check(data, rep)
     return rep
 
 
@@ -224,13 +295,25 @@ def main() -> int:
         "family",
         nargs="?",
         default="all",
-        choices=["all", *FAMILIES],
+        choices=["all", *FAMILY_ORDER],
         help="familia de §19.2 a ejecutar",
     )
+    ap.add_argument(
+        "--records",
+        metavar="DIR",
+        default=None,
+        help="directorio de registros a validar; por defecto knowledge/records/. "
+             "Apunta a un fixture de tests/fixtures/ para validarlo.",
+    )
     args = ap.parse_args()
-    names = list(FAMILIES) if args.family == "all" else [args.family]
+    names = list(FAMILY_ORDER) if args.family == "all" else [args.family]
 
-    rep = run(names)
+    records_dir = Path(args.records).resolve() if args.records else None
+    if records_dir is not None and not records_dir.is_dir():
+        print(f"ERROR   no existe el directorio de registros: {records_dir}")
+        return 1
+
+    rep = run(names, records_dir)
 
     for msg in rep.errors:
         print(f"ERROR   {msg}")

@@ -1,0 +1,90 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://eslabon-perdido.local/schemas/hypothesis.json",
+  "title": "Hypothesis",
+  "description": "Conjunto coherente de afirmaciones. Apéndice E.9 y §15.1. Carga su propia contraevidencia y sus fuentes opuestas: una hipótesis que sólo guarda lo que la favorece no es una hipótesis, es una conclusión disfrazada. Las cuatro dimensiones de §10.1–§10.5 van ANIDADAS bajo 'epistemic_dimensions'; 'record_status' va en la raíz porque describe el registro, no la idea.",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^HYP-[0-9]{6}$"
+    },
+    "name": { "type": "string", "minLength": 1 },
+    "description": { "type": "string" },
+    "included_claim_ids": {
+      "type": "array",
+      "items": { "type": "string", "pattern": "^CLAIM-[0-9]{6}$" }
+    },
+    "required_claim_ids": {
+      "type": "array",
+      "items": { "type": "string", "pattern": "^CLAIM-[0-9]{6}$" },
+      "description": "§15.2. Afirmaciones sin las cuales la hipótesis no se sostiene; son las que un validador comprueba antes de construir una vista."
+    },
+    "excluded_claim_ids": {
+      "type": "array",
+      "items": { "type": "string", "pattern": "^CLAIM-[0-9]{6}$" },
+      "description": "Afirmaciones incompatibles con esta hipótesis. Excluirlas aquí no las borra del dataset (§9.2)."
+    },
+    "assumptions": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "classification_view_ids": {
+      "type": "array",
+      "items": { "type": "string", "pattern": "^TAXVIEW-[0-9]{6}$" },
+      "description": "§15.1, clasificación utilizada. Dos hipótesis pueden usar clasificaciones distintas para los mismos nombres."
+    },
+    "supporting_evidence_ids": {
+      "type": "array",
+      "items": { "type": "string", "pattern": "^EVID-[0-9]{6}$" }
+    },
+    "counterevidence_ids": {
+      "type": "array",
+      "items": { "type": "string", "pattern": "^EVID-[0-9]{6}$" }
+    },
+    "supporting_source_ids": {
+      "type": "array",
+      "items": { "$ref": "common.json#/$defs/source_id" }
+    },
+    "opposing_source_ids": {
+      "type": "array",
+      "items": { "$ref": "common.json#/$defs/source_id" }
+    },
+    "conflict_group_ids": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "description": "§15.2, grupos de conflicto: conjuntos de afirmaciones mutuamente excluyentes. Son cadenas libres porque §16.3 no consolida todavía un prefijo para ellos; cuando lo haga, migran a identificador opaco."
+    },
+    "open_question_issue_ids": {
+      "type": "array",
+      "items": { "$ref": "common.json#/$defs/issue_id" },
+      "description": "§15.1, preguntas no resueltas de la hipótesis, registradas como cuestiones pendientes (E.12)."
+    },
+    "alternative_hypothesis_ids": {
+      "type": "array",
+      "items": { "type": "string", "pattern": "^HYP-[0-9]{6}$" },
+      "description": "§14.5 'alternativa_a'. Las alternativas se enlazan; no se dibujan como simultáneamente ciertas."
+    },
+    "event_ids": {
+      "type": "array",
+      "items": { "type": "string", "pattern": "^EVENT-[0-9]{6}$" }
+    },
+    "epistemic_dimensions": { "$ref": "common.json#/$defs/epistemic_dimensions" },
+    "introduced_in": {
+      "oneOf": [{ "$ref": "common.json#/$defs/section_id" }, { "type": "null" }]
+    },
+    "provenance": { "$ref": "common.json#/$defs/provenance" },
+    "notes": { "$ref": "common.json#/$defs/notes" },
+    "record_status": { "$ref": "common.json#/$defs/record_status" }
+  },
+  "required": [
+    "id",
+    "name",
+    "included_claim_ids",
+    "counterevidence_ids",
+    "epistemic_dimensions",
+    "introduced_in",
+    "record_status"
+  ],
+  "additionalProperties": false
+}
