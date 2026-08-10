@@ -1,4 +1,4 @@
-# Encargo de seguimiento: cuatro cosas sobre el corredor Eukaryota → Holozoa
+# Encargo de seguimiento sobre el corredor Eukaryota → Holozoa
 
 Ejecuta lo que sigue sobre el corpus que ya entregaste. **No es una revisión ni una reescritura**: son cuatro adiciones acotadas. Todo lo que ya está entregado se queda como está, salvo donde digo lo contrario.
 
@@ -70,6 +70,62 @@ Lo que sí quiero: **revisa solo aquellas donde la literatura permite nombrar a 
 Sospecho que están concentradas en las controversias con nombre propio —las hipótesis rivales de eucariogénesis, la raíz eucariota, Choanozoa frente a Apoikozoa— donde la discrepancia está publicada y es citable.
 
 **Si el resultado es que casi ninguna sube, dilo con esas palabras.** Eso también es información, y es una que necesito: significaría que el eje de aceptación llega vacío y que la decisión de qué hacer con él es mía y no tuya.
+
+---
+
+## 5. Localizadores: completar los dos tipos, sin sustituir ninguno
+
+Los localizadores de la columna `Fuente` vienen de dos clases distintas, y cada
+una dice algo que la otra no:
+
+- **Posicional** — «S56 líneas 318–321», «S57 p. 296», «S38 resumen y fig. 5».
+  Dice **dónde** está la evidencia. Permite recortar el pasaje exacto.
+- **Semántico** — «S01 clasificación», «S109 filogenia», «S124 definición de
+  Amorphea», «S05 tesis general». Dice **qué papel** juega la fuente en esa
+  afirmación. No se puede deducir de un rango de líneas.
+
+Contadas las 1 885 afirmaciones con localizador:
+
+| | Afirmaciones |
+|---|---:|
+| sólo posicional o de sección | 914 |
+| **posicional + semántico** | **523** |
+| sólo semántico | 193 |
+
+La convención buena ya la usas en 523 filas. Lo que se pide es extenderla, y
+**nunca sustituir un tipo por el otro**: convertir «S01 clasificación» en un
+rango de líneas perdería el papel de la fuente, y al revés perdería el sitio.
+Se quieren los dos.
+
+**5.a — Prioritario: 193 afirmaciones sólo con puntero semántico.**
+Añadirles el localizador posicional. Estas bloquean: la ingestión exige una capa
+de pasajes (§17) donde cada afirmación apunta al fragmento que la sostiene, y un
+puntero semántico no se puede recortar mecánicamente. Sin esto, esas 193 entran
+sin pasaje o entran como cuestión abierta.
+
+**5.b — Deseable, no bloqueante: 914 afirmaciones sólo con localizador
+posicional.** Añadirles el puntero semántico. Nada se rompe sin ellos —el pasaje
+ya se recorta—, pero con ellos el corpus dice, de cada cita, no sólo dónde
+mirar sino por qué esa fuente sostiene esa afirmación. Es información editorial
+que hoy sólo vive en 523 filas y que ningún proceso puede reconstruir después.
+
+Si hay que elegir por tiempo, 5.a primero y 5.b como pasada posterior.
+
+---
+
+## 6. Dos discrepancias que aparecieron al contar
+
+Ninguna es grave, pero conviene resolverlas antes de dar el corpus por cerrado.
+
+**El recuento de fuente única no cuadra por uno.** El apéndice H declara **1 196**
+afirmaciones que dependen de una sola fuente. Contando sobre
+`exports/afirmaciones.csv` —claves `S` de dos o tres dígitos, que es la regla del
+apéndice A— salen **1 195**. Una fila de diferencia, sin identificar. O el
+control arrastra un valor viejo, o hay una fila que se cuenta distinto.
+
+**Diez fuentes del apéndice A no las cita ninguna afirmación.** De las 523, sólo
+513 aparecen en la columna `Fuente` de alguna fila. ¿Sobran del apéndice, o
+falta citarlas en las afirmaciones que las usaron?
 
 ---
 
