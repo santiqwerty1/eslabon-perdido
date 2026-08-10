@@ -1,0 +1,904 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="_ds/nocturne-2350752f-03f0-4a19-9ab0-e9cdccf2815a/styles.css">
+  <script src="_ds/nocturne-2350752f-03f0-4a19-9ab0-e9cdccf2815a/_ds_bundle.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css">
+  <style>
+    html,body{margin:0;padding:0;background:#161826;color:#e9e9ed;}
+    a{color:var(--color-accent-300);} a:hover{color:var(--color-accent-200);}
+  </style>
+</helmet>
+<div style="display:flex;height:100vh;background:var(--color-bg);color:var(--color-text);font-family:var(--font-body);overflow:hidden;">
+  <aside style="width:236px;flex:none;display:flex;flex-direction:column;padding:var(--space-8) var(--space-6);gap:var(--space-6);position:relative;overflow-y:auto;">
+    <div style="position:absolute;top:0;right:0;bottom:0;width:1px;background:linear-gradient(180deg,transparent,var(--color-neutral-800) 48px,var(--color-neutral-800) calc(100% - 48px),transparent);"></div>
+    <div>
+      <div style="font:500 10.5px var(--font-heading);letter-spacing:.16em;text-transform:uppercase;color:var(--color-accent-300);margin-bottom:var(--space-2);">Base de conocimiento versionada</div>
+      <div style="font:500 16px/1.3 var(--font-heading);">eslabón perdido</div>
+    </div>
+    <nav style="display:flex;flex-direction:column;gap:var(--space-1);">
+      <sc-for list="{{ nav }}" as="it" hint-placeholder-count="5">
+        <button onClick="{{ it.onClick }}" style="{{ it.style }}" style-hover="background:color-mix(in oklab,var(--color-accent) 10%,transparent);color:var(--color-accent-200);"><i class="ph {{ it.icon }}" style="font-size:16px;"></i>{{ it.label }}</button>
+      </sc-for>
+    </nav>
+    <div style="display:flex;gap:var(--space-2);">
+      <sc-for list="{{ navBtns }}" as="nb" hint-placeholder-count="4">
+        <button onClick="{{ nb.onClick }}" title="{{ nb.title }}" style="{{ nb.style }}" style-hover="color:var(--color-accent-200);"><i class="ph {{ nb.icon }}"></i></button>
+      </sc-for>
+    </div>
+    <div style="margin-top:auto;display:flex;flex-direction:column;gap:var(--space-3);font-size:11px;color:var(--color-neutral-400);line-height:1.5;">
+      <div style="height:1px;background:linear-gradient(90deg,transparent,var(--color-neutral-800) 24px,var(--color-neutral-800) calc(100% - 24px),transparent);"></div>
+      <div style="display:flex;gap:var(--space-2);flex-wrap:wrap;"><span class="tag tag-accent" style="white-space:nowrap;">Fase 0 completada</span><span class="tag tag-outline" style="white-space:nowrap;">sin corpus ingerido</span></div>
+      <div>Corpus en investigación:<br><a href="https://santiqwerty1.github.io/corredor-eukaryota-holozoa/" style="text-decoration:none;">corredor-eukaryota-holozoa →</a></div>
+    </div>
+  </aside>
+
+  <main style="flex:1;overflow-y:auto;min-width:0;">
+
+    <sc-if value="{{ isEstado }}" hint-placeholder-val="{{ true }}">
+      <div style="padding:var(--space-8) 36px 48px;max-width:1180px;">
+        <div style="font:500 10.5px var(--font-heading);letter-spacing:.16em;text-transform:uppercase;color:var(--color-accent-300);margin-bottom:var(--space-3);">Estado del sistema</div>
+        <h1 style="font:500 27px/1.25 var(--font-heading);margin:0 0 var(--space-3);">Una base de afirmaciones, ocho instantáneas, cero corpus</h1>
+        <p style="margin:0 0 var(--space-8);max-width:660px;font-size:13.5px;line-height:1.6;color:var(--color-neutral-300);text-wrap:pretty;">Dos sistemas separados: un núcleo científico que organiza corpus, entidades, afirmaciones, evidencia, eventos, hipótesis y vistas; y una capa de juego que los referencia por identificador estable sin modificarlos jamás. La Fase 1 ingiere el corpus del corredor Eukaryota → Holozoa.</p>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:var(--space-4);margin-bottom:var(--space-8);">
+          <div style="background:var(--color-surface);box-shadow:var(--shadow-sm);border-radius:var(--radius-md);padding:var(--space-6);"><div style="white-space:nowrap;font:500 18px ui-monospace,monospace;color:var(--color-accent-200);">SNAP-000007</div><div style="font-size:11.5px;color:var(--color-neutral-400);margin-top:var(--space-1);">snapshot actual</div></div>
+          <div style="background:var(--color-surface);box-shadow:var(--shadow-sm);border-radius:var(--radius-md);padding:var(--space-6);"><div style="white-space:nowrap;font:500 18px ui-monospace,monospace;">REV-000000</div><div style="font-size:11.5px;color:var(--color-neutral-400);margin-top:var(--space-1);">revisión del dataset</div></div>
+          <div style="background:var(--color-surface);box-shadow:var(--shadow-sm);border-radius:var(--radius-md);padding:var(--space-6);"><div style="white-space:nowrap;font:500 18px var(--font-heading);">v1.1.0</div><div style="font-size:11.5px;color:var(--color-neutral-400);margin-top:var(--space-1);">guía rectora</div></div>
+          <div style="background:var(--color-surface);box-shadow:var(--shadow-sm);border-radius:var(--radius-md);padding:var(--space-6);"><div style="white-space:nowrap;font:500 18px var(--font-heading);">v1.0.0</div><div style="font-size:11.5px;color:var(--color-neutral-400);margin-top:var(--space-1);">esquema</div></div>
+          <div style="background:var(--color-surface);box-shadow:var(--shadow-sm);border-radius:var(--radius-md);padding:var(--space-6);"><div style="white-space:nowrap;font:500 18px ui-monospace,monospace;">CAMP-000001</div><div style="font-size:11.5px;color:var(--color-neutral-400);margin-top:var(--space-1);">campaña activa</div></div>
+          <div style="background:var(--color-surface);box-shadow:var(--shadow-sm);border-radius:var(--radius-md);padding:var(--space-6);"><div style="white-space:nowrap;font:500 18px var(--font-heading);color:var(--color-accent-200);">{{ totalRecs }}</div><div style="font-size:11.5px;color:var(--color-neutral-400);margin-top:var(--space-1);">registros en el libro mayor</div></div>
+        </div>
+        <div style="background:var(--color-surface);box-shadow:var(--shadow-sm);border-radius:var(--radius-md);padding:var(--space-6);margin-bottom:var(--space-6);">
+          <div style="font:500 13px var(--font-heading);margin-bottom:var(--space-2);">Cadena de instantáneas</div>
+          <div style="font-size:11px;color:var(--color-neutral-400);margin-bottom:var(--space-4);">knowledge/snapshots/ · estados completos reconstruibles · {{ snapLine }}</div>
+          <div style="display:flex;flex-wrap:wrap;gap:var(--space-3);align-items:stretch;">
+            <sc-for list="{{ snaps }}" as="s" hint-placeholder-count="8">
+              <div style="{{ s.style }}" onClick="{{ s.onClick }}" title="clic para ver qué cambió">
+                <div style="font:500 11px ui-monospace,monospace;color:var(--color-accent-300);white-space:nowrap;">{{ s.id }}</div>
+                <div style="font-size:10.5px;line-height:1.4;color:var(--color-neutral-400);max-width:150px;">{{ s.label }}</div>
+              </div>
+            </sc-for>
+          </div>
+          <div style="height:1px;margin:var(--space-6) 0 var(--space-4);background:linear-gradient(90deg,transparent,var(--color-neutral-800) 48px,var(--color-neutral-800) calc(100% - 48px),transparent);"></div>
+          <div data-scroll-target="diff" style="font:500 13px var(--font-heading);margin-bottom:var(--space-3);">Qué cambió · {{ diffTitle }}</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-6);align-items:start;">
+            <div style="display:flex;flex-direction:column;gap:var(--space-2);font-size:11.5px;">
+              <sc-for list="{{ diffCounts }}" as="dcnt" hint-placeholder-count="2">
+                <div style="display:flex;gap:var(--space-3);align-items:baseline;"><span style="color:var(--color-neutral-400);">{{ dcnt.k }}</span><span style="font-family:ui-monospace,monospace;color:var(--color-neutral-500);">{{ dcnt.from }}</span><i class="ph ph-arrow-right" style="font-size:10px;color:var(--color-neutral-600);"></i><span style="font-family:ui-monospace,monospace;color:var(--color-accent-200);">{{ dcnt.to }}</span></div>
+              </sc-for>
+              <span style="font-size:11px;color:var(--color-neutral-500);">{{ diffNote }}</span>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:var(--space-1);font:10.5px ui-monospace,monospace;color:var(--color-neutral-400);max-height:150px;overflow-y:auto;">
+              <sc-for list="{{ diffFiles }}" as="dfl" hint-placeholder-count="3"><span data-ref="{{ dfl }}" onClick="{{ openEnt }}" style="cursor:pointer;" style-hover="color:var(--color-accent-200);"><i class="ph ph-file-text" style="color:var(--color-accent-300);margin-right:5px;"></i>{{ dfl }}</span></sc-for>
+            </div>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-6);align-items:start;">
+          <div style="background:var(--color-surface);box-shadow:var(--shadow-sm);border-radius:var(--radius-md);padding:var(--space-6);">
+            <div style="font:500 13px var(--font-heading);margin-bottom:var(--space-4);">Dos capas, una frontera</div>
+            <div style="display:grid;grid-template-columns:110px 1fr 92px;gap:var(--space-3) var(--space-4);font-size:12px;line-height:1.5;align-items:baseline;">
+              <span style="font-family:ui-monospace,monospace;color:var(--color-accent-300);">knowledge/</span><span style="color:var(--color-neutral-300);">núcleo científico: corpus, 22 registros JSONL, vistas, deltas, snapshots</span><span class="tag tag-outline" style="font-size:9px;white-space:nowrap;">CC BY 4.0</span>
+              <span style="font-family:ui-monospace,monospace;color:var(--color-accent-300);">game/</span><span style="color:var(--color-neutral-300);">núcleo de juego y módulos por campaña; referencia, nunca modifica</span><span class="tag tag-outline" style="font-size:9px;white-space:nowrap;">propietario</span>
+              <span style="font-family:ui-monospace,monospace;color:var(--color-accent-300);">scripts/</span><span style="color:var(--color-neutral-300);">tooling en Python sin dependencias; once familias de validación</span><span class="tag tag-outline" style="font-size:9px;white-space:nowrap;">MIT</span>
+            </div>
+            <div style="height:1px;margin:var(--space-4) 0;background:linear-gradient(90deg,transparent,var(--color-neutral-800) 24px,var(--color-neutral-800) calc(100% - 24px),transparent);"></div>
+            <p style="margin:0;font-size:11.5px;line-height:1.55;color:var(--color-neutral-400);text-wrap:pretty;">La frontera de licencia coincide con la frontera arquitectónica (ADR-006). Borrar un módulo de campaña nunca debe romper datos científicos (§27.10).</p>
+          </div>
+          <div style="background:var(--color-surface);box-shadow:var(--shadow-sm);border-radius:var(--radius-md);padding:var(--space-6);">
+            <div style="font:500 13px var(--font-heading);margin-bottom:var(--space-4);">Reglas que no se negocian</div>
+            <div style="display:flex;flex-direction:column;gap:var(--space-3);font-size:12px;color:var(--color-neutral-300);line-height:1.5;">
+              <div style="display:flex;gap:var(--space-3);"><i class="ph ph-prohibit" style="color:var(--color-accent-300);font-size:13px;position:relative;top:2px;"></i><span><b style="font-weight:500;">No se inventa nada.</b> Lo que no está en el material se registra como Issue, nunca como dato silencioso.</span></div>
+              <div style="display:flex;gap:var(--space-3);"><i class="ph ph-percent" style="color:var(--color-accent-300);font-size:13px;position:relative;top:2px;"></i><span><b style="font-weight:500;">Nada de certeza falsa.</b> Sin porcentajes de confianza arbitrarios.</span></div>
+              <div style="display:flex;gap:var(--space-3);"><i class="ph ph-arrow-up-right" style="color:var(--color-accent-300);font-size:13px;position:relative;top:2px;"></i><span><b style="font-weight:500;">Nada de teleología.</b> Ningún linaje es superior ni está destinado a producir humanos.</span></div>
+              <div style="display:flex;gap:var(--space-3);"><i class="ph ph-path" style="color:var(--color-accent-300);font-size:13px;position:relative;top:2px;"></i><span><b style="font-weight:500;">Procedencia obligatoria.</b> Toda afirmación se rastrea hasta sección, mención, fuente y operación.</span></div>
+              <div style="display:flex;gap:var(--space-3);"><i class="ph ph-chat-slash" style="color:var(--color-accent-300);font-size:13px;position:relative;top:2px;"></i><span><b style="font-weight:500;">La conversación no es fuente de verdad.</b> El estado vive en archivos versionados.</span></div>
+              <div style="display:flex;gap:var(--space-3);"><i class="ph ph-clock-counter-clockwise" style="color:var(--color-accent-300);font-size:13px;position:relative;top:2px;"></i><span><b style="font-weight:500;">No se borra historia.</b> Lo reemplazado se marca SUPERSEDIDO y enlaza su reemplazo.</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isRegistros }}" hint-placeholder-val="{{ false }}">
+      <div style="padding:var(--space-8) 36px 48px;max-width:1120px;">
+        <div style="display:flex;align-items:baseline;gap:var(--space-4);flex-wrap:wrap;margin-bottom:var(--space-2);">
+          <h1 style="font:500 21px var(--font-heading);margin:0;">Registros JSONL · knowledge/records/</h1>
+          <span class="tag tag-outline" style="white-space:nowrap;">REV-000000</span>
+          <span class="tag tag-accent" style="white-space:nowrap;">validation: passed</span>
+        </div>
+        <p style="margin:0 0 var(--space-6);font-size:12.5px;color:var(--color-neutral-400);max-width:660px;text-wrap:pretty;">La fuente de verdad del núcleo. {{ recResumen }} ISSUE-000001…000038 viven en docs/ISSUES.md hasta su migración en la Fase 2; el siguiente identificador libre es {{ nextIssue }}.</p>
+        <div style="display:grid;grid-template-columns:250px 1fr;gap:var(--space-6);align-items:start;">
+          <div style="display:flex;flex-direction:column;gap:var(--space-1);">
+            <sc-for list="{{ recFiles }}" as="rf" hint-placeholder-count="8">
+              <button onClick="{{ rf.onClick }}" style="{{ rf.style }}" style-hover="color:var(--color-accent-200);"><span style="font-family:ui-monospace,monospace;font-size:11px;">{{ rf.name }}.jsonl</span><span style="{{ rf.nStyle }}">{{ rf.n }}</span></button>
+            </sc-for>
+          </div>
+          <div style="min-width:0;">
+            <sc-if value="{{ recEmpty }}" hint-placeholder-val="{{ false }}">
+              <div style="background:var(--color-surface);box-shadow:var(--shadow-sm);border-radius:var(--radius-md);padding:var(--space-8);font-size:12.5px;line-height:1.6;color:var(--color-neutral-400);max-width:520px;">
+                <i class="ph ph-circle-dashed" style="color:var(--color-accent-300);margin-right:6px;"></i>Vacío. Este registro no tiene filas todavía: se llena en la Fase 1, cuando el corpus del corredor pase por el protocolo de ingestión de §17 (scripts/ingest). La ausencia no es dato.
+              </div>
+            </sc-if>
+            <div style="display:flex;flex-direction:column;gap:var(--space-4);">
+              <sc-for list="{{ recItems }}" as="ri" hint-placeholder-count="1">
+                <div style="background:var(--color-surface);box-shadow:var(--shadow-sm);border-radius:var(--radius-md);padding:var(--space-6);min-width:0;">
+                  <div style="display:flex;align-items:baseline;gap:var(--space-3);flex-wrap:wrap;margin-bottom:var(--space-2);">
+                    <span style="font:500 12px ui-monospace,monospace;color:var(--color-accent-300);">{{ ri.id }}</span>
+                    <span class="{{ ri.sevClass }}" style="font-size:9px;white-space:nowrap;">{{ ri.sev }}</span>
+                    <span class="tag tag-neutral" style="font-size:9px;white-space:nowrap;">{{ ri.status }}</span>
+                  </div>
+                  <div style="font:500 13px var(--font-heading);margin-bottom:var(--space-3);text-wrap:pretty;">{{ ri.title }}</div>
+                  <pre style="margin:0;padding:var(--space-4);background:var(--color-bg);border-radius:var(--radius-sm);font:10.5px/1.55 ui-monospace,monospace;color:var(--color-neutral-300);white-space:pre-wrap;word-break:break-word;max-height:420px;overflow-y:auto;">{{ ri.json }}</pre>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isConsultas }}" hint-placeholder-val="{{ false }}">
+      <div style="padding:var(--space-8) 36px 48px;max-width:1120px;">
+        <h1 style="font:500 21px var(--font-heading);margin:0 0 var(--space-2);">Consultas sobre el estado</h1>
+        <p style="margin:0 0 var(--space-6);font-size:12.5px;color:var(--color-neutral-400);">{{ conMeta }}</p>
+        <div style="display:flex;gap:var(--space-3);flex-wrap:wrap;margin-bottom:var(--space-4);">
+          <select class="input" value="{{ conDs }}" onChange="{{ onConDs }}" style="width:auto;">
+            <sc-for list="{{ conDsOpts }}" as="dso" hint-placeholder-count="3"><option value="{{ dso.v }}">{{ dso.label }}</option></sc-for>
+          </select>
+          <select class="input" value="{{ conGroup }}" onChange="{{ onConGroup }}" style="width:auto;">
+            <sc-for list="{{ conGroupOpts }}" as="go" hint-placeholder-count="3"><option value="{{ go.v }}">{{ go.label }}</option></sc-for>
+          </select>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:var(--space-2);margin-bottom:var(--space-3);">
+          <sc-for list="{{ conds }}" as="cd" hint-placeholder-count="1">
+            <div style="display:flex;gap:var(--space-2);flex-wrap:wrap;align-items:center;">
+              <select class="input" value="{{ cd.f }}" onChange="{{ cd.onF }}" style="width:auto;">
+                <sc-for list="{{ cd.fieldOpts }}" as="fo" hint-placeholder-count="4"><option value="{{ fo }}">{{ fo }}</option></sc-for>
+              </select>
+              <select class="input" value="{{ cd.op }}" onChange="{{ cd.onOp }}" style="width:auto;">
+                <option value="contiene">contiene</option><option value="no contiene">no contiene</option><option value="es">es</option><option value="no es">no es</option><option value="empieza por">empieza por</option><option value="regex">regex</option>
+              </select>
+              <input class="input" value="{{ cd.v }}" onChange="{{ cd.onV }}" placeholder="valor…" style="width:260px;">
+              <button class="btn btn-icon btn-ghost" onClick="{{ cd.onDel }}" aria-label="Quitar condición"><i class="ph ph-x"></i></button>
+            </div>
+          </sc-for>
+        </div>
+        <button class="btn btn-ghost" onClick="{{ addCond }}" style="margin-bottom:var(--space-6);"><i class="ph ph-plus" style="margin-right:6px;"></i>Añadir condición</button>
+        <sc-if value="{{ conShowGroups }}" hint-placeholder-val="{{ false }}">
+          <div style="background:var(--color-surface);box-shadow:var(--shadow-sm);border-radius:var(--radius-md);padding:var(--space-6);max-width:720px;margin-bottom:var(--space-6);">
+            <div style="font:500 13px var(--font-heading);margin-bottom:var(--space-4);">Recuento por «{{ conGroup }}»</div>
+            <div style="display:flex;flex-direction:column;gap:var(--space-3);font-size:11.5px;">
+              <sc-for list="{{ conGroups }}" as="gg" hint-placeholder-count="4">
+                <div style="display:grid;grid-template-columns:minmax(120px,240px) 1fr 48px;gap:var(--space-4);align-items:center;"><span style="color:var(--color-neutral-300);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ gg.label }}</span><div style="height:6px;border-radius:3px;background:var(--color-neutral-800);"><div style="{{ gg.barStyle }}"></div></div><span style="text-align:right;color:var(--color-neutral-400);font-variant-numeric:tabular-nums;">{{ gg.n }}</span></div>
+              </sc-for>
+            </div>
+          </div>
+        </sc-if>
+        <div style="display:flex;flex-direction:column;gap:var(--space-4);">
+          <sc-for list="{{ conRows }}" as="cr" hint-placeholder-count="3">
+            <div style="background:var(--color-surface);box-shadow:var(--shadow-sm);border-radius:var(--radius-md);padding:var(--space-6);">
+              <div style="display:grid;grid-template-columns:150px 1fr;gap:3px var(--space-4);font-size:11.5px;line-height:1.5;">
+                <sc-for list="{{ cr.fields }}" as="fl" hint-placeholder-count="4">
+                  <span style="color:var(--color-neutral-500);font-family:ui-monospace,monospace;font-size:10px;">{{ fl.k }}</span><span style="color:var(--color-neutral-200);min-width:0;word-break:break-word;">{{ fl.v }}</span>
+                </sc-for>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isCuestiones }}" hint-placeholder-val="{{ false }}">
+      <div style="padding:var(--space-8) 36px 48px;max-width:1080px;">
+        <h1 style="font:500 21px var(--font-heading);margin:0 0 var(--space-2);">Cuestiones · docs/ISSUES.md</h1>
+        <p style="margin:0 0 var(--space-6);font-size:12.5px;color:var(--color-neutral-400);max-width:640px;text-wrap:pretty;">{{ issMeta }} Ninguna cuestión se resuelve borrándola; al cerrarse enlaza la decisión que la resolvió. Migran a issues.jsonl en la Fase 2.</p>
+        <div style="display:flex;gap:var(--space-2);margin-bottom:var(--space-6);flex-wrap:wrap;">
+          <sc-for list="{{ issBtns }}" as="ib" hint-placeholder-count="3"><button onClick="{{ ib.onClick }}" style="{{ ib.style }}" style-hover="color:var(--color-accent-200);">{{ ib.label }}</button></sc-for>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:var(--space-2);">
+          <sc-for list="{{ issRows }}" as="ir" hint-placeholder-count="8">
+            <div onClick="{{ ir.onClick }}" style="{{ ir.style }}" style-hover="background:color-mix(in oklab,var(--color-accent) 6%,transparent);">
+              <div style="display:grid;grid-template-columns:96px 76px 150px 1fr 70px;gap:var(--space-3);align-items:baseline;">
+                <span style="font:500 10.5px ui-monospace,monospace;color:var(--color-accent-300);white-space:nowrap;">{{ ir.id }}</span>
+                <span><span class="{{ ir.sevClass }}" style="font-size:9px;">{{ ir.sev }}</span></span>
+                <span style="font:10px ui-monospace,monospace;color:var(--color-neutral-500);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ ir.tipo }}</span>
+                <span style="font-size:12px;color:{{ ir.color }};">{{ ir.cuestion }}</span>
+                <span style="font-size:10.5px;color:var(--color-neutral-500);white-space:nowrap;text-align:right;">{{ ir.bloquea }}</span>
+              </div>
+              <sc-if value="{{ ir.open }}" hint-placeholder-val="{{ false }}">
+                <div style="margin-top:var(--space-3);border-top:1px solid var(--color-neutral-800);padding-top:var(--space-3);">
+                  <div style="font:500 13px var(--font-heading);margin-bottom:var(--space-3);text-wrap:pretty;">{{ ir.dTitle }}</div>
+                  <pre style="margin:0;font:11px/1.6 var(--font-body);color:var(--color-neutral-300);white-space:pre-wrap;word-break:break-word;max-height:340px;overflow-y:auto;">{{ ir.dBody }}</pre>
+                </div>
+              </sc-if>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isIngestion }}" hint-placeholder-val="{{ false }}">
+      <div style="padding:var(--space-8) 36px 48px;max-width:1120px;">
+        <h1 style="font:500 21px var(--font-heading);margin:0 0 var(--space-2);">Simulador de ingestión · fila → claim.jsonl</h1>
+        <p style="margin:0 0 var(--space-6);font-size:12.5px;color:var(--color-neutral-400);max-width:680px;text-wrap:pretty;">Cómo una fila real de exports/afirmaciones.csv del corredor se convertiría en un registro del núcleo, con los vocabularios cerrados de common.json (§10, §14). Tres ejemplos fijos; la ingestión real es el protocolo de §17.</p>
+        <div style="display:flex;gap:var(--space-2);margin-bottom:var(--space-6);flex-wrap:wrap;">
+          <sc-for list="{{ simBtns }}" as="sb" hint-placeholder-count="3"><button onClick="{{ sb.onClick }}" style="{{ sb.style }}" style-hover="color:var(--color-accent-200);">{{ sb.label }}</button></sc-for>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1.1fr;gap:var(--space-6);align-items:start;margin-bottom:var(--space-6);">
+          <div style="background:var(--color-surface);box-shadow:var(--shadow-sm);border-radius:var(--radius-md);padding:var(--space-6);">
+            <div style="font:500 13px var(--font-heading);margin-bottom:var(--space-4);">Fila del corredor <span style="font:10px ui-monospace,monospace;color:var(--color-neutral-500);">exports/afirmaciones.csv</span></div>
+            <div style="display:grid;grid-template-columns:92px 1fr;gap:var(--space-2) var(--space-4);font-size:11.5px;line-height:1.5;">
+              <sc-for list="{{ simFila }}" as="sf" hint-placeholder-count="6">
+                <span style="color:var(--color-neutral-500);font-family:ui-monospace,monospace;font-size:10px;">{{ sf.k }}</span><span style="color:var(--color-neutral-200);">{{ sf.v }}</span>
+              </sc-for>
+            </div>
+          </div>
+          <div style="background:var(--color-surface);box-shadow:var(--shadow-sm);border-radius:var(--radius-md);padding:var(--space-6);">
+            <div style="font:500 13px var(--font-heading);margin-bottom:var(--space-4);">{{ simOutTitle }}</div>
+            <pre style="margin:0;padding:var(--space-4);background:var(--color-bg);border-radius:var(--radius-sm);font:10.5px/1.55 ui-monospace,monospace;color:var(--color-neutral-300);white-space:pre-wrap;word-break:break-word;max-height:420px;overflow-y:auto;">{{ simJson }}</pre>
+          </div>
+        </div>
+        <div style="background:var(--color-surface);box-shadow:var(--shadow-sm);border-radius:var(--radius-md);padding:var(--space-6);max-width:860px;">
+          <div style="font:500 13px var(--font-heading);margin-bottom:var(--space-4);">Lo que la ingestión debe resolver</div>
+          <div style="display:flex;flex-direction:column;gap:var(--space-3);font-size:12px;color:var(--color-neutral-300);line-height:1.55;">
+            <sc-for list="{{ simNotas }}" as="sn" hint-placeholder-count="3">
+              <div style="display:flex;gap:var(--space-3);"><i class="ph ph-arrow-elbow-down-right" style="color:var(--color-accent-300);font-size:13px;position:relative;top:2px;"></i><span>{{ sn }}</span></div>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isCampana }}" hint-placeholder-val="{{ false }}">
+      <div style="padding:var(--space-8) 36px 48px;max-width:1080px;">
+        <div style="display:flex;align-items:baseline;gap:var(--space-4);flex-wrap:wrap;margin-bottom:var(--space-2);">
+          <h1 style="font:500 21px var(--font-heading);margin:0;">Campaña 1 · Eucaria: una célula dentro de otra</h1>
+          <span class="tag tag-accent" style="white-space:nowrap;">planning</span>
+          <span class="tag tag-outline" style="white-space:nowrap;">CAMP-000001</span>
+        </div>
+        <p style="margin:0 0 var(--space-8);font-size:12.5px;color:var(--color-neutral-400);max-width:640px;text-wrap:pretty;">El dossier está vacío por diseño: fijar el alcance exige tener el corpus, y el corpus está pendiente de ingestión. Termina en Holozoa, en el umbral de la historia animal.</p>
+        <div style="background:var(--color-surface);box-shadow:var(--shadow-sm);border-radius:var(--radius-md);padding:var(--space-6);margin-bottom:var(--space-6);">
+          <div style="font:500 13px var(--font-heading);margin-bottom:var(--space-6);">Corredor principal</div>
+          <div style="display:flex;align-items:center;gap:var(--space-3);flex-wrap:wrap;">
+            <span style="padding:6px 14px;border:1px dashed var(--color-neutral-600);border-radius:var(--radius-md);font-size:12px;color:var(--color-neutral-400);white-space:nowrap;">prólogo de eucariogénesis</span>
+            <i class="ph ph-arrow-right" style="color:var(--color-neutral-500);"></i>
+            <span style="padding:6px 14px;border:1px solid var(--color-accent);border-radius:var(--radius-md);font-size:12px;color:var(--color-accent-200);white-space:nowrap;">Eukaryota</span>
+            <i class="ph ph-arrow-right" style="color:var(--color-neutral-500);"></i>
+            <span style="padding:6px 14px;border:1px solid var(--color-neutral-600);border-radius:var(--radius-md);font-size:12px;white-space:nowrap;">Amorphea</span>
+            <i class="ph ph-arrow-right" style="color:var(--color-neutral-500);"></i>
+            <span style="padding:6px 14px;border:1px solid var(--color-neutral-600);border-radius:var(--radius-md);font-size:12px;white-space:nowrap;">Obazoa</span>
+            <i class="ph ph-arrow-right" style="color:var(--color-neutral-500);"></i>
+            <span style="padding:6px 14px;border:1px solid var(--color-neutral-600);border-radius:var(--radius-md);font-size:12px;white-space:nowrap;">Opisthokonta</span>
+            <i class="ph ph-arrow-right" style="color:var(--color-neutral-500);"></i>
+            <span style="padding:6px 14px;border:1px solid var(--color-accent);border-radius:var(--radius-md);font-size:12px;color:var(--color-accent-200);white-space:nowrap;">Holozoa</span>
+          </div>
+          <p style="margin:var(--space-4) 0 0;font-size:11.5px;color:var(--color-neutral-400);">Conecta con la Campaña 2, «Animales: construir un cuerpo» (Holozoa → Bilateria), sin afirmar inevitabilidad. La última campaña cubre Hominini → <i>Homo sapiens</i>; el orden cronológico es de exposición, no una escalera de progreso.</p>
+        </div>
+        <div style="display:grid;grid-template-columns:1.1fr 1fr;gap:var(--space-6);align-items:start;">
+          <div style="background:var(--color-surface);box-shadow:var(--shadow-sm);border-radius:var(--radius-md);padding:var(--space-6);">
+            <div style="font:500 13px var(--font-heading);margin-bottom:var(--space-4);">Qué falta decidir en la Fase 1</div>
+            <table class="table" style="width:100%;font-size:12px;">
+              <thead><tr><th>tarea</th><th>estado</th></tr></thead>
+              <tbody>
+                <tr><td>Pregunta central de campaña</td><td><span class="tag tag-neutral" style="font-size:9px;">pendiente</span></td></tr>
+                <tr><td>Inicio, final y capítulos</td><td><span class="tag tag-neutral" style="font-size:9px;">pendiente</span></td></tr>
+                <tr><td>Corredor principal detallado</td><td><span class="tag tag-outline" style="font-size:9px;">esbozado</span></td></tr>
+                <tr><td>Ramas hermanas inmediatas</td><td><span class="tag tag-outline" style="font-size:9px;">esbozadas</span></td></tr>
+                <tr><td>Grupos externos representativos</td><td><span class="tag tag-outline" style="font-size:9px;">esbozados</span></td></tr>
+                <tr><td>Lista explícita de exclusiones</td><td><span class="tag tag-neutral" style="font-size:9px;">pendiente</span></td></tr>
+                <tr><td>Controversias obligatorias</td><td><span class="tag tag-outline" style="font-size:9px;">3 candidatas</span></td></tr>
+                <tr><td>Evento de endosimbiosis y sus requisitos</td><td><span class="tag tag-neutral" style="font-size:9px;">pendiente</span></td></tr>
+                <tr><td>Corpus científico inicial</td><td><span class="tag tag-accent" style="font-size:9px;white-space:nowrap;">listo para ingerir</span></td></tr>
+                <tr><td>Fecha de corte bibliográfico (OPEN-016)</td><td><span class="tag tag-neutral" style="font-size:9px;">pendiente</span></td></tr>
+                <tr><td>Presupuesto máximo de entidades y vistas</td><td><span class="tag tag-neutral" style="font-size:9px;">pendiente</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:var(--space-6);">
+            <div style="background:var(--color-surface);box-shadow:var(--shadow-sm);border-radius:var(--radius-md);padding:var(--space-6);">
+              <div style="font:500 13px var(--font-heading);margin-bottom:var(--space-4);">Material disponible, no ingerido</div>
+              <div style="display:flex;flex-direction:column;gap:var(--space-4);font-size:12px;line-height:1.55;color:var(--color-neutral-300);">
+                <div><span style="font-family:ui-monospace,monospace;color:var(--color-accent-300);">inbox/Filogenia.md</span> — filogenia humana, corte 4 de agosto de 2026, 34 referencias. Cubre el corredor de paso: sólo dos citas lo sostienen.</div>
+                <div><span style="font-family:ui-monospace,monospace;color:var(--color-accent-300);">C01-PROMPT-INVESTIGACION.md</span> — la investigación específica de Eucaria ya existe: es <a href="https://santiqwerty1.github.io/corredor-eukaryota-holozoa/">corredor-eukaryota-holozoa</a> v0.6.0 (1 952 afirmaciones, encargo completo), pendiente del protocolo de ingestión de §17.</div>
+              </div>
+            </div>
+            <div style="background:var(--color-surface);box-shadow:var(--shadow-sm);border-radius:var(--radius-md);padding:var(--space-6);">
+              <div style="font:500 13px var(--font-heading);margin-bottom:var(--space-4);">Huecos conocidos</div>
+              <div style="display:flex;flex-direction:column;gap:var(--space-3);font-size:12px;color:var(--color-neutral-300);line-height:1.5;">
+                <div style="display:flex;gap:var(--space-3);align-items:baseline;"><span data-ref="ISSUE-000010" onClick="{{ openEnt }}" style="cursor:pointer;font:500 10.5px ui-monospace,monospace;color:var(--color-accent-300);white-space:nowrap;background:color-mix(in oklab,var(--color-accent) 10%,transparent);padding:1px 6px;border-radius:var(--radius-sm);">ISSUE-000010</span><span>no hay catálogo terminológico eucariota («protista», «protozoo», «algas»)</span></div>
+                <div style="display:flex;gap:var(--space-3);align-items:baseline;"><span data-ref="ISSUE-000021" onClick="{{ openEnt }}" style="cursor:pointer;font:500 10.5px ui-monospace,monospace;color:var(--color-accent-300);white-space:nowrap;background:color-mix(in oklab,var(--color-accent) 10%,transparent);padding:1px 6px;border-radius:var(--radius-sm);">ISSUE-000021</span><span>Archaea y Bacteria no aparecen pese a ser el arranque; se perdió el sinónimo Corallochytrea</span></div>
+                <div style="display:flex;gap:var(--space-3);align-items:baseline;"><span style="font:500 10.5px ui-monospace,monospace;color:var(--color-neutral-500);text-decoration:line-through;white-space:nowrap;">ISSUE-000026</span><span style="color:var(--color-neutral-400);">resuelta el 8 de agosto de 2026: sexo y meiosis entran en la Campaña 1</span></div>
+                <div style="display:flex;gap:var(--space-3);align-items:baseline;"><span data-ref="ISSUE-000013" onClick="{{ openEnt }}" style="cursor:pointer;font:500 10.5px ui-monospace,monospace;color:var(--color-accent-300);white-space:nowrap;background:color-mix(in oklab,var(--color-accent) 10%,transparent);padding:1px 6px;border-radius:var(--radius-sm);">ISSUE-000013</span><span>OPEN-016 tiene respuesta de facto y sigue abierta</span></div>
+              </div>
+              <div style="margin-top:var(--space-4);font-size:11px;color:var(--color-neutral-500);">docs/ISSUES.md · {{ issFooter }}</div>
+            </div>
+          </div>
+        </div>
+        <div style="background:var(--color-surface);box-shadow:var(--shadow-sm);border-radius:var(--radius-md);padding:var(--space-6);margin-top:var(--space-6);">
+          <div style="display:flex;align-items:baseline;gap:var(--space-3);flex-wrap:wrap;margin-bottom:var(--space-2);">
+            <div style="font:500 13px var(--font-heading);">Puente con el corpus · requisitos de §5.3</div>
+            <span style="font-size:11px;color:var(--color-neutral-400);">lo que el dataset debe demostrar, contra lo que <a href="https://santiqwerty1.github.io/corredor-eukaryota-holozoa/">corredor-eukaryota-holozoa</a> v0.6.0 ya trae</span>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-3) var(--space-6);margin-top:var(--space-4);font-size:12px;line-height:1.5;">
+            <div style="display:flex;gap:var(--space-3);align-items:baseline;"><span class="tag tag-accent" style="font-size:9px;white-space:nowrap;">cubierto</span><span>Poblaciones ancestrales sin nombres inventados — FECA, mFECA y LECA como poblaciones reconstruidas no muestreadas (C-184, C-186, C-188)</span></div>
+            <div style="display:flex;gap:var(--space-3);align-items:baseline;"><span class="tag tag-accent" style="font-size:9px;white-space:nowrap;">cubierto</span><span>Origen e integración mitocondrial como evento reticulado con participantes y roles (apéndice C: E02, E03)</span></div>
+            <div style="display:flex;gap:var(--space-3);align-items:baseline;"><span class="tag tag-accent" style="font-size:9px;white-space:nowrap;">cubierto</span><span>Cooperación y conflicto intracelular — sección 10, rasgos con costo (137 afirmaciones)</span></div>
+            <div style="display:flex;gap:var(--space-3);align-items:baseline;"><span class="tag tag-accent" style="font-size:9px;white-space:nowrap;">cubierto</span><span>Al menos dos controversias reales — H01/H02/H03 sobre la raíz y el número de dominios</span></div>
+            <div style="display:flex;gap:var(--space-3);align-items:baseline;"><span class="tag tag-accent" style="font-size:9px;white-space:nowrap;">cubierto</span><span>Rasgos, costos, evidencia y procedencia — 12 columnas obligatorias + 562 magnitudes del apéndice F</span></div>
+            <div style="display:flex;gap:var(--space-3);align-items:baseline;"><span class="tag tag-accent" style="font-size:9px;white-space:nowrap;">cubierto</span><span>Intervalos temporales con incertidumbre — 215 fechas del apéndice D conservadas como texto</span></div>
+            <div style="display:flex;gap:var(--space-3);align-items:baseline;"><span class="tag tag-outline" style="font-size:9px;white-space:nowrap;">por validar</span><span>Dos hipótesis realmente incompatibles — H01 × H02 en la monofilia arqueana; la incompatibilidad parcial no basta (ISSUE-000028)</span></div>
+            <div style="display:flex;gap:var(--space-3);align-items:baseline;"><span class="tag tag-outline" style="font-size:9px;white-space:nowrap;">pendiente</span><span>Una vista de trabajo fechada y una vista histórica — se producen en la ingestión de la Fase 1</span></div>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isRed }}" hint-placeholder-val="{{ false }}">
+      <div style="padding:var(--space-8) 36px 48px;max-width:1120px;">
+        <div style="display:flex;align-items:baseline;gap:var(--space-4);flex-wrap:wrap;margin-bottom:var(--space-2);">
+          <h1 style="font:500 21px var(--font-heading);margin:0;">Red evolutiva · vista derivada</h1>
+          <span class="tag tag-outline" style="white-space:nowrap;">fixture de §27.9 — no es corpus</span>
+        </div>
+        <p style="margin:0 0 var(--space-6);font-size:12.5px;color:var(--color-neutral-400);max-width:660px;text-wrap:pretty;">El trazo codifica el estado epistémico, no es decoración. La endosimbiosis nunca se dibuja como bifurcación: es un evento n-ario con participantes, papeles y un producto con dos ascendencias — el caso mínimo que no cabe en un árbol.</p>
+        <div style="background:var(--color-surface);box-shadow:var(--shadow-sm);border-radius:var(--radius-md);padding:var(--space-6);margin-bottom:var(--space-6);">
+          <svg viewBox="0 0 920 400" style="{{ svgStyle }}">
+            <defs>
+              <marker id="arr" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M1,1 L7,4 L1,7" fill="none" stroke="var(--color-neutral-400)" stroke-width="1.2"></path></marker>
+              <marker id="arrA" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M1,1 L7,4 L1,7" fill="none" stroke="var(--color-accent)" stroke-width="1.2"></path></marker>
+            </defs>
+            <text x="20" y="24" font-size="11" fill="var(--color-neutral-500)" font-family="ui-monospace,monospace">EVENT-000200 · endosimbiosis · evento n-ario</text>
+            <circle cx="120" cy="120" r="34" fill="var(--color-neutral-800)" stroke="var(--color-neutral-400)" stroke-width="1.5"></circle>
+            <text x="120" y="117" text-anchor="middle" font-size="10.5" fill="var(--color-neutral-200)">LINEAGE-</text>
+            <text x="120" y="130" text-anchor="middle" font-size="10.5" fill="var(--color-neutral-200)">000200</text>
+            <text x="120" y="172" text-anchor="middle" font-size="10.5" fill="var(--color-neutral-400)">linaje hospedador</text>
+            <circle cx="120" cy="290" r="34" fill="var(--color-neutral-800)" stroke="var(--color-neutral-400)" stroke-width="1.5"></circle>
+            <text x="120" y="287" text-anchor="middle" font-size="10.5" fill="var(--color-neutral-200)">LINEAGE-</text>
+            <text x="120" y="300" text-anchor="middle" font-size="10.5" fill="var(--color-neutral-200)">000201</text>
+            <text x="120" y="342" text-anchor="middle" font-size="10.5" fill="var(--color-neutral-400)">linaje endosimbionte</text>
+            <line x1="154" y1="132" x2="332" y2="192" stroke="var(--color-neutral-400)" stroke-width="1.5" marker-end="url(#arr)"></line>
+            <text x="236" y="148" font-size="10" fill="var(--color-accent-300)" transform="rotate(18 236 148)">role: host</text>
+            <line x1="154" y1="278" x2="332" y2="218" stroke="var(--color-neutral-400)" stroke-width="1.5" marker-end="url(#arr)"></line>
+            <text x="224" y="278" font-size="10" fill="var(--color-accent-300)" transform="rotate(-18 224 278)">role: endosymbiont</text>
+            <rect x="336" y="169" width="72" height="72" rx="8" transform="rotate(45 372 205)" fill="var(--color-accent-900,#2a2650)" stroke="var(--color-accent)" stroke-width="1.5"></rect>
+            <text x="372" y="200" text-anchor="middle" font-size="10" fill="var(--color-accent-200)">evento</text>
+            <text x="372" y="213" text-anchor="middle" font-size="10" fill="var(--color-accent-200)">endosimbiosis</text>
+            <line x1="424" y1="205" x2="546" y2="205" stroke="var(--color-neutral-400)" stroke-width="1.5" marker-end="url(#arr)"></line>
+            <text x="484" y="196" text-anchor="middle" font-size="10" fill="var(--color-neutral-400)">result</text>
+            <circle cx="588" cy="205" r="36" fill="var(--color-neutral-800)" stroke="var(--color-accent)" stroke-width="1.5"></circle>
+            <text x="588" y="201" text-anchor="middle" font-size="10.5" fill="var(--color-neutral-100)">LINEAGE-</text>
+            <text x="588" y="214" text-anchor="middle" font-size="10.5" fill="var(--color-neutral-100)">000202</text>
+            <text x="588" y="259" text-anchor="middle" font-size="10.5" fill="var(--color-neutral-400)">linaje resultante · dos ascendencias</text>
+            <path d="M 150 105 C 340 40, 480 90, 566 175" fill="none" stroke="var(--color-accent)" stroke-width="1.2" stroke-dasharray="1 4" stroke-linecap="round" marker-end="url(#arrA)"></path>
+            <path d="M 150 305 C 340 370, 480 320, 566 236" fill="none" stroke="var(--color-accent)" stroke-width="1.2" stroke-dasharray="1 4" stroke-linecap="round" marker-end="url(#arrA)"></path>
+            <text x="360" y="60" font-size="10" fill="var(--color-accent-300)" font-family="ui-monospace,monospace">contributes_ancestry_to · CLAIM-000204</text>
+            <text x="360" y="352" font-size="10" fill="var(--color-accent-300)" font-family="ui-monospace,monospace">contributes_ancestry_to · CLAIM-000205</text>
+            <path d="M 660 180 L 700 160" fill="none" stroke="var(--color-neutral-400)" stroke-width="1.2" marker-end="url(#arr)"></path>
+            <polygon points="740,128 764,142 764,170 740,184 716,170 716,142" fill="var(--color-neutral-800)" stroke="var(--color-neutral-400)" stroke-width="1.3"></polygon>
+            <text x="740" y="152" text-anchor="middle" font-size="9.5" fill="var(--color-neutral-200)">TRAIT-</text>
+            <text x="740" y="164" text-anchor="middle" font-size="9.5" fill="var(--color-neutral-200)">000200</text>
+            <text x="740" y="200" text-anchor="middle" font-size="10" fill="var(--color-neutral-400)">rasgo: mitocondria</text>
+            <text x="700" y="148" font-size="9.5" fill="var(--color-neutral-500)" transform="rotate(-24 700 148)">acquires_trait</text>
+            <text x="812" y="120" font-size="16" fill="var(--color-accent-300)">?</text>
+            <text x="826" y="120" font-size="10" fill="var(--color-neutral-500)">fecha no resuelta</text>
+          </svg>
+        </div>
+        <div style="display:grid;grid-template-columns:{{ redGrid }};gap:var(--space-6);align-items:start;">
+          <div style="background:var(--color-surface);box-shadow:var(--shadow-sm);border-radius:var(--radius-md);padding:var(--space-6);">
+            <div style="font:500 13px var(--font-heading);margin-bottom:var(--space-2);">Dos dataciones que no se promedian</div>
+            <div style="font-size:11px;color:var(--color-neutral-400);margin-bottom:var(--space-4);">temporal_expression_ids es plural a propósito · elegir corresponde a una vista editorial fechada (ISSUE-000201)</div>
+            <div style="display:grid;grid-template-columns:96px 1fr;gap:var(--space-3) var(--space-4);font-size:12px;line-height:1.5;align-items:baseline;">
+              <span style="font-family:ui-monospace,monospace;color:var(--color-accent-300);">TIME-000200</span><span>2100–1200 Ma · correlación estratigráfica · <span style="color:var(--color-neutral-400);">inferred</span></span>
+              <span style="font-family:ui-monospace,monospace;color:var(--color-accent-300);">TIME-000201</span><span>1900–1400 Ma · reloj molecular · <span style="color:var(--color-neutral-400);">modelled</span></span>
+              <span style="font-family:ui-monospace,monospace;color:var(--color-accent-300);">EVID-000202</span><span style="color:var(--color-neutral-400);">contraevidencia: la genómica respalda la asociación pero no fija la fecha</span>
+            </div>
+            <p style="margin:var(--space-4) 0 0;font-size:11px;color:var(--color-neutral-500);line-height:1.5;">Los límites numéricos son marcadores del fixture; ISSUE-000200 bloquea su uso canónico.</p>
+          </div>
+          <sc-if value="{{ showLeyenda }}" hint-placeholder-val="{{ true }}">
+            <div style="background:var(--color-surface);box-shadow:var(--shadow-sm);border-radius:var(--radius-md);padding:var(--space-6);">
+              <div style="font:500 13px var(--font-heading);margin-bottom:var(--space-4);">Leyenda · el trazo es el estado epistémico</div>
+              <div style="display:grid;grid-template-columns:64px 1fr;gap:var(--space-3) var(--space-4);font-size:11.5px;color:var(--color-neutral-300);align-items:center;">
+                <svg viewBox="0 0 64 8" style="width:64px;height:8px;"><line x1="0" y1="4" x2="64" y2="4" stroke="var(--color-neutral-300)" stroke-width="1.6"></line></svg><span>backbone seleccionado</span>
+                <svg viewBox="0 0 64 8" style="width:64px;height:8px;"><line x1="0" y1="4" x2="64" y2="4" stroke="var(--color-neutral-300)" stroke-width="1.6" stroke-dasharray="7 5"></line></svg><span>hipótesis alternativa</span>
+                <svg viewBox="0 0 64 8" style="width:64px;height:8px;"><line x1="0" y1="4" x2="64" y2="4" stroke="var(--color-neutral-300)" stroke-width="1.6" stroke-dasharray="1 4" stroke-linecap="round"></line></svg><span>relación especulativa o derivada</span>
+                <svg viewBox="0 0 64 16" style="width:64px;height:16px;"><rect x="24" y="1" width="14" height="14" rx="3" transform="rotate(45 31 8)" fill="none" stroke="var(--color-accent)" stroke-width="1.4"></rect></svg><span>nodo-evento con participantes (n-ario)</span>
+                <svg viewBox="0 0 64 16" style="width:64px;height:16px;"><circle cx="31" cy="8" r="7" fill="none" stroke="var(--color-neutral-300)" stroke-width="1.4"></circle></svg><span>linaje · puede existir sin nombre formal</span>
+                <svg viewBox="0 0 64 16" style="width:64px;height:16px;"><polygon points="31,1 37,4.5 37,11.5 31,15 25,11.5 25,4.5" fill="none" stroke="var(--color-neutral-300)" stroke-width="1.4"></polygon></svg><span>rasgo, separado de su portador</span>
+                <span style="font-size:14px;color:var(--color-accent-300);text-align:center;">?</span><span>posición o fecha no resuelta</span>
+              </div>
+              <p style="margin:var(--space-4) 0 0;font-size:11px;color:var(--color-neutral-500);line-height:1.5;">Formas y etiquetas, nunca sólo color: la vista debe ser legible en blanco y negro. Hipótesis incompatibles van en vistas separadas, no superpuestas como si fueran verdaderas a la vez.</p>
+            </div>
+          </sc-if>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isModelo }}" hint-placeholder-val="{{ false }}">
+      <div style="padding:var(--space-8) 36px 48px;max-width:1080px;">
+        <h1 style="font:500 21px var(--font-heading);margin:0 0 var(--space-2);">Modelo de datos y vocabulario</h1>
+        <p style="margin:0 0 var(--space-8);font-size:12.5px;color:var(--color-neutral-400);max-width:640px;text-wrap:pretty;">Seis ejes epistemológicos independientes: no se promedian, no se derivan unos de otros y no se convierten en un porcentaje. Consenso amplio con evidencia débil es información, no una contradicción.</p>
+        <div style="background:var(--color-surface);box-shadow:var(--shadow-sm);border-radius:var(--radius-md);padding:var(--space-6);margin-bottom:var(--space-6);">
+          <div style="font:500 13px var(--font-heading);margin-bottom:var(--space-4);">Ejes epistemológicos</div>
+          <table class="table" style="width:100%;font-size:12px;">
+            <thead><tr><th>eje</th><th>valores</th><th>qué mide</th></tr></thead>
+            <tbody>
+              <tr><td style="white-space:nowrap;font-weight:500;">Aceptación científica</td><td style="font-family:ui-monospace,monospace;font-size:11px;color:var(--color-accent-300);">broad_consensus · majority_acceptance · mixed_acceptance · minority_position · not_assessed</td><td style="color:var(--color-neutral-400);">la recepción, no la fuerza lógica interna</td></tr>
+              <tr><td style="white-space:nowrap;font-weight:500;">Fuerza de evidencia</td><td style="font-family:ui-monospace,monospace;font-size:11px;color:var(--color-accent-300);">high · medium · low · unknown</td><td style="color:var(--color-neutral-400);">requiere razón escrita que nombre el mecanismo</td></tr>
+              <tr><td style="white-space:nowrap;font-weight:500;">Resolución</td><td style="font-family:ui-monospace,monospace;font-size:11px;color:var(--color-accent-300);">resolved · partially_resolved · unresolved · insufficient_information</td><td style="color:var(--color-neutral-400);">«hay disputa» frente a «no hay datos para decidir»</td></tr>
+              <tr><td style="white-space:nowrap;font-weight:500;">Vigencia histórica</td><td style="font-family:ui-monospace,monospace;font-size:11px;color:var(--color-accent-300);">current · historical · superseded · rejected</td><td style="color:var(--color-neutral-400);">estado de la idea</td></tr>
+              <tr><td style="white-space:nowrap;font-weight:500;">Estado del registro</td><td style="font-family:ui-monospace,monospace;font-size:11px;color:var(--color-accent-300);">active · deprecated · merged · replaced · archived</td><td style="color:var(--color-neutral-400);">ciclo de vida del dato</td></tr>
+              <tr><td style="white-space:nowrap;font-weight:500;">Papel en una vista</td><td style="font-family:ui-monospace,monospace;font-size:11px;color:var(--color-accent-300);">selected_backbone · selected_overlay · alternative · excluded · not_evaluated</td><td style="color:var(--color-neutral-400);">propiedad de la relación vista↔afirmación</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-6);align-items:start;margin-bottom:var(--space-6);">
+          <div style="background:var(--color-surface);box-shadow:var(--shadow-sm);border-radius:var(--radius-md);padding:var(--space-6);">
+            <div style="font:500 13px var(--font-heading);margin-bottom:var(--space-4);">Estados de decisión</div>
+            <div style="display:grid;grid-template-columns:104px 1fr;gap:var(--space-3) var(--space-4);font-size:12px;line-height:1.5;align-items:baseline;">
+              <span class="tag tag-accent" style="font-size:9px;">DECIDIDO</span><span style="color:var(--color-neutral-300);">forma parte de la arquitectura actual</span>
+              <span class="tag tag-outline" style="font-size:9px;">RETENIDO</span><span style="color:var(--color-neutral-300);">valioso; exige prototipo antes de ser definitivo</span>
+              <span class="tag tag-outline" style="font-size:9px;">POSPUESTO</span><span style="color:var(--color-neutral-300);">contemplado; debe llevar disparador explícito</span>
+              <span class="tag tag-neutral" style="font-size:9px;">RECHAZADO</span><span style="color:var(--color-neutral-300);">sólo se reabre con un ADR que explique qué premisa cambió</span>
+              <span class="tag tag-neutral" style="font-size:9px;">ABIERTO</span><span style="color:var(--color-neutral-300);">falta decidirlo en una fase posterior</span>
+              <span class="tag tag-neutral" style="font-size:9px;">SUPERSEDIDO</span><span style="color:var(--color-neutral-300);">conserva su texto y enlaza su reemplazo; nunca se borra la fila histórica</span>
+            </div>
+          </div>
+          <div style="background:var(--color-surface);box-shadow:var(--shadow-sm);border-radius:var(--radius-md);padding:var(--space-6);">
+            <div style="font:500 13px var(--font-heading);margin-bottom:var(--space-4);">Identidad: lo que nunca se confunde</div>
+            <div style="display:flex;flex-direction:column;gap:var(--space-2);font-size:11.5px;line-height:1.55;color:var(--color-neutral-300);">
+              <div><b style="font-weight:500;color:var(--color-neutral-200);">Nombre taxonómico</b> — una denominación; no contiene por sí solo una circunscripción.</div>
+              <div><b style="font-weight:500;color:var(--color-neutral-200);">Concepto taxonómico</b> — el uso de un nombre con circunscripción concreta según una fuente.</div>
+              <div><b style="font-weight:500;color:var(--color-neutral-200);">Clado</b> — grupo por ascendencia; conserva su tipo de definición.</div>
+              <div><b style="font-weight:500;color:var(--color-neutral-200);">Linaje</b> — continuidad biológica inferida; puede existir sin nombre formal.</div>
+              <div><b style="font-weight:500;color:var(--color-neutral-200);">Población</b> — unidad en tiempo y espacio; entidad principal de la simulación.</div>
+              <div><b style="font-weight:500;color:var(--color-neutral-200);">Espécimen</b> — objeto físico; no se convierte automáticamente en taxón ni ancestro.</div>
+              <div><b style="font-weight:500;color:var(--color-neutral-200);">Rasgo / observación de rasgo</b> — el carácter abstracto se separa de su observación concreta.</div>
+            </div>
+          </div>
+        </div>
+        <div style="background:var(--color-surface);box-shadow:var(--shadow-sm);border-radius:var(--radius-md);padding:var(--space-6);">
+          <div style="font:500 13px var(--font-heading);margin-bottom:var(--space-2);">22 esquemas JSON · schemas/json-schema/</div>
+          <div style="font-size:11px;color:var(--color-neutral-400);margin-bottom:var(--space-4);">todos con additionalProperties: false — un coste de juego escondido en un registro científico no valida</div>
+          <div style="display:flex;flex-wrap:wrap;gap:var(--space-2);margin-bottom:var(--space-6);">
+            <sc-for list="{{ schChips }}" as="sc" hint-placeholder-count="10"><button onClick="{{ sc.onClick }}" style="{{ sc.style }}" style-hover="color:var(--color-accent-200);">{{ sc.name }}</button></sc-for>
+          </div>
+          <p style="margin:0 0 var(--space-4);font-size:11.5px;line-height:1.6;color:var(--color-neutral-400);text-wrap:pretty;">{{ schDesc }}</p>
+          <table class="table" style="width:100%;font-size:11.5px;">
+            <thead><tr><th>campo</th><th>tipo</th><th>oblig.</th><th>detalle</th></tr></thead>
+            <tbody>
+              <sc-for list="{{ schProps }}" as="sp" hint-placeholder-count="8">
+                <tr><td style="font-family:ui-monospace,monospace;color:var(--color-accent-300);white-space:nowrap;">{{ sp.name }}</td><td style="font-family:ui-monospace,monospace;color:var(--color-neutral-400);white-space:nowrap;">{{ sp.type }}</td><td>{{ sp.req }}</td><td style="color:var(--color-neutral-400);">{{ sp.detail }}</td></tr>
+              </sc-for>
+            </tbody>
+          </table>
+          <div style="height:1px;margin:var(--space-4) 0;background:linear-gradient(90deg,transparent,var(--color-neutral-800) 24px,var(--color-neutral-800) calc(100% - 24px),transparent);"></div>
+          <div style="font-size:11.5px;color:var(--color-neutral-400);line-height:1.6;">Etiquetas para lo no identificado — la ausencia de ubicación es información válida: <span style="font-family:ui-monospace,monospace;color:var(--color-neutral-300);">ancestro común no identificado · linaje ancestral no muestreado · linaje fantasma · incertae_sedis · afinidad incierta · posible grupo hermano de · posición dependiente de hipótesis</span></div>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isJuego }}" hint-placeholder-val="{{ false }}">
+      <div style="padding:var(--space-8) 36px 48px;max-width:1080px;">
+        <h1 style="font:500 21px var(--font-heading);margin:0 0 var(--space-2);">Capa de juego · referencia sin contaminación</h1>
+        <p style="margin:0 0 var(--space-8);font-size:12.5px;color:var(--color-neutral-400);max-width:660px;text-wrap:pretty;">La proyección referencia entidades, afirmaciones, eventos y vistas del núcleo por identificador estable y declara en campos propios todo lo que el juego necesita y la ciencia no tiene. Ningún registro científico contiene costes, bonificaciones ni condiciones de victoria.</p>
+        <div style="background:var(--color-surface);box-shadow:var(--shadow-sm);border-radius:var(--radius-md);padding:var(--space-6);margin-bottom:var(--space-6);">
+          <div style="font:500 13px var(--font-heading);margin-bottom:var(--space-6);">La dirección de la dependencia</div>
+          <div style="display:flex;align-items:center;gap:var(--space-6);flex-wrap:wrap;">
+            <div style="padding:var(--space-4) var(--space-6);border:1px solid var(--color-accent);border-radius:var(--radius-md);">
+              <div style="font:500 12px ui-monospace,monospace;color:var(--color-accent-200);">GAME-900201</div>
+              <div style="font-size:10.5px;color:var(--color-neutral-400);margin-top:2px;">proyección de juego</div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:var(--space-2);align-items:center;">
+              <div style="display:flex;align-items:center;gap:var(--space-2);"><span style="font:10px ui-monospace,monospace;color:var(--color-accent-300);">scientific_reference_ids</span><i class="ph ph-arrow-right" style="color:var(--color-accent-300);"></i></div>
+              <div style="display:flex;align-items:center;gap:var(--space-2);"><i class="ph ph-arrow-left" style="color:var(--color-neutral-600);"></i><span style="font-size:14px;color:var(--color-accent-300);">✕</span><span style="font-size:10px;color:var(--color-neutral-500);">nunca en este sentido</span></div>
+            </div>
+            <div style="padding:var(--space-4) var(--space-6);border:1px solid var(--color-neutral-600);border-radius:var(--radius-md);">
+              <div style="font-size:11.5px;color:var(--color-neutral-200);">15 registros científicos</div>
+              <div style="font-size:10.5px;color:var(--color-neutral-400);margin-top:2px;">clados · linajes · afirmaciones · evento · hipótesis · vista</div>
+            </div>
+          </div>
+          <p style="margin:var(--space-4) 0 0;font-size:11.5px;color:var(--color-neutral-400);line-height:1.55;text-wrap:pretty;">La separación no se puede delegar en JSON Schema: una referencia perfectamente resuelta en el sentido prohibido valida contra el esquema. La familia <span style="font-family:ui-monospace,monospace;">separation</span> decide la capa por el prefijo del identificador y es la única que ve la inversión.</p>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-6);align-items:start;">
+          <div style="background:var(--color-surface);box-shadow:var(--shadow-sm);border-radius:var(--radius-md);padding:var(--space-6);">
+            <div style="font:500 13px var(--font-heading);margin-bottom:var(--space-4);">Lo que declara la proyección</div>
+            <div style="display:grid;grid-template-columns:150px 1fr;gap:var(--space-3) var(--space-4);font-size:11.5px;line-height:1.5;align-items:baseline;">
+              <span style="font-family:ui-monospace,monospace;color:var(--color-accent-300);">abstraction</span><span style="color:var(--color-neutral-300);">la unidad jugable es una población celular con variables; el núcleo no tiene tal cosa</span>
+              <span style="font-family:ui-monospace,monospace;color:var(--color-accent-300);">simplifications</span><span style="color:var(--color-neutral-300);">cuatro, cada una con su advertencia científica</span>
+              <span style="font-family:ui-monospace,monospace;color:var(--color-accent-300);">scientific_constraints</span><span style="color:var(--color-neutral-300);">seis, incluida la prohibición de alterar afirmaciones para equilibrar</span>
+              <span style="font-family:ui-monospace,monospace;color:var(--color-accent-300);">active_variables</span><span style="color:var(--color-neutral-300);">las variables del módulo, incluido el coste energético de la asociación</span>
+              <span style="font-family:ui-monospace,monospace;color:var(--color-accent-300);">justification</span><span style="color:var(--color-neutral-300);">por qué la simplificación sigue siendo aceptable</span>
+            </div>
+            <p style="margin:var(--space-4) 0 0;font-size:11px;color:var(--color-neutral-500);line-height:1.5;">Proyectar lo disputado obliga a declararlo: referenciar HYP-900201 sin simplificaciones ni restricciones sería convertir una hipótesis en hecho.</p>
+          </div>
+          <div style="background:var(--color-surface);box-shadow:var(--shadow-sm);border-radius:var(--radius-md);padding:var(--space-6);">
+            <div style="font:500 13px var(--font-heading);margin-bottom:var(--space-4);">Tres mutaciones que deben seguir fallando</div>
+            <table class="table" style="width:100%;font-size:11.5px;">
+              <thead><tr><th>mutación</th><th>quién la caza</th></tr></thead>
+              <tbody>
+                <tr><td style="font-family:ui-monospace,monospace;font-size:10.5px;">alias_ids: ["GAME-900201"] en un clado</td><td>separation · dirección de las referencias</td></tr>
+                <tr><td style="font-family:ui-monospace,monospace;font-size:10.5px;">"upkeep_cost": 3 en un clado</td><td>schema y separation, redundancia deliberada</td></tr>
+                <tr><td style="font-family:ui-monospace,monospace;font-size:10.5px;">"predicate" dentro de la proyección</td><td>separation · la proyección no reescribe</td></tr>
+              </tbody>
+            </table>
+            <p style="margin:var(--space-4) 0 0;font-size:11px;color:var(--color-neutral-500);line-height:1.5;">Campañas: C01 Eucaria (Eukaryota → Holozoa) → C02 Animales: construir un cuerpo (Holozoa → Bilateria) → … → Hominini → <i>Homo sapiens</i>. El orden es de exposición y producción, no una escalera de progreso.</p>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+
+  </main>
+</div></x-dc>
+<script type="text/x-dc" data-dc-script data-props="{
+  &quot;vistaInicial&quot;: {&quot;editor&quot;: &quot;enum&quot;, &quot;options&quot;: [&quot;estado&quot;, &quot;registros&quot;, &quot;consultas&quot;, &quot;cuestiones&quot;, &quot;ingestion&quot;, &quot;campana&quot;, &quot;red&quot;, &quot;modelo&quot;, &quot;juego&quot;], &quot;default&quot;: &quot;estado&quot;, &quot;tsType&quot;: &quot;string&quot;, &quot;section&quot;: &quot;Vista&quot;},
+  &quot;pruebaBlancoNegro&quot;: {&quot;editor&quot;: &quot;boolean&quot;, &quot;default&quot;: false, &quot;tsType&quot;: &quot;boolean&quot;, &quot;section&quot;: &quot;Red evolutiva&quot;},
+  &quot;mostrarLeyenda&quot;: {&quot;editor&quot;: &quot;boolean&quot;, &quot;default&quot;: true, &quot;tsType&quot;: &quot;boolean&quot;, &quot;section&quot;: &quot;Red evolutiva&quot;}
+}">
+class Component extends DCLogic {
+  state = { view: null, snaps: null, rec: 'issues', recs: null, manifest: null, conDs: 'instantaneas', conds: [{ f: 'label', op: 'contiene', v: '' }], conGroup: '', iss: null, issFilt: 'todas', issSel: null, schSel: 'claim', schCache: {}, snapSel: null, simSel: 0 };
+
+  RECS = ['analyses', 'clades', 'claims', 'datasets', 'events', 'evidence', 'hypotheses', 'issues', 'lineages', 'mentions', 'occurrences', 'populations', 'regions', 'results', 'sites', 'sources', 'specimens', 'taxon-concepts', 'taxonomic-names', 'temporal-expressions', 'trait-observations', 'traits'];
+
+  componentDidMount() {
+    Promise.all(Array.from({ length: 24 }, (_, i) =>
+      fetch('knowledge/snapshots/SNAP-' + String(i).padStart(6, '0') + '.json').then(r => r.ok ? r.json() : null).catch(() => null)
+    )).then(list => this.setState({ snaps: list.filter(Boolean) }));
+    Promise.all(this.RECS.map(n =>
+      fetch('knowledge/records/' + n + '.jsonl').then(r => r.ok ? r.text() : '').catch(() => '')
+        .then(t => [n, t.split('\n').filter(l => l.trim()).map(l => { try { return JSON.parse(l); } catch (e) { return null; } }).filter(Boolean)])
+    )).then(pairs => this.setState({ recs: Object.fromEntries(pairs) }));
+    fetch('docs/ISSUES.md').then(r => { if (!r.ok) throw new Error('ISSUES.md: ' + r.status); return r.text(); }).then(t => this.setState({ iss: this.parseIssues(t) })).catch(() => {});
+    this.loadSch('claim');
+    fetch('knowledge/corpus/manifests/dataset.json').then(r => { if (!r.ok) throw new Error('dataset.json: ' + r.status); return r.json(); }).then(m => this.setState({ manifest: m })).catch(() => {});
+  }
+
+  NAV_KEYS = ['view', 'snapSel', 'rec', 'issSel', 'issFilt', 'schSel', 'simSel', 'conDs', 'conGroup'];
+  _undo = []; _redo = []; _navving = false;
+  componentDidUpdate(prevProps, prevState) {
+    if (this._navving) { this._navving = false; return; }
+    if (!prevState) return;
+    if (this.NAV_KEYS.some(k => prevState[k] !== this.state[k])) {
+      const snap = {}; for (const k of this.NAV_KEYS) snap[k] = prevState[k];
+      this._undo.push(snap); if (this._undo.length > 60) this._undo.shift();
+      this._redo = [];
+      this.forceUpdate();
+    }
+  }
+  _snapNow() { const s = {}; for (const k of this.NAV_KEYS) s[k] = this.state[k]; return s; }
+  navBack = () => { const s = this._undo.pop(); if (!s) return; this._redo.push(this._snapNow()); this._navving = true; this.setState(s); this.resetScroll(); };
+  navFwd = () => { const s = this._redo.pop(); if (!s) return; this._undo.push(this._snapNow()); this._navving = true; this.setState(s); this.resetScroll(); };
+  navRoot = () => { this.setState({ view: 'estado', issSel: null, snapSel: null }); this.resetScroll(); };
+  navUp = () => {
+    const st = this.state;
+    const view = st.view ?? this.props.vistaInicial ?? 'estado';
+    if (view === 'cuestiones' && st.issSel) return this.setState({ issSel: null });
+    if (view === 'estado' && st.snapSel !== null) return this.setState({ snapSel: null });
+    this.navRoot();
+  };
+  navBtnsVals() {
+    const btn = (icon, title, onClick, enabled) => ({
+      icon, title, onClick,
+      style: 'flex:1;display:flex;align-items:center;justify-content:center;padding:6px 0;border:none;border-radius:var(--radius-md);font-size:14px;background:var(--color-bg);box-shadow:var(--shadow-sm);' +
+        (enabled ? 'cursor:pointer;color:var(--color-neutral-300);' : 'cursor:default;color:var(--color-neutral-700);')
+    });
+    return { navBtns: [
+      btn('ph-arrow-left', 'Atrás', this.navBack, this._undo.length > 0),
+      btn('ph-arrow-right', 'Adelante', this.navFwd, this._redo.length > 0),
+      btn('ph-arrow-elbow-left-up', 'Subir (cerrar el detalle)', this.navUp, true),
+      btn('ph-house', 'Raíz', this.navRoot, true)
+    ] };
+  }
+  scrollToSel(marker) {
+    setTimeout(() => {
+      const main = document.querySelector('main');
+      const el = main && main.querySelector('[data-scroll-target="' + marker + '"]');
+      if (!el || !main) return;
+      const mr = main.getBoundingClientRect(), er = el.getBoundingClientRect();
+      if (er.top < mr.top + 8 || er.bottom > mr.bottom - 8) main.scrollTop += er.top - mr.top - 72;
+    }, 130);
+  }
+  resetScroll() { const m = document.querySelector('main'); if (m) m.scrollTop = 0; }
+  openEnt = (e) => {
+    e.stopPropagation();
+    const id = e.currentTarget.dataset.ref;
+    if (!id) return;
+    if (/^ISSUE-/.test(id)) { this.setState({ view: 'cuestiones', issSel: id, issFilt: 'todas' }); this.resetScroll(); }
+    else if (/^SNAP-/.test(id)) { const i = parseInt(id.slice(5), 10); this.setState({ view: 'estado', snapSel: i }); this.resetScroll(); }
+    else if (/\.jsonl$/.test(id)) { const n = id.replace('records/', '').replace('.jsonl', ''); if (this.RECS.includes(n)) { this.setState({ view: 'registros', rec: n }); this.resetScroll(); } }
+  };
+  flatten(o, pre) {
+    const out = {};
+    for (const [k, v] of Object.entries(o || {})) {
+      const key = pre ? pre + '.' + k : k;
+      if (v === null) out[key] = 'null';
+      else if (Array.isArray(v)) out[key] = v.map(x => typeof x === 'object' ? JSON.stringify(x) : x).join('; ');
+      else if (typeof v === 'object') Object.assign(out, this.flatten(v, key));
+      else out[key] = String(v);
+    }
+    return out;
+  }
+  condMatch(c, row) {
+    const raw = String(row[c.f] ?? '');
+    const s = raw.toLowerCase(), v = (c.v || '').toLowerCase();
+    if (c.op === 'regex') { try { return new RegExp(c.v, 'i').test(raw); } catch (e) { return false; } }
+    if (!v) return true;
+    if (c.op === 'contiene') return s.includes(v);
+    if (c.op === 'no contiene') return !s.includes(v);
+    if (c.op === 'es') return s === v;
+    if (c.op === 'no es') return s !== v;
+    if (c.op === 'empieza por') return s.startsWith(v);
+    return true;
+  }
+  consultaDatasets() {
+    const st = this.state;
+    const flatRows = (arr) => (arr || []).map(o => this.flatten(o, ''));
+    const fieldsOf = (rows, fallback) => rows.length ? Object.keys(rows[0]) : fallback;
+    const defs = {
+      instantaneas: { label: 'Instantáneas (8)', get: () => { const rows = flatRows(st.snaps); return { fields: fieldsOf(rows, ['snapshot_id', 'label']), rows: st.snaps ? rows : null }; } },
+      registros: { label: 'Registros ingeridos', get: () => { const all = st.recs ? Object.entries(st.recs).flatMap(([n, items]) => items.map(o => ({ fichero: n + '.jsonl', ...this.flatten(o, '') }))) : null; return { fields: all && all.length ? Object.keys(all[0]) : ['fichero', 'id', 'title'], rows: all }; } },
+      manifiesto: { label: 'Manifiesto del dataset', get: () => { const rows = st.manifest ? [this.flatten(st.manifest, '')] : null; return { fields: rows ? Object.keys(rows[0]) : ['dataset_revision'], rows }; } }
+    };
+    return defs;
+  }
+  consultaVals() {
+    const st = this.state;
+    const defs = this.consultaDatasets();
+    const conDsOpts = Object.keys(defs).map(v => ({ v, label: defs[v].label }));
+    const ds = defs[st.conDs].get();
+    const loaded = !!ds.rows;
+    const rows = ds.rows || [];
+    const updCond = (i, patch) => this.setState(s => ({ conds: s.conds.map((c, j) => j === i ? { ...c, ...patch } : c) }));
+    const conds = st.conds.map((c, i) => ({
+      ...c, fieldOpts: ds.fields,
+      onF: (e) => updCond(i, { f: e.target.value }),
+      onOp: (e) => updCond(i, { op: e.target.value }),
+      onV: (e) => updCond(i, { v: e.target.value }),
+      onDel: () => this.setState(s => ({ conds: s.conds.filter((_, j) => j !== i) }))
+    }));
+    const filtered = rows.filter(r => st.conds.every(c => this.condMatch(c, r)));
+    const conGroupOpts = [{ v: '', label: 'Agrupar por: nada' }].concat(ds.fields.map(f => ({ v: f, label: 'Agrupar por: ' + f })));
+    let conGroups = [];
+    if (st.conGroup) {
+      const m = new Map();
+      for (const r of filtered) { const k = String(r[st.conGroup] ?? '').slice(0, 80) || '(vacío)'; m.set(k, (m.get(k) || 0) + 1); }
+      const arr = [...m.entries()].sort((a, b) => b[1] - a[1]).slice(0, 14);
+      const max = arr.length ? arr[0][1] : 1;
+      conGroups = arr.map(([label, n]) => ({ label, n, barStyle: 'width:' + Math.max(2, Math.round(n / max * 100)) + '%;height:100%;border-radius:3px;background:var(--color-accent-700);' }));
+    }
+    const conRows = (st.conGroup ? [] : filtered.slice(0, 30)).map(r => ({
+      fields: ds.fields.map(k => ({ k, v: String(r[k] ?? '').slice(0, 300) })).filter(f => f.v !== '')
+    }));
+    const conMeta = loaded
+      ? filtered.length + ' resultados de ' + rows.length + ' filas · condiciones en Y · ' + (st.conGroup ? 'recuento agrupado' : 'mostrando ' + conRows.length)
+      : 'cargando el dataset…';
+    return {
+      conDs: st.conDs, conDsOpts, conGroup: st.conGroup, conGroupOpts, conds, conMeta, conGroups, conRows,
+      conShowGroups: !!st.conGroup && conGroups.length > 0,
+      onConDs: (e) => { const k = e.target.value; const d = this.consultaDatasets()[k].get(); this.setState({ conDs: k, conGroup: '', conds: [{ f: (d.fields[0] || 'id'), op: 'contiene', v: '' }] }); },
+      onConGroup: (e) => this.setState({ conGroup: e.target.value }),
+      addCond: () => this.setState(s => ({ conds: s.conds.concat([{ f: ds.fields[0] || 'id', op: 'contiene', v: '' }]) }))
+    };
+  }
+  recVals() {
+    const st = this.state;
+    const recs = st.recs;
+    const sel = st.rec;
+    const chip = (active) => 'display:flex;align-items:center;justify-content:space-between;gap:var(--space-3);border:none;cursor:pointer;padding:6px 10px;border-radius:var(--radius-md);text-align:left;width:100%;' +
+      (active ? 'background:color-mix(in oklab,var(--color-accent) 14%,transparent);color:var(--color-accent-200);' : 'background:transparent;color:var(--color-neutral-400);');
+    const recFiles = this.RECS.map(name => {
+      const n = recs ? recs[name].length : '…';
+      return {
+        name, n,
+        nStyle: 'font:10px ui-monospace,monospace;' + (recs && recs[name].length > 0 ? 'color:var(--color-accent-300);' : 'color:var(--color-neutral-600);'),
+        onClick: () => this.setState({ rec: name }),
+        style: chip(sel === name)
+      };
+    });
+    const items = recs ? recs[sel] : [];
+    const recItems = items.map(o => ({
+      id: o.id || '—',
+      title: o.title || o.label || '',
+      sev: o.severity || '',
+      sevClass: o.severity ? 'tag tag-accent' : 'tag tag-outline',
+      status: o.record_status || 'active',
+      json: JSON.stringify(o, null, 2)
+    }));
+    const total = recs ? Object.values(recs).reduce((a, b) => a + b.length, 0) : 0;
+    return {
+      recFiles, recItems,
+      recEmpty: !!recs && items.length === 0,
+      recResumen: recs ? total + ' registro(s) ingerido(s) en ' + this.RECS.length + ' ficheros.' : 'Cargando knowledge/records/…'
+    };
+  }
+
+  SCHEMAS = ['claim', 'entity', 'event', 'evidence', 'hypothesis', 'mention', 'occurrence', 'passage', 'section', 'source', 'taxon-concept', 'taxonomic-name', 'temporal-expression', 'trait-observation', 'analysis', 'result', 'dataset', 'issue', 'classification-view', 'phylogenetic-view', 'game-projection', 'common'];
+  loadSch(k) {
+    if (this.state.schCache[k]) return;
+    fetch('schemas/json-schema/' + k + '.json').then(r => r.json()).then(j => this.setState(s => ({ schCache: { ...s.schCache, [k]: j } }))).catch(() => {});
+  }
+  parseIssues(t) {
+    const rows = [];
+    for (const l of t.split('\n')) {
+      const m = l.match(/^\|\s*\u0060(ISSUE-\d{6})\u0060\s*\|\s*(\w+)\s*\|\s*\u0060([a-z_]+)\u0060\s*\|\s*(.+?)\s*\|\s*(.*?)\s*\|\s*$/);
+      if (m) rows.push({ id: m[1], sev: m[2], tipo: m[3], resuelta: /resuelta/.test(m[4]), cuestion: m[4].replace(/\*\*/g, '').replace(/\s*—\s*resuelta.*$/, ''), bloquea: m[5].replace(/—/g, '').trim() });
+    }
+    const details = {};
+    const parts = t.split(/\n### /).slice(1);
+    for (const p of parts) {
+      const hm = p.match(/^\u0060(ISSUE-\d{6})\u0060\s*·\s*(.+)/);
+      if (!hm) continue;
+      let body = p.slice(p.indexOf('\n') + 1);
+      const cut = body.search(/\n(#|---)/);
+      if (cut > -1) body = body.slice(0, cut);
+      details[hm[1]] = { title: hm[2].trim(), body: body.replace(/\*\*/g, '').replace(/\u0060/g, '').trim() };
+    }
+    return { rows, details };
+  }
+  issuesVals() {
+    const st = this.state;
+    const iss = st.iss;
+    const rows = iss ? iss.rows : [];
+    const nRes = rows.filter(r => r.resuelta).length;
+    const filtered = rows.filter(r => st.issFilt === 'todas' || (st.issFilt === 'abiertas' ? !r.resuelta : r.resuelta));
+    const seg = (active) => 'border:none;cursor:pointer;padding:6px 12px;border-radius:var(--radius-md);font:500 12px var(--font-body);' + (active ? 'background:color-mix(in oklab,var(--color-accent) 14%,transparent);color:var(--color-accent-200);' : 'background:var(--color-surface);color:var(--color-neutral-400);');
+    const sevClass = (s) => s === 'ERROR' ? 'tag tag-accent' : (s === 'WARNING' ? 'tag tag-outline' : 'tag tag-neutral');
+    const det = st.issSel && iss ? (iss.details[st.issSel] || null) : null;
+    return {
+      issMeta: iss ? rows.length + ' cuestiones registradas: ' + (rows.length - nRes) + ' abiertas y ' + nRes + ' resueltas.' : 'Cargando docs/ISSUES.md…',
+      issFooter: iss ? rows.length + ' registradas · ' + nRes + ' resueltas' : 'cargando…',
+      issBtns: [['todas', 'Todas (' + rows.length + ')'], ['abiertas', 'Abiertas (' + (rows.length - nRes) + ')'], ['resueltas', 'Resueltas (' + nRes + ')']].map(([v, label]) => ({ label, onClick: () => this.setState({ issFilt: v, issSel: null }), style: seg(st.issFilt === v) })),
+      issRows: filtered.map(r => {
+        const d = iss ? iss.details[r.id] : null;
+        const open = st.issSel === r.id;
+        return {
+          ...r, sevClass: sevClass(r.sev), open,
+          color: r.resuelta ? 'var(--color-neutral-500)' : 'var(--color-neutral-200)',
+          bloquea: r.resuelta ? 'resuelta' : (r.bloquea || ''),
+          dTitle: d ? d.title : r.cuestion, dBody: d ? d.body : '(sin detalle en el fichero)',
+          onClick: () => this.setState({ issSel: open ? null : r.id }),
+          style: 'display:flex;flex-direction:column;padding:var(--space-3) var(--space-4);cursor:pointer;border-radius:var(--radius-md);background:var(--color-surface);' + (open ? 'box-shadow:0 0 0 1px var(--color-accent);' : 'box-shadow:var(--shadow-sm);')
+        };
+      })
+    };
+  }
+  esquemasVals() {
+    const st = this.state;
+    const sch = st.schCache[st.schSel];
+    const chip = (active) => 'border:none;cursor:pointer;padding:4px 10px;border-radius:var(--radius-md);font:500 10.5px ui-monospace,monospace;' + (active ? 'background:color-mix(in oklab,var(--color-accent) 14%,transparent);color:var(--color-accent-200);' : 'background:var(--color-bg);box-shadow:var(--shadow-sm);color:var(--color-neutral-400);');
+    const schChips = this.SCHEMAS.map(name => ({ name, onClick: () => { this.setState({ schSel: name }); this.loadSch(name); }, style: chip(st.schSel === name) }));
+    let schProps = [], schDesc = 'Cargando el esquema…';
+    if (sch) {
+      schDesc = st.schSel + '.json — ' + (sch.description || sch.title || '').slice(0, 320);
+      const req = sch.required || [];
+      const entries = Object.entries(sch.properties || sch.$defs || {});
+      schProps = entries.map(([name, p]) => {
+        let type = Array.isArray(p.type) ? p.type.join(' | ') : (p.type || (p.$ref ? 'ref' : (p.oneOf ? 'oneOf' : '—')));
+        let detail = '';
+        if (p.enum) detail = p.enum.slice(0, 5).join(' · ') + (p.enum.length > 5 ? ' · +' + (p.enum.length - 5) : '');
+        else if (p.pattern) detail = p.pattern.slice(0, 48);
+        else if (p.$ref) detail = p.$ref.replace('common.json#/$defs/', 'common: ').replace('#/$defs/', '');
+        else detail = (p.description || '').slice(0, 110);
+        return { name, type, req: req.includes(name) ? 'sí' : '', detail };
+      });
+    }
+    return { schChips, schProps, schDesc };
+  }
+  diffVals() {
+    const st = this.state;
+    const snaps = st.snaps || [];
+    const sel = st.snapSel ?? (snaps.length - 1);
+    const cur = snaps[sel], prev = snaps[sel - 1];
+    if (!cur || !prev) return { diffTitle: 'selecciona una instantánea posterior a la primera', diffCounts: [], diffFiles: [], diffNote: '' };
+    const diffCounts = [];
+    for (const k of Object.keys(cur.counts || {})) if ((prev.counts || {})[k] !== cur.counts[k]) diffCounts.push({ k, from: String((prev.counts || {})[k] ?? '—'), to: String(cur.counts[k]) });
+    const diffFiles = [];
+    for (const k of Object.keys(cur.files || {})) if ((prev.files || {})[k] !== cur.files[k]) diffFiles.push(k.replace('knowledge/', ''));
+    return {
+      diffTitle: prev.snapshot_id + ' → ' + cur.snapshot_id + ' · «' + cur.label + '»',
+      diffCounts, diffFiles,
+      diffNote: (diffCounts.length ? '' : 'sin cambios de recuento · ') + (diffFiles.length ? diffFiles.length + ' ficheros con hash distinto' : 'sin ficheros cambiados')
+    };
+  }
+  simVals() {
+    const st = this.state;
+    const SIM = [
+      {
+        label: 'Relacional · C-184',
+        outTitle: 'claims.jsonl · claim_type relational',
+        fila: [['#', 'C-184'], ['Afirmación', 'Richards et al. definen FECA como el primer descendiente del lado eucariota del último ancestro común entre Eukaryota y el linaje asgard hermano adoptado.'], ['Sujeto', 'población FECA nuclear no muestreada'], ['Predicado', 'diverge_de'], ['Objeto', 'último ancestro común Eukaryota–Asgard'], ['Atribución', 'expresa'], ['Fuente', 'S56 líneas 318–321'], ['Aceptación', 'no evaluado'], ['Fuerza', 'alta'], ['Resolución', 'resuelta'], ['Vigencia', 'vigente']],
+        obj: { id: 'CLAIM-000101', claim_type: 'relational', subject_id: 'LINEAGE-000101', predicate: 'diverges_from', object: { entity_id: 'LINEAGE-000102' }, scope: { hypothesis_ids: [], classification_view_ids: [], temporal_expression_ids: [], region_ids: [] }, provenance: { section_ids: ['SEC-000301'], passage_ids: ['PASSAGE-000310'], source_ids: ['SRC-000056'], operation_id: null, origin: 'ingestion' }, epistemic_dimensions: { acceptance: 'not_assessed', evidence_strength: 'high', evidence_strength_reason: 'La definición operacional está formulada explícitamente.', resolution: 'resolved', historical_status: 'current' }, evidence_ids: [], counterevidence_ids: [], issue_ids: [], record_status: 'active' },
+        notas: ['El sujeto y el objeto pasan por resolve_identity: son linajes ancestrales no muestreados, así que reciben LINEAGE- sin NAME- asociado (§22.5: no se inventa un taxón).', 'S56 se traduce a SRC-000056 con la fila del apéndice A; la sección y el pasaje salen del protocolo de §17.', 'Los ejes en español mapean 1:1 a las enumeraciones cerradas de common.json: no evaluado → not_assessed, alta → high, resuelta → resolved, vigente → current.', 'El Motivo del corredor se conserva como evidence_strength_reason: §10.3 exige razón escrita.', 'Simplificación declarada: §14.1 trata diverge_de como EVENTO de divergencia, así que la ingestión completa promociona esta fila a un EVENT- con participantes y este claim queda como afirmación sobre el evento. El simulador muestra solo la primera mitad.']
+      },
+      {
+        label: 'Temporal · C-193',
+        outTitle: 'claims.jsonl · claim_type temporal + TemporalExpression',
+        fila: [['#', 'C-193'], ['Afirmación', 'Kay et al. estimaron nFECA entre 3.05 y 2.79 Ga.'], ['Sujeto', 'nFECA'], ['Predicado', 'tiene_edad_estimada'], ['Objeto', '3.05–2.79 Ga'], ['Atribución', 'expresa'], ['Fuente', 'S58 líneas 91–93; fig. 1'], ['Aceptación', 'no evaluado'], ['Fuerza', 'media'], ['Resolución', 'parcialmente resuelta'], ['Vigencia', 'vigente']],
+        obj: { id: 'CLAIM-000102', claim_type: 'temporal', subject_id: 'LINEAGE-000103', predicate: 'dated_to', object: { temporal_expression_id: 'TIME-000101' }, scope: { hypothesis_ids: [], classification_view_ids: [], temporal_expression_ids: ['TIME-000101'], region_ids: [] }, provenance: { section_ids: ['SEC-000301'], passage_ids: [], source_ids: ['SRC-000058'], operation_id: null, origin: 'ingestion' }, epistemic_dimensions: { acceptance: 'not_assessed', evidence_strength: 'medium', evidence_strength_reason: 'Estimación de reloj relajado dependiente de calibraciones, topología y muestreo.', resolution: 'partially_resolved', historical_status: 'current' }, evidence_ids: [], counterevidence_ids: [], issue_ids: [], record_status: 'active' },
+        notas: ['El intervalo vive en una TemporalExpression aparte (TIME-000101): 3050–2790, unidad million_years, referencia before_present, calibración molecular_clock, determination modelled — el ancho ES la incertidumbre y no se promedia.', 'original_expression conserva la redacción «3.05–2.79 Ga» para que ninguna conversión redondee en silencio (§11.4).', 'El predicado del corredor «tiene_edad_estimada» mapea a dated_to; la naturaleza inferida queda en determination, no en el predicado.']
+      },
+      {
+        label: 'Sin mapeo · C-189 → Issue',
+        outTitle: 'issues.jsonl · el predicado no existe en §14',
+        fila: [['#', 'C-189'], ['Afirmación', 'LECA no designa al primer eucariota.'], ['Sujeto', 'población LECA reconstruida'], ['Predicado', 'no_equivale_a*'], ['Objeto', 'primer eucariota'], ['Atribución', 'expresa'], ['Fuente', 'S56 líneas 318–330; S57 p. 296'], ['Aceptación', 'consenso amplio'], ['Fuerza', 'alta'], ['Resolución', 'resuelta'], ['Vigencia', 'vigente']],
+        obj: { id: 'ISSUE-000999', issue_type: 'schema_inconsistency', title: 'Predicado del corpus sin equivalente en el vocabulario cerrado de §14: no_equivale_a*', severity: 'WARNING', raised_in: null, affects: { record_ids: [], claim_ids: [], mention_ids: [] }, evidence_locators: ['exports/afirmaciones.csv fila C-189', 'docs/campaigns/C01-PREDICADOS-NUEVOS.csv'], proposed_resolution: 'Añadir el predicado vía C01-PREDICADOS-NUEVOS.csv (ampliar §14 sube schema_version, §16.5) o documentar el mapeo si un predicado existente conserva el sentido.', blocks: null, related_issue_ids: [], resolution: { status: 'open', resolved_in: null, decision_id: null }, record_status: 'active' },
+        notas: ['«No se inventa nada» también aplica al vocabulario: los predicados con asterisco del corredor (no_equivale_a*, aparece_en*…) no están en §14 y no se degradan a uno parecido en silencio.', 'El repo ya lo prevé: docs/campaigns/C01-PREDICADOS-NUEVOS.csv recoge los predicados que la campaña propone añadir.', 'Mientras la decisión no llegue, la fila queda registrada como Issue — un hueco declarado, nunca un dato silencioso.']
+      }
+    ];
+    const sim = SIM[st.simSel] || SIM[0];
+    const seg = (active) => 'border:none;cursor:pointer;padding:6px 12px;border-radius:var(--radius-md);font:500 12px var(--font-body);' + (active ? 'background:color-mix(in oklab,var(--color-accent) 14%,transparent);color:var(--color-accent-200);' : 'background:var(--color-surface);color:var(--color-neutral-400);');
+    return {
+      simBtns: SIM.map((s, i) => ({ label: s.label, onClick: () => this.setState({ simSel: i }), style: seg(st.simSel === i) })),
+      simFila: sim.fila.map(([k, v]) => ({ k, v })),
+      simJson: JSON.stringify(sim.obj, null, 2),
+      simOutTitle: sim.outTitle,
+      simNotas: sim.notas
+    };
+  }
+
+  renderVals() {
+    const st = this.state;
+    const view = st.view ?? this.props.vistaInicial ?? 'estado';
+    const nav = [
+      { id: 'estado', icon: 'ph-pulse', label: 'Estado' },
+      { id: 'registros', icon: 'ph-brackets-curly', label: 'Registros JSONL' },
+      { id: 'consultas', icon: 'ph-funnel', label: 'Consultas' },
+      { id: 'cuestiones', icon: 'ph-warning-circle', label: 'Cuestiones' },
+      { id: 'ingestion', icon: 'ph-flow-arrow', label: 'Ingestión' },
+      { id: 'campana', icon: 'ph-flag', label: 'Campaña C01' },
+      { id: 'red', icon: 'ph-graph', label: 'Red evolutiva' },
+      { id: 'modelo', icon: 'ph-tree-structure', label: 'Modelo de datos' },
+      { id: 'juego', icon: 'ph-game-controller', label: 'Capa de juego' }
+    ].map(n => ({
+      ...n,
+      onClick: () => { this.setState({ view: n.id }); this.resetScroll(); },
+      style: 'display:flex;align-items:center;gap:10px;padding:7px 11px;border:none;border-radius:var(--radius-md);font:500 12.5px var(--font-body);text-align:left;cursor:pointer;width:100%;' +
+        (view === n.id
+          ? 'background:color-mix(in oklab,var(--color-accent) 14%,transparent);color:var(--color-accent-200);box-shadow:inset 2px 0 0 var(--color-accent);'
+          : 'background:transparent;color:var(--color-neutral-300);')
+    }));
+
+    const list = st.snaps || [];
+    const selSnap = st.snapSel ?? (list.length - 1);
+    const snaps = list.map((s, i) => ({
+      id: s.snapshot_id,
+      label: s.label,
+      onClick: () => { this.setState({ snapSel: i }); this.scrollToSel('diff'); },
+      style: 'display:flex;flex-direction:column;gap:4px;padding:var(--space-3) var(--space-4);border-radius:var(--radius-md);background:var(--color-bg);cursor:pointer;' +
+        (i === selSnap ? 'box-shadow:0 0 0 1px var(--color-accent);' : 'box-shadow:var(--shadow-sm);')
+    }));
+    const snapLine = st.snaps ? list.length + ' instantáneas, la actual resaltada' : 'cargando…';
+
+    const showLeyenda = this.props.mostrarLeyenda ?? true;
+    const bw = this.props.pruebaBlancoNegro ?? false;
+
+    return {
+      nav,
+      isEstado: view === 'estado', isCampana: view === 'campana', isRed: view === 'red',
+      isModelo: view === 'modelo', isJuego: view === 'juego',
+      isRegistros: view === 'registros', isConsultas: view === 'consultas',
+      isCuestiones: view === 'cuestiones', isIngestion: view === 'ingestion',
+      ...this.recVals(), ...this.consultaVals(), ...this.issuesVals(), ...this.esquemasVals(), ...this.diffVals(), ...this.simVals(),
+      totalRecs: Object.values(st.recs || {}).reduce((a, b) => a + b.length, 0),
+      nextIssue: (() => {
+        const ids = [];
+        for (const r of (st.recs && st.recs.issues) || []) if (r.id) ids.push(parseInt(String(r.id).slice(6), 10) || 0);
+        for (const r of (st.iss ? st.iss.rows : [])) { const m = String(r.id || '').match(/ISSUE-(\d+)/); if (m) ids.push(parseInt(m[1], 10)); }
+        const mx = ids.length ? Math.max.apply(null, ids) : 38;
+        return 'ISSUE-' + String(mx + 1).padStart(6, '0');
+      })(),
+      snaps, snapLine, openEnt: this.openEnt, ...this.navBtnsVals(),
+      showLeyenda,
+      redGrid: showLeyenda ? '1.05fr 1fr' : '1fr',
+      svgStyle: 'width:100%;height:auto;display:block;' + (bw ? 'filter:grayscale(1);' : '')
+    };
+  }
+}
+</script>
+</body>
+</html>

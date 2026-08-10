@@ -87,6 +87,7 @@ Valores previstos para `issue_type`: `schema_inconsistency`, `documentation_ambi
 | `ISSUE-000026` | WARNING | `content_gap` | La reproducción sexual y el origen de la meiosis desaparecen sin exclusión ni disparador — **resuelta** | — |
 | `ISSUE-000027` | WARNING | `unspecified_requirement` | §27.7 perdió la exigencia de evaluar la forma de la distribución de resultados — **resuelta** | — |
 | `ISSUE-000028` | WARNING | `documentation_ambiguity` | Debilitamientos normativos no documentados como simplificaciones — **resuelta** | — |
+| `ISSUE-000029` | WARNING | `validation_warning` | Falta pip en el Python de WSL — **resuelta**; vive en `issues.jsonl`, no aquí | — |
 | `ISSUE-000030` | ERROR | `schema_inconsistency` | `provenance.origin` es obligatorio en `common.json` y no existe en E.6 ni §9.1 — **resuelta** | — |
 | `ISSUE-000031` | ERROR | `schema_inconsistency` | Ningún esquema tiene campo para el reemplazo de un registro deprecado — **resuelta** | — |
 | `ISSUE-000032` | WARNING | `schema_inconsistency` | `taxon-concept.json` no admite `epistemic_dimensions` — **resuelta** | — |
