@@ -25,7 +25,7 @@
     </div>
     <nav style="display:flex;flex-direction:column;gap:var(--space-1);">
       <sc-for list="{{ nav }}" as="it" hint-placeholder-count="5">
-        <button onClick="{{ it.onClick }}" style="{{ it.style }}" style-hover="background:color-mix(in oklab,var(--color-accent) 10%,transparent);color:var(--color-accent-200);"><i class="ph {{ it.icon }}" style="font-size:16px;"></i>{{ it.label }}</button>
+        <button onClick="{{ it.onClick }}" aria-current="{{ it.ariaCurrent }}" style="{{ it.style }}" style-hover="background:color-mix(in oklab,var(--color-accent) 10%,transparent);color:var(--color-accent-200);"><i class="ph {{ it.icon }}" style="font-size:16px;" aria-hidden="true"></i>{{ it.label }}</button>
       </sc-for>
     </nav>
     <div style="display:flex;gap:var(--space-2);">
@@ -45,7 +45,7 @@
     <sc-if value="{{ isEstado }}" hint-placeholder-val="{{ true }}">
       <div style="padding:var(--space-8) 36px 48px;max-width:1180px;">
         <div style="font:500 10.5px var(--font-heading);letter-spacing:.16em;text-transform:uppercase;color:var(--color-accent-300);margin-bottom:var(--space-3);">Estado del sistema</div>
-        <h1 style="font:500 27px/1.25 var(--font-heading);margin:0 0 var(--space-3);">Una base de afirmaciones, ocho instantáneas, cero corpus</h1>
+        <h1 style="font:500 27px/1.25 var(--font-heading);margin:0 0 var(--space-3);">Una base de afirmaciones, {{ nSnapsPalabra }} instantáneas, cero corpus</h1>
         <p style="margin:0 0 var(--space-8);max-width:660px;font-size:13.5px;line-height:1.6;color:var(--color-neutral-300);text-wrap:pretty;">Dos sistemas separados: un núcleo científico que organiza corpus, entidades, afirmaciones, evidencia, eventos, hipótesis y vistas; y una capa de juego que los referencia por identificador estable sin modificarlos jamás. La Fase 1 ingiere el corpus del corredor Eukaryota → Holozoa.</p>
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:var(--space-4);margin-bottom:var(--space-8);">
           <div style="background:var(--color-surface);box-shadow:var(--shadow-sm);border-radius:var(--radius-md);padding:var(--space-6);"><div style="white-space:nowrap;font:500 18px ui-monospace,monospace;color:var(--color-accent-200);">SNAP-000007</div><div style="font-size:11.5px;color:var(--color-neutral-400);margin-top:var(--space-1);">snapshot actual</div></div>
@@ -347,6 +347,7 @@
           <span class="tag tag-outline" style="white-space:nowrap;">fixture de §27.9 — no es corpus</span>
         </div>
         <p style="margin:0 0 var(--space-6);font-size:12.5px;color:var(--color-neutral-400);max-width:660px;text-wrap:pretty;">El trazo codifica el estado epistémico, no es decoración. La endosimbiosis nunca se dibuja como bifurcación: es un evento n-ario con participantes, papeles y un producto con dos ascendencias — el caso mínimo que no cabe en un árbol.</p>
+        <button onClick="{{ toggleBw }}" aria-pressed="{{ bwPressed }}" class="btn btn-secondary" style="margin-bottom:var(--space-6);font-size:12px;"><i class="ph ph-circle-half" style="font-size:15px;" aria-hidden="true"></i>{{ bwLabel }}</button>
         <div style="background:var(--color-surface);box-shadow:var(--shadow-sm);border-radius:var(--radius-md);padding:var(--space-6);margin-bottom:var(--space-6);">
           <svg viewBox="0 0 920 400" style="{{ svgStyle }}">
             <defs>
@@ -546,9 +547,16 @@ class Component extends DCLogic {
   RECS = ['analyses', 'clades', 'claims', 'datasets', 'events', 'evidence', 'hypotheses', 'issues', 'lineages', 'mentions', 'occurrences', 'populations', 'regions', 'results', 'sites', 'sources', 'specimens', 'taxon-concepts', 'taxonomic-names', 'temporal-expressions', 'trait-observations', 'traits'];
 
   componentDidMount() {
-    Promise.all(Array.from({ length: 24 }, (_, i) =>
-      fetch('knowledge/snapshots/SNAP-' + String(i).padStart(6, '0') + '.json').then(r => r.ok ? r.json() : null).catch(() => null)
-    )).then(list => this.setState({ snaps: list.filter(Boolean) }));
+    (async () => {
+      const list = [];
+      for (let i = 0; i < 200; i++) {
+        const s = await fetch('knowledge/snapshots/SNAP-' + String(i).padStart(6, '0') + '.json')
+          .then(r => r.ok ? r.json() : null).catch(() => null);
+        if (!s) break;           // la cadena es contigua: el primer hueco es el final
+        list.push(s);
+      }
+      this.setState({ snaps: list });
+    })();
     Promise.all(this.RECS.map(n =>
       fetch('knowledge/records/' + n + '.jsonl').then(r => r.ok ? r.text() : '').catch(() => '')
         .then(t => [n, t.split('\n').filter(l => l.trim()).map(l => { try { return JSON.parse(l); } catch (e) { return null; } }).filter(Boolean)])
@@ -559,13 +567,17 @@ class Component extends DCLogic {
   }
 
   NAV_KEYS = ['view', 'snapSel', 'rec', 'issSel', 'issFilt', 'schSel', 'simSel', 'conDs', 'conGroup'];
-  _undo = []; _redo = []; _navving = false;
-  componentDidUpdate(prevProps, prevState) {
+  _undo = []; _redo = []; _navving = false; _lastSnap = null;
+  componentDidUpdate() {
+    // El runtime llama componentDidUpdate(prevProps) —sin prevState, a
+    // diferencia de React—, así que la instantánea anterior la guardamos aquí.
+    const ahora = this._snapNow();
+    const prev = this._lastSnap;
+    this._lastSnap = ahora;
     if (this._navving) { this._navving = false; return; }
-    if (!prevState) return;
-    if (this.NAV_KEYS.some(k => prevState[k] !== this.state[k])) {
-      const snap = {}; for (const k of this.NAV_KEYS) snap[k] = prevState[k];
-      this._undo.push(snap); if (this._undo.length > 60) this._undo.shift();
+    if (!prev) return;
+    if (this.NAV_KEYS.some(k => prev[k] !== ahora[k])) {
+      this._undo.push(prev); if (this._undo.length > 60) this._undo.shift();
       this._redo = [];
       this.forceUpdate();
     }
@@ -856,6 +868,7 @@ class Component extends DCLogic {
       { id: 'juego', icon: 'ph-game-controller', label: 'Capa de juego' }
     ].map(n => ({
       ...n,
+      ariaCurrent: view === n.id ? 'page' : null,
       onClick: () => { this.setState({ view: n.id }); this.resetScroll(); },
       style: 'display:flex;align-items:center;gap:10px;padding:7px 11px;border:none;border-radius:var(--radius-md);font:500 12.5px var(--font-body);text-align:left;cursor:pointer;width:100%;' +
         (view === n.id
@@ -875,7 +888,7 @@ class Component extends DCLogic {
     const snapLine = st.snaps ? list.length + ' instantáneas, la actual resaltada' : 'cargando…';
 
     const showLeyenda = this.props.mostrarLeyenda ?? true;
-    const bw = this.props.pruebaBlancoNegro ?? false;
+    const bw = st.bw ?? this.props.pruebaBlancoNegro ?? false;
 
     return {
       nav,
@@ -894,6 +907,12 @@ class Component extends DCLogic {
       })(),
       snaps, snapLine, openEnt: this.openEnt, ...this.navBtnsVals(),
       showLeyenda,
+      // §20.6 se comprueba mirando: el visor trae su propia prueba de que la
+      // vista sobrevive sin color, en vez de depender del editor de diseño.
+      toggleBw: () => this.setState({ bw: !bw }),
+      bwPressed: bw ? 'true' : 'false',
+      bwLabel: bw ? 'Volver al color' : 'Ver en blanco y negro (§20.6)',
+      nSnapsPalabra: ['cero','una','dos','tres','cuatro','cinco','seis','siete','ocho','nueve','diez','once','doce'][snaps.length] || snaps.length,
       redGrid: showLeyenda ? '1.05fr 1fr' : '1fr',
       svgStyle: 'width:100%;height:auto;display:block;' + (bw ? 'filter:grayscale(1);' : '')
     };
