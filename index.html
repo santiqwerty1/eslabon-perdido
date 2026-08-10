@@ -204,7 +204,7 @@
         </div>
         <div style="display:flex;flex-direction:column;gap:var(--space-2);">
           <sc-for list="{{ issRows }}" as="ir" hint-placeholder-count="8">
-            <div onClick="{{ ir.onClick }}" style="{{ ir.style }}" style-hover="background:color-mix(in oklab,var(--color-accent) 6%,transparent);">
+            <div onClick="{{ ir.onClick }}" onKeyDown="{{ ir.onKey }}" tabindex="0" role="button" aria-expanded="{{ ir.expandida }}" aria-label="{{ ir.aria }}" style="{{ ir.style }}" style-hover="background:color-mix(in oklab,var(--color-accent) 6%,transparent);">
               <div style="display:grid;grid-template-columns:96px 76px 150px 1fr 70px;gap:var(--space-3);align-items:baseline;">
                 <span style="font:500 10.5px ui-monospace,monospace;color:var(--color-accent-300);white-space:nowrap;">{{ ir.id }}</span>
                 <span><span class="{{ ir.sevClass }}" style="font-size:9px;">{{ ir.sev }}</span></span>
@@ -773,7 +773,13 @@ class Component extends DCLogic {
           color: r.resuelta ? 'var(--color-neutral-500)' : 'var(--color-neutral-200)',
           bloquea: r.resuelta ? 'resuelta' : (r.bloquea || ''),
           dTitle: d ? d.title : r.cuestion, dBody: d ? d.body : '(sin detalle en el fichero)',
-          onClick: () => this.setState({ issSel: open ? null : r.id }),
+          onKey: (e) => {
+          if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); this.setState({ issSel: open ? null : r.id }); }
+        },
+        expandida: open ? 'true' : 'false',
+        aria: r.id + ', ' + (r.sev || '') + ', ' + (r.cuestion || '').slice(0, 90)
+          + (open ? '. Desplegada' : ''),
+        onClick: () => this.setState({ issSel: open ? null : r.id }),
           style: 'display:flex;flex-direction:column;padding:var(--space-3) var(--space-4);cursor:pointer;border-radius:var(--radius-md);background:var(--color-surface);' + (open ? 'box-shadow:0 0 0 1px var(--color-accent);' : 'box-shadow:var(--shadow-sm);')
         };
       })
