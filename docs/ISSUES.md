@@ -72,7 +72,7 @@ Valores previstos para `issue_type`: `schema_inconsistency`, `documentation_ambi
 | `ISSUE-000011` | WARNING | `unspecified_requirement` | La prueba de «ausencia de teleología» no está especificada — **resuelta** | — |
 | `ISSUE-000012` | INFO | `unspecified_requirement` | `evidence_strength` carece de rúbrica — **resuelta** | — |
 | `ISSUE-000013` | WARNING | `pending_decision` | `OPEN-016` ya tiene respuesta de facto y sigue abierta | Fase 1 |
-| `ISSUE-000014` | WARNING | `pending_decision` | La ingestión debe partir de `Filogenia.md`, no del Apéndice A | Fase 2 |
+| `ISSUE-000014` | WARNING | `pending_decision` | La ingestión debe partir de `Filogenia.md`, no del Apéndice A — **resuelta**, sin objeto | — |
 | `ISSUE-000015` | INFO | `documentation_ambiguity` | Nombre del fixture hominino — **resuelta**, se conserva por trazabilidad | — |
 | `ISSUE-000016` | ERROR | `content_gap` | Afirmación sin procedencia en C.16: flujo génico sapiens–denisovano — **reencuadrada**: no bloquea la C01 | Campaña del clado tardío |
 | `ISSUE-000017` | ERROR | `content_gap` | La capa de procedencia entera se perdió en la destilación — **resuelta** | — |
@@ -762,4 +762,24 @@ esta afirmación no entra en su ingestión. Pasa a bloquear la campaña que ingi
 el clado tardío, cuando exista. Sigue siendo un `ERROR` y sigue abierta: un dato
 verdadero sin procedencia es más difícil de detectar que uno falso, y ése era
 justamente su valor como ejemplo trabajado.
+
+### `ISSUE-000014` · La ingestión debe partir de `Filogenia.md` — **resuelta, sin objeto**
+
+La cuestión era correcta cuando se escribió: si la Campaña 1 iba a tratar el
+linaje humano, ingerir los apéndices de la guía en vez de `Filogenia.md`
+habría metido material destilado sin procedencia en lugar de la fuente.
+
+La premisa cambió. `CAMP-000001` es hoy **Eucaria**, y su material de partida es
+el corpus del corredor Eukaryota → Holozoa: 1 952 afirmaciones con 523 fuentes,
+492 de ellas con DOI. No hay ninguna decisión que tomar sobre `Filogenia.md`
+para esta campaña, porque no interviene en ella.
+
+`Filogenia.md` sigue siendo la fuente correcta para la campaña que ingiera el
+clado tardío humano, y allí su exigencia volverá a aplicar. Queda anotada junto
+a [`ISSUE-000016`](#issue-000016--flujo-sapiens-denisovano--reencuadrada-sigue-abierta),
+que describe un hueco de procedencia de ese mismo material.
+
+Decisión del dueño del proyecto, 10 de agosto de 2026. `OPEN-016` —el corte
+bibliográfico de `ISSUE-000013`— **no** se formaliza todavía: la auditoría del
+corredor sigue abierta y el corte podría moverse.
 
