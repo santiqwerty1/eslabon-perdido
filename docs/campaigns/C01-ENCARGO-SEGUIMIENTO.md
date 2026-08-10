@@ -123,6 +123,12 @@ afirmaciones que dependen de una sola fuente. Contando sobre
 apéndice A— salen **1 195**. Una fila de diferencia, sin identificar. O el
 control arrastra un valor viejo, o hay una fila que se cuenta distinto.
 
+**191 citas no dicen dónde mirar.** Dan la clave de la fuente y nada más
+—«S123» a secas—, sin sección, línea ni descripción. Con el texto completo
+descargado se puede recortar el pasaje que sostiene cada afirmación, pero sólo
+cuando la cita señala un sitio; en éstas no hay nada que localizar. Completarlas
+con un puntero, del tipo que sea, es lo mismo que pide el punto 5.
+
 **Diez fuentes del apéndice A no las cita ninguna afirmación.** De las 523, sólo
 513 aparecen en la columna `Fuente` de alguna fila. ¿Sobran del apéndice, o
 falta citarlas en las afirmaciones que las usaron?
