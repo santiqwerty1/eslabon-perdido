@@ -68,20 +68,20 @@ Valores previstos para `issue_type`: `schema_inconsistency`, `documentation_ambi
 | `ISSUE-000007` | WARNING | `documentation_ambiguity` | `superseded` designa dos cosas diferentes — **resuelta** | — |
 | `ISSUE-000008` | INFO | `documentation_ambiguity` | El informe humano está especificado con 9 y con 13 apartados — **resuelta** | — |
 | `ISSUE-000009` | ERROR | `schema_inconsistency` | No existe esquema mínimo para `Issue` — **resuelta** | — |
-| `ISSUE-000010` | WARNING | `content_gap` | No hay catálogo terminológico para el ámbito de la Campaña 1 | Fase 1 |
+| `ISSUE-000010` | WARNING | `content_gap` | No hay catálogo terminológico para el ámbito de la Campaña 1 — **resuelta** | — |
 | `ISSUE-000011` | WARNING | `unspecified_requirement` | La prueba de «ausencia de teleología» no está especificada — **resuelta** | — |
 | `ISSUE-000012` | INFO | `unspecified_requirement` | `evidence_strength` carece de rúbrica — **resuelta** | — |
 | `ISSUE-000013` | WARNING | `pending_decision` | `OPEN-016` ya tiene respuesta de facto y sigue abierta | Fase 1 |
 | `ISSUE-000014` | WARNING | `pending_decision` | La ingestión debe partir de `Filogenia.md`, no del Apéndice A | Fase 2 |
 | `ISSUE-000015` | INFO | `documentation_ambiguity` | Nombre del fixture hominino — **resuelta**, se conserva por trazabilidad | — |
-| `ISSUE-000016` | ERROR | `content_gap` | Afirmación sin procedencia en C.16: flujo génico sapiens–denisovano | Fase 2 |
-| `ISSUE-000017` | ERROR | `content_gap` | La capa de procedencia entera se perdió en la destilación | Fase 2 |
+| `ISSUE-000016` | ERROR | `content_gap` | Afirmación sin procedencia en C.16: flujo génico sapiens–denisovano — **reencuadrada**: no bloquea la C01 | Campaña del clado tardío |
+| `ISSUE-000017` | ERROR | `content_gap` | La capa de procedencia entera se perdió en la destilación — **resuelta** | — |
 | `ISSUE-000018` | WARNING | `content_gap` | La convención de marcado `⚠` se perdió: 17 usos en la fuente, 0 en la guía — **resuelta** | — |
 | `ISSUE-000019` | WARNING | `unspecified_requirement` | `crown` / `stem` / `total group` se listan como marcas y nunca se definen — **resuelta** | — |
 | `ISSUE-000020` | WARNING | `content_gap` | Falta la distinción nombre disponible / taxón aceptado / clado respaldado — **resuelta** | — |
-| `ISSUE-000021` | WARNING | `content_gap` | Contenido científico de la Campaña 1 ausente en los apéndices | Fase 1 |
+| `ISSUE-000021` | WARNING | `content_gap` | Contenido científico de la Campaña 1 ausente en los apéndices — **resuelta** | — |
 | `ISSUE-000022` | WARNING | `documentation_ambiguity` | Reformulaciones que cambian el sentido del original — **resuelta** | — |
-| `ISSUE-000023` | INFO | `unspecified_requirement` | Las 34 fuentes son de calidad muy desigual | Fase 4 |
+| `ISSUE-000023` | INFO | `unspecified_requirement` | Las 34 fuentes son de calidad muy desigual — **resuelta**, el corpus las sustituye | — |
 | `ISSUE-000024` | ERROR | `documentation_ambiguity` | `DEC-016` y `DEC-017` se reescribieron en el sitio sin marcarse `SUPERSEDIDO` — **resuelta** | — |
 | `ISSUE-000025` | ERROR | `unspecified_requirement` | La prueba de preservación §27.11 está codificada en duro — **resuelta** | — |
 | `ISSUE-000026` | WARNING | `content_gap` | La reproducción sexual y el origen de la meiosis desaparecen sin exclusión ni disparador — **resuelta** | — |
@@ -667,3 +667,99 @@ Fuera del alcance de la Campaña 1 pero disponibles para campañas posteriores: 
 **La migración no destructiva se sostiene empíricamente.** Se clasificaron las 657 eliminaciones del patch y se verificaron 112 candidatos de pérdida contra el documento nuevo: **ninguno resultó ser una pérdida real**. Varios candidatos eran falsos positivos por renumeración de secciones o por desduplicación —el documento anterior repetía inventarios en el resumen ejecutivo y en los apéndices, y el patch borró la copia, no el original—.
 
 La evidencia más sólida no es el recuento sino la estructura: la v1.1.0 **añade** el aparato que hace comprobable su propia promesa —§24.1 con la matriz de migración fila por fila, §21.14 con nueve subsecciones de requisitos preservados, el Apéndice J, los fixtures `future-*` y las pruebas de preservación de §27.11—. El patrón de las 2033 adiciones frente a las 657 eliminaciones lo confirma: **se borró prosa de resumen y se añadió mecanismo verificable**. El documento perdió retórica y ganó fuerza normativa, con la excepción de los debilitamientos de `ISSUE-000028`.
+
+
+# J. Resueltas por el corpus del corredor Eukaryota → Holozoa
+
+Cuatro cuestiones abiertas describían huecos de la Campaña 1 que sólo podía
+llenar investigación nueva. La investigación llegó: el corpus
+`corredor-eukaryota-holozoa` v0.6.0 —1952 afirmaciones, 523 fuentes— las cierra
+por contenido. Las comprobaciones de abajo se hicieron contra los CSV del
+corpus, no contra su resumen.
+
+Ninguna se cierra por decisión editorial: se cierran porque el material que
+pedían **existe y se puede contar**.
+
+### `ISSUE-000010` · Catálogo terminológico eucariota — **resuelta**
+
+Pedía un `D.7` con las trampas terminológicas del ámbito eucariota, y avisaba
+de que `Filogenia.md` no podía darlo porque su alcance era el linaje humano.
+La sección 14 del corpus, «Nomenclatura», trae 218 afirmaciones, y las cuatro
+trampas que la cuestión nombraba están tratadas: «protista» (53 apariciones),
+«protozoo» (8), «alga» (38) e «invertebrado» (21), más 10 usos de
+«parafilético» y el marcado de taxón histórico.
+
+Queda un trabajo editorial, no de contenido: decidir durante la ingestión si
+ese material se proyecta como un apéndice `D.7` o vive sólo como afirmaciones
+con procedencia. La distinción importa poco mientras el contenido sea
+rastreable, que era lo que faltaba.
+
+### `ISSUE-000017` · La capa de procedencia — **resuelta**
+
+La guía no tenía ni una URL, ni un DOI, ni una revista. Su resolución propuesta
+era no reconstruir citas dentro de los apéndices y dejar que la procedencia
+entrara por el protocolo. Es exactamente lo que ocurrió: el corpus trae **492
+DOIs sobre 523 fuentes** y **405 revistas distintas**, y cada afirmación cita su
+fuente con localizador.
+
+El eje de la cuestión —que la Campaña 1 arrancara sin procedencia verificable—
+ya no se sostiene.
+
+### `ISSUE-000021` · Contenido científico de la Campaña 1 — **resuelta**
+
+Enumeraba material presente en la fuente y ausente de la guía. Los diez
+términos que listaba aparecen ahora en el corpus, y ninguno de refilón:
+
+| Término | Apariciones |
+|---|---|
+| `Bacteria` | 265 |
+| `Holozoa` | 74 |
+| `Pluriformea` | 69 |
+| `Choanozoa` | 63 |
+| `Archaea` | 62 |
+| `Ichthyosporea` | 50 |
+| `Corallochytrea` | 48 |
+| `Holomycota` | 38 |
+| `Apoikozoa` | 37 |
+| `Fungi` | 29 |
+
+`Archaea` y `Bacteria` pasan de 0 apariciones en la guía a 62 y 265: la
+identidad arqueana del hospedador, que la cuestión señalaba como «el hecho
+central del arranque de la campaña», está documentada con fuentes.
+
+### `ISSUE-000023` · Calidad desigual de las fuentes — **resuelta**
+
+Hablaba de las 34 referencias de `Filogenia.md`, que mezclaban Nature con un
+blog personal. Esa bibliografía ya no es la de la Campaña 1: son las 523
+fuentes del corpus, **clasificadas por tipo**, que es la rúbrica que la cuestión
+echaba en falta.
+
+| Tipo | Fuentes |
+|---|---|
+| investigación primaria | 380 |
+| revisión | 108 |
+| otro | 16 |
+| base de datos taxonómica | 7 |
+| capítulo o libro | 7 |
+| preprint | 3 |
+| tesis | 1 |
+| divulgación o blog | 1 |
+
+El material de solidez baja pasa de ser una fracción notable de 34 a **cuatro
+fuentes sobre 523**. Siguen exigiendo el modo auditoría de §18.2 al ingerirlas,
+pero eso es trabajo acotado y nominal, no un problema de calidad de la
+bibliografía.
+
+### `ISSUE-000016` · Flujo sapiens–denisovano — **reencuadrada**, sigue abierta
+
+No la cierra el corpus nuevo, y conviene decir por qué: describe una afirmación
+sin procedencia en el Apéndice C.16, que es material del **clado tardío
+humano**. El corredor Eukaryota → Holozoa no lo toca.
+
+Lo que sí cambia es su alcance. La cuestión declaraba «Bloquea: Fase 2» cuando
+la Campaña 1 se creía humana; la Campaña 1 es hoy `CAMP-000001` · Eucaria, y
+esta afirmación no entra en su ingestión. Pasa a bloquear la campaña que ingiera
+el clado tardío, cuando exista. Sigue siendo un `ERROR` y sigue abierta: un dato
+verdadero sin procedencia es más difícil de detectar que uno falso, y ése era
+justamente su valor como ejemplo trabajado.
+
