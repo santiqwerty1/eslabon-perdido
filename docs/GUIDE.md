@@ -1083,10 +1083,22 @@ broad_consensus
 majority_acceptance
 mixed_acceptance
 minority_position
+abandoned
 not_assessed
 ```
 
 Describe la recepción general, no la fuerza lógica interna de una hipótesis.
+
+`abandoned` es cero apoyo actual: ya no la sostiene nadie. No se confunde con
+`not_assessed`, que es «no se ha mirado», ni con `minority_position`, que
+supone defensores aunque sean pocos.
+
+Y no se sustituye por `historical_status: rejected`. Son ejes independientes
+(§10) y responden a preguntas distintas: una idea puede estar rechazada por el
+consenso y conservar quien la defienda, y una idea puede quedarse sin
+defensores sin que nadie haya declarado formalmente que se rechaza. Expresar la
+recepción con el eje de vigencia acoplaría dos cosas que la guía separa a
+propósito (`ISSUE-000037`).
 
 ## 10.2. Papel dentro de una vista
 
@@ -1437,11 +1449,32 @@ Una hipótesis debe contener:
 
 No se mantendrá manualmente una lista exhaustiva de compatibilidad para cada par de aristas. Se utilizarán:
 
-- grupos de conflicto;
+- grupos de conflicto, que son **registros con identificador opaco**
+  (`CONFLICT-000001`) y ficha propia en `conflict-groups.jsonl`;
 - conjuntos de afirmaciones mutuamente excluyentes;
 - requisitos de una hipótesis;
 - escenarios o “mundos” compatibles;
 - validadores automáticos cuando sea posible.
+
+### 15.2.1. El grupo de conflicto es un registro, no una etiqueta
+
+Un grupo de conflicto tiene nombre, descripción y ámbito, y las hipótesis lo
+citan por identificador. La razón es doble.
+
+La primera es de integridad: mientras fueron cadenas libres no había nada que
+comprobara que dos hipótesis rivales escribían el mismo texto, y derivaron
+solas —los dos únicos fixtures del proyecto llegaron a usar convenciones
+distintas para el mismo mecanismo—. Un campo `_ids` sin registro detrás no
+tiene integridad referencial, y §7 no admite identificadores sin dueño.
+
+La segunda importa más: **saber que dos hipótesis chocan vale poco si no se
+dice en qué**. El registro obliga a escribirlo. Un conflicto sobre dónde cae la
+raíz de Eukaryota y uno sobre el orden de la integración mitocondrial exigen
+decisiones editoriales distintas, y sin ficha ambos se veían igual.
+
+El validador exige que todo grupo citado exista, y avisa de los grupos con una
+sola hipótesis —un conflicto necesita al menos dos que se excluyan— y de los
+declarados que nadie cita (`ISSUE-000036`).
 
 ## 15.3. Topologías
 
@@ -1521,6 +1554,7 @@ No se utilizará un único archivo gigantesco como fuente de verdad. Tampoco se 
 │   │   ├── results.jsonl
 │   │   ├── events.jsonl
 │   │   ├── hypotheses.jsonl
+│   │   ├── conflict-groups.jsonl
 │   │   ├── issues.jsonl
 │   │   └── temporal-expressions.jsonl
 │   ├── classifications/
@@ -4481,6 +4515,8 @@ Una entidad no necesita estar científicamente “resuelta”. Está correctamen
 | `DEC-051` | DECIDIDO | Python como lenguaje del tooling inicial de ingestión, validación, deltas, snapshots y vistas. Resuelve `OPEN-001`. |
 | `DEC-052` | DECIDIDO | Identificadores secuenciales de ancho fijo, seis dígitos, tras el prefijo de §16.3. Resuelve `OPEN-002`. |
 | `DEC-053` | DECIDIDO | Código bajo MIT, corpus científico bajo CC BY 4.0, contenido de juego propietario. Resuelve `OPEN-015`. |
+| `DEC-054` | DECIDIDO | El eje `acceptance` gana `abandoned` para «ya no la sostiene nadie», en vez de expresarlo con `historical_status: rejected`: son ejes independientes (§10) y acoplarlos habría hecho indistinguible una idea rechazada con defensores de otra sin ellos. Resuelve `ISSUE-000037`. Sube el esquema a 1.1.0. |
+| `DEC-055` | DECIDIDO | Los grupos de conflicto pasan a registro propio con identificador opaco (`CONFLICT-000001`, `conflict-groups.jsonl`). Como cadenas libres no tenían integridad referencial y derivaron solas —los dos fixtures usaban convenciones distintas—, y no había dónde decir en qué consiste cada desacuerdo. Resuelve `ISSUE-000036`. Sube el esquema a 1.1.0. |
 
 ## 30.1. Relación entre decisiones nuevas y anteriores
 

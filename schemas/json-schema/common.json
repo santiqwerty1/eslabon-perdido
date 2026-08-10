@@ -60,8 +60,10 @@
             "majority_acceptance",
             "mixed_acceptance",
             "minority_position",
+            "abandoned",
             "not_assessed"
-          ]
+          ],
+          "description": "Cómo recibe la comunidad la afirmación (§10.1). «abandoned» es cero apoyo actual —ya no la sostiene nadie—, que es un hecho de recepción y no de vigencia: una idea puede estar rechazada (historical_status) y conservar defensores, y al revés. Los ejes no se acoplan (§10)."
         },
         "evidence_strength": {
           "type": "string",
@@ -173,7 +175,7 @@
     "conflict_group_id": {
       "type": "string",
       "pattern": "^CONFLICT-[0-9]{6}$",
-      "description": "Grupo de afirmaciones o hipótesis mutuamente excluyentes (§15.2)."
+      "description": "Identificador opaco de un grupo de hipótesis mutuamente excluyentes (§15.2). Referencia a un registro de conflict-groups.jsonl: el grupo tiene ficha propia para poder decir en qué consiste el desacuerdo."
     },
     "superseded_by": {
       "oneOf": [

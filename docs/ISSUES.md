@@ -94,8 +94,8 @@ Valores previstos para `issue_type`: `schema_inconsistency`, `documentation_ambi
 | `ISSUE-000033` | WARNING | `documentation_ambiguity` | §16.2 no asigna fichero JSONL ni a `TIME-` ni a las vistas — **resuelta** | — |
 | `ISSUE-000034` | WARNING | `documentation_ambiguity` | Cuatro `entity_type` sin prefijo consolidado en §16.3 — **resuelta** | — |
 | `ISSUE-000035` | WARNING | `schema_inconsistency` | `Occurrence` viaja por `entity.json`, que es delgada y no admite tiempo ni lugar — **resuelta** | — |
-| `ISSUE-000036` | WARNING | `documentation_ambiguity` | `conflict_group_ids` son cadenas libres, no identificadores opacos | Fase 5 |
-| `ISSUE-000037` | INFO | `content_gap` | El eje `acceptance` no tiene valor para «ya no la sostiene nadie» | Fase 4 |
+| `ISSUE-000036` | WARNING | `documentation_ambiguity` | `conflict_group_ids` son cadenas libres, no identificadores opacos — **resuelta** por `DEC-055` | — |
+| `ISSUE-000037` | INFO | `content_gap` | El eje `acceptance` no tiene valor para «ya no la sostiene nadie» — **resuelta** por `DEC-054` | — |
 | `ISSUE-000038` | INFO | `schema_inconsistency` | `game-projection.json` no cubre «efectos» ni «condiciones de aparición» de §6.8 — **resuelta** | — |
 
 ---
@@ -782,4 +782,40 @@ que describe un hueco de procedencia de ese mismo material.
 Decisión del dueño del proyecto, 10 de agosto de 2026. `OPEN-016` —el corte
 bibliográfico de `ISSUE-000013`— **no** se formaliza todavía: la auditoría del
 corredor sigue abierta y el corte podría moverse.
+
+### `ISSUE-000036` · Grupos de conflicto — **resuelta** por `DEC-055`
+
+Pasan a registro con identificador opaco: `CONFLICT-000001` en
+`conflict-groups.jsonl`, con nombre, descripción y ámbito.
+
+La cuestión decía que eran cadenas fuera del sistema de identidad y sin
+comprobación referencial. La deriva ya había empezado: los dos únicos fixtures
+del proyecto usaban convenciones distintas —`CONFLICT-EUKARYOTE-ROOT-2026-08` y
+`orden-relativo-de-la-integracion-mitocondrial`— para el mismo mecanismo. Con
+dos ejemplos bastó para demostrar el problema que la cuestión anticipaba.
+
+Se decidió en la Fase 1 y no en la 5, que era donde bloqueaba, porque el coste
+de decidirlo ahora es un fichero y una migración, y el de decidirlo después
+habría sido convertir todos los grupos que la Fase 5 hubiera acumulado.
+
+Lo que el registro añade y la cadena no podía: **decir en qué consiste el
+desacuerdo**. §15.2.1 lo argumenta. El validador comprueba que todo grupo citado
+exista, avisa de los que sólo cita una hipótesis —un conflicto necesita dos que
+se excluyan— y de los declarados que nadie usa.
+
+### `ISSUE-000037` · Aceptación de lo abandonado — **resuelta** por `DEC-054`
+
+El eje `acceptance` gana `abandoned`. Cero apoyo actual es un hecho de
+recepción, que es lo que ese eje mide.
+
+La alternativa era expresarlo con `historical_status: rejected`, y se descartó
+por lo que la propia cuestión señalaba: acopla dos ejes que §10 declara
+independientes. Una idea puede estar rechazada por el consenso y conservar
+defensores, y puede quedarse sin defensores sin que nadie la haya rechazado
+formalmente. Con un solo eje esas dos situaciones se vuelven indistinguibles.
+
+Ningún registro escrito bajo el esquema 1.0.0 deja de validar: es un valor nuevo
+en una enumeración. La migración está en `schemas/migrations/1.0.0-a-1.1.0.md`.
+
+Decisiones del dueño del proyecto, 10 de agosto de 2026.
 

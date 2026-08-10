@@ -65,6 +65,7 @@ SCHEMA_BY_FILE = {
     "temporal-expressions.jsonl": "temporal-expression.json",
     "classification-views.jsonl": "classification-view.json",
     "phylogenetic-views.jsonl": "phylogenetic-view.json",
+    "conflict-groups.jsonl": "conflict-group.json",
 }
 
 # Orden canónico de §19.2. Las familias se cargan desde families/.

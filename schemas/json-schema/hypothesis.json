@@ -82,10 +82,9 @@
     "conflict_group_ids": {
       "type": "array",
       "items": {
-        "type": "string",
-        "minLength": 1
+        "$ref": "common.json#/$defs/conflict_group_id"
       },
-      "description": "Grupos de afirmaciones o hipótesis mutuamente excluyentes (§15.2). Son cadenas y NO identificadores opacos: volverlos opacos exigiría darles tipo de registro propio, porque un campo '_ids' obliga a integridad referencial. Decisión de Fase 5 — ver ISSUE-000036."
+      "description": "Grupos de hipótesis mutuamente excluyentes a los que pertenece (§15.2). Identificadores opacos con integridad referencial: cada uno debe existir en conflict-groups.jsonl. Antes eran cadenas libres y derivaron —dos fixtures usaban convenciones distintas—; ISSUE-000036."
     },
     "open_question_issue_ids": {
       "type": "array",

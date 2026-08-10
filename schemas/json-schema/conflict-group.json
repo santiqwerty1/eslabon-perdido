@@ -1,0 +1,55 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://eslabon-perdido.local/schemas/conflict-group.json",
+  "title": "ConflictGroup",
+  "description": "Desacuerdo declarado entre hipótesis que no pueden sostenerse a la vez (§15.2). Existe como registro para que el conflicto se pueda nombrar y describir: saber que H01 y H02 chocan vale poco si no se dice en qué. Es además lo que impide dibujar dos topologías incompatibles en la misma vista (§20.3).",
+  "type": "object",
+  "properties": {
+    "id": {
+      "$ref": "common.json#/$defs/conflict_group_id"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Nombre legible del desacuerdo, p. ej. «raíz de Eukaryota»."
+    },
+    "description": {
+      "type": "string",
+      "minLength": 1,
+      "description": "En qué consiste el desacuerdo y por qué las hipótesis se excluyen."
+    },
+    "scope": {
+      "type": "string",
+      "enum": [
+        "topology",
+        "timing",
+        "mechanism",
+        "identity",
+        "other"
+      ],
+      "description": "Sobre qué versa el desacuerdo. No es una jerarquía: son clases."
+    },
+    "provenance": {
+      "$ref": "common.json#/$defs/provenance"
+    },
+    "issue_ids": {
+      "type": "array",
+      "items": {
+        "$ref": "common.json#/$defs/issue_id"
+      }
+    },
+    "notes": {
+      "$ref": "common.json#/$defs/notes"
+    },
+    "record_status": {
+      "$ref": "common.json#/$defs/record_status"
+    }
+  },
+  "required": [
+    "id",
+    "name",
+    "description",
+    "record_status"
+  ],
+  "additionalProperties": false
+}

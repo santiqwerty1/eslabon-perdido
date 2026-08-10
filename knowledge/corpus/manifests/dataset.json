@@ -1,8 +1,8 @@
 {
   "guide_version": "1.1.0",
-  "schema_version": "1.0.0",
+  "schema_version": "1.1.0",
   "dataset_revision": "REV-000000",
-  "snapshot_id": "SNAP-000008",
+  "snapshot_id": "SNAP-000009",
   "active_campaign": "CAMP-000001",
   "campaign_status": "planning",
   "counts": {
@@ -21,7 +21,7 @@
     "active": {
       "path": "docs/GUIDE.md",
       "version": "1.1.0",
-      "content_hash": "sha256:eb8079cd28fadb7bc15c7421f2d6e4f7ef44017e3a379f848e120913cd448c4a"
+      "content_hash": "sha256:35ea8e114a3288d5fa9a6e35a10540c18c1b253665b27a691d16ae4aca53b864"
     },
     "archived": [
       {

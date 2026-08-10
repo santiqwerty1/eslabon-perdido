@@ -426,6 +426,42 @@ def _check_evidence_direction(
 
 # --- entrada ----------------------------------------------------------------
 
+def _check_conflict_groups(hyps, data, rep) -> None:
+    """Todo grupo de conflicto citado tiene que existir, y servir para algo.
+
+    Antes eran cadenas libres y derivaron solas: dos fixtures llegaron a usar
+    convenciones distintas para el mismo mecanismo. Con identificador opaco hay
+    integridad referencial, y con registro propio hay un sitio donde decir en
+    qué consiste el desacuerdo — saber que dos hipótesis chocan vale poco si no
+    se dice en qué (ISSUE-000036).
+    """
+    grupos = {r["id"] for r in _by_prefix(data, "CONFLICT")}
+    usados: dict[str, list[str]] = {}
+    for h in hyps:
+        for g in h.get("conflict_group_ids") or []:
+            usados.setdefault(g, []).append(h["id"])
+
+    for g, quienes in sorted(usados.items()):
+        if g not in grupos:
+            rep.error(
+                f"hipótesis: {', '.join(sorted(quienes))} cita el grupo de conflicto {g}, "
+                f"que no existe en conflict-groups.jsonl (§15.2)"
+            )
+        elif len(quienes) < 2:
+            # Un grupo con un solo miembro no excluye nada: o falta la rival, o
+            # el grupo sobra. Aviso, no error: puede estar a medio construir.
+            rep.warn(
+                f"hipótesis: el grupo de conflicto {g} sólo lo cita {quienes[0]}; "
+                f"un conflicto necesita al menos dos hipótesis que se excluyan (§15.2)"
+            )
+
+    for g in sorted(grupos - set(usados)):
+        rep.warn(
+            f"hipótesis: el grupo de conflicto {g} está declarado y ninguna hipótesis "
+            f"lo cita"
+        )
+
+
 def check(data: dict[str, list[dict]], rep) -> None:
     index = _index(data)
     claims = _by_prefix(data, CLAIM)
@@ -449,3 +485,4 @@ def check(data: dict[str, list[dict]], rep) -> None:
     _check_scope_coherence(claims, hyps, rep)
     _check_view_mixing(views, hyps, index, rep)
     _check_evidence_links(hyps, index, rep)
+    _check_conflict_groups(hyps, data, rep)
