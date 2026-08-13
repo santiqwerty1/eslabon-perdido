@@ -1,6 +1,29 @@
 # Encargo de seguimiento sobre el corredor Eukaryota → Holozoa
 
-Ejecuta lo que sigue sobre el corpus que ya entregaste. **No es una revisión ni una reescritura**: son cuatro adiciones acotadas. Todo lo que ya está entregado se queda como está, salvo donde digo lo contrario.
+**Este encargo llega con la investigación todavía abierta, a propósito.** Tres de
+sus puntos son mucho más baratos si los aplicas mientras escribes que si hay que
+retocarlos después sobre mil novecientas filas; por eso no espero al cierre.
+
+**No es una revisión ni una reescritura.** Lo que ya entregaste se queda como
+está salvo donde digo lo contrario, y **no hay que parar a retroalimentar el
+material anterior**: basta con que lo nuevo salga ya con la forma buena.
+
+## Qué aplicar desde hoy y qué dejar para el cierre
+
+| | Punto | Cuándo |
+|---|---|---|
+| 🟢 | **7.a · formato de los localizadores** | **desde la próxima cita que escribas** |
+| 🟢 | **7.b · preferir fuentes accesibles a igualdad de calidad** | **desde la próxima fuente que elijas** |
+| 🟢 | **3 · definir cada predicado nuevo al inventarlo** | **desde el próximo predicado** |
+| ⚪ | 5 · completar los localizadores que ya existen | al cerrar |
+| ⚪ | 1 · regenerar manifiesto y apéndice H | al cerrar, cuando no entren más filas |
+| ⚪ | 2 · las siete filas del apéndice G | al cerrar |
+| ⚪ | 4 · repaso del eje de aceptación | al cerrar |
+| ⚪ | 6 · las tres discrepancias de recuento | al cerrar |
+
+Los tres verdes no piden trabajo extra: piden **escribir distinto de aquí en
+adelante**. Los blancos son pasadas de cierre y no tienen sentido hasta que el
+corpus deje de crecer.
 
 Antes de nada, dos cosas que hiciste bien y que **no** quiero que cambies:
 
