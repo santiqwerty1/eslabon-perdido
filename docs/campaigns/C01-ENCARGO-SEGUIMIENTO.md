@@ -25,6 +25,11 @@ Los tres verdes no piden trabajo extra: piden **escribir distinto de aquí en
 adelante**. Los blancos son pasadas de cierre y no tienen sentido hasta que el
 corpus deje de crecer.
 
+Los tres verdes se enviaron el **12 de agosto de 2026** como aviso aparte, y ese
+envío queda registrado en `C01-AVISO-EN-CURSO.md`. Ese fichero es una copia
+fechada de lo que se mandó y **no se actualiza**: si algo cambia, se corrige aquí
+y se envía un aviso nuevo.
+
 Antes de nada, dos cosas que hiciste bien y que **no** quiero que cambies:
 
 - **Las búsquedas negativas etiquetadas `NO LOCALIZADO EN ESTA SESIÓN` son un resultado, no una tarea pendiente.** No las rellenes. Un hueco declarado me sirve; una respuesta rellenada me estropea lo que construya encima.

@@ -1,8 +1,14 @@
-# Aviso para aplicar desde ya · corredor Eukaryota → Holozoa
+# Aviso enviado al investigador · 12 de agosto de 2026
 
-Versión corta y pegable del encargo de seguimiento, con **sólo lo que conviene
-aplicar mientras la investigación sigue abierta**. El documento completo, con
-las pasadas de cierre, es `C01-ENCARGO-SEGUIMIENTO.md`.
+**Qué es este fichero.** El registro de lo que se le pidió al investigador con la
+investigación aún en curso, tal como se le envió. No es un documento vivo: no se
+edita para mantenerlo al día. Si lo que se pide cambia, se envía otro aviso y se
+guarda también, porque lo que importa aquí es **qué se pidió y cuándo** — cuando
+el corpus cambie de forma, esta fecha explicará por qué.
+
+**Dónde está lo vivo.** `C01-ENCARGO-SEGUIMIENTO.md` es el encargo completo y la
+única fuente de verdad sobre lo que falta. Esto es un extracto suyo con los tres
+puntos aplicables a mitad de vuelo.
 
 ---
 
