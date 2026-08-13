@@ -135,6 +135,76 @@ falta citarlas en las afirmaciones que las usaron?
 
 ---
 
+## 7. Antes de cerrar: dos cosas que sólo se saben ahora
+
+Estos dos hallazgos salieron de descargar las fuentes y extraer los pasajes, así
+que no existían cuando se escribió el encargo original. Los dos son **mucho más
+baratos de aplicar mientras escribes que de arreglar después**, y por eso llegan
+ahora y no al final.
+
+### 7.a. Qué formatos de localizador se pueden verificar y cuáles no
+
+Con el texto completo de 286 fuentes se pudo medir, sobre 1 149 localizadores,
+cuáles permiten recortar automáticamente el pasaje que citan:
+
+| Forma del localizador | Casos | Resuelve |
+|---|---:|---:|
+| nombre de apartado — «resumen», «resultados», «discusión» | 507 | **89 %** |
+| puntero semántico — «clasificación», «filogenia» | 123 | **78 %** |
+| sección con § | 32 | 46 % |
+| **sólo la clave, sin nada más** | 232 | **0 %** |
+| **figura** | 138 | **0 %** |
+| **tabla** | 49 | **0 %** |
+| **página** | 31 | **0 %** |
+| **número de línea** | 37 | **0 %** |
+
+El resultado es contraintuitivo y conviene leerlo dos veces: **los localizadores
+que parecen más precisos son los que menos sirven para verificar**. «Líneas
+318–321» resuelve el 0 % de las veces, porque el texto completo llega en XML
+JATS y **el XML no conserva la maquetación impresa**: no hay líneas ni páginas
+que contar. En cambio el humilde «resumen» resuelve el 89 %.
+
+Eso no significa que las líneas sobren: a una persona con el PDF delante le
+sirven, y son la forma más exacta de señalar. Significa que **no deben ir
+solas**.
+
+**Lo que se pide, y es barato si se hace al escribir:** que cada cita lleve
+siempre el **nombre del apartado**, y que la línea, la página o la figura vayan
+**además**, no en su lugar. «S56 discusión, líneas 318–321» se verifica sola y
+sigue siendo igual de precisa para quien lee. «S56 líneas 318–321» obliga a
+abrir el PDF a mano cada vez.
+
+Las figuras y las tablas son un caso aparte y legítimo: si una afirmación
+descansa en una figura, ningún texto la sostiene y siempre hará falta un ojo
+humano. Sólo conviene que, **cuando el texto también lo diga**, se cite también
+el apartado, para que la comprobación automática pueda al menos acompañar.
+
+### 7.b. Qué parte del corpus no puede verificar nadie hoy
+
+De las 523 fuentes del apéndice A, **286 tienen texto completo accesible y 237
+no**. Y eso se traslada a las afirmaciones:
+
+- **501 afirmaciones de 1 813 (27 %) no tienen accesible ninguna de sus
+  fuentes.**
+- De ellas, **409 dependen además de una sola fuente**, que tampoco es accesible.
+
+Esas 409 son hoy **inverificables por cualquiera**: ni por ti, ni por un
+revisor, ni por un lector futuro. No están mal —nada indica que sean falsas—
+pero nadie puede comprobarlas sin conseguir el artículo por otra vía.
+
+**Lo que se pide es una regla de desempate, no un cambio de criterio.** Cuando
+dos fuentes sostengan lo mismo con calidad científica equivalente, cita la
+accesible. Cuando no lo sean, **manda la ciencia**: una fuente cerrada y buena
+vale más que una abierta y mediocre, y esta petición no autoriza a rebajar
+calidad por comodidad.
+
+Y donde una afirmación quede con una sola fuente cerrada, ayuda mucho añadir
+**una segunda fuente accesible que la corrobore**, aunque sea secundaria. No
+sustituye a la primera: hace que la afirmación deje de ser un callejón sin
+salida para quien quiera comprobarla.
+
+---
+
 ## Formato
 
 El mismo de siempre: CSV canónico en `data/`, columnas en el orden fijado, vocabularios cerrados, `exports/` regenerado. La sección nueva del punto 2 entra como fichero de sección más filas en los apéndices que le correspondan.
