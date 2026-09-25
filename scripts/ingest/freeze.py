@@ -49,6 +49,7 @@ import csv
 import hashlib
 import io
 import json
+import os
 import re
 import subprocess
 import sys
@@ -147,8 +148,17 @@ def ficheros(base: Path) -> list[dict]:
         raise SystemExit(f"ERROR {base} no parece el corpus: falta {', '.join(faltan)}/")
     salida = []
     for capa in CAPA_CANONICA:
-        for p in sorted((base / capa).rglob("*")):
-            if p.is_file():
+        # Un enlace simbólico se hashearía por lo que hay al otro lado, que
+        # puede cambiar sin que cambie el commit, o no existir en otra copia.
+        # Una huella así no se reproduce: se rechaza.
+        for dirpath, dirnames, filenames in os.walk(base / capa, followlinks=False):
+            for nombre in (*dirnames, *filenames):
+                if (Path(dirpath) / nombre).is_symlink() or (base / capa).is_symlink():
+                    ruta = (Path(dirpath) / nombre).relative_to(base).as_posix()
+                    raise SystemExit(f"ERROR {ruta} es un enlace simbólico dentro de la capa "
+                                     "canónica: la huella no puede depender de a dónde apunte")
+            for nombre in filenames:
+                p = Path(dirpath) / nombre
                 datos = p.read_bytes()
                 salida.append({
                     "path": p.relative_to(base).as_posix(),
@@ -385,6 +395,11 @@ def comparar_afirmaciones(a: Path, b: Path) -> dict:
     viejas, nuevas = leer_afirmaciones(a), leer_afirmaciones(b)
     pares, retiradas, anadidas = emparejar(viejas, nuevas)
     mapa = {i: j for i, j, _ in pares}
+    # Una cita a una afirmación retirada ya no apunta a nada, o apunta a otra
+    # si su número lo ocupa ahora una fila renumerada. Se traduce a una forma
+    # que no coincide con ningún número, para que nunca pase por igual.
+    for i in retiradas:
+        mapa[i] = f"{i}[retirada]"
 
     sin_cambios, renumeradas, modificadas = 0, [], []
     afectadas: dict[str, Counter] = defaultdict(Counter)
@@ -499,17 +514,49 @@ def cmd_diff(args) -> int:
             registros[f"{carpeta}/{nombre}"] = comparar_registro(
                 a.base / carpeta / nombre, b.base / carpeta / nombre, af["mapa"])
 
+    # Un fichero idéntico byte a byte también puede haber cambiado de sentido:
+    # si cita C-0412 y C-0412 se renumeró, su cita apunta ahora a otra fila.
+    # Cuando el mapa mueve algo, se revisan todos los que citan.
+    desfasados: set[str] = set()
+    if any(i != j for i, j in af["mapa"].items()):
+        for ruta in sorted(fa.keys() & fb.keys()):
+            if ruta in tocados or ruta.startswith(AFIRMACIONES + "/"):
+                continue
+            texto = (a.base / ruta).read_text(encoding="utf-8", errors="replace")
+            if C_REF.search(texto) and traducir(texto, af["mapa"]) != texto:
+                desfasados.add(ruta)
+    tocados |= desfasados
+    for carpeta in REGISTROS:
+        for ruta in sorted(desfasados):
+            if ruta.startswith(carpeta + "/") and ruta.endswith(".csv"):
+                registros[ruta] = comparar_registro(a.base / ruta, b.base / ruta, af["mapa"])
+
     def estado(ruta: str) -> str:
         if ruta in nuevos:
             return "nuevo"
         if ruta in retirados:
             return "retirado"
+        if ruta in desfasados:
+            return "citas desactualizadas"
         antes = (a.base / ruta).read_text(encoding="utf-8", errors="replace")
         despues = (b.base / ruta).read_text(encoding="utf-8", errors="replace")
         return "sólo renumeración" if traducir(antes, af["mapa"]) == despues else "cambiado"
 
     def en(prefijo: str) -> list[dict]:
         return [{"path": p, "estado": estado(p)} for p in sorted(tocados) if p.startswith(prefijo + "/")]
+
+    # La sección se ingiere con su prosa y sus tablas, no sólo con sus filas:
+    # un cambio sólo de prosa también la manda a reingerir.
+    prosa, tablas = en(PROSA), en(TABLAS)
+    afectadas = af["secciones_afectadas"]
+    for lista, clave, seccion in ((prosa, "prosa", lambda r: [s for s in Path(r).name.split("-")[1:2] if s.isdigit()]),
+                                  (tablas, "tablas", lambda r: Path(r).parts[2:3])):
+        for x in lista:
+            sec = seccion(x["path"])
+            if x["estado"] != "sólo renumeración" and sec:
+                afectadas.setdefault(sec[0], {})
+                afectadas[sec[0]][clave] = afectadas[sec[0]].get(clave, 0) + 1
+    af["secciones_afectadas"] = dict(sorted(afectadas.items()))
 
     conocidas = (AFIRMACIONES, *REGISTROS, PROSA, TABLAS)
     informe = {
@@ -518,8 +565,8 @@ def cmd_diff(args) -> int:
         "ficheros": {"cambiados": cambiados, "nuevos": nuevos, "retirados": retirados},
         "afirmaciones": {k: v for k, v in af.items() if k != "mapa"},
         "registros": registros,
-        "prosa": en(PROSA),
-        "tablas_de_sintesis": en(TABLAS),
+        "prosa": prosa,
+        "tablas_de_sintesis": tablas,
         "otros": [{"path": p, "estado": estado(p)} for p in sorted(tocados)
                   if not any(p.startswith(c + "/") for c in conocidas)],
     }
