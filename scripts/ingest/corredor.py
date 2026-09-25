@@ -139,10 +139,12 @@ def ficheros_de_seccion(raiz: Path, sec: str) -> tuple[Path, Path]:
 
 
 def ya_ingerida(sec: str) -> str | None:
-    revertidos = {d for d, a in base.ultima_accion().items() if a == "revertir"}
+    # Un delta revertido también cuenta. Revertir deshace sus operaciones sobre
+    # los registros, pero la sección, sus pasajes, la copia del registro y el
+    # informe siguen en su sitio; ingerirla otra vez daría un SEC nuevo con los
+    # mismos pasajes duplicados. `revision_siguiente` sí lo salta: nada se
+    # encadena detrás de un delta revertido.
     for p in sorted(base.DELTAS.glob("*.json")):
-        if p.name in revertidos:
-            continue
         try:
             origen = json.loads(p.read_text(encoding="utf-8")).get("corpus_origin") or {}
         except json.JSONDecodeError:
@@ -186,8 +188,22 @@ def construir(spec: str, seccion: str, ruta_congelacion: Path | None = None) -> 
     if conformidad.errores:
         raise SystemExit("ERROR el corpus no pasa la conformidad (parse_research.py): "
                          + "; ".join(conformidad.errores[:5]))
+    # El formato de investigación no fija los nombres de las columnas de B; el
+    # corredor sí, y con ellos se asigna cada entidad a su sección. Si faltan,
+    # ninguna entidad caería en ninguna sección y el contraste saldría 0 = 0.
+    faltan_b = [c for c in ("etiqueta preferida", COL_PRIMERA)
+                if datos["entities"] and c not in datos["entities"][0]]
+    if faltan_b:
+        raise SystemExit("ERROR el apéndice B no tiene la columna "
+                         + " ni la ".join(f"«{c}»" for c in faltan_b))
 
     previa = ya_ingerida(sec)
+    if previa and base.ultima_accion().get(previa) == "revertir":
+        sid = Path(previa).stem
+        raise SystemExit(
+            f"ERROR la sección {sec} ya se ingirió ({previa}) y su delta se revirtió. Sus ficheros "
+            f"siguen ahí: vuelve a aplicarlo con delta.py, o retira antes knowledge/corpus/sections/{sid}.*, "
+            f"knowledge/corpus/passages/{sid}.json, knowledge/deltas/{previa} y generated/reports/{sid}.md")
     if previa:
         raise SystemExit(f"ERROR la sección {sec} ya se ingirió ({previa}). Una versión nueva entra "
                          "por diferencia, no ingiriendo otra vez (INGESTION-C01.md)")

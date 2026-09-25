@@ -284,6 +284,33 @@ class Congelacion(unittest.TestCase):
         with self.assertRaises(SystemExit):
             freeze.ficheros(c)
 
+    def test_una_capa_que_es_un_enlace_a_un_directorio_vacio_se_rechaza(self):
+        c = self.tmp / "c"
+        (c / "docs" / "secciones").mkdir(parents=True)
+        (c / "docs" / "secciones" / "001-00-0-prosa.md").write_text("Prosa.\n", encoding="utf-8")
+        (self.tmp / "vacio").mkdir()
+        (c / "data").symlink_to(self.tmp / "vacio")
+        with self.assertRaises(SystemExit):
+            freeze.ficheros(c)
+
+    def test_el_snapshot_registra_el_historial_y_las_copias_del_registro(self):
+        spec = importlib.util.spec_from_file_location("snapshot", ROOT / "scripts" / "snapshot" / "snapshot.py")
+        snapshot = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(snapshot)
+        snapshot.ROOT = self.tmp
+        snapshot.RECORDS = self.tmp / "knowledge" / "records"
+        snapshot.VIEW_DIR = self.tmp / "knowledge" / "views"
+        snapshot.MANIFEST = self.tmp / "knowledge" / "corpus" / "manifests" / "dataset.json"
+        snapshot.MANIFEST.parent.mkdir(parents=True)
+        snapshot.MANIFEST.write_text("{}", encoding="utf-8")
+        (self.tmp / "knowledge" / "corpus" / "sections").mkdir(parents=True)
+        (self.tmp / "knowledge" / "corpus" / "sections" / "SEC-000001.registro.csv").write_text("x\n", encoding="utf-8")
+        (self.tmp / "knowledge" / "deltas").mkdir(parents=True)
+        (self.tmp / "knowledge" / "deltas" / "historial.jsonl").write_text("{}\n", encoding="utf-8")
+        ficheros = snapshot.gather()["files"]
+        self.assertIn("knowledge/corpus/sections/SEC-000001.registro.csv", ficheros)
+        self.assertIn("knowledge/deltas/historial.jsonl", ficheros)
+
     def test_el_snapshot_cubre_la_congelacion_activa(self):
         spec = importlib.util.spec_from_file_location("snapshot", ROOT / "scripts" / "snapshot" / "snapshot.py")
         snapshot = importlib.util.module_from_spec(spec)
