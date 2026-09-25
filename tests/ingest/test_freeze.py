@@ -207,6 +207,12 @@ class Registros(unittest.TestCase):
         r = freeze.comparar_registro(a, b, {})
         self.assertTrue(r["cabecera_cambiada"])
 
+    def test_una_fila_mas_ancha_que_su_cabecera_aborta(self):
+        p = self.tmp / "a.csv"
+        p.write_text('"clave","valor"\n"X","1","sobra"\n', encoding="utf-8")
+        with self.assertRaises(SystemExit):
+            freeze.leer_csv(p)
+
     def test_sin_clave_unica_nunca_da_recuentos_negativos(self):
         cab = ["magnitud", "#"]
         filas = [["m", "C-001"], ["m", "C-001"]]

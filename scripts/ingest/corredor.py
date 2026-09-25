@@ -53,19 +53,24 @@ MARCADOR = re.compile(r"<!--\s*TABLE:([^\s>]+)\s*-->")
 COL_PRIMERA = "# de la fila del registro donde aparece por primera vez"
 
 
-def cid(n: int) -> str:
-    return f"C-{n:03d}"
-
-
 def citas(texto: str) -> set[str]:
+    """Las claves `C-…` que cita un texto, con rangos expandidos.
+
+    Se conserva la forma del propio corpus: `C-0412` sigue siendo `C-0412`. Un
+    rango se expande con el ancho de su primer extremo, que es el que usa el
+    corpus para esos números; al pasar de 999 a 1000 el ancho crece solo.
+    """
     salida: set[str] = set()
     for m in CITA.finditer(texto):
-        a = int(m.group(1))
-        b = int(m.group(2)) if m.group(2) else a
+        ta, tb = m.group(1), m.group(2)
+        if not tb:
+            salida.add(f"C-{ta}")
+            continue
+        a, b, ancho = int(ta), int(tb), len(ta)
         if b < a or b - a > RANGO_MAX:
-            salida.update({cid(a), cid(b)})
+            salida.update({f"C-{ta}", f"C-{tb}"})
         else:
-            salida.update(cid(n) for n in range(a, b + 1))
+            salida.update(f"C-{n:0{ancho}d}" for n in range(a, b + 1))
     return salida
 
 
@@ -221,11 +226,11 @@ def construir(spec: str, seccion: str, ruta_congelacion: Path | None = None) -> 
             "id": pid, "section_id": sec_id, "ordinal": n, "text": cuerpo,
             "character_offsets": {"start": ini, "end": fin}, "record_status": "active",
         })
-        marcas = MARCADOR.findall(cuerpo)
-        for tid in marcas:
+        for tid in MARCADOR.findall(cuerpo):
             por_marcador[tid] = pid
-        if not marcas:
-            citadas[pid] = citas(cuerpo)
+        # Un párrafo con marcador también puede tener prosa que cite: sus citas
+        # cuentan igual. El marcador en sí no lleva ninguna clave C-….
+        citadas[pid] = citas(cuerpo)
     pasaje = {p["id"]: p for p in pasajes}
 
     congelados = {f["path"] for f in congelada["files"]}
@@ -244,8 +249,13 @@ def construir(spec: str, seccion: str, ruta_congelacion: Path | None = None) -> 
                              "fichero de la versión congelada")
         return ruta
 
-    indice = {t["id"]: t for t in json.loads(
-        (src.base / "data" / "table_index.json").read_text(encoding="utf-8"))["tables"]}
+    entradas = json.loads((src.base / "data" / "table_index.json").read_text(encoding="utf-8"))["tables"]
+    repetidos = sorted({e["id"] for e in entradas if sum(1 for x in entradas if x["id"] == e["id"]) > 1})
+    if repetidos:
+        # Con un id repetido, un marcador se resolvería contra la última entrada
+        # sin que nadie lo decidiera.
+        raise SystemExit(f"ERROR data/table_index.json repite identificadores: {', '.join(repetidos)}")
+    indice = {t["id"]: t for t in entradas}
     # Un marcador que el índice no conoce haría caer sus filas en «sólo el
     # registro» sin aviso: la procedencia cambiaría por un índice incompleto.
     sin_indice = sorted(tid for tid in por_marcador if tid not in indice)

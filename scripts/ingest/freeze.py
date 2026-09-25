@@ -280,7 +280,13 @@ def leer_csv(p: Path) -> tuple[list[str], list[dict]]:
     if not filas:
         return [], []
     cab = filas[0]
-    return cab, [dict(zip(cab, (f + [""] * len(cab))[: len(cab)])) for f in filas[1:]]
+    # Una fila más ancha o más estrecha que su cabecera no se recorta ni se
+    # rellena: recortarla haría que un cambio real en las celdas sobrantes
+    # pasara por «sin cambios».
+    for n, f in enumerate(filas[1:], 2):
+        if f and len(f) != len(cab):
+            raise SystemExit(f"ERROR {p}: la línea {n} tiene {len(f)} celdas y la cabecera {len(cab)}")
+    return cab, [dict(zip(cab, f)) for f in filas[1:] if f]
 
 
 def leer_afirmaciones(base: Path) -> dict[str, tuple[str, dict]]:
