@@ -176,7 +176,17 @@ def main() -> int:
             print(f"  {marca}  congelar v1: verify la reconoce y rechaza v2")
             if not bien:
                 fallos.append("corpus-versions: create/verify")
-        total_ver = 2
+
+        # Los bordes: filas que un diff equivocado haría desaparecer sin aviso.
+        bordes = subprocess.run([sys.executable, str(ROOT / "tests" / "ingest" / "test_freeze.py")],
+                                capture_output=True, text=True)
+        resumen = (bordes.stderr.strip().splitlines() or ["?"])[-1]
+        marca = f"{GREEN}PASA{RESET}" if bordes.returncode == 0 else f"{RED}FALLA{RESET}"
+        print(f"  {marca}  casos límite de freeze.py  {DIM}({resumen}){RESET}")
+        if bordes.returncode != 0:
+            fallos.append("corpus-versions: casos límite")
+            print(bordes.stderr[-2000:])
+        total_ver = 3
 
     total = len(ordinarios) + len(ok_cases) + len(bad_cases) + total_fmt + total_ver
     print(f"\n{total} casos · {len(fallos)} fallos · {avisos} advertencias acumuladas")
