@@ -240,6 +240,47 @@ class Barreras(unittest.TestCase):
         self.assertIn("fingerprint", str(e.exception))
 
 
+    def test_un_identificador_repetido_en_el_indice_se_rechaza(self):
+        otra = self.tmp / "otra"
+        shutil.copytree(MINI, otra)
+        indice = json.loads((otra / "data" / "table_index.json").read_text(encoding="utf-8"))
+        indice["tables"].append(dict(indice["tables"][1]))
+        (otra / "data" / "table_index.json").write_text(json.dumps(indice), encoding="utf-8")
+        congelacion = congelar(otra, self.tmp / "otra.json")
+        with self.assertRaises(SystemExit) as e:
+            corredor.construir(str(otra), "00", congelacion)
+        self.assertIn("repite identificadores", str(e.exception))
+
+    def test_un_parrafo_con_marcador_y_prosa_tambien_cita(self):
+        # C-005 no la cita nadie en el fixture; aquí la cita una frase que
+        # comparte párrafo con el marcador del registro.
+        otra = self.tmp / "otra"
+        shutil.copytree(MINI, otra)
+        prosa = otra / "docs" / "secciones" / "001-00-0-arranque.md"
+        prosa.write_text(prosa.read_text(encoding="utf-8").replace(
+            "<!-- TABLE:claims-00 -->", "Cierre del arranque. [C-005]\n<!-- TABLE:claims-00 -->"),
+            encoding="utf-8")
+        r = corredor.construir(str(otra), "00", congelar(otra, self.tmp / "otra.json"))
+        self.assertEqual(r["delta"]["corpus_origin"]["rows"]["C-005"]["via"], "prosa")
+
+    def test_una_fila_mas_ancha_que_su_cabecera_no_pasa_la_conformidad(self):
+        otra = self.tmp / "otra"
+        shutil.copytree(MINI, otra)
+        registro = otra / "data" / "afirmaciones" / "01.csv"
+        registro.write_text(registro.read_text(encoding="utf-8").rstrip("\n") + ',"sobra"\n', encoding="utf-8")
+        datos, h = parse(otra)
+        self.assertTrue(any("celdas" in e for e in h.errores))
+
+
+class Citas(unittest.TestCase):
+    def test_conserva_la_forma_del_corpus(self):
+        self.assertEqual(corredor.citas("[C-0412; C-0001–C-0003]"),
+                         {"C-0412", "C-0001", "C-0002", "C-0003"})
+
+    def test_un_rango_que_cruza_el_millar(self):
+        self.assertEqual(corredor.citas("C-998–C-1001"), {"C-998", "C-999", "C-1000", "C-1001"})
+
+
 class Localizar(unittest.TestCase):
     pasaje = {"text": "Se habla de fix-alfa aquí.", "character_offsets": {"start": 100, "end": 126}}
 

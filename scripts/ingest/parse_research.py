@@ -92,6 +92,8 @@ def _parse_repo(base: Path) -> tuple[dict, Hallazgos]:
     man = _json.loads((base / "manifest.json").read_text(encoding="utf-8"))
     trozos = [f"Fecha de corte bibliográfico: {man.get('fecha_de_corte_bibliografico', '')}", ""]
 
+    anchura: list[str] = []
+
     def volcar(f: Path) -> None:
         with f.open(encoding="utf-8", newline="") as fh:
             filas = list(csv.reader(fh))
@@ -101,7 +103,13 @@ def _parse_repo(base: Path) -> tuple[dict, Hallazgos]:
         limpia = lambda c: c.replace("|", "\\|").replace("\n", " ")
         trozos.append("| " + " | ".join(limpia(c) for c in cab) + " |")
         trozos.append("|" + "---|" * len(cab))
-        for fila in cuerpo:
+        for n, fila in enumerate(cuerpo, 2):
+            # Se ajusta para poder seguir leyendo, pero no en silencio: una fila
+            # con celdas de más perdería datos, y una con celdas de menos los
+            # desplazaría. Es un error de conformidad.
+            if len(fila) != len(cab):
+                anchura.append(f"{f.relative_to(base)}: la línea {n} tiene {len(fila)} celdas "
+                               f"y la cabecera {len(cab)}")
             fila = (fila + [""] * len(cab))[: len(cab)]
             trozos.append("| " + " | ".join(limpia(c) for c in fila) + " |")
         trozos.append("")
@@ -113,6 +121,8 @@ def _parse_repo(base: Path) -> tuple[dict, Hallazgos]:
         volcar(f)
 
     datos, h = _parse_texto("\n".join(trozos))
+    for e in anchura:
+        h.error(e)
     if not afirm:
         h.error(f"no hay ficheros de afirmaciones en {base}/data/afirmaciones/")
     datos["manifest"] = man
