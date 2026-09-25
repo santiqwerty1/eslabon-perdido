@@ -177,16 +177,24 @@ def main() -> int:
             if not bien:
                 fallos.append("corpus-versions: create/verify")
 
-        # Los bordes: filas que un diff equivocado haría desaparecer sin aviso.
-        bordes = subprocess.run([sys.executable, str(ROOT / "tests" / "ingest" / "test_freeze.py")],
-                                capture_output=True, text=True)
-        resumen = (bordes.stderr.strip().splitlines() or ["?"])[-1]
-        marca = f"{GREEN}PASA{RESET}" if bordes.returncode == 0 else f"{RED}FALLA{RESET}"
-        print(f"  {marca}  casos límite de freeze.py  {DIM}({resumen}){RESET}")
-        if bordes.returncode != 0:
-            fallos.append("corpus-versions: casos límite")
-            print(bordes.stderr[-2000:])
-        total_ver = 3
+        total_ver = 2
+
+    # --- pruebas de la ingestión ---------------------------------------------
+    # Los bordes del diff —filas que un diff equivocado haría desaparecer sin
+    # aviso— y la ingestión de una sección del corredor sobre corredor-mini.
+    pruebas = sorted((ROOT / "tests" / "ingest").glob("test_*.py"))
+    if pruebas:
+        import subprocess
+        print(f"\n{DIM}ingestión — congelación, diff y secciones del corredor{RESET}")
+        for prueba in pruebas:
+            r = subprocess.run([sys.executable, str(prueba)], capture_output=True, text=True)
+            resumen = (r.stderr.strip().splitlines() or ["?"])[-1]
+            marca = f"{GREEN}PASA{RESET}" if r.returncode == 0 else f"{RED}FALLA{RESET}"
+            print(f"  {marca}  {prueba.name}  {DIM}({resumen}){RESET}")
+            if r.returncode != 0:
+                fallos.append(f"ingest/{prueba.name}")
+                print(r.stderr[-3000:])
+        total_ver += len(pruebas)
 
     total = len(ordinarios) + len(ok_cases) + len(bad_cases) + total_fmt + total_ver
     print(f"\n{total} casos · {len(fallos)} fallos · {avisos} advertencias acumuladas")

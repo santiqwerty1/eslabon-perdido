@@ -1519,11 +1519,30 @@ def aplicar(revision: Path, mapa_path: Path, salida: Path) -> int:
 # Propuesta
 # --------------------------------------------------------------------------
 
-def proponer(documento: Path, salida: Path, corpus: Path | None, tope_edicion: int,
+def abrir_documento(spec: str):
+    """Un documento Markdown, o el corredor: su directorio o `directorio@ref`.
+
+    La identidad se resuelve sobre el corpus entero —la misma etiqueta en dos
+    secciones tiene que acabar en la misma entidad—, así que el corredor entra
+    completo. Su «hash de documento», que ata la revisión marcada al mapa, es la
+    huella de su capa canónica: la misma que fija la congelación (DEC-056).
+    Devuelve la ruta que se analiza, el hash y el objeto que mantiene viva la
+    extracción temporal de un commit.
+    """
+    directorio = spec.rpartition("@")[0] if "@" in spec else spec
+    if Path(directorio).is_dir():
+        import freeze
+        src = freeze.abrir(spec)
+        return src.base, freeze.huella(freeze.ficheros(src.base)), src
+    ruta = Path(spec)
+    return ruta, sha256(ruta.read_bytes()), None
+
+
+def proponer(spec: str, salida: Path, corpus: Path | None, tope_edicion: int,
              raiz: int, limite: int) -> int:
-    bruto = documento.read_bytes()
-    doc_hash = sha256(bruto)
-    datos, h = parse(documento)
+    ruta, doc_hash, _vivo = abrir_documento(spec)
+    datos, h = parse(ruta)
+    documento = Path(spec)  # para nombrarlo en el informe y en el mapa
 
     etiquetas, excluidas = inventario(datos, corpus)
     decisiones, unicas, suprimidos = construir_decisiones(etiquetas, tope_edicion, raiz)
@@ -1573,7 +1592,8 @@ def main() -> int:
     sub = ap.add_subparsers(dest="command", required=True)
 
     p = sub.add_parser("propose", help="agrupar por riesgo y emitir la revisión")
-    p.add_argument("document")
+    p.add_argument("document", help="documento Markdown, o el directorio del corredor "
+                                     "(o directorio@ref) entero")
     p.add_argument("--out", default=None, metavar="DIR",
                    help="por defecto generated/identity/<documento>/")
     p.add_argument("--corpus", default=None, metavar="DIR",
@@ -1596,7 +1616,7 @@ def main() -> int:
     args = ap.parse_args()
 
     if args.command == "propose":
-        doc = Path(args.document)
+        doc = Path(args.document.rpartition("@")[0] if "@" in args.document else args.document)
         if not doc.exists():
             print(f"ERROR no existe: {doc}")
             return 1
@@ -1605,7 +1625,7 @@ def main() -> int:
         if corpus is not None and not corpus.is_dir():
             print(f"ERROR no es un directorio: {corpus}")
             return 1
-        return proponer(doc, salida, corpus, args.edit_threshold,
+        return proponer(args.document, salida, corpus, args.edit_threshold,
                         args.root_prefix, args.context)
 
     revision, mapa = Path(args.review), Path(args.mapa)

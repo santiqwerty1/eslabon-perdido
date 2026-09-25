@@ -1,0 +1,6 @@
+"#","Afirmación","Sujeto","Predicado","Objeto","Atribución","Fuente","Aceptación","Fuerza","Motivo","Resolución","Vigencia"
+"C-001","FIX-Alfa es el grupo hermano de FIX-Beta.","FIX-Alfa","grupo_hermano_de","FIX-Beta","expresa","S01 resumen","no evaluado","media","Lo dice el resumen.","resuelta","vigente"
+"C-002","FIX-Gamma procede de FIX-Delta.","FIX-Gamma","desciende_de","FIX-Delta","expresa","S02 resultados","no evaluado","media","Lo dicen los resultados.","resuelta","vigente"
+"C-003","FIX-Gamma conserva un rasgo de FIX-Delta.","FIX-Gamma","posee_rasgo","rasgo heredado de FIX-Delta","expresa","S02 discusión","no evaluado","baja","Una sola fuente.","sin resolver","vigente"
+"C-004","El linaje de FIX-Epsilon tiene una edad estimada.","linaje de FIX-Epsilon","tiene_edad_estimada","n/a","expresa","S01 tabla 2","no evaluado","baja","Sólo en una tabla.","sin resolver","vigente"
+"C-005","FIX-Alfa y FIX-Gamma son el arranque del corredor.","FIX-Alfa","forma_con*","FIX-Gamma","sintesis(C-001; C-002)","n/a","no evaluado","media","Se sigue de C-001 y C-002.","resuelta","vigente"
