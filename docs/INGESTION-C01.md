@@ -135,6 +135,8 @@ Si algo salió mal:
 .venv/bin/python scripts/ingest/delta.py SEC-000001.json --revert
 ```
 
+`delta.py` anota cada aplicación y cada reversión en `knowledge/deltas/historial.jsonl`. El delta revertido se queda en `knowledge/deltas/` como constancia, y por el historial `ingest.py` sabe que no está pendiente: la ingestión siguiente no se encadena detrás de él y la sección se puede volver a ingerir. Sus identificadores siguen reservados.
+
 Si se ingiere otra sección antes de aplicar la anterior, su delta va detrás en la cadena de revisiones —el de la anterior lleva a `REV-000001`, el nuevo parte de ahí— y no reutiliza sus identificadores. `ingest.py` lo avisa. `delta.py` no comprueba el orden: hay que aplicarlos en el de la cadena.
 
 ## 8 · Cerrar la sección

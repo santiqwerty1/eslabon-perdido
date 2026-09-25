@@ -195,17 +195,37 @@ def revision_siguiente(manifiesto: dict) -> tuple[str, str, list[str]]:
     """
     num = lambda r: int(str(r).split("-")[1])
     actual = manifiesto.get("dataset_revision", "REV-000000")
+    revertidos = {d for d, a in ultima_accion().items() if a == "revertir"}
     antes, pendientes = actual, []
     for p in sorted(DELTAS.glob("*.json")):
+        if p.name in revertidos:
+            # Revertido a propósito: sigue ahí como constancia, pero nada nuevo
+            # se encadena detrás de él.
+            continue
         try:
             despues = json.loads(p.read_text(encoding="utf-8")).get("dataset_revision_after")
         except json.JSONDecodeError:
             continue
         if despues and num(despues) > num(actual):
             pendientes.append(p.name)
-        if despues and num(despues) > num(antes):
-            antes = despues
+            if num(despues) > num(antes):
+                antes = despues
     return antes, f"REV-{num(antes) + 1:06d}", pendientes
+
+
+def ultima_accion() -> dict[str, str]:
+    """Lo último que delta.py hizo con cada delta, según su historial."""
+    historial = DELTAS / "historial.jsonl"
+    estado: dict[str, str] = {}
+    if historial.exists():
+        for linea in historial.read_text(encoding="utf-8").splitlines():
+            if linea.strip():
+                try:
+                    e = json.loads(linea)
+                except json.JSONDecodeError:
+                    continue
+                estado[e.get("delta")] = e.get("accion")
+    return estado
 
 
 def siguiente_libre(prefijo: str, usados: set[str]) -> int:

@@ -139,7 +139,10 @@ def ficheros_de_seccion(raiz: Path, sec: str) -> tuple[Path, Path]:
 
 
 def ya_ingerida(sec: str) -> str | None:
+    revertidos = {d for d, a in base.ultima_accion().items() if a == "revertir"}
     for p in sorted(base.DELTAS.glob("*.json")):
+        if p.name in revertidos:
+            continue
         try:
             origen = json.loads(p.read_text(encoding="utf-8")).get("corpus_origin") or {}
         except json.JSONDecodeError:

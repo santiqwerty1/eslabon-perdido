@@ -17,12 +17,17 @@ from __future__ import annotations
 import argparse
 import json
 import sys
+from datetime import datetime, timezone
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 RECORDS = ROOT / "knowledge" / "records"
 DELTAS = ROOT / "knowledge" / "deltas"
 MANIFEST = ROOT / "knowledge" / "corpus" / "manifests" / "dataset.json"
+# Qué se aplicó y qué se revirtió, en orden. El delta revertido sigue en
+# knowledge/deltas/ como constancia, y sin esto no se distinguiría de uno que
+# nadie ha aplicado todavía. Sólo se añaden líneas.
+HISTORIAL = DELTAS / "historial.jsonl"
 
 # §16.4. El valor indica si la operación añade, modifica o marca.
 OPERATIONS = {
@@ -199,8 +204,18 @@ def cmd(path: Path, reverse: bool, dry: bool, full: bool = False) -> int:
     if not full and len(diario) > TOPE_LISTADO:
         print(f"    … y {len(diario) - TOPE_LISTADO} más (--full para verlas todas)")
     bump_revision(delta, reverse)
+    registrar(path.name, "revertir" if reverse else "aplicar",
+              delta["dataset_revision_before"] if reverse else delta["dataset_revision_after"])
     print(f"\n{len(diario)} operaciones {'revertidas' if reverse else 'aplicadas'}")
     return 0
+
+
+def registrar(nombre: str, accion: str, revision: str) -> None:
+    HISTORIAL.parent.mkdir(parents=True, exist_ok=True)
+    with HISTORIAL.open("a", encoding="utf-8") as fh:
+        fh.write(json.dumps({"delta": nombre, "accion": accion, "revision": revision,
+                             "fecha": datetime.now(timezone.utc).isoformat(timespec="seconds")},
+                            ensure_ascii=False) + "\n")
 
 
 def main() -> int:
