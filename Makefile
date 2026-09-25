@@ -39,9 +39,14 @@ test: ## Valida todos los fixtures de referencia (§27.9)
 
 check: validate verify test ## Todo lo anterior: es lo que ejecuta la CI
 
-ingest: ## Ingiere una sección: make ingest FILE=ruta/al/texto.md
-	@test -n "$(FILE)" || { echo "uso: make ingest FILE=ruta/al/texto.md"; exit 1; }
-	@$(PYTHON) scripts/ingest/ingest.py "$(FILE)" $(if $(TITLE),--title "$(TITLE)",) $(if $(DRY),--dry-run,)
+ingest: ## Ingiere una sección: make ingest CORPUS=../corredor SECCION=03 [DRY=1], o FILE=texto.md
+	@if [ -n "$(CORPUS)" ]; then \
+		test -n "$(SECCION)" || { echo "uso: make ingest CORPUS=ruta[@ref] SECCION=NN [DRY=1]"; exit 1; }; \
+		$(PYTHON) scripts/ingest/ingest.py "$(CORPUS)" --seccion "$(SECCION)" $(if $(DRY),--dry-run,); \
+	else \
+		test -n "$(FILE)" || { echo "uso: make ingest CORPUS=ruta[@ref] SECCION=NN, o make ingest FILE=ruta/al/texto.md"; exit 1; }; \
+		$(PYTHON) scripts/ingest/ingest.py "$(FILE)" $(if $(TITLE),--title "$(TITLE)",) $(if $(DRY),--dry-run,); \
+	fi
 
 corpus-freeze: ## Congela una versión del corpus: make corpus-freeze CORPUS=../corredor@ref DEC=DEC-…
 	@test -n "$(CORPUS)" || { echo "uso: make corpus-freeze CORPUS=ruta[@ref] [DEC=DEC-…] [SUSTITUYE=manifiesto]"; exit 1; }

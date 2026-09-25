@@ -1,0 +1,8 @@
+{
+  "schema_version": 1,
+  "tables": [
+    {"id": "claims-00", "category": "claims", "section": "0", "csv_path": "data/afirmaciones/00.csv", "row_count": 5},
+    {"id": "table-01-00-edades", "category": "synthesis", "section": "0", "csv_path": "data/tablas/00/table-01-00-edades.csv", "row_count": 1},
+    {"id": "claims-01", "category": "claims", "section": "1", "csv_path": "data/afirmaciones/01.csv", "row_count": 1}
+  ]
+}

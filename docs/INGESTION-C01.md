@@ -66,22 +66,54 @@ make test
 
 Si algo falla, se descubre con veinte menciones inventadas y no con tres mil reales. Es el orden que fija el Apéndice I: fixture en el paso 13, corpus real en el 21.
 
+Para el corredor, el fixture es `tests/fixtures/corredor-mini`: dos secciones con una fila citada en un párrafo, otra por un rango `C-002–C-003`, otra sólo por una tabla y otra en ningún sitio, y el apéndice A con la cabecera larga del DOI. `tests/ingest/test_ingest.py` lo recorre y `make check` lo ejecuta.
+
 ## 5 · Ingerir, sección por sección
 
 ```bash
-make ingest FILE=knowledge/corpus/inbox/DOCUMENTO.md DRY=1   # ver sin escribir
-make ingest FILE=knowledge/corpus/inbox/DOCUMENTO.md
+make ingest CORPUS=../corredor-eukaryota-holozoa SECCION=03 DRY=1   # ver sin escribir
+make ingest CORPUS=../corredor-eukaryota-holozoa SECCION=03
 ```
 
-Produce la sección con su hash, los pasajes con offsets, las menciones candidatas, el delta y el informe humano. **No aplica nada.**
+`CORPUS` admite `directorio@commit` para ingerir la versión congelada aunque la copia de trabajo haya avanzado. Un documento Markdown suelto sigue entrando con `FILE=`.
 
-> **Pendiente antes de la primera ingestión real.** `ingest.py` todavía recibe un único fichero de texto: está hecho para el documento Markdown que se esperaba. `parse_research.py` ya lee el repositorio de CSV, pero hay que enseñar a `ingest.py` a tomar una sección del corredor —su prosa y sus filas— y a anotar en el delta de qué congelación sale. Es el primer trabajo de la ingestión, y se prueba con el fixture antes de tocar el corpus, como dice el paso 4.
+Produce la sección con su hash, los pasajes con offsets, las menciones candidatas, el delta y el informe humano. **No aplica nada.** Antes de leer una fila:
+
+- **comprueba la congelación**: si la copia no tiene la huella de la congelación activa, se niega (DEC-056);
+- **comprueba la conformidad** con `parse_research.py`, y se niega si hay errores;
+- **se niega a repetir una sección** ya ingerida: una versión nueva entra por diferencia, no ingiriendo otra vez.
+
+Lo que produce, por sección:
+
+- **la prosa y el registro, copiados en bytes** a `knowledge/corpus/sections/SEC-….md` y `SEC-….registro.csv`;
+- **un pasaje por párrafo** de la prosa;
+- **una mención por etiqueta distinta** —sujeto u objeto de sus filas, y las entidades del apéndice B que aparecen en ella por primera vez—, apuntando al pasaje que cita la fila: el párrafo que la cita, o el de la tabla que la cita, o el del registro si no la cita nada. Si la etiqueta aparece literal en el pasaje, sus offsets son los suyos; si no, cubren el pasaje entero y una nota lo dice;
+- **en el delta, `corpus_origin`**: la congelación, los dos ficheros con su hash y, por cada fila `C-…`, sus pasajes, la vía por la que se llegó a ellos y sus menciones. Es la correspondencia que necesitará la reingestión cuando el corredor renumere.
+
+Todas las menciones quedan `pending` y de tipo `unresolved`: el tipo lo fija quien resuelve identidad, no una heurística sobre la columna «tipo» del apéndice B, que es texto libre.
+
+**Medido en seco sobre las dieciséis secciones de la versión congelada:**
+- el 91 % de las filas sale de un párrafo que la cita, el 8 % de una tabla y 18 filas sólo del registro, 15 de ellas en la sección 15;
+- el 78 % de las etiquetas no aparece literal en su pasaje, porque el registro usa como sujeto u objeto frases y listas —«tallo de Eukaryota entre FECA y LECA; Eukaryota; Amorphea…»— y no nombres;
+- el contraste de las secciones 9, 10 y 11 no cuadra por siete filas del apéndice B que no son entidades: tres marcadores de hueco y cuatro cifras. El informe las nombra.
+
+**Qué no hace todavía.** Ingerir los apéndices como tales: las fuentes del apéndice A no se convierten en registros `SOURCE-`, y eventos, fechas, hipótesis y magnitudes no se leen por este camino. Tampoco convierte filas en afirmaciones: eso es el paso 6 y espera a la correspondencia de predicados (ver abajo).
 
 ## 6 · Lo que hay que hacer a mano
 
 Los pasos 5 a 9 de §17 son juicio y no se automatizan. Concretamente:
 
 **Resolución de identidad.** Decidir si dos menciones son la misma entidad. La regla es ser conservador: **no se fusionan entidades por parecido nominal**. Ante duda, se deja sin resolver y se abre `Issue` — es lo que dice F.3, y bloquear el registro afectado no bloquea la sección entera.
+
+Se hace sobre el corpus entero, no por sección —la misma etiqueta en dos secciones tiene que acabar en la misma entidad—:
+
+```bash
+.venv/bin/python scripts/ingest/resolve_identity.py propose ../corredor-eukaryota-holozoa@af7e799
+```
+
+Sobre la versión congelada salen 3.725 etiquetas distintas, sinónimos incluidos: 1.934 sin ambigüedad y **1.737 decisiones humanas**, casi todas pares parecidos. El hash que ata la revisión marcada a su mapa es la huella de la congelación, así que una revisión hecha sobre otra versión no se puede aplicar a ésta.
+
+**Correspondencia de predicados.** Antes del paso 6. El esquema admite 48 predicados y el corredor usa 330: 22 del vocabulario del prompt (1.135 filas) y 308 inventados (817 filas), sin definir. Varios de los 22 no son afirmaciones en el modelo sino otros registros —`tiene_valor_medido` es soporte cuantitativo, `posee_rasgo` una observación de rasgo, `clasificado_como_por` una vista de clasificación, `respaldado_por` o `cuestionado_por` procedencia—. Es decisión editorial y va antes de convertir ninguna fila.
 
 **Integración de hipótesis.** Decidir si una afirmación apoya, contradice, parte una hipótesis existente o crea un grupo de conflicto. No se mezclan topologías incompatibles en un árbol.
 

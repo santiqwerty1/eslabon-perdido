@@ -46,7 +46,9 @@ MANIFEST = CORPUS / "manifests" / "dataset.json"
 DELTAS = ROOT / "knowledge" / "deltas"
 REPORTS = ROOT / "generated" / "reports"
 
-SCHEMA_VERSION = "1.0.0"
+# La del contrato vigente (schemas/migrations/1.0.0-a-1.1.0.md). Escribir 1.0.0
+# en registros nuevos los declararía anteriores a DEC-054 y DEC-055.
+SCHEMA_VERSION = "1.1.0"
 
 # Heurísticas del paso 3. Proponen, no deciden: cada acierto y cada falso
 # positivo acaban igualmente en el libro mayor de menciones, y es el paso 5 quien
@@ -150,6 +152,21 @@ def ids_en_uso(fichero: str, prefijo: str) -> set[str]:
     return out
 
 
+def ids_de_pasajes() -> set[str]:
+    """Pasajes ya emitidos. Viven en corpus/passages/, no en el libro mayor:
+    buscarlos en mentions.jsonl no encontraba ninguno y cada sección volvía a
+    empezar en PASSAGE-000001."""
+    out: set[str] = set()
+    for p in PASSAGES.glob("*.json"):
+        try:
+            for rec in json.loads(p.read_text(encoding="utf-8")):
+                if isinstance(rec, dict) and isinstance(rec.get("id"), str):
+                    out.add(rec["id"])
+        except (json.JSONDecodeError, TypeError):
+            continue
+    return out
+
+
 def siguiente_libre(prefijo: str, usados: set[str]) -> int:
     n = 0
     for i in usados:
@@ -202,7 +219,7 @@ def ingerir(origen: Path, titulo: str | None, dry: bool) -> int:
         estructurado = None
 
     base_mention = siguiente_libre("MENTION", ids_en_uso("mentions.jsonl", "MENTION"))
-    base_passage = siguiente_libre("PASSAGE", ids_en_uso("mentions.jsonl", "PASSAGE"))
+    base_passage = siguiente_libre("PASSAGE", ids_de_pasajes())
 
     # --- paso 2: segmentar en pasajes -------------------------------------
     pasajes, menciones = [], []
@@ -418,6 +435,12 @@ def ingerir(origen: Path, titulo: str | None, dry: bool) -> int:
         print("\n  el documento no trae capa de registro: menciones por heurística")
     print(f"\n  sin destino: {len(sin_destino)} — la cobertura del paso 10 no se cumple todavía")
 
+    return escribir(sec_id, texto, seccion, pasajes, delta, informe, dry)
+
+
+def escribir(sec_id: str, texto: str, seccion: dict, pasajes: list[dict], delta: dict,
+             informe: list[str], dry: bool, extras: dict[Path, bytes] | None = None) -> int:
+    """Escribe la sección, sus pasajes, el delta y el informe. No aplica nada."""
     if dry:
         print("\n(en seco: no se ha escrito nada)")
         return 0
@@ -427,8 +450,11 @@ def ingerir(origen: Path, titulo: str | None, dry: bool) -> int:
     DELTAS.mkdir(parents=True, exist_ok=True)
     REPORTS.mkdir(parents=True, exist_ok=True)
 
-    # El original es inmutable (§6.1): se copia tal cual y no se vuelve a tocar.
-    (SECTIONS / f"{sec_id}.md").write_text(texto, encoding="utf-8")
+    # El original es inmutable (§6.1): se copia tal cual, en bytes, para que su
+    # hash sea el de la fuente, y no se vuelve a tocar.
+    (SECTIONS / f"{sec_id}.md").write_bytes(texto.encode("utf-8"))
+    for ruta, contenido in (extras or {}).items():
+        ruta.write_bytes(contenido)
     (SECTIONS / f"{sec_id}.json").write_text(
         json.dumps(seccion, indent=2, ensure_ascii=False) + "\n", encoding="utf-8"
     )
@@ -441,6 +467,8 @@ def ingerir(origen: Path, titulo: str | None, dry: bool) -> int:
     (REPORTS / f"{sec_id}.md").write_text("\n".join(informe) + "\n", encoding="utf-8")
 
     print(f"\n  sección   knowledge/corpus/sections/{sec_id}.md")
+    for ruta in extras or {}:
+        print(f"            {ruta.relative_to(ROOT)}")
     print(f"  pasajes   knowledge/corpus/passages/{sec_id}.json")
     print(f"  delta     knowledge/deltas/{sec_id}.json")
     print(f"  informe   generated/reports/{sec_id}.md")
@@ -451,10 +479,24 @@ def ingerir(origen: Path, titulo: str | None, dry: bool) -> int:
 
 def main() -> int:
     ap = argparse.ArgumentParser(description="Ingiere una sección de investigación (§17)")
-    ap.add_argument("origen", help="fichero de texto o Markdown a ingerir")
+    ap.add_argument("origen", help="fichero de texto o Markdown, o el directorio del corredor "
+                                   "(o directorio@ref) con --seccion")
+    ap.add_argument("--seccion", default=None, help="sección del corredor: 03, 11…")
+    ap.add_argument("--congelacion", default=None,
+                    help="manifiesto de congelación (por defecto, el activo de dataset.json)")
     ap.add_argument("--title", default=None)
     ap.add_argument("--dry-run", action="store_true", help="analizar sin escribir")
     args = ap.parse_args()
+
+    directorio = args.origen.rpartition("@")[0] if "@" in args.origen else args.origen
+    if Path(directorio).is_dir():
+        # Un repositorio de CSV no es un documento: va por el modo corredor.
+        if not args.seccion:
+            print("ERROR el corredor se ingiere por secciones: añade --seccion NN")
+            return 1
+        import corredor
+        return corredor.ingerir(args.origen, args.seccion,
+                                Path(args.congelacion) if args.congelacion else None, args.dry_run)
 
     origen = Path(args.origen)
     if not origen.exists():
