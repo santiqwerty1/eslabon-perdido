@@ -115,6 +115,11 @@ class Seccion(unittest.TestCase):
         menciones_de_c001 = {m for m in origen["rows"]["C-001"]["mention_ids"]}
         self.assertEqual(menciones_de_c001, {self.menciones["FIX-Alfa"]["id"], self.menciones["FIX-Beta"]["id"]})
 
+    def test_la_mencion_del_apendice_b_queda_en_su_fila(self):
+        # FIX-Omega sólo existe en el apéndice B, con primera fila C-003: la
+        # procedencia de C-003 tiene que llevar su mención.
+        self.assertIn(self.menciones["FIX-Omega"]["id"], self.filas["C-003"]["mention_ids"])
+
     def test_contraste_cuadra(self):
         for etiqueta, declarado, ingerido in self.r["contraste"]:
             self.assertEqual(declarado, ingerido, etiqueta)
@@ -209,6 +214,32 @@ class Barreras(unittest.TestCase):
         self.assertEqual(r["pendientes"], ["SEC-000001.json"])
 
 
+    def test_un_marcador_de_tabla_sin_indice_se_rechaza(self):
+        otra = self.tmp / "otra"
+        shutil.copytree(MINI, otra)
+        indice = json.loads((otra / "data" / "table_index.json").read_text(encoding="utf-8"))
+        indice["tables"] = [e for e in indice["tables"] if e["id"] != "table-01-00-edades"]
+        (otra / "data" / "table_index.json").write_text(json.dumps(indice), encoding="utf-8")
+        congelacion = congelar(otra, self.tmp / "otra.json")
+        with self.assertRaises(SystemExit) as e:
+            corredor.construir(str(otra), "00", congelacion)
+        self.assertIn("table-01-00-edades", str(e.exception))
+
+    def test_la_declaracion_del_dataset_tiene_que_describir_su_manifiesto(self):
+        registro = json.loads(self.congelacion.read_text(encoding="utf-8"))
+        dataset = self.tmp / "dataset.json"
+        dataset.write_text(json.dumps({"corpus_freeze": {
+            "path": str(self.congelacion), "version": registro["version"],
+            "fingerprint": "sha256:" + "0" * 64}}), encoding="utf-8")
+        original, ingest.MANIFEST = ingest.MANIFEST, dataset
+        try:
+            with self.assertRaises(SystemExit) as e:
+                corredor.construir(str(MINI), "00")
+        finally:
+            ingest.MANIFEST = original
+        self.assertIn("fingerprint", str(e.exception))
+
+
 class Localizar(unittest.TestCase):
     pasaje = {"text": "Se habla de fix-alfa aquí.", "character_offsets": {"start": 100, "end": 126}}
 
@@ -219,6 +250,12 @@ class Localizar(unittest.TestCase):
         ini, fin, nota = corredor.localizar("FIX-Alfa", self.pasaje)
         self.assertEqual((ini, fin), (112, 120))
         self.assertIn("«fix-alfa»", nota)
+
+    def test_dentro_de_otra_palabra_no_es_literal(self):
+        pasaje = {"text": "Los Eutheria tienen placenta.", "character_offsets": {"start": 0, "end": 29}}
+        ini, fin, nota = corredor.localizar("Theria", pasaje)
+        self.assertEqual((ini, fin), (0, 29))
+        self.assertIn("no aparece literal", nota)
 
     def test_ausente_cubre_el_pasaje(self):
         ini, fin, nota = corredor.localizar("FIX-Beta", self.pasaje)
@@ -238,6 +275,18 @@ class Identidad(unittest.TestCase):
             segunda = subprocess.run(orden, capture_output=True, text=True)
             self.assertNotEqual(segunda.returncode, 0)
             self.assertIn("marca humana", revision.read_text(encoding="utf-8"))
+
+    def test_sobrescribir_retira_los_productos_de_la_revision_anterior(self):
+        import subprocess
+        with tempfile.TemporaryDirectory() as tmp:
+            orden = [sys.executable, str(ROOT / "scripts" / "ingest" / "resolve_identity.py"),
+                     "propose", str(MINI), "--out", tmp]
+            subprocess.run(orden, capture_output=True)
+            final = Path(tmp) / "identity-map-final.json"
+            final.write_text("{}", encoding="utf-8")
+            r = subprocess.run([*orden, "--sobrescribir"], capture_output=True)
+            self.assertEqual(r.returncode, 0)
+            self.assertFalse(final.exists())
 
     def test_la_salida_por_defecto_lleva_la_huella(self):
         import resolve_identity

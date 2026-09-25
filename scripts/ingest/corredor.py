@@ -88,6 +88,17 @@ def congelacion(ruta: Path | None) -> tuple[Path, dict]:
             raise SystemExit("ERROR dataset.json no declara congelación activa (`corpus_freeze`, "
                              "DEC-056): no hay versión del corpus que ingerir")
         ruta = base.ROOT / activa
+        registro = json.loads(Path(ruta).read_text(encoding="utf-8"))
+        # dataset.json repite versión, commit y huella junto a la ruta. Si no
+        # describen el manifiesto al que apunta —una edición a mano, una fusión
+        # mal resuelta—, el dataset declara una versión e ingeriríamos otra.
+        declarada = manifiesto["corpus_freeze"]
+        discrepan = [k for k in ("fingerprint", "commit", "version")
+                     if k in declarada and declarada[k] != registro.get(k)]
+        if discrepan:
+            raise SystemExit(f"ERROR dataset.json declara una congelación y {activa} describe otra "
+                             f"(difieren: {', '.join(discrepan)})")
+        return ruta, registro
     return ruta, json.loads(Path(ruta).read_text(encoding="utf-8"))
 
 
@@ -142,16 +153,17 @@ def localizar(etiqueta: str, pasaje: dict) -> tuple[int, int, str | None]:
     aparece: el pasaje entero, y la nota lo dice.
     """
     texto, ini = pasaje["text"], pasaje["character_offsets"]["start"]
-    i = texto.find(etiqueta)
-    if i >= 0:
-        return ini + i, ini + i + len(etiqueta), None
-    if len(texto.casefold()) == len(texto) and len(etiqueta.casefold()) == len(etiqueta):
-        i = texto.casefold().find(etiqueta.casefold())
-        if i >= 0:
-            visto = texto[i:i + len(etiqueta)]
-            return (ini + i, ini + i + len(etiqueta),
-                    f"en el pasaje aparece como «{visto}», con otra capitalización; "
-                    "los offsets señalan esa aparición")
+    # Como texto completo, no como trozo de otra palabra: «Theria» dentro de
+    # «Eutheria» no es una mención de Theria, son taxones distintos.
+    patron = re.compile(r"(?<!\w)" + re.escape(etiqueta) + r"(?!\w)")
+    m = patron.search(texto)
+    if m:
+        return ini + m.start(), ini + m.end(), None
+    m = re.compile(patron.pattern, re.IGNORECASE).search(texto)
+    if m:
+        return (ini + m.start(), ini + m.end(),
+                f"en el pasaje aparece como «{m.group()}», con otra capitalización; "
+                "los offsets señalan esa aparición")
     return (ini, pasaje["character_offsets"]["end"],
             "la etiqueta no aparece literal en el pasaje; los offsets cubren el pasaje entero")
 
@@ -234,6 +246,12 @@ def construir(spec: str, seccion: str, ruta_congelacion: Path | None = None) -> 
 
     indice = {t["id"]: t for t in json.loads(
         (src.base / "data" / "table_index.json").read_text(encoding="utf-8"))["tables"]}
+    # Un marcador que el índice no conoce haría caer sus filas en «sólo el
+    # registro» sin aviso: la procedencia cambiaría por un índice incompleto.
+    sin_indice = sorted(tid for tid in por_marcador if tid not in indice)
+    if sin_indice:
+        raise SystemExit(f"ERROR la prosa de la sección {sec} inserta tablas que no están en "
+                         f"data/table_index.json: {', '.join(sin_indice)}")
     por_tabla = {tid: citas(dentro(indice[tid]["csv_path"]).read_text(encoding="utf-8"))
                  for tid in por_marcador if tid in indice and indice[tid].get("category") != "claims"}
     del_registro = next((tid for tid in por_marcador if indice.get(tid, {}).get("category") == "claims"), None)
@@ -301,6 +319,8 @@ def construir(spec: str, seccion: str, ruta_congelacion: Path | None = None) -> 
     for e in propias_b:
         fila = e[COL_PRIMERA].strip()
         m = mencionar(e.get("etiqueta preferida"), fila, "apéndice B")
+        if m is not None and m["id"] not in origen_filas[fila]["mention_ids"]:
+            origen_filas[fila]["mention_ids"].append(m["id"])
         if m is not None:
             tipo = (e.get("tipo") or "").strip()
             if tipo and not any(n.startswith("apéndice B") for n in m["notes"]):

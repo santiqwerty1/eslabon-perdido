@@ -566,6 +566,29 @@ def cmd_diff(args) -> int:
     # del apéndice B cuya primera fila es de la sección 3 se ingiere con la 3.
     sec_vieja = {i: s for i, (s, _) in leer_afirmaciones(a.base).items()}
     sec_nueva = {i: s for i, (s, _) in leer_afirmaciones(b.base).items()}
+    # El índice de tablas decide qué tabla es el registro de una sección y cuál
+    # una síntesis, y con eso de qué pasaje sale una fila. Cambiar una entrada
+    # cambia la sección que la usa.
+    indice = "data/table_index.json"
+    if indice in tocados:
+        def entradas(base: Path) -> dict[str, dict]:
+            ruta = base / indice
+            if not ruta.exists():
+                return {}
+            return {e["id"]: e for e in json.loads(ruta.read_text(encoding="utf-8")).get("tables", [])}
+        ea, eb = entradas(a.base), entradas(b.base)
+        for tid in sorted(ea.keys() | eb.keys()):
+            if ea.get(tid) == eb.get(tid):
+                continue
+            for e in (ea.get(tid), eb.get(tid)):
+                partes = Path((e or {}).get("csv_path", "")).parts
+                sec = (Path(partes[-1]).stem if partes[:2] == ("data", "afirmaciones")
+                       else partes[2] if partes[:2] == ("data", "tablas") and len(partes) > 3 else None)
+                if sec:
+                    afectadas.setdefault(sec, {})
+                    afectadas[sec]["índice"] = afectadas[sec].get("índice", 0) + 1
+                    break
+
     for ruta, r in registros.items():
         tocadas = ({sec_vieja[c] for c in r.get("citas_viejas", []) if c in sec_vieja}
                    | {sec_nueva[c] for c in r.get("citas_nuevas", []) if c in sec_nueva})

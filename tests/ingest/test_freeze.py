@@ -167,6 +167,18 @@ class Informe(unittest.TestCase):
         self.assertEqual(inf["afirmaciones"]["secciones_afectadas"], {"01": {"apéndices": 1}})
 
 
+    def test_un_cambio_del_indice_de_tablas_manda_reingerir_su_seccion(self):
+        filas = {"00": [fila("C-001", "Uno.")], "01": [fila("C-002", "Dos.")]}
+        a = corpus(self.tmp / "a", filas)
+        b = corpus(self.tmp / "b", filas)
+        for base, categoria in ((a, "synthesis"), (b, "claims")):
+            (base / "data" / "table_index.json").write_text(json.dumps({"tables": [
+                {"id": "t-01", "category": categoria, "csv_path": "data/tablas/01/t-01.csv"}]}),
+                encoding="utf-8")
+        inf = self.informe(a, b)
+        self.assertEqual(inf["afirmaciones"]["secciones_afectadas"], {"01": {"índice": 1}})
+
+
 class Registros(unittest.TestCase):
     def setUp(self):
         self._tmp = tempfile.TemporaryDirectory()
