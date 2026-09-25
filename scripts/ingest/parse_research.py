@@ -322,12 +322,19 @@ def _parse_texto(texto: str) -> tuple[dict, Hallazgos]:
         elif cab and cab[0].lower() == "clave" and "tipo" in [c.lower() for c in cab] and any(
                 c.lower().startswith("autor") for c in cab):
             clasificada("A fuentes")
+            # El prompt nombra la columna «DOI en forma https://doi.org/… o URL
+            # resoluble si no hay DOI», y el corpus la copió literal. Buscar
+            # «DOI» a secas la perdía en las 523 fuentes, y con ella la
+            # comprobación de abajo, que nunca llegaba a ejecutarse.
+            col_doi = next((c for c in cab if c.strip().lower().startswith("doi")), None)
+            if col_doi is None:
+                h.error("el apéndice A no tiene columna de DOI")
             for f in filas:
                 d = dict(zip(cab, f))
                 tipo = d.get("tipo", "").lower()
                 if tipo and tipo not in TIPO_FUENTE:
                     h.aviso(f"fuente {d.get('clave')}: tipo {tipo!r} fuera de la lista cerrada")
-                doi = d.get("DOI", "")
+                doi = d.get(col_doi, "").strip() if col_doi else ""
                 if doi and doi != "n/a" and not doi.startswith("http") and "no verificado" not in doi:
                     h.aviso(f"fuente {d.get('clave')}: DOI {doi!r} no es una URL resoluble")
                 fuentes.append({"key": d.get("clave"), "authors": d.get("autores"),
