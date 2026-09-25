@@ -1555,13 +1555,22 @@ def proponer(spec: str, salida: Path | None, corpus: Path | None, tope_edicion: 
     datos, h = parse(ruta)
     documento = Path(spec)  # para nombrarlo en el informe y en el mapa
     salida = salida or salida_por_defecto(spec, doc_hash)
-    if (salida / "identity-review.md").exists() and not sobrescribir:
+    previos = [salida / n for n in ("identity-review.md", "identity-map.json",
+                                    "identity-map-final.json", "identity-issues.json")]
+    if any(p.exists() for p in previos) and not sobrescribir:
         # La revisión es trabajo humano en cuanto se marca. No se pisa nunca
         # sin que se pida.
-        print(f"ERROR ya hay una revisión en {salida / 'identity-review.md'}. Puede tener marcas "
-              "hechas a mano: no se sobrescribe. Usa otra --out, o --sobrescribir si de verdad "
-              "quieres descartarla")
+        print(f"ERROR ya hay una revisión en {salida}. Puede tener marcas hechas a mano: no se "
+              "sobrescribe. Usa otra --out, o --sobrescribir si de verdad quieres descartarla")
         return 1
+    if sobrescribir:
+        # El mapa final y las cuestiones salieron de la revisión que se descarta.
+        # Dejarlos junto a la propuesta nueva, con el mismo hash de documento,
+        # los haría pasar por resultado de ella.
+        for p in previos[2:]:
+            if p.exists():
+                p.unlink()
+                print(f"  retirado {p.name}: derivaba de la revisión descartada")
 
     etiquetas, excluidas = inventario(datos, corpus)
     decisiones, unicas, suprimidos = construir_decisiones(etiquetas, tope_edicion, raiz)

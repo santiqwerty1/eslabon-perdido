@@ -94,7 +94,7 @@ Todas las menciones quedan `pending` y de tipo `unresolved`: el tipo lo fija qui
 
 **Medido en seco sobre las dieciséis secciones de la versión congelada:**
 - el 91 % de las filas sale de un párrafo que la cita, el 8 % de una tabla y 18 filas sólo del registro, 15 de ellas en la sección 15;
-- el 78 % de las etiquetas no aparece en su pasaje, y otras 40 sólo con otra capitalización, porque el registro usa como sujeto u objeto frases y listas —«tallo de Eukaryota entre FECA y LECA; Eukaryota; Amorphea…»— y no nombres;
+- el 79 % de las etiquetas no aparece en su pasaje como palabra completa, y otras 40 sólo con otra capitalización, porque el registro usa como sujeto u objeto frases y listas —«tallo de Eukaryota entre FECA y LECA; Eukaryota; Amorphea…»— y no nombres;
 - el contraste de las secciones 9, 10 y 11 no cuadra por siete filas del apéndice B que no son entidades: tres marcadores de hueco y cuatro cifras. El informe las nombra.
 
 **Qué no hace todavía.** Ingerir los apéndices como tales: las fuentes del apéndice A no se convierten en registros `SOURCE-`, y eventos, fechas, hipótesis y magnitudes no se leen por este camino. Tampoco convierte filas en afirmaciones: eso es el paso 6 y espera a la correspondencia de predicados (ver abajo).
