@@ -87,14 +87,14 @@ Lo que produce, por sección:
 
 - **la prosa y el registro, copiados en bytes** a `knowledge/corpus/sections/SEC-….md` y `SEC-….registro.csv`;
 - **un pasaje por párrafo** de la prosa;
-- **una mención por etiqueta distinta** —sujeto u objeto de sus filas, y las entidades del apéndice B que aparecen en ella por primera vez—, apuntando al pasaje que cita la fila: el párrafo que la cita, o el de la tabla que la cita, o el del registro si no la cita nada. Si la etiqueta aparece literal en el pasaje, sus offsets son los suyos; si no, cubren el pasaje entero y una nota lo dice;
+- **una mención por etiqueta distinta** —sujeto u objeto de sus filas, y las entidades del apéndice B que aparecen en ella por primera vez—, apuntando al pasaje que cita la fila: el párrafo que la cita, o el de la tabla que la cita, o el del registro si no la cita nada. Si la etiqueta aparece literal en el pasaje, sus offsets son los suyos; si aparece con otra capitalización, los de esa aparición y una nota que dice cómo aparece; si no aparece, cubren el pasaje entero y una nota lo dice;
 - **en el delta, `corpus_origin`**: la congelación, los dos ficheros con su hash y, por cada fila `C-…`, sus pasajes, la vía por la que se llegó a ellos y sus menciones. Es la correspondencia que necesitará la reingestión cuando el corredor renumere.
 
 Todas las menciones quedan `pending` y de tipo `unresolved`: el tipo lo fija quien resuelve identidad, no una heurística sobre la columna «tipo» del apéndice B, que es texto libre.
 
 **Medido en seco sobre las dieciséis secciones de la versión congelada:**
 - el 91 % de las filas sale de un párrafo que la cita, el 8 % de una tabla y 18 filas sólo del registro, 15 de ellas en la sección 15;
-- el 78 % de las etiquetas no aparece literal en su pasaje, porque el registro usa como sujeto u objeto frases y listas —«tallo de Eukaryota entre FECA y LECA; Eukaryota; Amorphea…»— y no nombres;
+- el 78 % de las etiquetas no aparece en su pasaje, y otras 40 sólo con otra capitalización, porque el registro usa como sujeto u objeto frases y listas —«tallo de Eukaryota entre FECA y LECA; Eukaryota; Amorphea…»— y no nombres;
 - el contraste de las secciones 9, 10 y 11 no cuadra por siete filas del apéndice B que no son entidades: tres marcadores de hueco y cuatro cifras. El informe las nombra.
 
 **Qué no hace todavía.** Ingerir los apéndices como tales: las fuentes del apéndice A no se convierten en registros `SOURCE-`, y eventos, fechas, hipótesis y magnitudes no se leen por este camino. Tampoco convierte filas en afirmaciones: eso es el paso 6 y espera a la correspondencia de predicados (ver abajo).
@@ -110,6 +110,8 @@ Se hace sobre el corpus entero, no por sección —la misma etiqueta en dos secc
 ```bash
 .venv/bin/python scripts/ingest/resolve_identity.py propose ../corredor-eukaryota-holozoa@af7e799
 ```
+
+La revisión se escribe en `generated/identity/<corpus>-<huella>/`, una carpeta por versión, y una revisión existente no se sobrescribe nunca sin `--sobrescribir`: en cuanto se marca es trabajo humano.
 
 Sobre la versión congelada salen 3.725 etiquetas distintas, sinónimos incluidos: 1.934 sin ambigüedad y **1.737 decisiones humanas**, casi todas pares parecidos. El hash que ata la revisión marcada a su mapa es la huella de la congelación, así que una revisión hecha sobre otra versión no se puede aplicar a ésta.
 
@@ -132,6 +134,8 @@ Si algo salió mal:
 ```bash
 .venv/bin/python scripts/ingest/delta.py SEC-000001.json --revert
 ```
+
+Si se ingiere otra sección antes de aplicar la anterior, su delta va detrás en la cadena de revisiones —el de la anterior lleva a `REV-000001`, el nuevo parte de ahí— y no reutiliza sus identificadores. `ingest.py` lo avisa. `delta.py` no comprueba el orden: hay que aplicarlos en el de la cadena.
 
 ## 8 · Cerrar la sección
 

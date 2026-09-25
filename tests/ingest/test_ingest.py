@@ -177,6 +177,75 @@ class Barreras(unittest.TestCase):
             corredor.construir(str(MINI), "17", self.congelacion)
 
 
+    def test_una_ruta_del_indice_fuera_de_la_congelacion_se_rechaza(self):
+        otra = self.tmp / "otra"
+        shutil.copytree(MINI, otra)
+        (self.tmp / "fuera.csv").write_text('"x"\n"C-004"\n', encoding="utf-8")
+        indice = json.loads((otra / "data" / "table_index.json").read_text(encoding="utf-8"))
+        indice["tables"][1]["csv_path"] = "../fuera.csv"
+        (otra / "data" / "table_index.json").write_text(json.dumps(indice), encoding="utf-8")
+        congelacion = congelar(otra, self.tmp / "otra.json")
+        with self.assertRaises(SystemExit) as e:
+            corredor.construir(str(otra), "00", congelacion)
+        self.assertIn("no es un fichero de la versión congelada", str(e.exception))
+
+    def test_un_delta_sin_aplicar_reserva_sus_identificadores_y_su_revision(self):
+        # Ingerir escribe el delta pero no lo aplica: la sección siguiente no
+        # puede volver a emitir sus MENTION ni llevar el dataset a la misma
+        # revisión.
+        deltas = self.tmp / "deltas"
+        deltas.mkdir()
+        (deltas / "SEC-000001.json").write_text(json.dumps({
+            "dataset_revision_before": "REV-000000", "dataset_revision_after": "REV-000001",
+            "records_added": ["MENTION-000001", "MENTION-000007"],
+            "corpus_origin": {"section": "01"}}), encoding="utf-8")
+        original, ingest.DELTAS = ingest.DELTAS, deltas
+        try:
+            r = corredor.construir(str(MINI), "00", self.congelacion)
+        finally:
+            ingest.DELTAS = original
+        self.assertEqual(r["menciones"][0]["id"], "MENTION-000008")
+        self.assertEqual(r["rev"], ("REV-000001", "REV-000002"))
+        self.assertEqual(r["pendientes"], ["SEC-000001.json"])
+
+
+class Localizar(unittest.TestCase):
+    pasaje = {"text": "Se habla de fix-alfa aquí.", "character_offsets": {"start": 100, "end": 126}}
+
+    def test_literal(self):
+        self.assertEqual(corredor.localizar("habla", self.pasaje), (103, 108, None))
+
+    def test_otra_capitalizacion_lo_dice(self):
+        ini, fin, nota = corredor.localizar("FIX-Alfa", self.pasaje)
+        self.assertEqual((ini, fin), (112, 120))
+        self.assertIn("«fix-alfa»", nota)
+
+    def test_ausente_cubre_el_pasaje(self):
+        ini, fin, nota = corredor.localizar("FIX-Beta", self.pasaje)
+        self.assertEqual((ini, fin), (100, 126))
+        self.assertIn("no aparece literal", nota)
+
+
+class Identidad(unittest.TestCase):
+    def test_una_revision_existente_no_se_sobrescribe(self):
+        import subprocess
+        with tempfile.TemporaryDirectory() as tmp:
+            orden = [sys.executable, str(ROOT / "scripts" / "ingest" / "resolve_identity.py"),
+                     "propose", str(MINI), "--out", tmp]
+            self.assertEqual(subprocess.run(orden, capture_output=True).returncode, 0)
+            revision = Path(tmp) / "identity-review.md"
+            revision.write_text(revision.read_text(encoding="utf-8") + "\nmarca humana\n", encoding="utf-8")
+            segunda = subprocess.run(orden, capture_output=True, text=True)
+            self.assertNotEqual(segunda.returncode, 0)
+            self.assertIn("marca humana", revision.read_text(encoding="utf-8"))
+
+    def test_la_salida_por_defecto_lleva_la_huella(self):
+        import resolve_identity
+        _, huella, _ = resolve_identity.abrir_documento(str(MINI))
+        destino = resolve_identity.salida_por_defecto(str(MINI), huella)
+        self.assertEqual(destino.name, "corredor-mini-" + huella.split(":")[1][:12])
+
+
 class Doi(unittest.TestCase):
     def test_la_cabecera_larga_del_doi_se_lee(self):
         datos, h = parse(MINI)

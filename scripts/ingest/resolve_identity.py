@@ -1538,11 +1538,30 @@ def abrir_documento(spec: str):
     return ruta, sha256(ruta.read_bytes()), None
 
 
-def proponer(spec: str, salida: Path, corpus: Path | None, tope_edicion: int,
-             raiz: int, limite: int) -> int:
+def salida_por_defecto(spec: str, doc_hash: str) -> Path:
+    """generated/identity/<nombre>-<huella>/: una carpeta por versión.
+
+    Sin la huella en el nombre, proponer sobre una versión nueva del corpus
+    escribía en la misma carpeta que la anterior, encima de una revisión que
+    alguien pudo haber marcado a mano.
+    """
+    nombre = Path(spec.rpartition("@")[0] if "@" in spec else spec).stem
+    return ROOT / "generated" / "identity" / f"{nombre}-{doc_hash.split(':')[-1][:12]}"
+
+
+def proponer(spec: str, salida: Path | None, corpus: Path | None, tope_edicion: int,
+             raiz: int, limite: int, sobrescribir: bool = False) -> int:
     ruta, doc_hash, _vivo = abrir_documento(spec)
     datos, h = parse(ruta)
     documento = Path(spec)  # para nombrarlo en el informe y en el mapa
+    salida = salida or salida_por_defecto(spec, doc_hash)
+    if (salida / "identity-review.md").exists() and not sobrescribir:
+        # La revisión es trabajo humano en cuanto se marca. No se pisa nunca
+        # sin que se pida.
+        print(f"ERROR ya hay una revisión en {salida / 'identity-review.md'}. Puede tener marcas "
+              "hechas a mano: no se sobrescribe. Usa otra --out, o --sobrescribir si de verdad "
+              "quieres descartarla")
+        return 1
 
     etiquetas, excluidas = inventario(datos, corpus)
     decisiones, unicas, suprimidos = construir_decisiones(etiquetas, tope_edicion, raiz)
@@ -1595,7 +1614,9 @@ def main() -> int:
     p.add_argument("document", help="documento Markdown, o el directorio del corredor "
                                      "(o directorio@ref) entero")
     p.add_argument("--out", default=None, metavar="DIR",
-                   help="por defecto generated/identity/<documento>/")
+                   help="por defecto generated/identity/<documento>-<huella>/")
+    p.add_argument("--sobrescribir", action="store_true",
+                   help="descartar una revisión existente en la carpeta de salida")
     p.add_argument("--corpus", default=None, metavar="DIR",
                    help="cotejar contra entidades ya ingeridas (knowledge/records)")
     p.add_argument("--edit-threshold", type=int, default=1, metavar="N",
@@ -1620,13 +1641,13 @@ def main() -> int:
         if not doc.exists():
             print(f"ERROR no existe: {doc}")
             return 1
-        salida = Path(args.out) if args.out else ROOT / "generated" / "identity" / doc.stem
+        salida = Path(args.out) if args.out else None
         corpus = Path(args.corpus) if args.corpus else None
         if corpus is not None and not corpus.is_dir():
             print(f"ERROR no es un directorio: {corpus}")
             return 1
         return proponer(args.document, salida, corpus, args.edit_threshold,
-                        args.root_prefix, args.context)
+                        args.root_prefix, args.context, args.sobrescribir)
 
     revision, mapa = Path(args.review), Path(args.mapa)
     for p_ in (revision, mapa):
