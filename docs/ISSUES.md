@@ -71,7 +71,7 @@ Valores previstos para `issue_type`: `schema_inconsistency`, `documentation_ambi
 | `ISSUE-000010` | WARNING | `content_gap` | No hay catálogo terminológico para el ámbito de la Campaña 1 — **resuelta** | — |
 | `ISSUE-000011` | WARNING | `unspecified_requirement` | La prueba de «ausencia de teleología» no está especificada — **resuelta** | — |
 | `ISSUE-000012` | INFO | `unspecified_requirement` | `evidence_strength` carece de rúbrica — **resuelta** | — |
-| `ISSUE-000013` | WARNING | `pending_decision` | `OPEN-016` ya tiene respuesta de facto y sigue abierta | Fase 1 |
+| `ISSUE-000013` | WARNING | `pending_decision` | `OPEN-016` ya tiene respuesta de facto y sigue abierta — **resuelta** por `DEC-056` | — |
 | `ISSUE-000014` | WARNING | `pending_decision` | La ingestión debe partir de `Filogenia.md`, no del Apéndice A — **resuelta**, sin objeto | — |
 | `ISSUE-000015` | INFO | `documentation_ambiguity` | Nombre del fixture hominino — **resuelta**, se conserva por trazabilidad | — |
 | `ISSUE-000016` | ERROR | `content_gap` | Afirmación sin procedencia en C.16: flujo génico sapiens–denisovano — **reencuadrada**: no bloquea la C01 | Campaña del clado tardío |
@@ -819,3 +819,31 @@ en una enumeración. La migración está en `schemas/migrations/1.0.0-a-1.1.0.md
 
 Decisiones del dueño del proyecto, 10 de agosto de 2026.
 
+# K. Resuelta por la congelación del corpus
+
+### `ISSUE-000013` · Corte bibliográfico y corpus exacto — **resuelta** por `DEC-056`
+
+La cuestión decía que `OPEN-016` tenía respuesta de facto y proponía cerrarla con
+`Filogenia.md` y el 4 de agosto de 2026. Esa respuesta caducó cuando la Campaña 1
+pasó a ser Eucaria —`ISSUE-000014`—, y el 10 de agosto se decidió no formalizar
+la nueva todavía porque la auditoría del corredor seguía abierta y el corte
+podía moverse.
+
+La auditoría sigue abierta y el corte todavía puede moverse. Lo que cambió es la
+forma de la respuesta: en vez de esperar a un corpus final que la auditoría no garantiza,
+se congela **una versión** y se prepara la entrada de las siguientes.
+
+- **Corpus exacto:** el corredor `0.6.0-research-audit` en el commit `af7e799`,
+  identificado por la huella de su capa canónica,
+  `sha256:b53f15ad613451387591f519d7ec8d4144a774aed83fbaaabd5e5207a18aa415`,
+  sobre 122 ficheros de `data/` y `docs/secciones/`. El registro está en
+  `knowledge/corpus/manifests/corredor-v0.6.0-research-audit-af7e799.json`.
+- **Fecha de corte:** 8 de agosto de 2026, la que declara esa versión. Deja de
+  ser una decisión aparte: moverla es congelar otra versión.
+- **Cuando lleguen resultados de auditoría:** se congelan como versión nueva que
+  enlaza la anterior, `freeze.py diff` dice qué afirmaciones cambiaron de verdad
+  y cuáles sólo se renumeraron, y sólo las secciones afectadas producen deltas.
+  El procedimiento está en `docs/INGESTION-C01.md`.
+
+Decisión del dueño del proyecto, 25 de septiembre de 2026, con la advertencia
+expresa de que llegarán más resultados de la auditoría en los días siguientes.

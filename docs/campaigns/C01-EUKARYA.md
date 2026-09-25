@@ -1,8 +1,8 @@
 # Campaña 1 · Eucaria: una célula dentro de otra
 
-**Estado:** `planning` · **ID:** `CAMP-000001` · **Fase actual:** pendiente de Fase 1
+**Estado:** `planning` · **ID:** `CAMP-000001` · **Fase actual:** Fase 1, con el corpus congelado
 
-> Este dossier está **vacío por diseño**. La Fase 1 lo completa, y no antes: fijar el alcance exige tener el corpus, y el corpus está pendiente de ingestión.
+> Este dossier sigue **vacío por diseño**, pero ya no por falta de corpus. Fijar el alcance exigía tener el corpus, y desde el 25 de septiembre de 2026 hay una versión congelada (`DEC-056`). La Fase 1 lo completa sobre ella.
 
 ## Corredor
 
@@ -27,28 +27,52 @@ Termina en Holozoa, en el umbral de la historia animal. **No** pretende poblar e
 | Ramas hermanas inmediatas | esbozadas |
 | Grupos externos representativos | esbozados |
 | **Lista explícita de exclusiones** | pendiente |
-| Controversias obligatorias | tres candidatas identificadas, sin ingerir |
+| Controversias obligatorias | en el corpus congelado —81 hipótesis, con sus incompatibilidades declaradas en el apéndice E—; falta elegir cuáles son obligatorias |
 | Evento de endosimbiosis y sus requisitos | pendiente |
-| Corpus científico inicial | pendiente de ingestión |
-| Fecha de corte bibliográfico | pendiente (`OPEN-016`) |
+| Corpus científico inicial | **congelado**, sin ingerir: corredor `0.6.0-research-audit` en `af7e799` (`DEC-056`) |
+| Fecha de corte bibliográfico | **8 de agosto de 2026**, la de la versión congelada (`DEC-056`) |
 | Criterios de aceptación científica | pendiente |
 | **Presupuesto máximo** de entidades, afirmaciones y vistas | pendiente |
 
-## Material disponible, no ingerido
+## Corpus de la campaña
 
-`knowledge/corpus/inbox/` contiene material recibido que **todavía no es corpus**. Nada de ahí es dato canónico hasta pasar por el protocolo de §17.
+El material de partida es el corpus del repositorio `corredor-eukaryota-holozoa`,
+encargado con [`C01-PROMPT-INVESTIGACION.md`](C01-PROMPT-INVESTIGACION.md).
 
-- **`Filogenia.md`** — investigación sobre filogenia humana, corte bibliográfico 4 de agosto de 2026, 34 referencias. Cubre el corredor topológicamente pero de paso: sólo dos citas lo sostienen, y no aporta datos temporales, de caracteres ni ecológicos para estos nodos.
-- **Investigación específica de Eucaria** — encargada con el prompt de `C01-PROMPT-INVESTIGACION.md`, en curso. Es la que debe cerrar los huecos.
+| | |
+|---|---|
+| Versión congelada | `0.6.0-research-audit`, commit `af7e799` |
+| Registro | [`knowledge/corpus/manifests/corredor-v0.6.0-research-audit-af7e799.json`](../../knowledge/corpus/manifests/corredor-v0.6.0-research-audit-af7e799.json) |
+| Huella de la capa canónica | `sha256:b53f15ad613451387591f519d7ec8d4144a774aed83fbaaabd5e5207a18aa415` |
+| Contenido | 1.952 afirmaciones · 523 fuentes · 1.500 entidades · 109 eventos · 215 fechas · 81 hipótesis · 562 magnitudes · 68 búsquedas negativas |
+| Conformidad con el prompt | 0 errores de `parse_research.py` |
+
+**No es un corpus cerrado.** Su auditoría sigue abierta y el encargo de
+seguimiento está sin empezar, así que llegarán versiones nuevas. Cada una se
+congela aparte, se compara con la anterior y sólo reingiere las secciones que
+cambiaron: [`INGESTION-C01.md`](../INGESTION-C01.md) explica cómo.
+
+Lo que sigue pendiente del lado del corpus está en
+[`C01-ENCARGO-SEGUIMIENTO.md`](C01-ENCARGO-SEGUIMIENTO.md). Lo que más pesa en
+la campaña es su punto 2, sexo, anisogamia y mitocondria, porque el sexo entra
+como mecánica (§25.5.1). Antes de insistir en él conviene contrastarlo con lo
+que ya hay: la sección 11 del corpus trata costes del sexo (11.5) y tipos de
+apareamiento, ciclos de ploidía y anisogamia (11.6), la 9 trata cooperación y
+conflicto entre genomas (9.9), y la columna «sección propuesta» del apéndice G
+remite las siete filas a secciones existentes. Puede que el punto 2 pida
+profundidad y no una sección que falte.
+
+`knowledge/corpus/inbox/Filogenia.md` **no** es material de esta campaña: cubre el
+linaje humano y se reserva para la del clado tardío (`ISSUE-000014`).
 
 ## Huecos conocidos
 
 Registrados en `docs/ISSUES.md`:
 
-- `ISSUE-000010` — no hay catálogo terminológico eucariota («protista», «protozoo», «algas»). La fuente actual tampoco lo trae: exige investigación nueva.
-- `ISSUE-000021` — falta contenido científico del corredor: Archaea y Bacteria no aparecen nunca, pese a ser el arranque; se perdió el sinónimo Corallochytrea; no hay definiciones por contenido.
+- ~~`ISSUE-000010`~~ — **resuelta el 10 de agosto de 2026** por el corpus: la sección 14, «Nomenclatura», trata «protista», «protozoo», «alga» e «invertebrado». Queda decidir al ingerir si se proyecta como apéndice `D.7`.
+- ~~`ISSUE-000021`~~ — **resuelta el 10 de agosto de 2026** por el corpus: Archaea, Bacteria, Corallochytrea y el resto del contenido del corredor están con fuente.
 - ~~`ISSUE-000026`~~ — **resuelta el 8 de agosto de 2026**: el sexo y la meiosis **entran** en la Campaña 1, como contenido del Atlas y como mecánica. Ver §25.5.1 de la guía.
-- `ISSUE-000013` — `OPEN-016` tiene respuesta de facto y sigue abierta.
+- ~~`ISSUE-000013`~~ — **resuelta el 25 de septiembre de 2026** por `DEC-056`: corpus y fecha de corte los fija la versión congelada.
 
 ## Requisitos que el dataset debe demostrar
 

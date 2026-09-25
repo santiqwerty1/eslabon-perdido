@@ -2,9 +2,16 @@
   "guide_version": "1.1.0",
   "schema_version": "1.1.0",
   "dataset_revision": "REV-000000",
-  "snapshot_id": "SNAP-000009",
+  "snapshot_id": "SNAP-000010",
   "active_campaign": "CAMP-000001",
   "campaign_status": "planning",
+  "corpus_freeze": {
+    "path": "knowledge/corpus/manifests/corredor-v0.6.0-research-audit-af7e799.json",
+    "version": "0.6.0-research-audit",
+    "commit": "af7e799e2d096a48f24afd31d7745e19cebf374d",
+    "fingerprint": "sha256:b53f15ad613451387591f519d7ec8d4144a774aed83fbaaabd5e5207a18aa415",
+    "decision": "DEC-056"
+  },
   "counts": {
     "sections": 0,
     "passages": 0,
@@ -21,7 +28,7 @@
     "active": {
       "path": "docs/GUIDE.md",
       "version": "1.1.0",
-      "content_hash": "sha256:35ea8e114a3288d5fa9a6e35a10540c18c1b253665b27a691d16ae4aca53b864"
+      "content_hash": "sha256:efb6fd73ef351faef7d37a4d0d34495c592c170d075a387c7c0900fe65bbb629"
     },
     "archived": [
       {
