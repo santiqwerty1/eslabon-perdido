@@ -1,0 +1,3 @@
+"#","Afirmación","Sujeto","Predicado","Objeto","Atribución","Fuente","Aceptación","Fuerza","Motivo","Resolución","Vigencia"
+"C-005","FIX-Epsilon aparece a la vez que FIX-Zeta.","FIX-Epsilon","contemporaneo_de*","FIX-Zeta","expresa","S01 discusión","no evaluado","baja","Una sola fuente.","sin resolver","vigente"
+"C-006","FIX-Zeta persiste hasta el final del corredor.","FIX-Zeta","persiste_hasta*","final del corredor","sintesis(C-005)","n/a","no evaluado","baja","Se apoya en C-005.","sin resolver","vigente"

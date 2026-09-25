@@ -1,0 +1,5 @@
+"#","Afirmación","Sujeto","Predicado","Objeto","Atribución","Fuente","Aceptación","Fuerza","Motivo","Resolución","Vigencia"
+"C-001","FIX-Alfa es el grupo hermano de FIX-Beta.","FIX-Alfa","es_hermano_de","FIX-Beta","expresa","S01 resumen","no evaluado","media","Lo dice el resumen.","resuelta","vigente"
+"C-002","La auditoría añade que FIX-Beta es monofilético.","FIX-Beta","es_monofiletico*","sí","expresa","S01 resultados","no evaluado","media","Lo dicen los resultados.","resuelta","vigente"
+"C-003","FIX-Gamma procede de FIX-Delta.","FIX-Gamma","procede_de","FIX-Delta","expresa","S02 discusión","no evaluado","media","Lo dice la fuente.","resuelta","vigente"
+"C-004","FIX-Alfa y FIX-Gamma forman el arranque del corredor.","FIX-Alfa","forma_con*","FIX-Gamma","sintesis(C-001; C-003)","n/a","no evaluado","media","Se sigue de C-001 y C-003.","resuelta","vigente"

@@ -131,7 +131,54 @@ def main() -> int:
     else:
         total_fmt = 0
 
-    total = len(ordinarios) + len(ok_cases) + len(bad_cases) + total_fmt
+    # --- versiones del corpus ------------------------------------------------
+    # El diff tiene que separar la corrección de la renumeración: si confunde
+    # una con otra, la ingestión de cada pasada de auditoría reingeriría el
+    # corpus entero o, peor, daría por igual una afirmación que cambió.
+    ver = FIXTURES / "corpus-versions"
+    total_ver = 0
+    if ver.is_dir():
+        import json
+        import subprocess
+        import tempfile
+        print(f"\n{DIM}versiones del corpus — el diff separa corrección de renumeración{RESET}")
+        freeze = [sys.executable, str(ROOT / "scripts" / "ingest" / "freeze.py")]
+        esperado = {"sin_cambios": 1, "solo_renumeracion": 2, "modificadas": 2, "nuevas": 1, "retiradas": 1}
+        with tempfile.TemporaryDirectory() as tmp:
+            informe, congelada = Path(tmp) / "diff.json", Path(tmp) / "v1.json"
+            subprocess.run([*freeze, "diff", str(ver / "v1"), str(ver / "v2"), "--json", str(informe)],
+                           capture_output=True, text=True)
+            obtenido = {}
+            if informe.exists():
+                inf = json.loads(informe.read_text(encoding="utf-8"))
+                af = inf["afirmaciones"]
+                obtenido = {k: (v if isinstance(v, int) else len(v)) for k, v in af.items() if k in esperado}
+                ent = inf["registros"].get("data/apendices/B_entidades.csv", {})
+                obtenido["entidad nueva"] = len(ent.get("nuevas", []))
+                obtenido["entidad renumerada"] = len(ent.get("solo_renumeracion", []))
+                obtenido["prosa cambiada"] = sum(1 for x in inf["prosa"] if x["estado"] == "cambiado")
+            esperado_todo = {**esperado, "entidad nueva": 1, "entidad renumerada": 2, "prosa cambiada": 1}
+            bien = obtenido == esperado_todo
+            marca = f"{GREEN}PASA{RESET}" if bien else f"{RED}FALLA{RESET}"
+            print(f"  {marca}  diff v1 → v2  {DIM}({', '.join(f'{k} {v}' for k, v in obtenido.items())}){RESET}")
+            if not bien:
+                fallos.append("corpus-versions: diff")
+                print(f"        {RED}esperado {esperado_todo}{RESET}")
+
+            subprocess.run([*freeze, "create", str(ver / "v1"), "--salida", str(congelada),
+                            "--fecha", "2026-09-25"], capture_output=True, text=True)
+            propia = subprocess.run([*freeze, "verify", str(ver / "v1"), str(congelada)],
+                                    capture_output=True, text=True).returncode == 0
+            ajena = subprocess.run([*freeze, "verify", str(ver / "v2"), str(congelada)],
+                                   capture_output=True, text=True).returncode != 0
+            bien = propia and ajena
+            marca = f"{GREEN}PASA{RESET}" if bien else f"{RED}FALLA{RESET}"
+            print(f"  {marca}  congelar v1: verify la reconoce y rechaza v2")
+            if not bien:
+                fallos.append("corpus-versions: create/verify")
+        total_ver = 2
+
+    total = len(ordinarios) + len(ok_cases) + len(bad_cases) + total_fmt + total_ver
     print(f"\n{total} casos · {len(fallos)} fallos · {avisos} advertencias acumuladas")
     if fallos:
         print(f"{RED}FALLOS:{RESET} " + ", ".join(fallos))
