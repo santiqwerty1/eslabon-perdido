@@ -72,9 +72,12 @@ def gather() -> dict:
     # y qué se revirtió: cambiarlos cambia lo que el estado significa.
     for p in sorted((corpus / "sections").glob("*.registro.csv")):
         files[str(p.relative_to(ROOT))] = digest(p)
-    historial = ROOT / "knowledge" / "deltas" / "historial.jsonl"
-    if historial.exists():
-        files[str(historial.relative_to(ROOT))] = digest(historial)
+    # Los deltas también: los pendientes reservan revisión e identificadores,
+    # y cualquiera de ellos dice qué secciones se ingirieron ya.
+    deltas = ROOT / "knowledge" / "deltas"
+    for p in sorted([*deltas.glob("*.json"), deltas / "historial.jsonl"]):
+        if p.exists():
+            files[str(p.relative_to(ROOT))] = digest(p)
     congelada = (json.loads(MANIFEST.read_text(encoding="utf-8")).get("corpus_freeze") or {}).get("path")
     if congelada:
         ruta = ROOT / congelada

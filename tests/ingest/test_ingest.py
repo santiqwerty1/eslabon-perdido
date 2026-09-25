@@ -214,32 +214,73 @@ class Barreras(unittest.TestCase):
         self.assertEqual(r["pendientes"], ["SEC-000001.json"])
 
 
-    def test_un_delta_revertido_no_reserva_la_revision_pero_si_la_seccion(self):
-        # Se aplicó y se revirtió: el manifiesto volvió a REV-000000 y el delta
-        # queda como constancia. Nada se encadena detrás de él, pero la sección
-        # no se vuelve a ingerir: sus ficheros siguen ahí y saldría duplicada.
-        deltas = self.tmp / "deltas"
-        deltas.mkdir()
-        (deltas / "SEC-000001.json").write_text(json.dumps({
+    @contextlib.contextmanager
+    def revertida(self, con_ficheros: bool):
+        """Un almacén donde la sección 00 se ingirió como SEC-000001 y se revirtió."""
+        k = self.tmp / "knowledge"
+        dirs = {"DELTAS": k / "deltas", "SECTIONS": k / "sections", "PASSAGES": k / "passages",
+                "REPORTS": k / "reports"}
+        for d in dirs.values():
+            d.mkdir(parents=True)
+        (dirs["DELTAS"] / "SEC-000001.json").write_text(json.dumps({
             "dataset_revision_before": "REV-000000", "dataset_revision_after": "REV-000001",
             "records_added": ["MENTION-000001"], "corpus_origin": {"section": "00"}}), encoding="utf-8")
-        (deltas / "historial.jsonl").write_text("".join(json.dumps(e) + "\n" for e in [
+        (dirs["DELTAS"] / "historial.jsonl").write_text("".join(json.dumps(e) + "\n" for e in [
             {"delta": "SEC-000001.json", "accion": "aplicar", "revision": "REV-000001"},
             {"delta": "SEC-000001.json", "accion": "revertir", "revision": "REV-000000"}]), encoding="utf-8")
-        dataset = self.tmp / "dataset.json"
-        dataset.write_text(json.dumps({"dataset_revision": "REV-000000"}), encoding="utf-8")
-        original, ingest.DELTAS = ingest.DELTAS, deltas
+        if con_ficheros:
+            (dirs["SECTIONS"] / "SEC-000001.md").write_text("x\n", encoding="utf-8")
+            (dirs["PASSAGES"] / "SEC-000001.json").write_text("[]\n", encoding="utf-8")
+        originales = {n: getattr(ingest, n) for n in dirs}
+        for n, d in dirs.items():
+            setattr(ingest, n, d)
         try:
+            yield dirs
+        finally:
+            for n, d in originales.items():
+                setattr(ingest, n, d)
+
+    def test_un_delta_revertido_no_reserva_la_revision_pero_si_la_seccion(self):
+        # Se aplicó y se revirtió: el manifiesto volvió a REV-000000 y el delta
+        # queda como constancia. Nada se encadena detrás de él, pero mientras
+        # queden sus ficheros la sección no se vuelve a ingerir: saldría duplicada.
+        with self.revertida(con_ficheros=True):
             self.assertEqual(ingest.revision_siguiente({"dataset_revision": "REV-000000"}),
                              ("REV-000000", "REV-000001", []))
             # Los identificadores del delta revertido siguen reservados.
             self.assertIn("MENTION-000001", ingest.reservados_por_deltas("MENTION"))
             with self.assertRaises(SystemExit) as e:
                 corredor.construir(str(MINI), "00", self.congelacion)
-        finally:
-            ingest.DELTAS = original
         self.assertIn("se revirtió", str(e.exception))
         self.assertIn("passages/SEC-000001.json", str(e.exception))
+
+    def test_retirados_sus_ficheros_la_seccion_revertida_se_reingiere_con_otro_numero(self):
+        # El número SEC-000001 no se reutiliza: si saliera otra vez, el delta
+        # nuevo heredaría el «revertir» del historial y no contaría como pendiente.
+        with self.revertida(con_ficheros=False) as dirs:
+            r = corredor.construir(str(MINI), "00", self.congelacion)
+            self.assertEqual(r["sec_id"], "SEC-000002")
+            self.assertEqual(r["rev"], ("REV-000000", "REV-000001"))
+            self.assertEqual(r["menciones"][0]["id"], "MENTION-000002")
+            (dirs["DELTAS"] / f"{r['sec_id']}.json").write_text(json.dumps(r["delta"]), encoding="utf-8")
+            self.assertEqual(ingest.revision_siguiente({"dataset_revision": "REV-000000"})[2],
+                             ["SEC-000002.json"])
+
+    def test_el_contraste_lee_la_entrada_del_registro_que_se_usa(self):
+        # La entrada del registro no se llama claims-00: la procedencia la
+        # encuentra por categoría, y el recuento declarado tiene que salir de ella.
+        otra = self.tmp / "otra"
+        shutil.copytree(MINI, otra)
+        indice = json.loads((otra / "data" / "table_index.json").read_text(encoding="utf-8"))
+        for e in indice["tables"]:
+            if e["id"] == "claims-00":
+                e["id"], e["row_count"] = "registro-00", 99
+        (otra / "data" / "table_index.json").write_text(json.dumps(indice), encoding="utf-8")
+        prosa = otra / "docs" / "secciones" / "001-00-0-arranque.md"
+        prosa.write_text(prosa.read_text(encoding="utf-8").replace("TABLE:claims-00", "TABLE:registro-00"),
+                         encoding="utf-8")
+        r = corredor.construir(str(otra), "00", congelar(otra, self.tmp / "otra.json"))
+        self.assertEqual(r["contraste"][0][1], 99)
 
     def test_sin_la_columna_de_primera_aparicion_del_apendice_b_no_se_ingiere(self):
         otra = self.tmp / "otra"

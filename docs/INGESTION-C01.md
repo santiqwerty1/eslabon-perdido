@@ -135,7 +135,7 @@ Si algo salió mal:
 .venv/bin/python scripts/ingest/delta.py SEC-000001.json --revert
 ```
 
-`delta.py` anota cada aplicación y cada reversión en `knowledge/deltas/historial.jsonl`. El delta revertido se queda en `knowledge/deltas/` como constancia, y por el historial `ingest.py` sabe que no está pendiente: la ingestión siguiente no se encadena detrás de él, y sus identificadores siguen reservados. Revertir no retira la sección, sus pasajes ni su informe, así que la sección no se puede ingerir otra vez sin más: o se vuelve a aplicar el mismo delta, o se retiran antes sus ficheros, que `ingest.py` enumera al negarse. `make snapshot` registra el historial y las copias del registro del corredor.
+`delta.py` anota cada aplicación y cada reversión en `knowledge/deltas/historial.jsonl`. El delta revertido se queda en `knowledge/deltas/` como constancia, y por el historial `ingest.py` sabe que no está pendiente: la ingestión siguiente no se encadena detrás de él, y sus identificadores siguen reservados. Revertir no retira la sección, sus pasajes ni su informe, así que la sección no se puede ingerir otra vez sin más: o se vuelve a aplicar el mismo delta, o se retiran antes esos ficheros, que `ingest.py` enumera al negarse. El delta se queda: su número de `SEC` no se vuelve a emitir y sus identificadores siguen reservados. `make snapshot` registra los deltas, el historial y las copias del registro del corredor.
 
 Si se ingiere otra sección antes de aplicar la anterior, su delta va detrás en la cadena de revisiones —el de la anterior lleva a `REV-000001`, el nuevo parte de ahí— y no reutiliza sus identificadores. `ingest.py` lo avisa. `delta.py` no comprueba el orden: hay que aplicarlos en el de la cadena.
 

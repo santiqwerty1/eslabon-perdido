@@ -138,18 +138,30 @@ def ficheros_de_seccion(raiz: Path, sec: str) -> tuple[Path, Path]:
     return prosa[0], registro
 
 
+def restos(sid: str) -> list[str]:
+    """Los ficheros que una ingestión deja fuera de los registros."""
+    candidatos = [base.SECTIONS / f"{sid}.md", base.SECTIONS / f"{sid}.json",
+                  base.SECTIONS / f"{sid}.registro.csv", base.PASSAGES / f"{sid}.json",
+                  base.REPORTS / f"{sid}.md"]
+    return [_rel(p) for p in candidatos if p.exists()]
+
+
 def ya_ingerida(sec: str) -> str | None:
-    # Un delta revertido también cuenta. Revertir deshace sus operaciones sobre
-    # los registros, pero la sección, sus pasajes, la copia del registro y el
-    # informe siguen en su sitio; ingerirla otra vez daría un SEC nuevo con los
-    # mismos pasajes duplicados. `revision_siguiente` sí lo salta: nada se
-    # encadena detrás de un delta revertido.
+    # Un delta revertido cuenta mientras queden sus ficheros. Revertir deshace
+    # sus operaciones sobre los registros, pero la sección, sus pasajes, la
+    # copia del registro y el informe siguen en su sitio; ingerirla otra vez
+    # los duplicaría con un SEC nuevo. Retirados, el delta se queda como
+    # constancia y la sección se puede ingerir de nuevo. `revision_siguiente`
+    # lo salta en cualquier caso: nada se encadena detrás de él.
+    revertidos = {d for d, a in base.ultima_accion().items() if a == "revertir"}
     for p in sorted(base.DELTAS.glob("*.json")):
         try:
             origen = json.loads(p.read_text(encoding="utf-8")).get("corpus_origin") or {}
         except json.JSONDecodeError:
             continue
         if origen.get("section") == sec:
+            if p.name in revertidos and not restos(p.stem):
+                continue
             return p.name
     return None
 
@@ -199,11 +211,10 @@ def construir(spec: str, seccion: str, ruta_congelacion: Path | None = None) -> 
 
     previa = ya_ingerida(sec)
     if previa and base.ultima_accion().get(previa) == "revertir":
-        sid = Path(previa).stem
         raise SystemExit(
-            f"ERROR la sección {sec} ya se ingirió ({previa}) y su delta se revirtió. Sus ficheros "
-            f"siguen ahí: vuelve a aplicarlo con delta.py, o retira antes knowledge/corpus/sections/{sid}.*, "
-            f"knowledge/corpus/passages/{sid}.json, knowledge/deltas/{previa} y generated/reports/{sid}.md")
+            f"ERROR la sección {sec} ya se ingirió ({previa}) y su delta se revirtió, pero sus ficheros "
+            f"siguen ahí: vuelve a aplicarlo con delta.py, o retira antes {', '.join(restos(Path(previa).stem))}. "
+            "El delta se queda como constancia: reserva su número y sus identificadores")
     if previa:
         raise SystemExit(f"ERROR la sección {sec} ya se ingirió ({previa}). Una versión nueva entra "
                          "por diferencia, no ingiriendo otra vez (INGESTION-C01.md)")
@@ -217,7 +228,7 @@ def construir(spec: str, seccion: str, ruta_congelacion: Path | None = None) -> 
 
     manifiesto = json.loads(base.MANIFEST.read_text(encoding="utf-8")) if base.MANIFEST.exists() else {}
     rev_antes, rev_despues, pendientes = base.revision_siguiente(manifiesto)
-    sec_id = base.siguiente_id("SEC", {p.stem for p in base.SECTIONS.glob("SEC-*")})
+    sec_id = base.siguiente_id("SEC", base.ids_de_secciones())
     base_pasaje = base.siguiente_libre("PASSAGE", base.ids_de_pasajes())
     base_mencion = base.siguiente_libre("MENTION", base.ids_en_uso("mentions.jsonl", "MENTION")
                                         | base.reservados_por_deltas("MENTION"))
@@ -359,7 +370,8 @@ def construir(spec: str, seccion: str, ruta_congelacion: Path | None = None) -> 
         m["notes"].insert(0, "capa de registro: " + "; ".join(usos[m["original_text"]]))
 
     # --- paso 10 y contraste ------------------------------------------------
-    declaradas = indice.get(f"claims-{sec}", {}).get("row_count")
+    # La entrada del registro que se usó para la procedencia, se llame como se llame.
+    declaradas = indice.get(del_registro or f"claims-{sec}", {}).get("row_count")
     con_mencion_b = sum(1 for e in propias_b if (e.get("etiqueta preferida") or "").strip() in por_etiqueta)
     # Filas del apéndice B que no nombran nada: un marcador de hueco o una cifra
     # metidos como entidad. Explican cualquier descuadre del contraste.
