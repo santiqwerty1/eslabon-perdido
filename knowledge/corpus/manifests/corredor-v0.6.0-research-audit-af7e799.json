@@ -1,0 +1,640 @@
+{
+  "corpus": "Corredor Eukaryota → Holozoa",
+  "version": "0.6.0-research-audit",
+  "cutoff": "2026-08-08",
+  "declared_state": "encargo completo; huecos científicos etiquetados",
+  "counts": {
+    "tablas": 92,
+    "afirmaciones": 1952,
+    "fuentes": 523,
+    "entidades": 1500,
+    "eventos": 109,
+    "fechas": 215,
+    "hipótesis": 81,
+    "magnitudes": 562,
+    "búsquedas_negativas": 68
+  },
+  "repository": "santiqwerty1/corredor-eukaryota-holozoa",
+  "commit": "af7e799e2d096a48f24afd31d7745e19cebf374d",
+  "frozen_on": "2026-09-25",
+  "decision": "DEC-056",
+  "supersedes": null,
+  "canonical_layer": [
+    "data/",
+    "docs/secciones/"
+  ],
+  "fingerprint": "sha256:b53f15ad613451387591f519d7ec8d4144a774aed83fbaaabd5e5207a18aa415",
+  "file_count": 122,
+  "files": [
+    {
+      "path": "data/afirmaciones/00.csv",
+      "sha256": "2aea806cbc1fb8efd4b3b42dbfe4e14da697f8d9d22f1ae8155c46542494d5f7",
+      "bytes": 4288
+    },
+    {
+      "path": "data/afirmaciones/01.csv",
+      "sha256": "38de749941d4f51521128aeda668bf763cee96cdb513fd3a6636e2c95bc6cd81",
+      "bytes": 1986
+    },
+    {
+      "path": "data/afirmaciones/02.csv",
+      "sha256": "854c8cee494094e323813545f7004b2c8f5dbf2698c8733b7d3ee5196bd51e94",
+      "bytes": 65697
+    },
+    {
+      "path": "data/afirmaciones/03.csv",
+      "sha256": "4c0e6f8ca71e139a1489ff91fb136a74abddd008b5f2af6f83b2e5714ad4a997",
+      "bytes": 125805
+    },
+    {
+      "path": "data/afirmaciones/04.csv",
+      "sha256": "a3d673169940f6d36c85e1f415006a1ba159c29aa98c62da069aa2a1f91cc713",
+      "bytes": 106446
+    },
+    {
+      "path": "data/afirmaciones/05.csv",
+      "sha256": "9e729fabdb7357cf6af1089b70f0887563d32c44ff3df933aba9fdd5ad91b29d",
+      "bytes": 32351
+    },
+    {
+      "path": "data/afirmaciones/06.csv",
+      "sha256": "dc54b334db8573ea2bb085ec8e9f5b5b89ca3b41c2566a771bec7506a1a8897c",
+      "bytes": 14926
+    },
+    {
+      "path": "data/afirmaciones/07.csv",
+      "sha256": "c851bc807989b0acef787f7405c5d8af5a7c84503ed6aa89ee6949d032b3165b",
+      "bytes": 32837
+    },
+    {
+      "path": "data/afirmaciones/08.csv",
+      "sha256": "b881b29f8c1e67e46d0737a3a73078e0631be9f457d3c1f1dd670e14522748aa",
+      "bytes": 59061
+    },
+    {
+      "path": "data/afirmaciones/09.csv",
+      "sha256": "610b9e93a04b2bd6048ea4f4504b8bcfb7b4df78934f214e29105a11038381c9",
+      "bytes": 97249
+    },
+    {
+      "path": "data/afirmaciones/10.csv",
+      "sha256": "b6b4fbe1f04e582b05c48ea0f5a7c6490262a6ea87d033f288759cbc941ab8ec",
+      "bytes": 54140
+    },
+    {
+      "path": "data/afirmaciones/11.csv",
+      "sha256": "d9c744bd6293f9c5128d5667e79dbc49ff645bcdd78202ba7a9fe2a31aa2ee02",
+      "bytes": 48762
+    },
+    {
+      "path": "data/afirmaciones/12.csv",
+      "sha256": "102b60394d0f0bee4bec3610ba6fffd68ce90dde579cb3b6af12ec1d11c2d05b",
+      "bytes": 55675
+    },
+    {
+      "path": "data/afirmaciones/13.csv",
+      "sha256": "a8e5b371e58cee45b64b72db12806c4bcd8531b5b7388a601ad4983a84a323b6",
+      "bytes": 30886
+    },
+    {
+      "path": "data/afirmaciones/14.csv",
+      "sha256": "8e823bc8c6b7f7ad883039187e766bbe309dfd9d7952da1ed26b8b8da235afcb",
+      "bytes": 83551
+    },
+    {
+      "path": "data/afirmaciones/15.csv",
+      "sha256": "206cc877db656f604008217f0078f3f57be272e034a76500fe1b3103ebcb7477",
+      "bytes": 28797
+    },
+    {
+      "path": "data/apendices/A_fuentes.csv",
+      "sha256": "613a006a475ae0d59e6eb661365dbfcd734ed045544914167254ed8a1f3aed6b",
+      "bytes": 276170
+    },
+    {
+      "path": "data/apendices/B_entidades.csv",
+      "sha256": "3909526777ae4944d10efe344e235f79328b987e8b6117b09cfc7f6a9d29c91f",
+      "bytes": 128034
+    },
+    {
+      "path": "data/apendices/C_eventos.csv",
+      "sha256": "c6bb28ecd90721e7c51ade9dd2a9c990779c249baa4fba4a6aea6ee546207987",
+      "bytes": 25801
+    },
+    {
+      "path": "data/apendices/D_fechas.csv",
+      "sha256": "eccb6f6ac72e463be56d4d732f5d49ac0049a700bf3a8b120b72d50005b1b4f7",
+      "bytes": 47874
+    },
+    {
+      "path": "data/apendices/E_hipotesis.csv",
+      "sha256": "70cc59a8e2ef9723c7fc6026d00dbb218c48bd5730609867efb64ddb1711b601",
+      "bytes": 45142
+    },
+    {
+      "path": "data/apendices/F_magnitudes.csv",
+      "sha256": "cf5b66f44b038bfce63d4c36d71fc562668c067407a63c701589eca30fb64b96",
+      "bytes": 103511
+    },
+    {
+      "path": "data/apendices/G_material_no_encajado.csv",
+      "sha256": "94a431c105a529526d75b6b72de2e0d5a972c36cf47fc3036bec25649c77be8a",
+      "bytes": 5742
+    },
+    {
+      "path": "data/apendices/H_recuento_control.csv",
+      "sha256": "d7ce6a2fa86d0d29ed04638be5d1f14a6337ec39dfee8df7acf356dd59c95497",
+      "bytes": 1331
+    },
+    {
+      "path": "data/auditoria/mapeo_celdas_afirmaciones.csv",
+      "sha256": "12cfde4c0b5437e8d80c22ba32ccba9d0d23ebb2149f4027f643a5738adff622",
+      "bytes": 566558
+    },
+    {
+      "path": "data/auditoria/requisitos_disposiciones.csv",
+      "sha256": "e11c87bf5fbfad1a7c26283a96451e12bfdfbb0245b6299d202a7e65aecf3083",
+      "bytes": 201777
+    },
+    {
+      "path": "data/busquedas_negativas/15_1_15-1-punto-de-partida-y-participantes-celulares.csv",
+      "sha256": "51576f79b62e19517f5177982a10037c31d84b650ed15f1df2ddddbed2bd9d42",
+      "bytes": 3640
+    },
+    {
+      "path": "data/busquedas_negativas/15_2_15-2-eucariogenesis.csv",
+      "sha256": "5558849f36ed29e2a72a91bf04c0f0877982a1c3edbc5de350843a9c6dcd54a9",
+      "bytes": 3524
+    },
+    {
+      "path": "data/busquedas_negativas/15_3_15-3-raiz-eucariota-y-corredor-filogenetico.csv",
+      "sha256": "1942da786c6990cc70addb8a30d284fbe9d0c2b89535cb7283ed2df42a988c32",
+      "bytes": 2640
+    },
+    {
+      "path": "data/busquedas_negativas/15_4_15-4-registro-material-tiempo-ambiente-y-ecologia.csv",
+      "sha256": "6b1952dfd50d51ad3cd0af2cda1526c6faa7f4ad65cb8608c990b5d27fc9face",
+      "bytes": 6002
+    },
+    {
+      "path": "data/busquedas_negativas/15_5_15-5-asociacion-integracion-y-transferencia.csv",
+      "sha256": "e2d208e1746ff7a116a3141590c53aaaf8d60b6994cb29bcb5362e2a7c40331b",
+      "bytes": 5557
+    },
+    {
+      "path": "data/busquedas_negativas/15_6_15-6-rasgos-con-costo-y-controversia-energetica.csv",
+      "sha256": "36c119af3fc341dbcafa61c0613acf44d13d8eda8a88967bda89eca22954dded",
+      "bytes": 5101
+    },
+    {
+      "path": "data/busquedas_negativas/15_7_15-7-sexo-meiosis-y-ciclo-vital.csv",
+      "sha256": "61e1ec864327aae52c56bd37fcc7960c12fa7c8c52d15453384a5334e089e254",
+      "bytes": 4781
+    },
+    {
+      "path": "data/busquedas_negativas/15_8_15-8-nombres-y-nomenclatura.csv",
+      "sha256": "3ed67c7276ab11adb96db81fdec361823e666e2b8d6b08122dc18a1ec49f3f29",
+      "bytes": 1116
+    },
+    {
+      "path": "data/busquedas_negativas/15_9_15-9-multicelularidad-y-repertorio-preanimal.csv",
+      "sha256": "6fce32d5a356bf3b0805e222f51cec111f827fdddeb3e25bef86a34478c6f919",
+      "bytes": 3338
+    },
+    {
+      "path": "data/tablas/02/table-01-2-1-2-por-que-el-modelo-cambia-el-arbol.csv",
+      "sha256": "06fe09729c1b47d48a59c4883f6b56ef1692cf500f2b1072a74c842c15bae2b3",
+      "bytes": 1378
+    },
+    {
+      "path": "data/tablas/02/table-02-2-2-1-quimica-de-membrana.csv",
+      "sha256": "f8de46365f433628a8f06549a8eab962d368e74f997bae1b80c02a10c6c5a4fb",
+      "bytes": 319
+    },
+    {
+      "path": "data/tablas/02/table-03-2-2-3-soluciones-propuestas-y-estado-del-problema.csv",
+      "sha256": "bd4d8019b022666709d3eb3a8b654cb5cd19d01ffb86c641c975bccdff9a6fd5",
+      "bytes": 1000
+    },
+    {
+      "path": "data/tablas/02/table-04-2-4-2-divisiones-nombradas-y-clase-de-evidencia-localizada.csv",
+      "sha256": "81a4d83c70cab7cdb5616effa769195cb90f16c66278b94a92ad697330c276ab",
+      "bytes": 4558
+    },
+    {
+      "path": "data/tablas/02/table-05-2-7-proteinas-de-firma-eucariota-deteccion-y-funcion.csv",
+      "sha256": "40c506d943d956d2e3128f2d1e616154d19912c228b7024c4db8f43dfdde85d4",
+      "bytes": 1993
+    },
+    {
+      "path": "data/tablas/02/table-06-2-8-2-el-grupo-vivo-mas-proximo-no-esta-resuelto.csv",
+      "sha256": "15bc09249480d81876ba84ce6b3fdeb1563ed2fed66e83b6b9a20669fe3a9669",
+      "bytes": 867
+    },
+    {
+      "path": "data/tablas/03/table-08-3-1-1-etiquetas-y-alcance.csv",
+      "sha256": "34a58dd97367f72e3ca9ebeb4d50f3669c8c8bd4ef553f7b678032cbf731beb4",
+      "bytes": 1186
+    },
+    {
+      "path": "data/tablas/03/table-09-3-2-7-matriz-de-caracteres-y-metodo-de-inferencia.csv",
+      "sha256": "98f0fc76f55b3e5d3f04ec57937ee7bdddeed0457a1884c0d0ff45705fffddde",
+      "bytes": 1894
+    },
+    {
+      "path": "data/tablas/03/table-10-3-3-orden-de-los-eventos-mitocondria-y-fagotrofia.csv",
+      "sha256": "6340f011df02bb6cb9cdac97646f92f130befabaf753940e231a910bd65216f3",
+      "bytes": 962
+    },
+    {
+      "path": "data/tablas/03/table-11-3-4-7-comparacion-del-montaje-inicial.csv",
+      "sha256": "9d623c29973d4d71c096fb7ecbf794e6a57c6e18fcc24e604a8e7104000031d9",
+      "bytes": 2214
+    },
+    {
+      "path": "data/tablas/03/table-12-3-5-5-comparacion-de-los-modelos-nucleares.csv",
+      "sha256": "5932490be98496e24bc2b5f894a040f7fe2b5cbcf653efe688ce9801482a72e4",
+      "bytes": 908
+    },
+    {
+      "path": "data/tablas/03/table-13-3-7-matriz-de-compatibilidad.csv",
+      "sha256": "1aef0c81a19735fe6bf370da51872eab0f370ec104e045d33c013b141d1e39b5",
+      "bytes": 17847
+    },
+    {
+      "path": "data/tablas/04/table-15-4-2-8-comparacion-de-las-raices.csv",
+      "sha256": "ff1b79b989b2361cb83aeccd98b3ad50134b91eead05ec658cda653ac756a717",
+      "bytes": 1588
+    },
+    {
+      "path": "data/tablas/04/table-16-4-6-1-eukaryota.csv",
+      "sha256": "519d2f9be2cd548cc8fb50d264841851d99bef109f6ffa760890661ac23190d8",
+      "bytes": 1179
+    },
+    {
+      "path": "data/tablas/04/table-17-4-6-2-amorphea.csv",
+      "sha256": "c09b040c62289a79b978128c13c5618f2ab940c437b860e9207ddfc2a25ce432",
+      "bytes": 1307
+    },
+    {
+      "path": "data/tablas/04/table-18-4-6-3-amoebozoa.csv",
+      "sha256": "85b49a811e29e71896f1587837755713dafc08e77249f99a0e1b982e4321e33f",
+      "bytes": 1108
+    },
+    {
+      "path": "data/tablas/04/table-19-4-6-4-obazoa.csv",
+      "sha256": "90bd6a1e535ddba095bfd7d8c6fc69e219e06b6f3987fa7b1d0e24f08c7892b1",
+      "bytes": 1136
+    },
+    {
+      "path": "data/tablas/04/table-20-4-6-5-apusomonadida.csv",
+      "sha256": "51098562e38ebd5e1544ccdca7753a4d22c678868eecdb05fb79654d5a17f5a7",
+      "bytes": 1225
+    },
+    {
+      "path": "data/tablas/04/table-21-4-6-6-breviatea.csv",
+      "sha256": "edd5dd1a848930427555a38f61ce204f42ad8e583212be4a4ddde053b880921e",
+      "bytes": 1186
+    },
+    {
+      "path": "data/tablas/04/table-22-4-6-7-opisthokonta.csv",
+      "sha256": "57cb5cecee509b435e577df22b49b9be11b8d5365d95d2c8e8e9182141436301",
+      "bytes": 1286
+    },
+    {
+      "path": "data/tablas/04/table-23-4-6-8-holomycota.csv",
+      "sha256": "fbe027fed7524e848d9fd19e129fc9f7c81402151e07ab40107c27b1450782eb",
+      "bytes": 1242
+    },
+    {
+      "path": "data/tablas/04/table-24-4-6-9-holozoa.csv",
+      "sha256": "7d244079f1be6b0afb219fb7f2692ec92cd30c73c980006c51e6a5d3b09ad241",
+      "bytes": 1210
+    },
+    {
+      "path": "data/tablas/04/table-25-4-6-10-ichthyosporea.csv",
+      "sha256": "67968730780e26c4a7a664700a74a679d96d7fcfedab49e8ff87d365affcdd92",
+      "bytes": 1269
+    },
+    {
+      "path": "data/tablas/04/table-26-4-6-11-pluriformea-sensu-hehenberger-et-al-2017.csv",
+      "sha256": "1dd3970dbdbf2f2792fe4bd75f44f53c03890d5ba7196a9a11d47711447bf1e9",
+      "bytes": 1283
+    },
+    {
+      "path": "data/tablas/04/table-27-4-6-12-corallochytrea.csv",
+      "sha256": "8e491fea4b05f9336726a4e3523dc8e13a82e731636b05ed29d6af8eed03cf08",
+      "bytes": 1286
+    },
+    {
+      "path": "data/tablas/04/table-28-4-6-13-filasterea.csv",
+      "sha256": "eedd97459b551d6e3246b4a0c35895594825275f341a8248821299e368d6411a",
+      "bytes": 1262
+    },
+    {
+      "path": "data/tablas/04/table-29-4-6-14-filozoa.csv",
+      "sha256": "79977bbaf698c0c2dcca4f6be5bab7d77ce81d8ff5af3e0c5c1f3fc00ad4afe7",
+      "bytes": 1197
+    },
+    {
+      "path": "data/tablas/04/table-30-4-6-15-choanozoa-sensu-stricto-apoikozoa.csv",
+      "sha256": "771b7f937be51451f58e3575f3308813d1e5808727730713d4841fdc0e0ba9eb",
+      "bytes": 1150
+    },
+    {
+      "path": "data/tablas/04/table-31-4-6-16-choanoflagellata.csv",
+      "sha256": "6b401c213c81e60c8876e8aa7ade561adc37512c13b911e30716e23601b7f992",
+      "bytes": 1177
+    },
+    {
+      "path": "data/tablas/04/table-32-4-6-17-metazoa.csv",
+      "sha256": "60e7ce0349b1d24527582dd93d01d940f3137642cb3cd2fcdc548962cbc00edb",
+      "bytes": 1159
+    },
+    {
+      "path": "data/tablas/05/table-33-5-4-evidencia-de-interaccion-en-perforaciones-del-grupo-chuar.csv",
+      "sha256": "ff5eb6e1712c49f088b6ae2489356f4ca558e434d9dcea20808e54cf4b37decb",
+      "bytes": 516
+    },
+    {
+      "path": "data/tablas/05/table-34-5-8-asignacion-fosil-mas-antigua-localizada-por-nodo.csv",
+      "sha256": "493b8633dad97f7f3059a3c0c016fceef1fbd0fda87ea99e84e9c61f49d6b4d5",
+      "bytes": 5248
+    },
+    {
+      "path": "data/tablas/06/table-36-6-1-estimaciones-publicadas.csv",
+      "sha256": "9a193b8f5fb7d2e0a0158b8a4c2f888f08108d76d7070f52c62483eb06e7568a",
+      "bytes": 2545
+    },
+    {
+      "path": "data/tablas/07/table-38-7-1-oxigeno-cronologia-proxies-y-discrepancias-cuantitativas.csv",
+      "sha256": "db6778a96b270d70e7f5cc290195c975ed9ae2d9525704fc31324550868175e9",
+      "bytes": 1589
+    },
+    {
+      "path": "data/tablas/07/table-38b-7-2-redox-y-aceptores.csv",
+      "sha256": "1af62b0f3195319c5881b6ef15fa450278c02852c26fa3ca5933ca4bd7ce42c4",
+      "bytes": 2392
+    },
+    {
+      "path": "data/tablas/07/table-38c-7-4-episodios-globales.csv",
+      "sha256": "864e9234187fa9fde169e1306bc9ef2cfb1cf4c8f650a8a9a032afbfdf77511a",
+      "bytes": 1090
+    },
+    {
+      "path": "data/tablas/08/table-40-8-3-depredadores-holozoos-obazoa-holomycota-y-amoebozoa.csv",
+      "sha256": "f0a1b77ac89b55d0e65c1b7e893e0a468b7b86a446e3c36eb01661283f707d68",
+      "bytes": 5804
+    },
+    {
+      "path": "data/tablas/08/table-40b-8-5-virus-gigantes.csv",
+      "sha256": "d2cbcb72f735533c198def3daef9500b2c8482a4f45cefdf10b448492fc1b88f",
+      "bytes": 794
+    },
+    {
+      "path": "data/tablas/09/table-42-9-1-1-tipologia-cerrada.csv",
+      "sha256": "836d2ebcfb6d8006e38cf03415cf670ec7fdd47d5da754237ffe533ca991fedd",
+      "bytes": 2390
+    },
+    {
+      "path": "data/tablas/09/table-43-9-4-1-fichas-comparativas-por-grado-de-integracion.csv",
+      "sha256": "621e04014b5135dfb0bcdcc18d37e50fe5f99e42fdcb6ebd408a328ddfed8cc3",
+      "bytes": 6505
+    },
+    {
+      "path": "data/tablas/09/table-44-9-7-1-correlatos-publicados.csv",
+      "sha256": "1a4f96df22380e4b428c4543ec8fc041b841a8618fd9b31809bcd2d2b1f2b82c",
+      "bytes": 1422
+    },
+    {
+      "path": "data/tablas/09/table-45-9-8-1-gradiente-funcional-comparado.csv",
+      "sha256": "1ee63914488d230c35130ae60fd230a3f55b06ac0e08ed8e2d8acb9f1ffd3452",
+      "bytes": 1130
+    },
+    {
+      "path": "data/tablas/10/table-47-10-1-tabla-consolidada-de-rasgos-con-coste.csv",
+      "sha256": "877d1d84b51340117d14d09ecd4059068a2f249a2cade6db1108e35d3577d904",
+      "bytes": 5763
+    },
+    {
+      "path": "data/tablas/11/table-49-11-11-vista-comparativa-de-clases-de-evidencia.csv",
+      "sha256": "bea869a65a6fc72e9da47c4637d71935f51a14204b029d4c6cd21ce52bbe06f3",
+      "bytes": 1430
+    },
+    {
+      "path": "data/tablas/12/table-51-12-1-1-vista-comparativa-de-rutas.csv",
+      "sha256": "a4d8fbd8ef670fd14963b1994f09f9edf6edc38998015739dec009c5d49e4412",
+      "bytes": 1572
+    },
+    {
+      "path": "data/tablas/12/table-52-12-6-1-costes-y-compensaciones-cuantificados-o-no-localizado.csv",
+      "sha256": "a2d950ffac3449f877b66acac2cfe109fc2b804e63e29b5d29f0d83bd689ced4",
+      "bytes": 2458
+    },
+    {
+      "path": "data/tablas/12/table-53-12-7-1-tabla-comparativa-de-genomas.csv",
+      "sha256": "cf8e70232bafe0a7c83dff68bc1af5be57284326ba061a35494b37b74564c521",
+      "bytes": 1853
+    },
+    {
+      "path": "data/tablas/12/table-54-12-10-1-repertorio-funcional-localizado.csv",
+      "sha256": "3179a65900665e28125b9faf567aa3c6219724d5af70af581073a0c81746b1db",
+      "bytes": 3063
+    },
+    {
+      "path": "data/tablas/13/table-55a-13-3-escalas-de-division-y-ambiente.csv",
+      "sha256": "677fd548758566e018c67323df1aac9e59f99948b91fb2b24f4a772a7f3bc740",
+      "bytes": 1906
+    },
+    {
+      "path": "data/tablas/13/table-55b-13-4-tasas-de-mutacion-directas.csv",
+      "sha256": "c1a499776755c4688ec7672447c383d70be868b7ae1902e361d6b707db6b3750",
+      "bytes": 1782
+    },
+    {
+      "path": "data/tablas/13/table-55c-13-6-cronologia-de-endosimbiosis-e-integracion.csv",
+      "sha256": "7b1d4ed68ae4461dee7ce41af67cc5215624963cc219de7bfb47f238645cd34d",
+      "bytes": 2114
+    },
+    {
+      "path": "data/tablas/13/table-55d-13-9-recuentos-de-origenes-y-perdidas.csv",
+      "sha256": "c1f7b73b2445614a481d5b835923156fff0d66bd4ab022a8a44fc837b626ea05",
+      "bytes": 2822
+    },
+    {
+      "path": "data/tablas/14/table-56-14-8-1-codigos.csv",
+      "sha256": "7e613fae1f85da1010460672b47beeead9f7dfb86c6cc207237e9d0a6195dc71",
+      "bytes": 890
+    },
+    {
+      "path": "data/tablas/14/table-57-14-8-2-nombres-rivales-o-solapados.csv",
+      "sha256": "c07b6d6c8de5d3de7862573dd48a50f24583bb8b2a047af62591bf2ea5031d11",
+      "bytes": 1769
+    },
+    {
+      "path": "data/tablas/14/table-58-14-8-3-terminos-problematicos-y-reemplazos.csv",
+      "sha256": "28533740e309ae9989b7adb6d788886e44856c02336045b30766cdd78ec3a46d",
+      "bytes": 2998
+    },
+    {
+      "path": "data/tablas/15/table-59-15-1-mapa-del-terreno-probatorio.csv",
+      "sha256": "3f98ecaa55c954d589386c570a7cf7e29246b700d5ed9274fdf3ac6a99005ab2",
+      "bytes": 1639
+    },
+    {
+      "path": "data/tablas/15/table-60-15-2-evidencia-retirada-refutada-o-reinterpretada.csv",
+      "sha256": "d5fca6136f428e0f35258c18a5a1be06d8c98888ad2613036a4cea31b17ef449",
+      "bytes": 2178
+    },
+    {
+      "path": "data/tablas/15/table-61-15-3-nodos-fechas-y-relaciones-debiles.csv",
+      "sha256": "95a67125c47edc8a072d0680e42470d1c95797430f24c82d04d20db438bce5c3",
+      "bytes": 1774
+    },
+    {
+      "path": "data/tablas/19/table-77-19-respuestas-a-las-seis-preguntas-de-cierre.csv",
+      "sha256": "4bca8cfdf60e2923fd80d3fe92b4766edb7180da8ff881234d897da8edf64743",
+      "bytes": 3565
+    },
+    {
+      "path": "data/table_index.json",
+      "sha256": "b864cd703c38971ed901c07fe76b5ced808e4e5368e556cb289abc0318366960",
+      "bytes": 76497
+    },
+    {
+      "path": "data/table_lineage.csv",
+      "sha256": "9bcd450abc9fbfe0a7b3757ed11a2cad3ce0d7d3d9867f0c0449dafe77648da1",
+      "bytes": 37870
+    },
+    {
+      "path": "docs/secciones/000-preambulo.md",
+      "sha256": "de0ca337d1d01e6c0f9a17dd8127e625a1fc7d407fe501b9e7b16c4223c735f1",
+      "bytes": 1941
+    },
+    {
+      "path": "docs/secciones/001-00-0-convenciones-probatorias-y-taxonomicas.md",
+      "sha256": "1c37ce9a3dbd5f22c7e617861b01edd1edce4a1001e3fdf23c5b27c8a8aea2fb",
+      "bytes": 2590
+    },
+    {
+      "path": "docs/secciones/002-01-1-alcance-del-corpus.md",
+      "sha256": "c7dcfa9cc880bb81da94198562aa9c18273f9cff3a041912deddfb3d715486be",
+      "bytes": 789
+    },
+    {
+      "path": "docs/secciones/003-02-2-el-punto-de-partida-dos-dominios-o-tres.md",
+      "sha256": "7f7439d24ef1656fe5249f26e0a0c8ba02c72b52dc0c863061786dcf27557383",
+      "bytes": 21827
+    },
+    {
+      "path": "docs/secciones/004-03-3-eucariogenesis.md",
+      "sha256": "3be7522a8b61b605b10e2638026f4f6738c98ba1ff631ca007142b506ab8eac9",
+      "bytes": 39395
+    },
+    {
+      "path": "docs/secciones/005-04-4-la-raiz-eucariota-y-la-forma-de-amorphea.md",
+      "sha256": "e85bf706b65fc472e73fbebee0cf9883d95774d52799b8547fa7a7c0460aaa8b",
+      "bytes": 25215
+    },
+    {
+      "path": "docs/secciones/006-05-5-el-registro-material-fosiles-y-biomarcadores.md",
+      "sha256": "95cc030fcf06813b0377d45fcec8193365e6c6df2de8b9a6cac01370c212bf9e",
+      "bytes": 12398
+    },
+    {
+      "path": "docs/secciones/007-06-6-tiempo-relojes-moleculares-y-desacuerdo-con-las-rocas.md",
+      "sha256": "b9107c3a8e66f8fcd8e39c2198092b09e1b877b86c4cd14030029a85f20aeaad",
+      "bytes": 5647
+    },
+    {
+      "path": "docs/secciones/008-07-7-ambiente.md",
+      "sha256": "86fd5d270e7830cc8cd2dc80a76197595028f09744655b6caf14b2a8bd64a1fa",
+      "bytes": 17689
+    },
+    {
+      "path": "docs/secciones/009-08-8-ecologia-y-trofismo.md",
+      "sha256": "d748130968d2c7cb3ccfbe67f65a96179eef937bfbc3b268cd3d8a49dcb158a8",
+      "bytes": 20721
+    },
+    {
+      "path": "docs/secciones/010-09-9-asociacion-el-catalogo-de-desenlaces.md",
+      "sha256": "ada2b3752d3878e3b3b470da4e923f9ef193422e17dd7784b8f4c05b0bcf2366",
+      "bytes": 42868
+    },
+    {
+      "path": "docs/secciones/011-10-10-rasgos-con-costo.md",
+      "sha256": "06149ac5c313f9c412bdb471b92ec66c6452ad3bf80f691b2618de86c387a0b9",
+      "bytes": 22829
+    },
+    {
+      "path": "docs/secciones/012-11-11-sexo-meiosis-y-ciclo-vital.md",
+      "sha256": "60953a3308492b4afc150ff64080f991a555554b998709937fe962083e74736a",
+      "bytes": 21023
+    },
+    {
+      "path": "docs/secciones/013-12-12-multicelularidad-y-el-repertorio-preanimal.md",
+      "sha256": "e6ed4303b39048e3514b4a45eff183c4d47b244f184fa030e6b640799cf61157",
+      "bytes": 24629
+    },
+    {
+      "path": "docs/secciones/014-13-13-escalas-tasas-y-recuentos.md",
+      "sha256": "662ce600f94858909be2a417e96de6b94d19965d14f0dc4cac318b788cff1413",
+      "bytes": 21237
+    },
+    {
+      "path": "docs/secciones/015-14-14-nombres-y-nomenclatura.md",
+      "sha256": "5144a0b35a724efa24f0e673932208db17593e807b9fd855d4338e904eedd4e4",
+      "bytes": 41099
+    },
+    {
+      "path": "docs/secciones/016-15-15-lo-que-no-se-sabe-y-como-lo-sabemos.md",
+      "sha256": "355e99ba306382e9d30b8d394be60f1249ad2c93a98604bc1c057547a919fe4f",
+      "bytes": 9813
+    },
+    {
+      "path": "docs/secciones/017-17-apendice-a-apendice-a-fuentes.md",
+      "sha256": "9588d5060143038815469e6c03fb9c89fc92641628a0161bd15f9a80b767f7ef",
+      "bytes": 58
+    },
+    {
+      "path": "docs/secciones/018-17-apendice-b-apendice-b-entidades.md",
+      "sha256": "913da3986beb739105122c14352650985fa52a8eeb42a793f06763c73848a1f6",
+      "bytes": 60
+    },
+    {
+      "path": "docs/secciones/019-17-apendice-c-apendice-c-eventos.md",
+      "sha256": "4d10122f3546947dd82ef38f5655c1c4c99a03457babd2bc5fc7d8ddc570a052",
+      "bytes": 58
+    },
+    {
+      "path": "docs/secciones/020-17-apendice-d-apendice-d-fechas.md",
+      "sha256": "a3b8976565b1918fd23d116968a6477b3b10d0e57b659e5e7cc760941ffa07ed",
+      "bytes": 57
+    },
+    {
+      "path": "docs/secciones/021-17-apendice-e-apendice-e-hipotesis.md",
+      "sha256": "13e8477d34ebcbb82e05f2f278cbe317be79fa2e5ed85f68439f0ee32eaebfd6",
+      "bytes": 61
+    },
+    {
+      "path": "docs/secciones/022-17-apendice-f-apendice-f-magnitudes.md",
+      "sha256": "7388900bc5773e26118e70ecb0b32e39ba4b326afefd80e5bb261d8bef30b34a",
+      "bytes": 61
+    },
+    {
+      "path": "docs/secciones/023-17-apendice-g-apendice-g-material-no-encajado.md",
+      "sha256": "e56ed0dd2a73a94a835161e1c38ef3d03d31597a31bea9ae82b759f8976f2f7d",
+      "bytes": 71
+    },
+    {
+      "path": "docs/secciones/024-17-apendice-h-apendice-h-recuento-de-control.md",
+      "sha256": "55bd5965b30980e007044a570aecc4f8a7345c1290cc74670fda0a9d1c9a408b",
+      "bytes": 68
+    },
+    {
+      "path": "docs/secciones/025-19-19-respuestas-a-las-seis-preguntas-de-cierre.md",
+      "sha256": "a2493e1b16a8d7578e5366ff8d4cd3ab9d46fba182bfc612558295f58b834782",
+      "bytes": 118
+    }
+  ]
+}

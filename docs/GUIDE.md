@@ -4053,7 +4053,7 @@ Las siguientes decisiones no deben resolverse prematuramente. Cada una debe prod
 | `OPEN-013` | Condiciones exactas de éxito de Eucaria | Fase 10 |
 | `OPEN-014` | Nombre definitivo del juego y de Campaña 1 | Después del prototipo jugable |
 | `OPEN-015` | Licencia de datos, código y contenido | ~~Fases 0–1~~ · **RESUELTA** por `DEC-053` |
-| `OPEN-016` | Fecha de corte y corpus científico exacto de Eucaria | Fase 1 |
+| `OPEN-016` | Fecha de corte y corpus científico exacto de Eucaria | ~~Fase 1~~ · **RESUELTA** por `DEC-056` |
 | `OPEN-017` | Representación visual de célula, ambiente e integración | Fases 8–12 |
 | `OPEN-018` | Alcance exacto de Filozoa/Choanozoa dentro del cierre Holozoa | Fases 1 y 7 |
 | `OPEN-019` | Qué señales científicas usa la lente de la Campaña 1 | Fases 7–11 |
@@ -4517,6 +4517,7 @@ Una entidad no necesita estar científicamente “resuelta”. Está correctamen
 | `DEC-053` | DECIDIDO | Código bajo MIT, corpus científico bajo CC BY 4.0, contenido de juego propietario. Resuelve `OPEN-015`. |
 | `DEC-054` | DECIDIDO | El eje `acceptance` gana `abandoned` para «ya no la sostiene nadie», en vez de expresarlo con `historical_status: rejected`: son ejes independientes (§10) y acoplarlos habría hecho indistinguible una idea rechazada con defensores de otra sin ellos. Resuelve `ISSUE-000037`. Sube el esquema a 1.1.0. |
 | `DEC-055` | DECIDIDO | Los grupos de conflicto pasan a registro propio con identificador opaco (`CONFLICT-000001`, `conflict-groups.jsonl`). Como cadenas libres no tenían integridad referencial y derivaron solas —los dos fixtures usaban convenciones distintas—, y no había dónde decir en qué consiste cada desacuerdo. Resuelve `ISSUE-000036`. Sube el esquema a 1.1.0. |
+| `DEC-056` | DECIDIDO | El corpus de la Campaña 1 se fija por **versión congelada**, no por fecha: commit y huella de la capa canónica del corredor (`data/` y `docs/secciones/`), registrados en `knowledge/corpus/manifests/` con `scripts/ingest/freeze.py`. La primera es `0.6.0-research-audit` en `af7e799`, con corte bibliográfico el 8 de agosto de 2026. Los resultados de auditoría posteriores entran como congelaciones nuevas que enlazan la anterior y se ingieren por diferencia, sección a sección; una congelación no se reescribe. Resuelve `OPEN-016` e `ISSUE-000013`. |
 
 ## 30.1. Relación entre decisiones nuevas y anteriores
 
@@ -4532,6 +4533,8 @@ Los principios científicos, la estructura de conocimiento y los inventarios per
 Cuatro decisiones anteriores están supersedidas: `DEC-018` y `DEC-032` desde la revisión estratégica, y `DEC-016` y `DEC-017` desde la corrección de trazabilidad del 7 de agosto de 2026. Las cuatro conservan su texto original y enlazan su reemplazo.
 
 `DEC-051` a `DEC-053` resuelven las tres decisiones abiertas que bloqueaban la Fase 0. Sus ADR correspondientes se redactan al crear el repositorio, junto a `ADR-001`, `ADR-002` y `ADR-003`.
+
+Sobre `DEC-056`: se congela sin esperar al cierre de la auditoría del corredor porque la Fase 1 no puede fijar alcance, presupuesto ni controversias sobre un corpus que cambia bajo los pies, y porque esperar no garantiza un corpus final: una auditoría cerrada puede reabrirse. Lo que se fija no es una fecha sino una versión, y una versión nueva no deshace la anterior: se compara con ella (`freeze.py diff` separa corrección de renumeración, porque el corredor renumera sus `C-…`), y sólo las secciones que cambiaron producen deltas nuevos. El corte bibliográfico deja de ser una decisión aparte: es el que declara la congelación activa, y moverlo es congelar otra versión.
 
 Sobre `DEC-052`: seis dígitos dan un millón de registros por tipo. Si algún tipo se acercara a ese límite, la ampliación de ancho es una migración de esquema, no un cambio de identidad: los identificadores ya emitidos no se renumeran. El contador es central, lo que basta mientras el proyecto sea individual; el disparador para revisarlo es el del editor colaborativo de §25.9.
 

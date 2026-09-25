@@ -2,7 +2,7 @@
 
 Una **base de conocimiento científico versionada y centrada en afirmaciones**, capaz de generar múltiples redes evolutivas coherentes y de proyectarlas hacia un juego poblacional desarrollado cronológicamente por campañas.
 
-**Estado:** Fase 0 completada. Sin corpus ingerido todavía.
+**Estado:** Fase 0 completada y pipeline de las Fases 2–6 verificado contra fixtures. El corpus de la Campaña 1 está **congelado y sin ingerir** (`DEC-056`): siguen la Fase 1 y la ingestión sección por sección.
 
 ---
 
@@ -23,10 +23,11 @@ La primera campaña cubre **Eukaryota → Holozoa**. La última, **Hominini → 
 |---|---|
 | [`docs/GUIDE.md`](docs/GUIDE.md) | El documento rector. Todo lo demás se deriva de él. |
 | [`docs/GLOSSARY.md`](docs/GLOSSARY.md) | Vocabulario mínimo: estados de decisión, ejes epistemológicos, identidad. |
-| [`docs/ISSUES.md`](docs/ISSUES.md) | Cuestiones pendientes. 28 registradas, 9 resueltas. |
+| [`docs/ISSUES.md`](docs/ISSUES.md) | Cuestiones pendientes. 38 registradas, 37 resueltas; la abierta, `ISSUE-000016`, no bloquea la Campaña 1. |
 | [`docs/adr/`](docs/adr/) | Decisiones arquitectónicas con su razón y sus alternativas rechazadas. |
-| [`docs/campaigns/C01-EUKARYA.md`](docs/campaigns/C01-EUKARYA.md) | Dossier de la Campaña 1. Vacío por diseño hasta la Fase 1. |
-| [`docs/INGESTION-C01.md`](docs/INGESTION-C01.md) | **Qué hacer cuando llegue la investigación.** Paso a paso. |
+| [`docs/campaigns/C01-EUKARYA.md`](docs/campaigns/C01-EUKARYA.md) | Dossier de la Campaña 1. Se completa en la Fase 1, sobre el corpus congelado. |
+| [`docs/INGESTION-C01.md`](docs/INGESTION-C01.md) | **Cómo se ingiere el corpus y cómo entra cada versión nueva.** Paso a paso. |
+| [`docs/campaigns/C01-ENCARGO-SEGUIMIENTO.md`](docs/campaigns/C01-ENCARGO-SEGUIMIENTO.md) | Lo que se le sigue pidiendo al investigador. |
 
 ## Estructura
 
@@ -34,7 +35,8 @@ La primera campaña cubre **Eukaryota → Holozoa**. La última, **Hominini → 
 docs/           guía activa, ADR, glosario, dossiers de campaña
 knowledge/      el núcleo científico
   corpus/       secciones, pasajes, manifiestos · inbox/ = recibido, sin ingerir
-  records/      21 JSONL: menciones, fuentes, entidades, afirmaciones, evidencia…
+                manifests/ guarda también cada versión congelada del corpus
+  records/      23 JSONL: menciones, fuentes, entidades, afirmaciones, evidencia…
   views/        vistas derivadas
   deltas/       un delta por sección ingerida, aplicable y reversible
   snapshots/    estados completos reconstruibles
@@ -50,6 +52,13 @@ archive/        versiones rectoras anteriores — trazabilidad, no basurero
 ```bash
 make setup      # entorno virtual y dependencias
 make check      # validación + integridad del snapshot + fixtures
+```
+
+El corpus de investigación vive en su propio repositorio, `corredor-eukaryota-holozoa`, y se clona al lado de éste:
+
+```bash
+make corpus-verify CORPUS=../corredor-eukaryota-holozoa FREEZE=knowledge/corpus/manifests/corredor-v0.6.0-research-audit-af7e799.json
+make corpus-diff ANTES=../corredor-eukaryota-holozoa@af7e799 DESPUES=../corredor-eukaryota-holozoa
 ```
 
 `make help` lista todos los objetivos. Usa el entorno virtual si existe y el Python del sistema si no.
