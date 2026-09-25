@@ -45,11 +45,12 @@ def csv_texto(cab: list[str], filas: list[list[str]]) -> str:
 
 
 def corpus(base: Path, secciones: dict[str, list[list[str]]],
-           registros: dict[str, tuple[list[str], list[list[str]]]] | None = None) -> Path:
+           registros: dict[str, tuple[list[str], list[list[str]]]] | None = None,
+           prosa: str = "Prosa.\n") -> Path:
     (base / "data" / "afirmaciones").mkdir(parents=True)
     (base / "data" / "apendices").mkdir(parents=True)
     (base / "docs" / "secciones").mkdir(parents=True)
-    (base / "docs" / "secciones" / "001-prosa.md").write_text("Prosa.\n", encoding="utf-8")
+    (base / "docs" / "secciones" / "001-00-0-prosa.md").write_text(prosa, encoding="utf-8")
     for sec, filas in secciones.items():
         (base / "data" / "afirmaciones" / f"{sec}.csv").write_text(csv_texto(CAB, filas), encoding="utf-8")
     for nombre, (cab, filas) in (registros or {}).items():
@@ -106,10 +107,55 @@ class Afirmaciones(unittest.TestCase):
         self.assertEqual(r["sin_cambios"], 0)
         self.assertIn("C-001", {m["a"] for m in r["modificadas"]})
 
+    def test_cita_a_un_numero_retirado_y_reutilizado_es_modificacion(self):
+        # Se retira C-001 y C-002 pasa a ocuparlo. La síntesis sigue citando
+        # C-001, que ahora es la antigua C-002: no puede darse por buena.
+        v1 = {"00": [fila("C-001", "Uno."), fila("C-002", "Dos."),
+                     fila("C-003", "Síntesis.", atribucion="sintesis(C-001)")]}
+        v2 = {"00": [fila("C-001", "Dos."), fila("C-002", "Síntesis.", atribucion="sintesis(C-001)")]}
+        r = self.diff(v1, v2)
+        self.assertEqual([x["id"] for x in r["retiradas"]], ["C-001"])
+        self.assertIn("C-002", {m["a"] for m in r["modificadas"]})
+
     def test_numero_repetido_aborta(self):
         a = corpus(self.tmp / "a", {"00": [fila("C-001", "Uno.")], "01": [fila("C-001", "Otra.")]})
         with self.assertRaises(SystemExit):
             freeze.leer_afirmaciones(a)
+
+
+class Informe(unittest.TestCase):
+    """El informe completo de `diff`, no sólo la comparación de filas."""
+
+    def setUp(self):
+        self._tmp = tempfile.TemporaryDirectory()
+        self.tmp = Path(self._tmp.name)
+
+    def tearDown(self):
+        self._tmp.cleanup()
+
+    def informe(self, a: Path, b: Path) -> dict:
+        salida = self.tmp / "diff.json"
+        with contextlib.redirect_stdout(io.StringIO()):
+            freeze.cmd_diff(argparse.Namespace(anterior=str(a), nueva=str(b), detalle=False, json=str(salida)))
+        return json.loads(salida.read_text(encoding="utf-8"))
+
+    def test_prosa_intacta_con_citas_desfasadas(self):
+        # Se inserta una fila antes de C-002, que pasa a C-003; la prosa no se
+        # tocó y sigue citando C-002, que ahora es la insertada.
+        prosa = "Dos. [C-002]\n"
+        a = corpus(self.tmp / "a", {"00": [fila("C-001", "Uno."), fila("C-002", "Dos.")]}, prosa=prosa)
+        b = corpus(self.tmp / "b", {"00": [fila("C-001", "Uno."), fila("C-002", "Nueva."),
+                                           fila("C-003", "Dos.")]}, prosa=prosa)
+        inf = self.informe(a, b)
+        self.assertEqual([x["estado"] for x in inf["prosa"]], ["citas desactualizadas"])
+        self.assertIn("prosa", inf["afirmaciones"]["secciones_afectadas"]["00"])
+
+    def test_un_cambio_solo_de_prosa_manda_reingerir_la_seccion(self):
+        filas = {"00": [fila("C-001", "Uno.")]}
+        a = corpus(self.tmp / "a", filas, prosa="Uno. [C-001]\n")
+        b = corpus(self.tmp / "b", filas, prosa="Uno, dicho de otro modo. [C-001]\n")
+        inf = self.informe(a, b)
+        self.assertEqual(inf["afirmaciones"]["secciones_afectadas"], {"00": {"prosa": 1}})
 
 
 class Registros(unittest.TestCase):
@@ -171,6 +217,22 @@ class Congelacion(unittest.TestCase):
         registro["fingerprint"] = "sha256:" + "0" * 64
         m.write_text(json.dumps(registro), encoding="utf-8")
         self.assertNotEqual(self.ejecutar(freeze.cmd_verify, fuente=str(c), manifiesto=str(m)), 0)
+
+    def test_un_enlace_simbolico_en_la_capa_canonica_se_rechaza(self):
+        c = corpus(self.tmp / "c", {"00": [fila("C-001", "Uno.")]})
+        fuera = self.tmp / "fuera.csv"
+        fuera.write_text("x\n", encoding="utf-8")
+        (c / "data" / "afirmaciones" / "enlace.csv").symlink_to(fuera)
+        with self.assertRaises(SystemExit):
+            freeze.ficheros(c)
+
+    def test_el_snapshot_cubre_la_congelacion_activa(self):
+        spec = importlib.util.spec_from_file_location("snapshot", ROOT / "scripts" / "snapshot" / "snapshot.py")
+        snapshot = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(snapshot)
+        activa = json.loads((ROOT / "knowledge" / "corpus" / "manifests" / "dataset.json")
+                            .read_text(encoding="utf-8"))["corpus_freeze"]["path"]
+        self.assertIn(activa, snapshot.gather()["files"])
 
     def test_fichero_ignorado_en_la_capa_canonica_no_es_copia_limpia(self):
         c = corpus(self.tmp / "c", {"00": [fila("C-001", "Uno.")]})

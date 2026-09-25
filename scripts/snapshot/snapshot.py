@@ -64,6 +64,13 @@ def gather() -> dict:
     for p in sorted(RECORDS.glob("*.jsonl")):
         files[str(p.relative_to(ROOT))] = digest(p)
     files[str(MANIFEST.relative_to(ROOT))] = digest(MANIFEST)
+    # La congelación activa del corpus (DEC-056) es parte del estado: sin ella
+    # no se puede demostrar qué versión se ingirió. Su ausencia se registra como
+    # tal, para que verify la detecte en vez de fallar al leerla.
+    congelada = (json.loads(MANIFEST.read_text(encoding="utf-8")).get("corpus_freeze") or {}).get("path")
+    if congelada:
+        ruta = ROOT / congelada
+        files[congelada] = digest(ruta) if ruta.exists() else "ausente"
     return {"counts": counts, "files": files}
 
 
