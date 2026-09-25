@@ -113,7 +113,10 @@ def abrir(spec: str) -> Fuente:
         commit = _git(base, "rev-parse", "HEAD") if es_raiz else None
         limpia = None
         if commit:
-            sucio = _git(base, "status", "--porcelain", "--untracked-files=all", "--", *CAPA_CANONICA)
+            # --ignored también: un fichero ignorado entra en la huella de la
+            # copia de trabajo pero ningún commit lo reproduce.
+            sucio = _git(base, "status", "--porcelain", "--untracked-files=all", "--ignored",
+                         "--", *CAPA_CANONICA)
             limpia = sucio == ""
         return Fuente(base, str(base), commit, limpia)
 
@@ -182,7 +185,8 @@ def metadatos(base: Path) -> dict:
 def cmd_create(args) -> int:
     src = abrir(args.fuente)
     if src.limpia is False:
-        print("ERROR la capa canónica tiene cambios sin confirmar: ningún commit la reproduce.")
+        print("ERROR la capa canónica tiene cambios sin confirmar o ficheros ignorados: "
+              "ningún commit la reproduce.")
         print("      Confírmalos, o congela un commit concreto con directorio@ref.")
         return 1
     lista = ficheros(src.base)
@@ -228,6 +232,13 @@ def cmd_create(args) -> int:
 def cmd_verify(args) -> int:
     src = abrir(args.fuente)
     registro = json.loads(Path(args.manifiesto).read_text(encoding="utf-8"))
+    # Un manifiesto editado a mano o mal fusionado puede declarar una huella que
+    # sus propios ficheros no dan. Entonces no hay contra qué verificar.
+    if huella(registro["files"]) != registro.get("fingerprint") or \
+            registro.get("file_count", len(registro["files"])) != len(registro["files"]):
+        print(f"ERROR {Path(args.manifiesto).name} es incoherente: su huella o su recuento "
+              "no corresponden a la lista de ficheros que declara")
+        return 1
     actual = {f["path"]: f["sha256"] for f in ficheros(src.base)}
     esperado = {f["path"]: f["sha256"] for f in registro["files"]}
 
@@ -237,7 +248,7 @@ def cmd_verify(args) -> int:
 
     print(f"verificando {src.etiqueta} contra {Path(args.manifiesto).name}")
     if src.limpia is False:
-        print("  aviso: la capa canónica tiene cambios sin confirmar")
+        print("  aviso: la capa canónica tiene cambios sin confirmar o ficheros ignorados")
     if not (cambiados or nuevos or retirados):
         print(f"  COINCIDE · {len(actual)} ficheros · {registro['fingerprint']}")
         return 0
@@ -267,6 +278,11 @@ def leer_afirmaciones(base: Path) -> dict[str, tuple[str, dict]]:
     for p in sorted((base / AFIRMACIONES).glob("*.csv")):
         _, filas = leer_csv(p)
         for f in filas:
+            # Un # repetido haría desaparecer una fila del diff sin aviso.
+            # parse_research.py ya lo trata como error de conformidad.
+            if f["#"] in salida:
+                raise SystemExit(f"ERROR {base}: {f['#']} aparece en {salida[f['#']][0]}.csv "
+                                 f"y en {p.name}; el diff no puede emparejar un # repetido")
             salida[f["#"]] = (p.stem, f)
     return salida
 
@@ -374,9 +390,8 @@ def comparar_afirmaciones(a: Path, b: Path) -> dict:
     afectadas: dict[str, Counter] = defaultdict(Counter)
     for i, j, via in pares:
         (sec_v, fv), (sec_n, fn) = viejas[i], nuevas[j]
-        if i == j and fv == fn:
-            sin_cambios += 1
-            continue
+        # Nada se da por igual antes de traducir: una fila idéntica byte a byte
+        # cuya cita apunta a una afirmación renumerada ya no dice lo mismo.
         columnas = {}
         for col in sorted(set(fv) | set(fn)):
             if col == "#":
@@ -389,6 +404,11 @@ def comparar_afirmaciones(a: Path, b: Path) -> dict:
         if columnas:
             modificadas.append({"de": i, "a": j, "via": via, "seccion": sec_n, "columnas": columnas})
             afectadas[sec_n]["modificadas"] += 1
+            if sec_v != sec_n:
+                # La sección de origen perdió la fila: también hay que reingerirla.
+                afectadas[sec_v]["salidas"] += 1
+        elif i == j and fv == fn:
+            sin_cambios += 1
         else:
             renumeradas.append({"de": i, "a": j})
 
@@ -418,13 +438,18 @@ def comparar_registro(pa: Path | None, pb: Path | None, mapa: dict[str, str]) ->
     clave = (cab_b or cab_a or [None])[0]
     traducidas = [{k: traducir(v, mapa) for k, v in f.items()} for f in filas_a]
 
-    unica = clave is not None and all(
-        len({f.get(clave) for f in filas}) == len(filas) for filas in (filas_a, filas_b))
+    # La clave también se traduce —B_entidades tiene etiquetas como «afirmación
+    # C-1015», que la renumeración cambia sin cambiar la entidad—, y por eso la
+    # unicidad se comprueba después de traducir: retirar C-001 y renumerar C-002
+    # a C-001 hace colisionar dos claves que antes eran distintas. Y la clave
+    # tiene que existir en las dos cabeceras.
+    unica = (clave is not None
+             and all(clave in cab for cab in (cab_a, cab_b) if cab)
+             and len({t[clave] for t in traducidas}) == len(traducidas)
+             and len({f[clave] for f in filas_b}) == len(filas_b))
     res = {"filas": [len(filas_a), len(filas_b)], "cabecera_cambiada": bool(cab_a and cab_b and cab_a != cab_b)}
 
     if unica:
-        # La clave también se traduce: B_entidades tiene etiquetas como
-        # «afirmación C-1015», que la renumeración cambia sin cambiar la entidad.
         va = {t[clave]: (f, t) for f, t in zip(filas_a, traducidas)}
         vb = {f[clave]: f for f in filas_b}
         comunes = va.keys() & vb.keys()
@@ -438,14 +463,22 @@ def comparar_registro(pa: Path | None, pb: Path | None, mapa: dict[str, str]) ->
     else:
         # Sin clave única (F_magnitudes repite magnitud): una fila corregida
         # aparece como una retirada más una nueva, y así se declara.
-        cuenta = lambda filas: Counter(json.dumps(f, sort_keys=True, ensure_ascii=False) for f in filas)
-        fa, fa_crudo, fb = cuenta(traducidas), cuenta(filas_a), cuenta(filas_b)
+        forma = lambda f: json.dumps(f, sort_keys=True, ensure_ascii=False)
+        fa, fb = Counter(forma(t) for t in traducidas), Counter(forma(f) for f in filas_b)
+        # De las filas viejas que casan con una nueva, cuántas casan sólo gracias
+        # a la traducción: se cuentan primero las que ya eran idénticas, y el
+        # resto es renumeración. Nunca puede salir negativo.
+        cambiadas = Counter(forma(t) for f, t in zip(filas_a, traducidas) if f != t)
+        renumeradas = 0
+        for k, n in (fa & fb).items():
+            identicas = fa[k] - cambiadas[k]
+            renumeradas += n - min(n, identicas)
         res.update({
             "clave": None,
             "nuevas": sum((fb - fa).values()),
             "retiradas": sum((fa - fb).values()),
             "modificadas": [],
-            "solo_renumeracion": sum((fa & fb).values()) - sum((fa_crudo & fb).values()),
+            "solo_renumeracion": renumeradas,
         })
     return res
 
