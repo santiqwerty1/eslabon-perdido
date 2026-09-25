@@ -167,6 +167,47 @@ def ids_de_pasajes() -> set[str]:
     return out
 
 
+def reservados_por_deltas(prefijo: str) -> set[str]:
+    """Identificadores que algún delta ya emitió, se haya aplicado o no.
+
+    Ingerir escribe el delta pero no lo aplica. Sin esto, una segunda sección
+    ingerida antes de aplicar la primera repetía sus MENTION-…, y al aplicar
+    una la otra abortaba. Un identificador emitido no se reutiliza nunca.
+    """
+    out: set[str] = set()
+    for p in DELTAS.glob("*.json"):
+        try:
+            delta = json.loads(p.read_text(encoding="utf-8"))
+        except json.JSONDecodeError:
+            continue
+        candidatos = list(delta.get("records_added") or [])
+        candidatos += [op.get("record_id") for op in delta.get("operations") or [] if isinstance(op, dict)]
+        out.update(i for i in candidatos if isinstance(i, str) and i.startswith(prefijo + "-"))
+    return out
+
+
+def revision_siguiente(manifiesto: dict) -> tuple[str, str, list[str]]:
+    """Revisión de partida y de llegada para un delta nuevo, y deltas pendientes.
+
+    La de partida es la última que algún delta ya declara, no la del manifiesto:
+    dos deltas sin aplicar no pueden llevar el dataset a la misma revisión. El
+    orden queda escrito en la cadena y hay que respetarlo al aplicar.
+    """
+    num = lambda r: int(str(r).split("-")[1])
+    actual = manifiesto.get("dataset_revision", "REV-000000")
+    antes, pendientes = actual, []
+    for p in sorted(DELTAS.glob("*.json")):
+        try:
+            despues = json.loads(p.read_text(encoding="utf-8")).get("dataset_revision_after")
+        except json.JSONDecodeError:
+            continue
+        if despues and num(despues) > num(actual):
+            pendientes.append(p.name)
+        if despues and num(despues) > num(antes):
+            antes = despues
+    return antes, f"REV-{num(antes) + 1:06d}", pendientes
+
+
 def siguiente_libre(prefijo: str, usados: set[str]) -> int:
     n = 0
     for i in usados:
@@ -180,8 +221,10 @@ def siguiente_libre(prefijo: str, usados: set[str]) -> int:
 def ingerir(origen: Path, titulo: str | None, dry: bool) -> int:
     texto = origen.read_text(encoding="utf-8")
     manifest = json.loads(MANIFEST.read_text(encoding="utf-8")) if MANIFEST.exists() else {}
-    rev_antes = manifest.get("dataset_revision", "REV-000000")
-    rev_despues = f"REV-{int(rev_antes.split('-')[1]) + 1:06d}"
+    rev_antes, rev_despues, pendientes = revision_siguiente(manifest)
+    if pendientes:
+        print(f"aviso: hay deltas sin aplicar ({', '.join(pendientes)}); éste va detrás "
+              f"({rev_antes} → {rev_despues}) y se aplica después de ellos")
 
     existentes = {p.stem for p in SECTIONS.glob("SEC-*")}
     sec_id = siguiente_id("SEC", existentes)
@@ -218,7 +261,8 @@ def ingerir(origen: Path, titulo: str | None, dry: bool) -> int:
     except Exception:
         estructurado = None
 
-    base_mention = siguiente_libre("MENTION", ids_en_uso("mentions.jsonl", "MENTION"))
+    base_mention = siguiente_libre("MENTION", ids_en_uso("mentions.jsonl", "MENTION")
+                                   | reservados_por_deltas("MENTION"))
     base_passage = siguiente_libre("PASSAGE", ids_de_pasajes())
 
     # --- paso 2: segmentar en pasajes -------------------------------------

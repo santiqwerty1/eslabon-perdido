@@ -464,17 +464,25 @@ def comparar_registro(pa: Path | None, pb: Path | None, mapa: dict[str, str]) ->
              and len({f[clave] for f in filas_b}) == len(filas_b))
     res = {"filas": [len(filas_a), len(filas_b)], "cabecera_cambiada": bool(cab_a and cab_b and cab_a != cab_b)}
 
+    # Las filas que cambiaron de verdad, en su versión: sus citas C-… dicen qué
+    # secciones del corredor las usan, y por tanto cuáles hay que reingerir.
+    viejas_cambiadas: list[dict] = []
+    nuevas_cambiadas: list[dict] = []
+
     if unica:
         va = {t[clave]: (f, t) for f, t in zip(filas_a, traducidas)}
         vb = {f[clave]: f for f in filas_b}
         comunes = va.keys() & vb.keys()
+        modificadas = sorted(k for k in comunes if va[k][1] != vb[k])
         res.update({
             "clave": clave,
             "nuevas": sorted(vb.keys() - va.keys()),
             "retiradas": sorted(va.keys() - vb.keys()),
-            "modificadas": sorted(k for k in comunes if va[k][1] != vb[k]),
+            "modificadas": modificadas,
             "solo_renumeracion": sorted(k for k in comunes if va[k][0] != vb[k] and va[k][1] == vb[k]),
         })
+        viejas_cambiadas = [va[k][0] for k in (*res["retiradas"], *modificadas)]
+        nuevas_cambiadas = [vb[k] for k in (*res["nuevas"], *modificadas)]
     else:
         # Sin clave única (F_magnitudes repite magnitud): una fila corregida
         # aparece como una retirada más una nueva, y así se declara.
@@ -495,6 +503,11 @@ def comparar_registro(pa: Path | None, pb: Path | None, mapa: dict[str, str]) ->
             "modificadas": [],
             "solo_renumeracion": renumeradas,
         })
+        solo_a, solo_b = fa - fb, fb - fa
+        viejas_cambiadas = [f for f, t in zip(filas_a, traducidas) if solo_a[forma(t)] > 0]
+        nuevas_cambiadas = [f for f in filas_b if solo_b[forma(f)] > 0]
+    res["citas_viejas"] = sorted({c for f in viejas_cambiadas for v in f.values() for c in C_REF.findall(v)})
+    res["citas_nuevas"] = sorted({c for f in nuevas_cambiadas for v in f.values() for c in C_REF.findall(v)})
     return res
 
 
@@ -549,6 +562,16 @@ def cmd_diff(args) -> int:
     # un cambio sólo de prosa también la manda a reingerir.
     prosa, tablas = en(PROSA), en(TABLAS)
     afectadas = af["secciones_afectadas"]
+    # Y con las filas de los apéndices que citan sus afirmaciones: una entidad
+    # del apéndice B cuya primera fila es de la sección 3 se ingiere con la 3.
+    sec_vieja = {i: s for i, (s, _) in leer_afirmaciones(a.base).items()}
+    sec_nueva = {i: s for i, (s, _) in leer_afirmaciones(b.base).items()}
+    for ruta, r in registros.items():
+        tocadas = ({sec_vieja[c] for c in r.get("citas_viejas", []) if c in sec_vieja}
+                   | {sec_nueva[c] for c in r.get("citas_nuevas", []) if c in sec_nueva})
+        for sec in tocadas:
+            afectadas.setdefault(sec, {})
+            afectadas[sec]["apéndices"] = afectadas[sec].get("apéndices", 0) + 1
     for lista, clave, seccion in ((prosa, "prosa", lambda r: [s for s in Path(r).name.split("-")[1:2] if s.isdigit()]),
                                   (tablas, "tablas", lambda r: Path(r).parts[2:3])):
         for x in lista:

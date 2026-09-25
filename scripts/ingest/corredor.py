@@ -133,15 +133,27 @@ def ya_ingerida(sec: str) -> str | None:
     return None
 
 
-def localizar(etiqueta: str, pasaje: dict) -> tuple[int, int, bool]:
-    """Offsets de la etiqueta dentro del pasaje, o del pasaje entero si no está."""
+def localizar(etiqueta: str, pasaje: dict) -> tuple[int, int, str | None]:
+    """Offsets de la etiqueta dentro del pasaje, y una nota si no es literal.
+
+    Literal: sus offsets y ninguna nota. Con otra capitalización: los offsets de
+    esa aparición y una nota que dice cómo aparece, porque una mención es una
+    aparición textual y el texto seleccionado no es el de `original_text`. Si no
+    aparece: el pasaje entero, y la nota lo dice.
+    """
     texto, ini = pasaje["text"], pasaje["character_offsets"]["start"]
     i = texto.find(etiqueta)
-    if i < 0 and len(texto.casefold()) == len(texto):
-        i = texto.casefold().find(etiqueta.casefold())
     if i >= 0:
-        return ini + i, ini + i + len(etiqueta), True
-    return ini, pasaje["character_offsets"]["end"], False
+        return ini + i, ini + i + len(etiqueta), None
+    if len(texto.casefold()) == len(texto) and len(etiqueta.casefold()) == len(etiqueta):
+        i = texto.casefold().find(etiqueta.casefold())
+        if i >= 0:
+            visto = texto[i:i + len(etiqueta)]
+            return (ini + i, ini + i + len(etiqueta),
+                    f"en el pasaje aparece como «{visto}», con otra capitalización; "
+                    "los offsets señalan esa aparición")
+    return (ini, pasaje["character_offsets"]["end"],
+            "la etiqueta no aparece literal en el pasaje; los offsets cubren el pasaje entero")
 
 
 def construir(spec: str, seccion: str, ruta_congelacion: Path | None = None) -> dict:
@@ -168,11 +180,11 @@ def construir(spec: str, seccion: str, ruta_congelacion: Path | None = None) -> 
     filas = [por_id[i] for i in ids]
 
     manifiesto = json.loads(base.MANIFEST.read_text(encoding="utf-8")) if base.MANIFEST.exists() else {}
-    rev_antes = manifiesto.get("dataset_revision", "REV-000000")
-    rev_despues = f"REV-{int(rev_antes.split('-')[1]) + 1:06d}"
+    rev_antes, rev_despues, pendientes = base.revision_siguiente(manifiesto)
     sec_id = base.siguiente_id("SEC", {p.stem for p in base.SECTIONS.glob("SEC-*")})
     base_pasaje = base.siguiente_libre("PASSAGE", base.ids_de_pasajes())
-    base_mencion = base.siguiente_libre("MENTION", base.ids_en_uso("mentions.jsonl", "MENTION"))
+    base_mencion = base.siguiente_libre("MENTION", base.ids_en_uso("mentions.jsonl", "MENTION")
+                                        | base.reservados_por_deltas("MENTION"))
 
     titulo = next((l.lstrip("#").strip() for l in texto.splitlines() if l.startswith("# ")), prosa.stem)
     seccion_rec = {
@@ -204,9 +216,25 @@ def construir(spec: str, seccion: str, ruta_congelacion: Path | None = None) -> 
             citadas[pid] = citas(cuerpo)
     pasaje = {p["id"]: p for p in pasajes}
 
+    congelados = {f["path"] for f in congelada["files"]}
+
+    def dentro(relativa: str) -> Path:
+        # Una ruta del índice que saliera de la capa congelada —absoluta, con
+        # «..» o a un fichero sin huella— cambiaría la procedencia sin que la
+        # verificación lo notara.
+        ruta = (src.base / relativa).resolve()
+        try:
+            rel = ruta.relative_to(src.base.resolve()).as_posix()
+        except ValueError:
+            rel = None
+        if rel not in congelados:
+            raise SystemExit(f"ERROR data/table_index.json apunta a {relativa!r}, que no es un "
+                             "fichero de la versión congelada")
+        return ruta
+
     indice = {t["id"]: t for t in json.loads(
         (src.base / "data" / "table_index.json").read_text(encoding="utf-8"))["tables"]}
-    por_tabla = {tid: citas((src.base / indice[tid]["csv_path"]).read_text(encoding="utf-8"))
+    por_tabla = {tid: citas(dentro(indice[tid]["csv_path"]).read_text(encoding="utf-8"))
                  for tid in por_marcador if tid in indice and indice[tid].get("category") != "claims"}
     del_registro = next((tid for tid in por_marcador if indice.get(tid, {}).get("category") == "claims"), None)
 
@@ -240,7 +268,7 @@ def construir(spec: str, seccion: str, ruta_congelacion: Path | None = None) -> 
         if etiqueta in por_etiqueta:
             return por_etiqueta[etiqueta]
         pid = origen_filas[fila]["passage_ids"][0]
-        ini, fin, literal = localizar(etiqueta, pasaje[pid])
+        ini, fin, nota = localizar(etiqueta, pasaje[pid])
         m = {
             "id": f"MENTION-{base_mencion + len(menciones):06d}",
             "section_id": sec_id,
@@ -254,13 +282,12 @@ def construir(spec: str, seccion: str, ruta_congelacion: Path | None = None) -> 
             "resolution": {"status": "pending", "target_ids": [], "reason": None},
             "disposition": None,
             "issue_ids": [],
-            "notes": [] if literal else [
-                "la etiqueta no aparece literal en el pasaje; los offsets cubren el pasaje entero"],
+            "notes": [nota] if nota else [],
             "record_status": "active",
         }
         menciones.append(m)
         por_etiqueta[etiqueta] = m
-        if not literal:
+        if nota:
             sin_literal.add(m["id"])
         return m
 
@@ -335,7 +362,7 @@ def construir(spec: str, seccion: str, ruta_congelacion: Path | None = None) -> 
         "pasajes": pasajes, "menciones": menciones, "delta": delta, "contraste": contraste,
         "vias": vias, "no_literales": no_literales, "descartadas": descartadas,
         "b_descartadas": b_descartadas,
-        "rev": (rev_antes, rev_despues), "avisos": conformidad.avisos,
+        "rev": (rev_antes, rev_despues), "pendientes": pendientes, "avisos": conformidad.avisos,
     }
 
 
@@ -427,6 +454,9 @@ def ingerir(spec: str, seccion: str, ruta_congelacion: Path | None, dry: bool) -
     r = construir(spec, seccion, ruta_congelacion)
     print(f"{r['sec_id']} · sección {r['sec']} del corredor · {r['seccion']['title']}")
     print(f"  versión {r['congelada'].get('version')} · huella verificada")
+    if r["pendientes"]:
+        print(f"  aviso: hay deltas sin aplicar ({', '.join(r['pendientes'])}); éste va detrás "
+              f"({r['rev'][0]} → {r['rev'][1]}) y se aplica después de ellos")
     print(f"  {len(r['pasajes'])} pasajes · {len(r['menciones'])} menciones "
           f"({r['no_literales']} sin literal en su pasaje)")
     print("  filas por vía: " + " · ".join(f"{v} {n}" for v, n in sorted(r["vias"].items())))

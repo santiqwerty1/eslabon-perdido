@@ -158,6 +158,15 @@ class Informe(unittest.TestCase):
         self.assertEqual(inf["afirmaciones"]["secciones_afectadas"], {"00": {"prosa": 1}})
 
 
+    def test_un_cambio_solo_del_apendice_b_manda_reingerir_su_seccion(self):
+        filas = {"00": [fila("C-001", "Uno.")], "01": [fila("C-002", "Dos.")]}
+        cab = ["etiqueta preferida", "tipo", "# de la fila del registro donde aparece por primera vez"]
+        a = corpus(self.tmp / "a", filas, {"B_entidades.csv": (cab, [["FIX-Alfa", "clado", "C-002"]])})
+        b = corpus(self.tmp / "b", filas, {"B_entidades.csv": (cab, [["FIX-Alfa", "taxón", "C-002"]])})
+        inf = self.informe(a, b)
+        self.assertEqual(inf["afirmaciones"]["secciones_afectadas"], {"01": {"apéndices": 1}})
+
+
 class Registros(unittest.TestCase):
     def setUp(self):
         self._tmp = tempfile.TemporaryDirectory()
