@@ -1,0 +1,4 @@
+"#","Afirmación","Sujeto","Predicado","Objeto","Atribución","Fuente","Aceptación","Fuerza","Motivo","Resolución","Vigencia"
+"C-004","FIX-Epsilon aparece antes que FIX-Zeta.","FIX-Epsilon","anterior_a","FIX-Zeta","expresa","S01 discusión","no evaluado","baja","Una sola fuente.","sin resolver","vigente"
+"C-005","FIX-Zeta persiste hasta el final del corredor.","FIX-Zeta","persiste_hasta*","final del corredor","sintesis(C-004)","n/a","no evaluado","baja","Se apoya en C-004.","sin resolver","vigente"
+"C-006","FIX-Eta es un taxón histórico.","FIX-Eta","tiene_estado*","histórico","expresa","S02 introducción","no evaluado","alta","Lo dice la fuente.","resuelta","histórica"

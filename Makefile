@@ -10,7 +10,7 @@
 VENV   := .venv
 PYTHON := $(shell [ -x $(VENV)/bin/python ] && echo $(VENV)/bin/python || echo python3)
 
-.PHONY: help setup validate verify snapshot test check clean-generated ingest
+.PHONY: help setup validate verify snapshot test check clean-generated ingest corpus-freeze corpus-verify corpus-diff
 
 help: ## Muestra estos objetivos
 	@grep -hE '^[a-z-]+:.*?## ' $(MAKEFILE_LIST) \
@@ -42,6 +42,18 @@ check: validate verify test ## Todo lo anterior: es lo que ejecuta la CI
 ingest: ## Ingiere una sección: make ingest FILE=ruta/al/texto.md
 	@test -n "$(FILE)" || { echo "uso: make ingest FILE=ruta/al/texto.md"; exit 1; }
 	@$(PYTHON) scripts/ingest/ingest.py "$(FILE)" $(if $(TITLE),--title "$(TITLE)",) $(if $(DRY),--dry-run,)
+
+corpus-freeze: ## Congela una versión del corpus: make corpus-freeze CORPUS=../corredor@ref DEC=DEC-…
+	@test -n "$(CORPUS)" || { echo "uso: make corpus-freeze CORPUS=ruta[@ref] [DEC=DEC-…] [SUSTITUYE=manifiesto]"; exit 1; }
+	@$(PYTHON) scripts/ingest/freeze.py create "$(CORPUS)" $(if $(DEC),--decision "$(DEC)",) $(if $(SUSTITUYE),--sustituye "$(SUSTITUYE)",)
+
+corpus-verify: ## Comprueba que una copia es la versión congelada: make corpus-verify CORPUS=… FREEZE=…
+	@test -n "$(CORPUS)" -a -n "$(FREEZE)" || { echo "uso: make corpus-verify CORPUS=ruta[@ref] FREEZE=manifiesto"; exit 1; }
+	@$(PYTHON) scripts/ingest/freeze.py verify "$(CORPUS)" "$(FREEZE)"
+
+corpus-diff: ## Qué cambió entre dos versiones: make corpus-diff ANTES=../corredor@af7e799 DESPUES=../corredor
+	@test -n "$(ANTES)" -a -n "$(DESPUES)" || { echo "uso: make corpus-diff ANTES=ruta[@ref] DESPUES=ruta[@ref] [DETALLE=1]"; exit 1; }
+	@$(PYTHON) scripts/ingest/freeze.py diff "$(ANTES)" "$(DESPUES)" $(if $(DETALLE),--detalle,)
 
 snapshot: ## Crea un snapshot nuevo del estado actual
 	@$(PYTHON) scripts/snapshot/snapshot.py create --label "$(LABEL)"
