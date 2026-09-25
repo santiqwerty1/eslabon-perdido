@@ -214,10 +214,10 @@ class Barreras(unittest.TestCase):
         self.assertEqual(r["pendientes"], ["SEC-000001.json"])
 
 
-    def test_un_delta_revertido_no_reserva_la_revision_ni_la_seccion(self):
+    def test_un_delta_revertido_no_reserva_la_revision_pero_si_la_seccion(self):
         # Se aplicó y se revirtió: el manifiesto volvió a REV-000000 y el delta
-        # queda como constancia. La ingestión siguiente no se encadena detrás
-        # de él, y la sección se puede volver a ingerir.
+        # queda como constancia. Nada se encadena detrás de él, pero la sección
+        # no se vuelve a ingerir: sus ficheros siguen ahí y saldría duplicada.
         deltas = self.tmp / "deltas"
         deltas.mkdir()
         (deltas / "SEC-000001.json").write_text(json.dumps({
@@ -232,12 +232,24 @@ class Barreras(unittest.TestCase):
         try:
             self.assertEqual(ingest.revision_siguiente({"dataset_revision": "REV-000000"}),
                              ("REV-000000", "REV-000001", []))
-            r = corredor.construir(str(MINI), "00", self.congelacion)
+            # Los identificadores del delta revertido siguen reservados.
+            self.assertIn("MENTION-000001", ingest.reservados_por_deltas("MENTION"))
+            with self.assertRaises(SystemExit) as e:
+                corredor.construir(str(MINI), "00", self.congelacion)
         finally:
             ingest.DELTAS = original
-        self.assertEqual(r["rev"], ("REV-000000", "REV-000001"))
-        # Los identificadores del delta revertido siguen reservados.
-        self.assertEqual(r["menciones"][0]["id"], "MENTION-000002")
+        self.assertIn("se revirtió", str(e.exception))
+        self.assertIn("passages/SEC-000001.json", str(e.exception))
+
+    def test_sin_la_columna_de_primera_aparicion_del_apendice_b_no_se_ingiere(self):
+        otra = self.tmp / "otra"
+        shutil.copytree(MINI, otra)
+        b = otra / "data" / "apendices" / "B_entidades.csv"
+        b.write_text(b.read_text(encoding="utf-8").replace(
+            corredor.COL_PRIMERA, "primera aparición", 1), encoding="utf-8")
+        with self.assertRaises(SystemExit) as e:
+            corredor.construir(str(otra), "00", congelar(otra, self.tmp / "otra.json"))
+        self.assertIn(corredor.COL_PRIMERA, str(e.exception))
 
     def test_una_barra_en_una_celda_no_desplaza_las_columnas(self):
         otra = self.tmp / "otra"

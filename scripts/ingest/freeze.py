@@ -152,10 +152,17 @@ def ficheros(base: Path) -> list[dict]:
     for capa in CAPA_CANONICA:
         # Un enlace simbólico se hashearía por lo que hay al otro lado, que
         # puede cambiar sin que cambie el commit, o no existir en otra copia.
-        # Una huella así no se reproduce: se rechaza.
+        # Una huella así no se reproduce: se rechaza. La raíz de la capa y sus
+        # directorios padre se miran antes de recorrerla, porque un enlace a un
+        # directorio vacío no daría ningún nombre que mirar dentro.
+        partes = Path(capa).parts
+        for n in range(1, len(partes) + 1):
+            if (base.joinpath(*partes[:n])).is_symlink():
+                raise SystemExit(f"ERROR {'/'.join(partes[:n])} es un enlace simbólico en la capa "
+                                 "canónica: la huella no puede depender de a dónde apunte")
         for dirpath, dirnames, filenames in os.walk(base / capa, followlinks=False):
             for nombre in (*dirnames, *filenames):
-                if (Path(dirpath) / nombre).is_symlink() or (base / capa).is_symlink():
+                if (Path(dirpath) / nombre).is_symlink():
                     ruta = (Path(dirpath) / nombre).relative_to(base).as_posix()
                     raise SystemExit(f"ERROR {ruta} es un enlace simbólico dentro de la capa "
                                      "canónica: la huella no puede depender de a dónde apunte")

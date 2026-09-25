@@ -67,6 +67,14 @@ def gather() -> dict:
     # La congelación activa del corpus (DEC-056) es parte del estado: sin ella
     # no se puede demostrar qué versión se ingirió. Su ausencia se registra como
     # tal, para que verify la detecte en vez de fallar al leerla.
+    # Las copias del registro del corredor son la procedencia que declara cada
+    # delta (corpus_origin), y el historial de deltas decide qué está pendiente
+    # y qué se revirtió: cambiarlos cambia lo que el estado significa.
+    for p in sorted((corpus / "sections").glob("*.registro.csv")):
+        files[str(p.relative_to(ROOT))] = digest(p)
+    historial = ROOT / "knowledge" / "deltas" / "historial.jsonl"
+    if historial.exists():
+        files[str(historial.relative_to(ROOT))] = digest(historial)
     congelada = (json.loads(MANIFEST.read_text(encoding="utf-8")).get("corpus_freeze") or {}).get("path")
     if congelada:
         ruta = ROOT / congelada
