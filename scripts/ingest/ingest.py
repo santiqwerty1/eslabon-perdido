@@ -213,6 +213,19 @@ def revision_siguiente(manifiesto: dict) -> tuple[str, str, list[str]]:
     return antes, f"REV-{num(antes) + 1:06d}", pendientes
 
 
+def ids_de_secciones() -> set[str]:
+    """Todo SEC ya emitido: el de cada sección, cada delta y cada línea del historial.
+
+    Un SEC no se reutiliza nunca. El historial va por nombre de fichero: si,
+    tras retirar los ficheros de una sección revertida, su número volviera a
+    salir, el delta nuevo heredaría el «revertir» del viejo y se daría por no
+    pendiente.
+    """
+    return ({p.name.split(".")[0] for p in SECTIONS.glob("SEC-*")}
+            | {p.stem for p in DELTAS.glob("SEC-*.json")}
+            | {Path(n).stem for n in ultima_accion() if n})
+
+
 def ultima_accion() -> dict[str, str]:
     """Lo último que delta.py hizo con cada delta, según su historial."""
     historial = DELTAS / "historial.jsonl"
@@ -246,8 +259,7 @@ def ingerir(origen: Path, titulo: str | None, dry: bool) -> int:
         print(f"aviso: hay deltas sin aplicar ({', '.join(pendientes)}); éste va detrás "
               f"({rev_antes} → {rev_despues}) y se aplica después de ellos")
 
-    existentes = {p.stem for p in SECTIONS.glob("SEC-*")}
-    sec_id = siguiente_id("SEC", existentes)
+    sec_id = siguiente_id("SEC", ids_de_secciones())
 
     # --- paso 1: registrar la sección -------------------------------------
     seccion = {
