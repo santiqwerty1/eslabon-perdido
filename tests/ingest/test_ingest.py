@@ -224,7 +224,8 @@ class Barreras(unittest.TestCase):
             d.mkdir(parents=True)
         (dirs["DELTAS"] / "SEC-000001.json").write_text(json.dumps({
             "dataset_revision_before": "REV-000000", "dataset_revision_after": "REV-000001",
-            "records_added": ["MENTION-000001"], "corpus_origin": {"section": "00"}}), encoding="utf-8")
+            "records_added": ["MENTION-000001"], "corpus_origin": {"section": "00", "rows": {
+                "C-001": {"passage_ids": ["PASSAGE-000001", "PASSAGE-000005"]}}}}), encoding="utf-8")
         (dirs["DELTAS"] / "historial.jsonl").write_text("".join(json.dumps(e) + "\n" for e in [
             {"delta": "SEC-000001.json", "accion": "aplicar", "revision": "REV-000001"},
             {"delta": "SEC-000001.json", "accion": "revertir", "revision": "REV-000000"}]), encoding="utf-8")
@@ -262,6 +263,8 @@ class Barreras(unittest.TestCase):
             self.assertEqual(r["sec_id"], "SEC-000002")
             self.assertEqual(r["rev"], ("REV-000000", "REV-000001"))
             self.assertEqual(r["menciones"][0]["id"], "MENTION-000002")
+            # Los pasajes retirados siguen citados por el delta revertido.
+            self.assertEqual(r["pasajes"][0]["id"], "PASSAGE-000006")
             (dirs["DELTAS"] / f"{r['sec_id']}.json").write_text(json.dumps(r["delta"]), encoding="utf-8")
             self.assertEqual(ingest.revision_siguiente({"dataset_revision": "REV-000000"})[2],
                              ["SEC-000002.json"])

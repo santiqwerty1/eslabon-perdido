@@ -155,7 +155,12 @@ def ids_en_uso(fichero: str, prefijo: str) -> set[str]:
 def ids_de_pasajes() -> set[str]:
     """Pasajes ya emitidos. Viven en corpus/passages/, no en el libro mayor:
     buscarlos en mentions.jsonl no encontraba ninguno y cada sección volvía a
-    empezar en PASSAGE-000001."""
+    empezar en PASSAGE-000001.
+
+    También los que cita cualquier delta. Uno revertido se queda como
+    constancia aunque se retiren los pasajes de su sección, y su procedencia
+    sigue nombrándolos: si se reutilizaran, apuntaría a los de otra ingestión.
+    """
     out: set[str] = set()
     for p in PASSAGES.glob("*.json"):
         try:
@@ -164,6 +169,8 @@ def ids_de_pasajes() -> set[str]:
                     out.add(rec["id"])
         except (json.JSONDecodeError, TypeError):
             continue
+    for p in DELTAS.glob("*.json"):
+        out.update(re.findall(r"\bPASSAGE-\d+\b", p.read_text(encoding="utf-8")))
     return out
 
 
