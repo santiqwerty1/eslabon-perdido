@@ -83,6 +83,13 @@ def next_id() -> str:
 def create(label: str | None) -> int:
     manifest = json.loads(MANIFEST.read_text(encoding="utf-8"))
     state = gather()
+    ausentes = [f for f, h in state["files"].items() if h == "ausente"]
+    if ausentes:
+        # Un snapshot que registrara la ausencia la daría por buena en cada
+        # verify posterior: no reconstruiría la versión del corpus que declara.
+        print(f"ERROR falta {', '.join(ausentes)}, la congelación activa que declara dataset.json. "
+              "No se crea un snapshot que no pueda verificarla")
+        return 1
     snap_id = next_id()
 
     # El manifiesto se actualiza ANTES de fijar los hashes: si se hiciera después,

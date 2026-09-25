@@ -117,6 +117,25 @@ class Afirmaciones(unittest.TestCase):
         self.assertEqual([x["id"] for x in r["retiradas"]], ["C-001"])
         self.assertIn("C-002", {m["a"] for m in r["modificadas"]})
 
+    def test_un_rango_que_gana_una_fila_no_es_renumeracion(self):
+        # La fila insertada cae dentro del rango: «C-001–C-003» pasa a
+        # «C-001–C-004», que traduciendo sólo los extremos parece renumeración,
+        # pero ahora cita también la fila nueva.
+        v1 = {"00": [fila("C-001", "Uno."), fila("C-002", "Dos."), fila("C-003", "Tres."),
+                     fila("C-004", "Síntesis.", atribucion="sintesis(C-001–C-003)")]}
+        v2 = {"00": [fila("C-001", "Uno."), fila("C-002", "Insertada."), fila("C-003", "Dos."),
+                     fila("C-004", "Tres."), fila("C-005", "Síntesis.", atribucion="sintesis(C-001–C-004)")]}
+        r = self.diff(v1, v2)
+        self.assertIn("C-005", {m["a"] for m in r["modificadas"]})
+
+    def test_un_rango_que_solo_se_desplaza_es_renumeracion(self):
+        v1 = {"00": [fila("C-001", "Uno."), fila("C-002", "Dos."), fila("C-003", "Tres."),
+                     fila("C-004", "Síntesis.", atribucion="sintesis(C-001–C-003)")]}
+        v2 = {"00": [fila("C-001", "Insertada."), fila("C-002", "Uno."), fila("C-003", "Dos."),
+                     fila("C-004", "Tres."), fila("C-005", "Síntesis.", atribucion="sintesis(C-002–C-004)")]}
+        r = self.diff(v1, v2)
+        self.assertNotIn("C-005", {m["a"] for m in r["modificadas"]})
+
     def test_numero_repetido_aborta(self):
         a = corpus(self.tmp / "a", {"00": [fila("C-001", "Uno.")], "01": [fila("C-001", "Otra.")]})
         with self.assertRaises(SystemExit):
@@ -177,6 +196,18 @@ class Informe(unittest.TestCase):
                 encoding="utf-8")
         inf = self.informe(a, b)
         self.assertEqual(inf["afirmaciones"]["secciones_afectadas"], {"01": {"índice": 1}})
+
+    def test_una_tabla_que_cambia_de_seccion_marca_las_dos(self):
+        filas = {"00": [fila("C-001", "Uno.")], "01": [fila("C-002", "Dos.")]}
+        a = corpus(self.tmp / "a", filas)
+        b = corpus(self.tmp / "b", filas)
+        for base, sec in ((a, "00"), (b, "01")):
+            (base / "data" / "table_index.json").write_text(json.dumps({"tables": [
+                {"id": "t-01", "category": "synthesis", "csv_path": f"data/tablas/{sec}/t-01.csv"}]}),
+                encoding="utf-8")
+        inf = self.informe(a, b)
+        self.assertEqual(inf["afirmaciones"]["secciones_afectadas"],
+                         {"00": {"índice": 1}, "01": {"índice": 1}})
 
 
 class Registros(unittest.TestCase):
@@ -260,6 +291,22 @@ class Congelacion(unittest.TestCase):
         activa = json.loads((ROOT / "knowledge" / "corpus" / "manifests" / "dataset.json")
                             .read_text(encoding="utf-8"))["corpus_freeze"]["path"]
         self.assertIn(activa, snapshot.gather()["files"])
+
+    def test_sin_la_congelacion_activa_no_se_crea_snapshot(self):
+        spec = importlib.util.spec_from_file_location("snapshot", ROOT / "scripts" / "snapshot" / "snapshot.py")
+        snapshot = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(snapshot)
+        # Todo en una copia: si create no se negara, escribiría aquí.
+        snapshot.ROOT = self.tmp
+        snapshot.SNAPSHOTS = self.tmp / "snapshots"
+        snapshot.SNAPSHOTS.mkdir()
+        snapshot.MANIFEST = self.tmp / "dataset.json"
+        snapshot.MANIFEST.write_text(json.dumps({"guide_version": "x", "schema_version": "x",
+                                                 "dataset_revision": "REV-000001", "active_campaign": "C01",
+                                                 "corpus_freeze": {"path": "falta.json"}}), encoding="utf-8")
+        snapshot.gather = lambda: {"counts": {}, "files": {"falta.json": "ausente"}}
+        self.assertEqual(self.ejecutar(lambda a: snapshot.create(None)), 1)
+        self.assertEqual(list(snapshot.SNAPSHOTS.iterdir()), [])
 
     def test_fichero_ignorado_en_la_capa_canonica_no_es_copia_limpia(self):
         c = corpus(self.tmp / "c", {"00": [fila("C-001", "Uno.")]})

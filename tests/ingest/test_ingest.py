@@ -214,6 +214,41 @@ class Barreras(unittest.TestCase):
         self.assertEqual(r["pendientes"], ["SEC-000001.json"])
 
 
+    def test_un_delta_revertido_no_reserva_la_revision_ni_la_seccion(self):
+        # Se aplicó y se revirtió: el manifiesto volvió a REV-000000 y el delta
+        # queda como constancia. La ingestión siguiente no se encadena detrás
+        # de él, y la sección se puede volver a ingerir.
+        deltas = self.tmp / "deltas"
+        deltas.mkdir()
+        (deltas / "SEC-000001.json").write_text(json.dumps({
+            "dataset_revision_before": "REV-000000", "dataset_revision_after": "REV-000001",
+            "records_added": ["MENTION-000001"], "corpus_origin": {"section": "00"}}), encoding="utf-8")
+        (deltas / "historial.jsonl").write_text("".join(json.dumps(e) + "\n" for e in [
+            {"delta": "SEC-000001.json", "accion": "aplicar", "revision": "REV-000001"},
+            {"delta": "SEC-000001.json", "accion": "revertir", "revision": "REV-000000"}]), encoding="utf-8")
+        dataset = self.tmp / "dataset.json"
+        dataset.write_text(json.dumps({"dataset_revision": "REV-000000"}), encoding="utf-8")
+        original, ingest.DELTAS = ingest.DELTAS, deltas
+        try:
+            self.assertEqual(ingest.revision_siguiente({"dataset_revision": "REV-000000"}),
+                             ("REV-000000", "REV-000001", []))
+            r = corredor.construir(str(MINI), "00", self.congelacion)
+        finally:
+            ingest.DELTAS = original
+        self.assertEqual(r["rev"], ("REV-000000", "REV-000001"))
+        # Los identificadores del delta revertido siguen reservados.
+        self.assertEqual(r["menciones"][0]["id"], "MENTION-000002")
+
+    def test_una_barra_en_una_celda_no_desplaza_las_columnas(self):
+        otra = self.tmp / "otra"
+        shutil.copytree(MINI, otra)
+        registro = otra / "data" / "afirmaciones" / "00.csv"
+        texto = registro.read_text(encoding="utf-8")
+        self.assertIn("FIX-Alfa", texto)
+        registro.write_text(texto.replace("FIX-Alfa", "FIX-Alfa | alias", 1), encoding="utf-8")
+        datos, h = parse(otra)
+        self.assertEqual(h.errores, [])
+
     def test_un_marcador_de_tabla_sin_indice_se_rechaza(self):
         otra = self.tmp / "otra"
         shutil.copytree(MINI, otra)

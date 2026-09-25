@@ -156,6 +156,22 @@ class Hallazgos:
         self.avisos.append(m)
 
 
+def celdas(linea: str) -> list[str]:
+    """Las celdas de una fila de tabla Markdown, respetando `\\|`.
+
+    Una barra escapada es texto de la celda, no un separador (GFM). Partir por
+    todas las barras desplazaba las columnas de cualquier celda que la llevara
+    —el modo repositorio las escapa al volcar el CSV— y daba errores de
+    conformidad que no existen.
+    """
+    fila = linea.strip()
+    if fila.startswith("|"):
+        fila = fila[1:]
+    if fila.endswith("|") and not fila.endswith("\\|"):
+        fila = fila[:-1]
+    return [c.replace("\\|", "|").strip() for c in re.split(r"(?<!\\)\|", fila)]
+
+
 def tablas(texto: str) -> list[tuple[list[str], list[list[str]]]]:
     """Extrae toda tabla Markdown como (cabecera, filas)."""
     salida = []
@@ -165,11 +181,11 @@ def tablas(texto: str) -> list[tuple[list[str], list[list[str]]]]:
         if lineas[i].strip().startswith("|") and i + 1 < len(lineas) and re.match(
             r"^\s*\|[\s:|-]+\|\s*$", lineas[i + 1]
         ):
-            cab = [c.strip() for c in lineas[i].strip().strip("|").split("|")]
+            cab = celdas(lineas[i])
             filas = []
             j = i + 2
             while j < len(lineas) and lineas[j].strip().startswith("|"):
-                filas.append([c.strip() for c in lineas[j].strip().strip("|").split("|")])
+                filas.append(celdas(lineas[j]))
                 j += 1
             salida.append((cab, filas))
             i = j

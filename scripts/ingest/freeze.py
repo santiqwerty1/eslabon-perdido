@@ -74,6 +74,8 @@ PROSA = "docs/secciones"
 TABLAS = "data/tablas"
 
 C_REF = re.compile(r"\bC-\d{3,}\b")
+C_RANGO = re.compile(r"\bC-(\d{3,})\s*[–—-]\s*C-(\d{3,})\b")
+RANGO_MAX = 400
 
 
 # ---------------------------------------------------------------------------
@@ -320,6 +322,29 @@ def _contenido(fila: dict) -> str:
     return json.dumps(sorted((k, _mascara(v)) for k, v in fila.items() if k != "#"), ensure_ascii=False)
 
 
+def _expandir(valor: str) -> str:
+    """Escribe cada rango «C-001–C-003» como la lista de claves que cubre.
+
+    Traducir sólo los extremos de un rango esconde cambios de verdad: si se
+    inserta una fila entre C-001 y C-002, «C-001–C-003» pasa a «C-001–C-004» y
+    parece pura renumeración, aunque ahora cita también la fila nueva; y una
+    fila retirada dentro del rango no aparece nunca. Se compara lo que el rango
+    cita, no cómo se escribe. Un rango disparatado se deja como está.
+    """
+    def lista(m: re.Match) -> str:
+        ta, tb = m.group(1), m.group(2)
+        a, b = int(ta), int(tb)
+        if b < a or b - a > RANGO_MAX:
+            return m.group(0)
+        return ", ".join(f"C-{n:0{len(ta)}d}" for n in range(a, b + 1))
+    return C_RANGO.sub(lista, valor)
+
+
+def equivale(antes: str, despues: str, mapa: dict[str, str]) -> bool:
+    """¿Dice lo mismo `antes`, renumerado, que `despues`?"""
+    return traducir(_expandir(antes), mapa) == _expandir(despues)
+
+
 def traducir(valor: str, mapa: dict[str, str]) -> str:
     return C_REF.sub(lambda m: mapa.get(m.group(), m.group()), valor)
 
@@ -418,7 +443,7 @@ def comparar_afirmaciones(a: Path, b: Path) -> dict:
             if col == "#":
                 continue
             antes, despues = fv.get(col, ""), fn.get(col, "")
-            if traducir(antes, mapa) != despues:
+            if not equivale(antes, despues, mapa):
                 columnas[col] = [antes, despues]
         if sec_v != sec_n:
             columnas["(sección)"] = [sec_v, sec_n]
@@ -457,6 +482,9 @@ def comparar_registro(pa: Path | None, pb: Path | None, mapa: dict[str, str]) ->
     cab_a, filas_a = leer_csv(pa) if pa and pa.exists() else ([], [])
     cab_b, filas_b = leer_csv(pb) if pb and pb.exists() else ([], [])
     clave = (cab_b or cab_a or [None])[0]
+    # Las dos versiones se comparan con los rangos ya expandidos.
+    filas_a = [{k: _expandir(v) for k, v in f.items()} for f in filas_a]
+    filas_b = [{k: _expandir(v) for k, v in f.items()} for f in filas_b]
     traducidas = [{k: traducir(v, mapa) for k, v in f.items()} for f in filas_a]
 
     # La clave también se traduce —B_entidades tiene etiquetas como «afirmación
@@ -542,7 +570,7 @@ def cmd_diff(args) -> int:
             if ruta in tocados or ruta.startswith(AFIRMACIONES + "/"):
                 continue
             texto = (a.base / ruta).read_text(encoding="utf-8", errors="replace")
-            if C_REF.search(texto) and traducir(texto, af["mapa"]) != texto:
+            if C_REF.search(texto) and not equivale(texto, texto, af["mapa"]):
                 desfasados.add(ruta)
     tocados |= desfasados
     for carpeta in REGISTROS:
@@ -559,7 +587,7 @@ def cmd_diff(args) -> int:
             return "citas desactualizadas"
         antes = (a.base / ruta).read_text(encoding="utf-8", errors="replace")
         despues = (b.base / ruta).read_text(encoding="utf-8", errors="replace")
-        return "sólo renumeración" if traducir(antes, af["mapa"]) == despues else "cambiado"
+        return "sólo renumeración" if equivale(antes, despues, af["mapa"]) else "cambiado"
 
     def en(prefijo: str) -> list[dict]:
         return [{"path": p, "estado": estado(p)} for p in sorted(tocados) if p.startswith(prefijo + "/")]
@@ -586,14 +614,18 @@ def cmd_diff(args) -> int:
         for tid in sorted(ea.keys() | eb.keys()):
             if ea.get(tid) == eb.get(tid):
                 continue
+            # Las dos: si una entrada cambia de sección, la de origen la pierde y
+            # la de destino la gana, y las dos cambian de procedencia.
+            secciones = set()
             for e in (ea.get(tid), eb.get(tid)):
                 partes = Path((e or {}).get("csv_path", "")).parts
                 sec = (Path(partes[-1]).stem if partes[:2] == ("data", "afirmaciones")
                        else partes[2] if partes[:2] == ("data", "tablas") and len(partes) > 3 else None)
                 if sec:
-                    afectadas.setdefault(sec, {})
-                    afectadas[sec]["índice"] = afectadas[sec].get("índice", 0) + 1
-                    break
+                    secciones.add(sec)
+            for sec in secciones:
+                afectadas.setdefault(sec, {})
+                afectadas[sec]["índice"] = afectadas[sec].get("índice", 0) + 1
 
     for ruta, r in registros.items():
         tocadas = ({sec_vieja[c] for c in r.get("citas_viejas", []) if c in sec_vieja}
