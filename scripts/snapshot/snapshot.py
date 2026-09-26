@@ -94,6 +94,38 @@ def gather() -> dict:
     return {"counts": counts, "files": files}
 
 
+def conversiones_alteradas() -> list[str]:
+    """Ficheros de conversión que ya no son los que guardó su delta aplicado.
+
+    El delta de una conversión guarda la ruta y el hash del fichero del que
+    salió. Si el fichero cambió, un snapshot nuevo registraría el contenido
+    nuevo y lo daría por bueno, y la entrada real se habría perdido.
+    """
+    deltas = ROOT / "knowledge" / "deltas"
+    revertidos = set()
+    historial = deltas / "historial.jsonl"
+    if historial.exists():
+        ultima = {}
+        for linea in historial.read_text(encoding="utf-8").splitlines():
+            if linea.strip():
+                h = json.loads(linea)
+                ultima[h.get("delta")] = h.get("accion")
+        revertidos = {d for d, a in ultima.items() if a == "revertir"}
+    problemas = []
+    for p in sorted(deltas.glob("*.json")) if deltas.exists() else []:
+        if p.name in revertidos:
+            continue
+        ficha = (json.loads(p.read_text(encoding="utf-8")).get("conversion") or {}).get("spec") or {}
+        if not ficha.get("path"):
+            continue
+        ruta = ROOT / ficha["path"]
+        if not ruta.exists():
+            problemas.append(f"{ficha['path']}: falta, y {p.name} salió de él")
+        elif digest(ruta) != ficha.get("sha256"):
+            problemas.append(f"{ficha['path']}: no es el que guardó {p.name} ({ficha.get('sha256')})")
+    return problemas
+
+
 def next_id() -> str:
     existing = sorted(SNAPSHOTS.glob("SNAP-*.json"))
     n = int(existing[-1].stem.split("-")[1]) + 1 if existing else 0
@@ -101,6 +133,11 @@ def next_id() -> str:
 
 
 def create(label: str | None) -> int:
+    alteradas = conversiones_alteradas()
+    if alteradas:
+        print("ERROR ficheros de conversión que no son los que se aplicaron; "
+              "no se crea un snapshot que los dé por buenos:\n  " + "\n  ".join(alteradas))
+        return 1
     manifest = json.loads(MANIFEST.read_text(encoding="utf-8"))
     state = gather()
     ausentes = [f for f, h in state["files"].items() if h == "ausente"]
@@ -159,6 +196,7 @@ def verify(snap_id: str | None) -> int:
             problems.append(f"contenido cambiado: {f}")
     for f in set(state["files"]) - set(snapshot["files"]):
         problems.append(f"fichero nuevo no registrado: {f}")
+    problems += [f"conversión alterada: {a}" for a in conversiones_alteradas()]
 
     print(f"verificando {snapshot['snapshot_id']}")
     for p in problems:

@@ -172,3 +172,9 @@ el delta) sitúa así: LECA en C-760, C-762, C-765, C-771, C-772, C-773 y C-792;
 Eukaryota en C-757 y C-769; Opisthokonta en C-763; Metazoa en C-758.
 `convertir.py` ya une las dos cosas: toda conversión nueva lista en cada fila
 también los registros que la declaran.
+
+Errata en el mismo mapa: la fila C-757 lista el análisis de Douzery et al.
+(`ANALYSIS-000001`), que sale de C-759; C-757 sólo usa su resultado. La
+procedencia del análisis es la correcta, la de C-759. El fichero de conversión
+no se corrige porque su hash es el que guarda el delta aplicado; `convertir.py`
+rechaza ya que una fila liste un registro que no la declara en `rows`.
