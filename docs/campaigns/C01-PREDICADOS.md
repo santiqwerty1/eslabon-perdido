@@ -328,7 +328,7 @@ Y tres de representación:
 | C-729 | `clasificado_como_por` | B | *Bicellum* `assigned_to` Holozoa, posible |
 | C-730 | `cuestionado_por` | J | Contraevidencia de C-729: paredes flexibles no excluidas |
 | C-731 | `tiene_edad_estimada` | A | Formación Doushantuo, 635–551 Ma por U–Pb de circones |
-| C-732 | `tiene_edad_estimada` | A | Biota de Weng’an: más antigua que 609 ± 5 Ma o próxima, límite antiguo abierto |
+| C-732 | `tiene_edad_estimada` | A | Biota de Weng’an: más antigua que 609 ± 5 Ma (U–Pb SIMS de una toba suprayacente, según S169) o próxima, límite antiguo abierto |
 | C-733 | `clasificado_como_por` | B | *Tianzhushania* y *Megasphaera* `assigned_to` Metazoa, interpretación histórica |
 | C-734 | `clasificado_como_por` | B | *Tianzhushania* `assigned_to` Holozoa: protistas holozoos enquistantes |
 | C-735 | `posee_rasgo` | B | *Megasphaera*: diferenciación germen–soma, `reconstruction`, homología disputada |
@@ -355,4 +355,36 @@ Y tres de representación:
 | C-756 | `no_localiza*` | I | Sin fósil diagnóstico de Obazoa en la búsqueda Q-0172 |
 
 Las hipótesis H35–H42 del apéndice E se crean con las filas que las componen,
-en la sección 5.
+en la sección 5. Su descripción y sus supuestos son literales del apéndice. La
+primera de sus filas es la que enuncia la hipótesis, porque de ella salen sus
+ejes.
+
+## Resultado de la sección 5
+
+| Registros | |
+|---|---:|
+| Afirmaciones | 59: 18 observaciones de rasgo (`shows_evidence_of`), 13 asignaciones, 11 dataciones, 7 clasificaciones, 5 metodológicas, 2 `biomarker_of`, 1 depredación, 1 linaje troncal y 1 ambiente |
+| Ocurrencias | 9, siete de fósiles y dos sin localidad |
+| Expresiones temporales | 11, todas `occurrence_date`: cuatro radiométricas, seis acotaciones estratigráficas (`inferred`) y un intervalo publicado |
+| Estudios | 12 conjuntos de datos, 12 análisis y 11 resultados, en Ma |
+| Evidencias | 66: 33 morfológicas, 8 metodológicas, 7 geoquímicas, 6 estratigráficas, 4 cronológicas, 3 sedimentológicas, 2 fósiles y una taxonómica, una genómica y una molecular |
+| Entidades | 16 taxones fósiles y actuales (nombre y concepto), 8 clados, 9 unidades estratigráficas, 4 especímenes y conjuntos, 2 linajes, 5 moléculas, 16 rasgos con 18 observaciones y 8 métodos |
+| Fuentes | 25 nuevas; S141, S160, S171 y S178 se reutilizan |
+| Hipótesis y cuestiones | 8 (H35–H42) y 5 |
+
+Las 140 menciones tienen destino: 64 crean entidad, 44 son atributo de un
+registro, 17 repiten una entidad (grafías en cursiva del apéndice B, o
+*Bangiomorpha* y Eukaryota, que ya existían), 7 son cuestiones pendientes y 5
+señalan su evidencia. Se descartan con razón 3: Apoikozoa y Choanozoa *sensu
+stricto*, que ninguna fila usa, y U–Pb CA-ID-TIMS, que el apéndice B sitúa en
+C-721 sin que la fila ni la prosa lo liguen a una datación.
+
+La conversión enlaza de vuelta tres registros de la sección 6, por las
+afirmaciones nuevas que los nombran: Eukaryota, Metazoa y el concepto de
+*Bangiomorpha*.
+
+Antes de aplicar la conversión se hizo una auditoría fila a fila contra las
+filas, la prosa y los apéndices. Encontró resultados en Ga con unidad Ma,
+hipótesis cuya primera fila no las enunciaba, métodos de datación que la fila sí
+daba, y detalles que el corpus no dice. Todo quedó corregido en el fichero de
+conversión.
