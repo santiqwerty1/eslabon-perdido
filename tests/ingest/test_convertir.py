@@ -788,6 +788,16 @@ class Convertir(unittest.TestCase):
         self.assertIn("@EV1", str(e.exception))
         self.assertIn("@R1", str(e.exception))
 
+    def test_una_evidencia_con_datos_y_sin_analisis_se_rechaza(self):
+        # Sin un análisis citado, los datos no tienen de dónde salir: la cadena
+        # datos → análisis está rota aunque el esquema acepte la forma.
+        spec = self.estudio(self.entorno.spec(), None)
+        spec["records"][3]["record"].update({"dataset_ids": ["@D1"], "analysis_ids": []})
+        with self.assertRaises(SystemExit) as e:
+            self.entorno.construir(spec)
+        self.assertIn("@EV1", str(e.exception))
+        self.assertIn("@D1", str(e.exception))
+
     def test_delta_exige_revisiones_consecutivas(self):
         deltas = self.entorno.tmp / "deltas"
         ruta = deltas / "SEC-000001.json"

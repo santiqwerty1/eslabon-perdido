@@ -670,12 +670,12 @@ def construir(spec_path: Path, corpus: str) -> dict:
             if origen_res not in analisis:
                 rotas.append(f"{clave_de.get(rec['id'], rec['id'])}: el resultado {clave_de.get(res, res)} sale de "
                              f"{clave_de.get(origen_res, origen_res)}, que no está en `analysis_ids`")
-        if analisis:
-            datos = {d for a in analisis for d in (conocido.get(a) or {}).get("dataset_ids") or []}
-            for d in rec.get("dataset_ids") or []:
-                if d not in datos:
-                    rotas.append(f"{clave_de.get(rec['id'], rec['id'])}: el conjunto de datos "
-                                 f"{clave_de.get(d, d)} no es de ninguno de sus `analysis_ids`")
+        # Sin análisis citado tampoco: los datos tienen que salir de alguno.
+        datos = {d for a in analisis for d in (conocido.get(a) or {}).get("dataset_ids") or []}
+        for d in rec.get("dataset_ids") or []:
+            if d not in datos:
+                rotas.append(f"{clave_de.get(rec['id'], rec['id'])}: el conjunto de datos "
+                             f"{clave_de.get(d, d)} no es de ninguno de sus `analysis_ids`")
     if rotas:
         raise SystemExit("ERROR evidencias con la cadena datos → análisis → resultado rota:\n  "
                          + "\n  ".join(rotas))
