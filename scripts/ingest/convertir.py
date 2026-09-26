@@ -261,10 +261,16 @@ def usados(prefijo: str) -> set[str]:
     if prefijo == "PASSAGE":
         out |= base.ids_de_pasajes()
     manifiesto = json.loads(base.MANIFEST.read_text(encoding="utf-8")) if base.MANIFEST.exists() else {}
-    rango = ((manifiesto.get("id_allocation") or {}).get("reserved") or {}).get(prefijo)
+    asignacion = manifiesto.get("id_allocation") or {}
+    rango = (asignacion.get("reserved") or {}).get(prefijo)
     if rango:
         desde, hasta = (int(rango[k].split("-")[1]) for k in ("from", "to"))
         out |= {f"{prefijo}-{n:06d}" for n in range(desde, hasta + 1)}
+    # Lo que queda por debajo del siguiente que declara el manifiesto ya se
+    # asignó, aunque no esté en ningún fichero todavía.
+    siguiente = (asignacion.get("next") or {}).get(prefijo)
+    if isinstance(siguiente, str) and siguiente.startswith(prefijo + "-"):
+        out |= {f"{prefijo}-{n:06d}" for n in range(1, int(siguiente.split("-")[1]))}
     return out
 
 
@@ -712,7 +718,7 @@ def construir(spec_path: Path, corpus: str) -> dict:
         elif propia is not None and propia not in suyas:
             sin_datacion.append(f"{nombre}: `temporal_expression_id` {clave_de.get(propia, propia)} "
                                 "sin una afirmación dated_to de la ocurrencia que la use")
-        elif suyas:
+        elif propia is None and suyas:
             rec["temporal_expression_id"] = suyas[0]
     if sin_datacion:
         raise SystemExit("ERROR fechas de ocurrencias que no salen de sus dataciones:\n  "
