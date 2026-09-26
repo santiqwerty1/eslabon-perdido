@@ -196,15 +196,23 @@ def cmd(path: Path, reverse: bool, dry: bool, full: bool = False) -> int:
     # La cadena de revisiones es el orden: un delta se aplica sobre la revisión
     # de la que parte y sólo se revierte el último aplicado. Revertir la sección
     # antes que su conversión, por ejemplo, borraría las menciones que la
-    # conversión actualizó y dejaría sus registros sin procedencia.
+    # conversión actualizó y dejaría sus registros sin procedencia. La revisión
+    # no basta para saber cuál es el último: una conversión revertida y la que
+    # la sustituye recorren las mismas revisiones. Lo dice el historial.
     actual = (json.loads(MANIFEST.read_text(encoding="utf-8")).get("dataset_revision")
               if MANIFEST.exists() else None)
+    pila = aplicados()
+    if reverse and HISTORIAL.exists() and (not pila or pila[-1] != path.name):
+        print(f"ERROR {path.name} no es el último delta aplicado"
+              + (f": antes hay que revertir {pila[-1]}" if pila else ": no hay ninguno aplicado"))
+        return 1
+    if not reverse and path.name in pila:
+        print(f"ERROR {path.name} ya está aplicado")
+        return 1
     if actual is not None and actual != origen:
         if reverse:
-            ultimo = next((h["delta"] for h in reversed(read_jsonl(HISTORIAL))
-                           if h.get("accion") == "aplicar" and h.get("revision") == actual), None)
             print(f"ERROR el dataset está en {actual}, no en {origen}: antes hay que revertir "
-                  f"{ultimo or 'el delta que lo llevó ahí'}")
+                  f"{pila[-1] if pila else 'el delta que lo llevó ahí'}")
         else:
             print(f"ERROR el dataset está en {actual} y este delta parte de {origen}: "
                   "hay que aplicar los deltas en el orden de la cadena")
@@ -225,6 +233,17 @@ def cmd(path: Path, reverse: bool, dry: bool, full: bool = False) -> int:
               delta["dataset_revision_before"] if reverse else delta["dataset_revision_after"])
     print(f"\n{len(diario)} operaciones {'revertidas' if reverse else 'aplicadas'}")
     return 0
+
+
+def aplicados() -> list[str]:
+    """Los deltas aplicados y sin revertir, en el orden en que se aplicaron."""
+    pila: list[str] = []
+    for h in read_jsonl(HISTORIAL):
+        if h.get("accion") == "aplicar":
+            pila.append(h.get("delta"))
+        elif h.get("accion") == "revertir" and h.get("delta") in pila:
+            del pila[len(pila) - 1 - pila[::-1].index(h["delta"])]
+    return pila
 
 
 def registrar(nombre: str, accion: str, revision: str) -> None:
