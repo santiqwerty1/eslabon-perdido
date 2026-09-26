@@ -54,7 +54,7 @@ SCIENCE_PREFIXES = {
     "SEC", "PASSAGE", "MENTION", "SRC", "NAME", "TAXCONCEPT", "CLADE", "LINEAGE",
     "POP", "SPECIMEN", "SITE", "REGION", "OCC", "TRAIT", "TRAITOBS", "GENE",
     "ALLELE", "EVENT", "CLAIM", "EVID", "DATASET", "ANALYSIS", "RESULT", "HYP",
-    "TAXVIEW", "PHYVIEW", "TIME",
+    "TAXVIEW", "PHYVIEW", "TIME", "METHOD", "MOL", "CONFLICT",
 }
 
 # Vocabulario de mecánica. Se comparan piezas de la clave en snake_case, no

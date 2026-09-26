@@ -3,8 +3,8 @@
 
 Dos mitades. La familia «identidad» tiene que distinguir una molécula de quien
 la produce, y los esquemas tienen que aceptar lo que la migración añade. Los
-registros de prueba parten de los reales para no reescribir a mano campos que
-no vienen al caso; no son corpus y no se escriben en knowledge/records/.
+registros de prueba parten del fixture de referencia eukarya-minimal, no del
+libro mayor, para que la prueba no dependa de lo que se haya ingerido.
 
 Uso:
     python3 tests/validation/test_moleculas.py
@@ -25,11 +25,11 @@ sys.path.insert(0, str(ROOT / "scripts" / "validate"))
 import validate  # noqa: E402
 from families import identity  # noqa: E402
 
-RECORDS = ROOT / "knowledge" / "records"
+FIXTURE = ROOT / "tests" / "fixtures" / "eukarya-minimal"
 
 
 def primero(fichero: str) -> dict:
-    return json.loads((RECORDS / fichero).read_text(encoding="utf-8").splitlines()[0])
+    return json.loads((FIXTURE / fichero).read_text(encoding="utf-8").splitlines()[0])
 
 
 def afirmacion(cid: str, sujeto: str, predicado: str, objeto: dict) -> dict:
@@ -69,6 +69,22 @@ class Identidad(unittest.TestCase):
                                        {"entity_id": "MOL-000901"})])
         self.assertIn("MOL-000901", e)
 
+    def test_una_molecula_asignada_a_una_poblacion_falla(self):
+        [e] = self.errores([afirmacion("CLAIM-000901", "MOL-000901", "assigned_to",
+                                       {"entity_id": "POP-000901"})])
+        self.assertIn("MOL-000901", e)
+
+    def test_algo_asignado_a_una_molecula_falla(self):
+        [e] = self.errores([afirmacion("CLAIM-000901", "SPECIMEN-000901", "assigned_to",
+                                       {"entity_id": "MOL-000901"})])
+        self.assertIn("objeto", e)
+
+    def test_una_molecula_con_alias_a_un_taxon_falla(self):
+        rep = validate.Report()
+        identity.check({"molecules.jsonl": [{"id": "MOL-000901", "entity_type": "molecule",
+                                             "preferred_label": "esterano", "alias_ids": ["CLADE-000901"]}]}, rep)
+        self.assertTrue(any("alias" in e and "MOL-000901" in e for e in rep.errors), rep.errors)
+
     def test_una_molecula_clasificada_en_una_categoria_pasa(self):
         # «interpretados como biomarcadores singenéticos» (C-741): una
         # categoría, no un taxón.
@@ -96,8 +112,9 @@ class Esquemas(unittest.TestCase):
                     "preferred_label": "24-isopropilcolestano", "claim_ids": ["CLAIM-000901"]}
         claim = {**primero("claims.jsonl"), "id": "CLAIM-000901", "claim_type": "relational",
                  "subject_id": "MOL-000901", "predicate": "biomarker_of", "object": {"entity_id": "CLADE-000001"}}
-        evid = {**primero("evidence.jsonl"), "id": "EVID-000901", "evidence_type": "geochemical",
-                "supports_claim_ids": ["CLAIM-000901"]}
+        evid = {"id": "EVID-000901", "evidence_type": "geochemical", "description": "Esteranos en una roca.",
+                "source_id": "SRC-000100", "supports_claim_ids": ["CLAIM-000901"], "challenges_claim_ids": [],
+                "provenance": claim["provenance"], "record_status": "active"}
         occ = {"id": "OCC-000901", "entity_id": "MOL-000901", "temporal_expression_id": None, "site_id": None,
                "region_id": None, "location_precision": "unknown", "evidence_basis": "observed",
                "record_status": "active"}
