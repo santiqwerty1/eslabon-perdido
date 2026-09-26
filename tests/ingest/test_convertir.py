@@ -530,6 +530,37 @@ class Convertir(unittest.TestCase):
         self.assertIn(etiqueta, str(e.exception))
         self.assertIn("reason", str(e.exception))
 
+    def test_delta_no_revierte_sin_historial(self):
+        # Sin historial no hay prueba de que se aplicara ni de qué contenido.
+        deltas = self.entorno.tmp / "deltas"
+        with contextlib.redirect_stdout(io.StringIO()):
+            self.assertEqual(delta_mod.cmd(deltas / "SEC-000001.json", False, False), 0)
+        (deltas / "historial.jsonl").unlink()
+        salida = io.StringIO()
+        with contextlib.redirect_stdout(salida):
+            self.assertEqual(delta_mod.cmd(deltas / "SEC-000001.json", True, False), 1)
+        self.assertIn("no es el último delta aplicado", salida.getvalue())
+
+    def test_delta_revertido_solo_se_reaplica_con_el_mismo_contenido(self):
+        # El revertido se queda como constancia de lo que se aplicó: volver a
+        # aplicarlo editado borraría esa constancia. Otro contenido, otro nombre.
+        deltas = self.entorno.tmp / "deltas"
+        ruta = deltas / "SEC-000001.json"
+        original = ruta.read_bytes()
+        with contextlib.redirect_stdout(io.StringIO()):
+            self.assertEqual(delta_mod.cmd(ruta, False, False), 0)
+            self.assertEqual(delta_mod.cmd(ruta, True, False), 0)
+        d = json.loads(original)
+        d["operations"] = d["operations"][:-1]
+        ruta.write_text(json.dumps(d), encoding="utf-8")
+        salida = io.StringIO()
+        with contextlib.redirect_stdout(salida):
+            self.assertEqual(delta_mod.cmd(ruta, False, False), 1)
+        self.assertIn("otro contenido", salida.getvalue())
+        ruta.write_bytes(original)
+        with contextlib.redirect_stdout(io.StringIO()):
+            self.assertEqual(delta_mod.cmd(ruta, False, False), 0)
+
     def test_el_fichero_de_conversion_tiene_que_estar_en_conversions(self):
         # El snapshot sólo registra knowledge/corpus/conversions/*.json: una
         # entrada revisada fuera de ahí no se podría recuperar ni verificar.
