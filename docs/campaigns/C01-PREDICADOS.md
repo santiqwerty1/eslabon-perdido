@@ -164,3 +164,11 @@ La envolvente de C-773 (`CLAIM-000009`) entró con origen `ingestion` aunque
 lleva regla de derivación. `SEC-000001-correccion-1.json` (REV-000002 →
 REV-000003) la marca como `derived`, como pide §9.4, y `SNAP-000013` registra el
 estado corregido. `convertir.py` ya marca así toda afirmación con derivación.
+
+El mapa por fila de `SEC-000001-conversion.json` recoge las claves que lista cada
+fila del fichero de conversión, y no los registros que sólo declaran su fila en
+`rows`. Faltan cuatro entidades, que el fichero de conversión (cuyo hash guarda
+el delta) sitúa así: LECA en C-760, C-762, C-765, C-771, C-772, C-773 y C-792;
+Eukaryota en C-757 y C-769; Opisthokonta en C-763; Metazoa en C-758.
+`convertir.py` ya une las dos cosas: toda conversión nueva lista en cada fila
+también los registros que la declaran.

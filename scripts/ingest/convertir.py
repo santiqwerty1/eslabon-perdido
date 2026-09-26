@@ -708,10 +708,14 @@ def construir(spec_path: Path, corpus: str) -> dict:
     operaciones += [{"operation": "UPDATE_RECORD", "file": fichero, "record_id": rid,
                      "before": antes, "after": despues} for rid, (fichero, antes, despues) in sorted(cambios.items())]
     de = lambda f: [rec["id"] for fichero, rec in salida if fichero == f]
+    # Qué produjo cada fila: las claves que lista y los registros que la
+    # declaran en `rows`. Un registro con fila de origen está siempre en el mapa.
     filas_destino = {}
     for fila, destino in spec["rows"].items():
+        claves = list(destino.get("keys", []))
+        claves += [r["key"] for r in spec.get("records", []) if fila in r.get("rows", []) and r["key"] not in claves]
         filas_destino[fila] = {"destination": destino["destination"],
-                               "record_ids": [ids[k] for k in destino.get("keys", [])],
+                               "record_ids": [ids[k] for k in claves],
                                **({"note": destino["note"]} if destino.get("note") else {})}
     delta = {
         "section_id": sec_id,
