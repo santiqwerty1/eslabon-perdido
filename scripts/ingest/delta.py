@@ -17,6 +17,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import re
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
@@ -173,6 +174,11 @@ def huella(path: Path) -> str:
     return "sha256:" + hashlib.sha256(path.read_bytes()).hexdigest()
 
 
+def numero(revision) -> int:
+    m = re.fullmatch(r"REV-(\d+)", revision or "") if isinstance(revision, str) else None
+    return int(m.group(1)) if m else -1
+
+
 def fuera_de_orden(path: Path, origen: str, reverse: bool) -> str | None:
     """Por qué este delta no se puede aplicar o revertir ahora, o None."""
     # El historial y el snapshot sólo conocen los deltas de knowledge/deltas/:
@@ -203,6 +209,23 @@ def fuera_de_orden(path: Path, origen: str, reverse: bool) -> str | None:
                     "no se puede comprobar que sea el mismo contenido")
         if registrada and registrada != huella(path):
             return f"{path.name} cambió desde que se aplicó ({registrada}); no se revierte otro contenido"
+        # Un delta generado detrás de este y sin aplicar parte de la revisión que
+        # este deja: revertirlo lo dejaría colgando de una que ya no existe, y lo
+        # que se generase después se encadenaría detrás de él.
+        ultima = {h.get("delta"): h.get("accion") for h in read_jsonl(HISTORIAL)}
+        detras = []
+        for otro in sorted(DELTAS.glob("*.json")):
+            if otro.name == path.name or otro.name in pila or ultima.get(otro.name) == "revertir":
+                continue
+            try:
+                parte = json.loads(otro.read_text(encoding="utf-8")).get("dataset_revision_before")
+            except (OSError, json.JSONDecodeError, AttributeError):
+                continue
+            if numero(parte) >= numero(origen):
+                detras.append(otro.name)
+        if detras:
+            return (f"{', '.join(detras)} va detrás de {path.name} y está sin aplicar: antes hay que "
+                    "aplicarlo y revertirlo, o retirarlo de knowledge/deltas/ si no se va a aplicar")
     if actual is not None and actual != origen:
         if reverse:
             return (f"el dataset está en {actual}, no en {origen}: antes hay que revertir "
