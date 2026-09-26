@@ -126,10 +126,14 @@ LITERAL = re.compile(json.loads((base.ROOT / "schemas" / "json-schema" / "common
 # S3» es material suplementario del trabajo citado, como en parse_research.py.
 FUENTE = re.compile(r"^@(S\d{2,})$")
 CITA = re.compile(r"\bS\d{2,}\b")
-# Los destinos de fila de docs/campaigns/C01-PREDICADOS.md, A–I. Sólo la
+# Los destinos de fila de docs/campaigns/C01-PREDICADOS.md, A–J. Sólo la
 # glosa (H) puede no producir registros: las demás filas son contenido.
-DESTINOS = set("ABCDEFGHI")
+DESTINOS = set("ABCDEFGHIJ")
 SIN_REGISTROS = {"H"}
+# Una fila J es evidencia sobre lo que afirma otra fila (§14.5: respaldado_por
+# y cuestionado_por van de la evidencia a la afirmación): sólo produce
+# evidencias, y cada una apoya o cuestiona afirmaciones de otras filas.
+SOLO_EVIDENCIA = {"J"}
 # Sólo una mención descartada puede quedarse sin registro al que apunte.
 SIN_OBJETIVO = {"discarded_with_reason"}
 # Lo que convertir.py deduce y el fichero de conversión no puede fijar: escrito
@@ -281,6 +285,31 @@ def ejes(fila: dict) -> dict:
         "resolution": mapa(RESOLUCION, "Resolución"),
         "historical_status": mapa(VIGENCIA, "Vigencia"),
     }
+
+
+def evidencia_de_otra_fila(fila: str, destino: dict, definidas: dict[str, dict]) -> list[str]:
+    """Lo que falla en una fila J: sólo evidencias, y sobre afirmaciones de otras filas."""
+    errores = []
+    propias = list(destino.get("keys", []))
+    propias += [k for k, r in definidas.items() if fila in r.get("rows", []) and k not in propias]
+    for k in propias:
+        r = definidas.get(k)
+        if r is None:
+            continue
+        if r.get("file") != "evidence.jsonl":
+            errores.append(f"{fila}: una fila J sólo produce evidencias, y {k} va a {r.get('file')}")
+            continue
+        sobre = [*r["record"].get("supports_claim_ids", []), *r["record"].get("challenges_claim_ids", [])]
+        if not sobre:
+            errores.append(f"{fila}: {k} no apoya ni cuestiona ninguna afirmación")
+        for c in sobre:
+            if isinstance(c, str) and LITERAL.match(c):
+                continue  # una afirmación que ya existe; si no existe, se rechaza más abajo
+            otra = definidas.get(c)
+            if otra is None or otra.get("file") != "claims.jsonl" \
+                    or not set(otra.get("rows", [])) - {fila}:
+                errores.append(f"{fila}: {k} trata de {c}, que no es una afirmación de otra fila")
+    return errores
 
 
 def fuente_de_apendice(fila: dict, col_doi: str) -> dict:
@@ -459,13 +488,15 @@ def construir(spec_path: Path, corpus: str) -> dict:
             if k in definidas and fila not in definidas[k].get("rows", []):
                 errores.append(f"{fila}: lista {k}, que no declara esa fila en `rows`")
         if destino.get("destination") not in DESTINOS:
-            errores.append(f"{fila}: destino {destino.get('destination')!r} fuera de A–I")
+            errores.append(f"{fila}: destino {destino.get('destination')!r} fuera de A–J")
         elif destino["destination"] not in SIN_REGISTROS and not destino.get("keys"):
             errores.append(f"{fila}: destino {destino['destination']} sin registros (`keys`); "
                            "sólo una glosa (H) puede no producirlos")
         for k in destino.get("keys", []):
             if k not in definidas:
                 errores.append(f"{fila}: la clave {k} no está definida")
+        if destino.get("destination") in SOLO_EVIDENCIA:
+            errores += evidencia_de_otra_fila(fila, destino, definidas)
     if errores:
         raise SystemExit("ERROR el fichero de conversión no cubre la sección:\n  " + "\n  ".join(errores))
 
@@ -656,6 +687,31 @@ def construir(spec_path: Path, corpus: str) -> dict:
     if sin_datacion:
         raise SystemExit("ERROR fechas de eventos que no salen de sus dataciones:\n  " + "\n  ".join(sin_datacion))
 
+    # Una ocurrencia tiene una sola fecha, la de su afirmación `dated_to`: se
+    # deduce de ella, y si el fichero la fija tiene que ser esa.
+    sin_datacion = []
+    for fichero, rec in salida:
+        if fichero != "occurrences.jsonl":
+            continue
+        suyas = []
+        for c in dataciones:
+            t = c["object"]["temporal_expression_id"]
+            if c.get("subject_id") == rec["id"] and t not in suyas:
+                suyas.append(t)
+        nombre = clave_de.get(rec["id"], rec["id"])
+        propia = rec.get("temporal_expression_id")
+        if len(suyas) > 1:
+            sin_datacion.append(f"{nombre}: {len(suyas)} afirmaciones dated_to con fechas distintas; "
+                                "una ocurrencia tiene una sola")
+        elif propia is not None and propia not in suyas:
+            sin_datacion.append(f"{nombre}: `temporal_expression_id` {clave_de.get(propia, propia)} "
+                                "sin una afirmación dated_to de la ocurrencia que la use")
+        elif suyas:
+            rec["temporal_expression_id"] = suyas[0]
+    if sin_datacion:
+        raise SystemExit("ERROR fechas de ocurrencias que no salen de sus dataciones:\n  "
+                         + "\n  ".join(sin_datacion))
+
     # La cadena de una evidencia: cada resultado que cita sale de uno de los
     # análisis que cita, y cada conjunto de datos, de uno de esos análisis.
     conocido = {rid: rec for rid, (_, rec) in proy.items()}
@@ -781,10 +837,25 @@ def construir(spec_path: Path, corpus: str) -> dict:
                 enlazar(cid, "counterevidence_ids", rec["id"])
         if fichero == "results.jsonl" and isinstance(rec.get("analysis_id"), str):
             enlazar(rec["analysis_id"], "result_ids", rec["id"])
+    ocurrencias_fechadas = []
     for c in afirmaciones:
         t = (c.get("object") or {}).get("temporal_expression_id")
         if c.get("predicate") == "dated_to" and isinstance(t, str) and isinstance(c.get("subject_id"), str):
             enlazar(c["subject_id"], "temporal_expression_ids", t)
+            # La fecha de una ocurrencia que ya existía es un solo campo: se
+            # rellena si no la tenía, y si tenía otra, la datación la contradice.
+            sid = c["subject_id"]
+            if sid not in por_id and existentes_id.get(sid, (None,))[0] == "occurrences.jsonl":
+                _, antes = existentes_id[sid]
+                _, _, despues = cambios.setdefault(sid, ("occurrences.jsonl", antes, json.loads(json.dumps(antes))))
+                if despues.get("temporal_expression_id") in (None, t):
+                    despues["temporal_expression_id"] = t
+                else:
+                    ocurrencias_fechadas.append(f"{sid}: ya tiene la fecha {despues['temporal_expression_id']}, "
+                                                f"y {clave_de.get(c['id'], c['id'])} la fecha en {clave_de.get(t, t)}")
+    if ocurrencias_fechadas:
+        raise SystemExit("ERROR dataciones de ocurrencias que ya tienen otra fecha:\n  "
+                         + "\n  ".join(ocurrencias_fechadas))
 
     # Registros que ya existían y que una incidencia nueva afecta, e
     # incidencias que ya existían y que un registro nuevo nombra.
