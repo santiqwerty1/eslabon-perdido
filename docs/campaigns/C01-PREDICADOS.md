@@ -386,6 +386,10 @@ La conversión (`SEC-000002-conversion.json`, REV-000007 → REV-000008, con
   nuevas que los nombran;
 - Opisthokonta y Amorphea, por las cuestiones que los afectan (C-726, C-755).
 
+El manifiesto seguía declarando `ISSUE-000041` como siguiente incidencia
+cuando la conversión ya había dado de alta hasta `ISSUE-000045`. Se avanzó a
+mano a `ISSUE-000046` (`SNAP-000019`), y `delta.py` ya lo avanza al aplicar.
+
 Antes de aplicar la conversión se hizo una auditoría fila a fila contra las
 filas, la prosa y los apéndices. Encontró resultados en Ga con unidad Ma,
 hipótesis cuya primera fila no las enunciaba, métodos de datación que la fila sí
