@@ -72,6 +72,10 @@ def gather() -> dict:
     # y qué se revirtió: cambiarlos cambia lo que el estado significa.
     for p in sorted((corpus / "sections").glob("*.registro.csv")):
         files[str(p.relative_to(ROOT))] = digest(p)
+    # Y los ficheros de conversión: son la entrada revisada de la que salieron
+    # los registros (DEC-057), y su delta sólo guarda su ruta y su hash.
+    for p in sorted((corpus / "conversions").glob("*.json")):
+        files[str(p.relative_to(ROOT))] = digest(p)
     # Los deltas también: los pendientes reservan revisión e identificadores,
     # y cualquiera de ellos dice qué secciones se ingirieron ya.
     deltas = ROOT / "knowledge" / "deltas"

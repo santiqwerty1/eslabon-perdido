@@ -216,10 +216,12 @@ def revision_siguiente(manifiesto: dict) -> tuple[str, str, list[str]]:
         except json.JSONDecodeError:
             continue
         if despues and num(despues) > num(actual):
-            pendientes.append(p.name)
+            pendientes.append((num(despues), p.name))
             if num(despues) > num(antes):
                 antes = despues
-    return antes, f"REV-{num(antes) + 1:06d}", pendientes
+    # En el orden de la cadena, que es el de aplicación, y no en el de los
+    # nombres: «SEC-000001-conversion.json» ordena antes que «SEC-000001.json».
+    return antes, f"REV-{num(antes) + 1:06d}", [n for _, n in sorted(pendientes)]
 
 
 def ids_de_secciones() -> set[str]:

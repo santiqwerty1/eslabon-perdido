@@ -54,6 +54,7 @@ class Entorno:
             (ingest, "PASSAGES"): tmp / "passages",
             (ingest, "REPORTS"): tmp / "reports",
             (ingest, "RECORDS"): self.records,
+            (convertir, "VIEWS"): tmp / "views",
             (delta_mod, "RECORDS"): self.records,
         }
 
@@ -268,6 +269,49 @@ class Convertir(unittest.TestCase):
         # Los identificadores del revertido siguen reservados.
         reservados = set(json.loads(primera)["records_added"])
         self.assertFalse(reservados & set(segunda["records_added"]))
+
+    def test_los_enlaces_de_vuelta_parten_de_las_actualizaciones_pendientes(self):
+        # Otra conversión sin aplicar ya añadió evidencia a CLAIM-000050: la
+        # nueva tiene que partir de ese estado, o al aplicar la cadena lo pisaría.
+        base_claim = {"id": "CLAIM-000050", "claim_type": "relational", "subject_id": "CLAIM-000050",
+                      "predicate": "member_of", "object": {"entity_id": "CLAIM-000050"}, "evidence_ids": [],
+                      "counterevidence_ids": [], "record_status": "active"}
+        (self.entorno.records / "claims.jsonl").write_text(json.dumps(base_claim) + "\n", encoding="utf-8")
+        (self.entorno.tmp / "deltas" / "SEC-000009-conversion.json").write_text(json.dumps({
+            "dataset_revision_before": "REV-000001", "dataset_revision_after": "REV-000002",
+            "records_added": ["EVID-000900"],
+            "operations": [
+                {"operation": "ADD_RECORD", "file": "evidence.jsonl", "record_id": "EVID-000900",
+                 "before": None, "after": {"id": "EVID-000900"}},
+                {"operation": "UPDATE_RECORD", "file": "claims.jsonl", "record_id": "CLAIM-000050",
+                 "before": base_claim, "after": {**base_claim, "evidence_ids": ["EVID-000900"]}}]}),
+            encoding="utf-8")
+        spec = self.entorno.spec()
+        spec["records"][3]["record"]["supports_claim_ids"] = ["@CL1", "CLAIM-000050"]
+        r = self.entorno.construir(spec)
+        [op] = [o for o in r["delta"]["operations"] if o["record_id"] == "CLAIM-000050"]
+        [ev] = [rec["id"] for _, rec in r["salida"] if rec["id"].startswith("EVID-")]
+        self.assertEqual(op["before"]["evidence_ids"], ["EVID-000900"])
+        self.assertEqual(op["after"]["evidence_ids"], ["EVID-000900", ev])
+
+    def test_los_pendientes_se_listan_en_el_orden_de_la_cadena(self):
+        ruta = self.entorno.tmp / "spec.json"
+        ruta.write_text(json.dumps(self.entorno.spec(), ensure_ascii=False), encoding="utf-8")
+        with contextlib.redirect_stdout(io.StringIO()):
+            convertir.convertir(ruta, str(MINI), False)
+        _, _, pendientes = ingest.revision_siguiente({"dataset_revision": "REV-000000"})
+        self.assertEqual(pendientes, ["SEC-000001.json", "SEC-000001-conversion.json"])
+
+    def test_una_vista_existente_se_puede_citar(self):
+        vistas = self.entorno.tmp / "views"
+        vistas.mkdir()
+        (vistas / "classification-views.jsonl").write_text(json.dumps({"id": "TAXVIEW-000001"}) + "\n",
+                                                          encoding="utf-8")
+        spec = self.entorno.spec()
+        spec["records"][2]["record"]["scope"] = {"classification_view_ids": ["TAXVIEW-000001"]}
+        r = self.entorno.construir(spec)
+        [claim] = [rec for _, rec in r["salida"] if rec["id"].startswith("CLAIM-")]
+        self.assertEqual(claim["scope"]["classification_view_ids"], ["TAXVIEW-000001"])
 
     def test_la_conversion_va_detras_del_delta_de_la_seccion(self):
         r = self.entorno.construir(self.entorno.spec())
