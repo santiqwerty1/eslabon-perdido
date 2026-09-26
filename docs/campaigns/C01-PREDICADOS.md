@@ -379,9 +379,12 @@ señalan su evidencia. Se descartan con razón 3: Apoikozoa y Choanozoa *sensu
 stricto*, que ninguna fila usa, y U–Pb CA-ID-TIMS, que el apéndice B sitúa en
 C-721 sin que la fila ni la prosa lo liguen a una datación.
 
-La conversión enlaza de vuelta tres registros de la sección 6, por las
-afirmaciones nuevas que los nombran: Eukaryota, Metazoa y el concepto de
-*Bangiomorpha*.
+La conversión (`SEC-000002-conversion.json`, REV-000007 → REV-000008, con
+`SNAP-000018`) enlaza de vuelta cinco registros de la sección 6:
+
+- Eukaryota, Metazoa y el concepto de *Bangiomorpha*, por las afirmaciones
+  nuevas que los nombran;
+- Opisthokonta y Amorphea, por las cuestiones que los afectan (C-726, C-755).
 
 Antes de aplicar la conversión se hizo una auditoría fila a fila contra las
 filas, la prosa y los apéndices. Encontró resultados en Ga con unidad Ma,
