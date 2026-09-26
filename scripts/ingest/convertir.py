@@ -381,6 +381,9 @@ def construir(spec_path: Path, corpus: str) -> dict:
         if "id" in r.get("record", {}):
             errores.append(f"{r['key']}: el fichero de conversión no fija identificadores (`id`); "
                            "los asigna convertir.py")
+        if "provenance" in r.get("record", {}):
+            errores.append(f"{r['key']}: el fichero de conversión no fija la procedencia (`provenance`); "
+                           "convertir.py la deduce de sus filas (`rows`)")
         if r["file"] not in PREFIJO or r["file"] == "sources.jsonl":
             errores.append(f"{r['key']}: fichero {r['file']} fuera de lo que convierte este paso")
         if not r.get("rows"):
@@ -479,7 +482,7 @@ def construir(spec_path: Path, corpus: str) -> dict:
             claves_fuente = sorted({s for f in filas_r for s in CITA.findall(filas[f].get("Fuente", ""))},
                                    key=lambda s: int(s[1:]))
         fuentes_r = [ids[f"@{s}"] for s in claves_fuente]
-        if "provenance" in props and "provenance" not in rec:
+        if "provenance" in props:
             pasajes = []
             for f in filas_r:
                 for p in origen.get(f, {}).get("passage_ids", []):
