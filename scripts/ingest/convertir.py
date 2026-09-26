@@ -381,7 +381,7 @@ def construir(spec_path: Path, corpus: str) -> dict:
         if "id" in r.get("record", {}):
             errores.append(f"{r['key']}: el fichero de conversión no fija identificadores (`id`); "
                            "los asigna convertir.py")
-        for campo in ("provenance", "first_introduced_in", "introduced_in", "raised_in"):
+        for campo in ("provenance", "source_ids", "first_introduced_in", "introduced_in", "raised_in"):
             if campo in r.get("record", {}):
                 errores.append(f"{r['key']}: el fichero de conversión no fija `{campo}`; "
                                "convertir.py lo deduce de la sección y de sus filas (`rows`)")
@@ -491,7 +491,7 @@ def construir(spec_path: Path, corpus: str) -> dict:
                         pasajes.append(p)
             rec["provenance"] = {"section_ids": [sec_id], "passage_ids": pasajes, "source_ids": fuentes_r,
                                  "operation_id": None, "dataset_revision": rev_despues, "origin": "ingestion"}
-        if "source_ids" in props and "source_ids" not in rec:
+        if "source_ids" in props:
             rec["source_ids"] = fuentes_r
         if "epistemic_dimensions" in props and "epistemic_dimensions" not in rec and fichero in (
                 "claims.jsonl", "hypotheses.jsonl"):

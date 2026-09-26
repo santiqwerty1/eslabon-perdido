@@ -7,7 +7,7 @@
   "active_campaign": "CAMP-000001",
   "counts": {
     "sections": 1,
-    "passages": 1,
+    "passages": 39,
     "mentions": 68,
     "claims": 24,
     "events": 6,
@@ -42,7 +42,7 @@
     "knowledge/records/temporal-expressions.jsonl": "sha256:14f3878525442966a5369ddbfc7885f2eb5d3ed7e4600688fff7fec270859c91",
     "knowledge/records/trait-observations.jsonl": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
     "knowledge/records/traits.jsonl": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-    "knowledge/corpus/manifests/dataset.json": "sha256:0c2b6f83e0f1001e2c7a570cf26db51858ddfc66e51977399e2771b412a823af",
+    "knowledge/corpus/manifests/dataset.json": "sha256:063e6b003cb96dd56c447c05c60480bd507a609006d1ac7fb8a07a1a9a179553",
     "knowledge/corpus/passages/SEC-000001.json": "sha256:e2d13ed51c25ce55c63f9d5777628f6b0c4d3ac067811c3587cdc471e7eccc8b",
     "knowledge/corpus/sections/SEC-000001.json": "sha256:cd721502a1ec0c76988970078e20002506d8b30627841e09b65a10a3aa17220a",
     "knowledge/corpus/sections/SEC-000001.md": "sha256:b9107c3a8e66f8fcd8e39c2198092b09e1b877b86c4cd14030029a85f20aeaad",
@@ -50,7 +50,7 @@
     "knowledge/corpus/conversions/corredor-06.json": "sha256:e8100ba889ecfcc8d3f000a074bccdf6617bb4ceeb45763ed392b260257574e0",
     "knowledge/deltas/SEC-000001-conversion.json": "sha256:7ed425e9368bd5ccd5c851342a77300c560ff1f57aa23a1c822d3b96b4cf0bec",
     "knowledge/deltas/SEC-000001.json": "sha256:e1bd6fda2e74f873149ccbfb783199841562fc0e6b1f730f3aefbc6b602198db",
-    "knowledge/deltas/historial.jsonl": "sha256:e174a47cd7fb7f0885977f70eb4dd65c5112bbc7952b13ddae6c49a5fe41c88c",
+    "knowledge/deltas/historial.jsonl": "sha256:a374cd7f9a3056ea675b367681bfcf7a671d60aa1e5d8669eca00b5a9463ab7e",
     "knowledge/corpus/manifests/corredor-v0.6.0-research-audit-af7e799.json": "sha256:da71def12062930be361ef8f1bcd40b19ef91610fb7e1deab22192479c754013"
   }
 }

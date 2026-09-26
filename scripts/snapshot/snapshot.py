@@ -52,7 +52,9 @@ def gather() -> dict:
     corpus = ROOT / "knowledge" / "corpus"
     counts = {
         "sections": len(list((corpus / "sections").glob("*.md"))),
-        "passages": len(list((corpus / "passages").glob("*.json"))),
+        # Cada fichero agrupa los pasajes de una sección: se cuentan los pasajes.
+        "passages": sum(len(json.loads(p.read_text(encoding="utf-8")))
+                        for p in (corpus / "passages").glob("*.json")),
     }
     for key, fname in COUNT_MAP.items():
         if fname:
