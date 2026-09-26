@@ -122,8 +122,10 @@ CLAVE = re.compile(r"^@[A-Za-z0-9_.\-]+$")
 # Un identificador opaco escrito tal cual, con los prefijos de §16.3.
 LITERAL = re.compile(json.loads((base.ROOT / "schemas" / "json-schema" / "common.json")
                                 .read_text(encoding="utf-8"))["$defs"]["id"]["pattern"])
-FUENTE = re.compile(r"^@(S\d+)$")
-CITA = re.compile(r"\bS\d+\b")
+# Las claves del apéndice A tienen al menos dos dígitos; «S3» en «S07 supl. fig.
+# S3» es material suplementario del trabajo citado, como en parse_research.py.
+FUENTE = re.compile(r"^@(S\d{2,})$")
+CITA = re.compile(r"\bS\d{2,}\b")
 # Los destinos de fila de docs/campaigns/C01-PREDICADOS.md, A–I. Sólo la
 # glosa (H) puede no producir registros: las demás filas son contenido.
 DESTINOS = set("ABCDEFGHI")
