@@ -1,0 +1,150 @@
+{
+  "schema_version": "1.2.0",
+  "dataset_revision_before": "REV-000005",
+  "dataset_revision_after": "REV-000006",
+  "operations": [
+    {
+      "operation": "UPDATE_RECORD",
+      "file": "events.jsonl",
+      "record_id": "EVENT-000003",
+      "before": {
+        "id": "EVENT-000003",
+        "event_type": "divergence",
+        "label": "diversificación de la corona eucariota a partir de LECA",
+        "participants": [
+          {
+            "entity_id": "POP-000001",
+            "role": "ancestral_population"
+          }
+        ],
+        "result_entity_ids": [],
+        "temporal_expression_ids": [
+          "TIME-000003",
+          "TIME-000004",
+          "TIME-000006",
+          "TIME-000008",
+          "TIME-000009",
+          "TIME-000012"
+        ],
+        "region_ids": [],
+        "notes": [
+          "Los linajes que divergen primero dependen de la posición de la raíz eucariota, que el corpus trata en la sección 4; no se nombran aquí.",
+          "Sus dataciones conviven sin promediarse: cada una es una afirmación con su fuente."
+        ],
+        "first_introduced_in": "SEC-000001",
+        "provenance": {
+          "section_ids": [
+            "SEC-000001"
+          ],
+          "passage_ids": [
+            "PASSAGE-000006",
+            "PASSAGE-000036",
+            "PASSAGE-000008",
+            "PASSAGE-000011",
+            "PASSAGE-000017",
+            "PASSAGE-000019",
+            "PASSAGE-000021"
+          ],
+          "source_ids": [
+            "SRC-000001",
+            "SRC-000002",
+            "SRC-000003",
+            "SRC-000010",
+            "SRC-000012"
+          ],
+          "operation_id": null,
+          "dataset_revision": "REV-000002",
+          "origin": "ingestion"
+        },
+        "record_status": "active",
+        "claim_ids": [
+          "CLAIM-000003",
+          "CLAIM-000004",
+          "CLAIM-000006",
+          "CLAIM-000008",
+          "CLAIM-000009",
+          "CLAIM-000012"
+        ]
+      },
+      "after": {
+        "id": "EVENT-000003",
+        "event_type": "divergence",
+        "label": "diversificación de la corona eucariota a partir de LECA",
+        "participants": [
+          {
+            "entity_id": "POP-000001",
+            "role": "ancestral_population"
+          }
+        ],
+        "result_entity_ids": [],
+        "temporal_expression_ids": [
+          "TIME-000003",
+          "TIME-000004",
+          "TIME-000006",
+          "TIME-000008",
+          "TIME-000009",
+          "TIME-000012"
+        ],
+        "region_ids": [],
+        "notes": [
+          "Los linajes que divergen primero dependen de la posición de la raíz eucariota, que el corpus trata en la sección 4; no se nombran aquí.",
+          "Sus dataciones conviven sin promediarse: cada una es una afirmación con su fuente."
+        ],
+        "first_introduced_in": "SEC-000001",
+        "provenance": {
+          "section_ids": [
+            "SEC-000001"
+          ],
+          "passage_ids": [
+            "PASSAGE-000006",
+            "PASSAGE-000036",
+            "PASSAGE-000008",
+            "PASSAGE-000011",
+            "PASSAGE-000017",
+            "PASSAGE-000019",
+            "PASSAGE-000021"
+          ],
+          "source_ids": [
+            "SRC-000001",
+            "SRC-000002",
+            "SRC-000003",
+            "SRC-000010",
+            "SRC-000012"
+          ],
+          "operation_id": null,
+          "dataset_revision": "REV-000002",
+          "origin": "ingestion"
+        },
+        "record_status": "active",
+        "claim_ids": [
+          "CLAIM-000003",
+          "CLAIM-000004",
+          "CLAIM-000006",
+          "CLAIM-000008",
+          "CLAIM-000009",
+          "CLAIM-000012"
+        ],
+        "issue_ids": [
+          "ISSUE-000040"
+        ]
+      }
+    }
+  ],
+  "records_added": [],
+  "records_updated": [
+    "EVENT-000003"
+  ],
+  "claims_added": [],
+  "events_added": [],
+  "hypotheses_added": [],
+  "issues_added": [],
+  "issues_resolved": [],
+  "records_deprecated": [],
+  "views_invalidated": [],
+  "views_built": [],
+  "validation_results": {},
+  "correction": {
+    "of": "SEC-000001-conversion.json",
+    "reason": "ISSUE-000040 declara que afecta al evento de LECA (EVENT-000003), pero el evento no la listaba en `issue_ids`: recorrer el evento no llevaba a la pregunta abierta sobre su edad. Se enlaza; convertir.py ya enlaza los dos sentidos de toda incidencia."
+  }
+}

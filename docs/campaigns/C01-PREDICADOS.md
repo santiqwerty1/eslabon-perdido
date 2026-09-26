@@ -190,3 +190,9 @@ La mención «no existe» (`MENTION-000028`) señala `ISSUE-000040` solo por
 incidencia la enlazaban. `SEC-000001-correccion-3.json` (REV-000004 →
 REV-000005) enlaza los dos sentidos, y `SNAP-000015` registra el estado.
 `convertir.py` ya lo hace con toda mención que señala una incidencia.
+
+`ISSUE-000040` declara que afecta al evento de LECA (`EVENT-000003`), pero el
+evento no la listaba en `issue_ids`. `SEC-000001-correccion-4.json`
+(REV-000005 → REV-000006) la enlaza, y `SNAP-000016` registra el estado.
+`convertir.py` ya enlaza los dos sentidos de toda incidencia: su `affects` y
+el `issue_ids` de lo que afecta.
