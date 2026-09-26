@@ -126,6 +126,41 @@ def conversiones_alteradas() -> list[str]:
     return problemas
 
 
+def deltas_alterados() -> list[str]:
+    """Deltas aplicados que ya no son los que se aplicaron.
+
+    El historial guarda el hash de cada aplicación, y delta.py sólo acepta el
+    contenido de la primera. Si un delta aplicado cambió, los registros no
+    salieron de lo que dice y no se puede revertir: un snapshot que lo
+    registrara daría por bueno un estado que no se reconstruye.
+    """
+    deltas = ROOT / "knowledge" / "deltas"
+    historial = deltas / "historial.jsonl"
+    if not historial.exists():
+        return []
+    ultima, primera = {}, {}
+    for linea in historial.read_text(encoding="utf-8").splitlines():
+        if not linea.strip():
+            continue
+        h = json.loads(linea)
+        ultima[h.get("delta")] = h.get("accion")
+        if h.get("accion") == "aplicar":
+            primera.setdefault(h.get("delta"), h.get("sha256"))
+    problemas = []
+    for nombre, accion in sorted(ultima.items(), key=lambda par: str(par[0])):
+        if accion != "aplicar":
+            continue
+        ruta = deltas / str(nombre)
+        registrada = primera.get(nombre)
+        if not ruta.exists():
+            problemas.append(f"{nombre}: aplicado según el historial, pero falta")
+        elif not registrada:
+            problemas.append(f"{nombre}: aplicado sin hash en el historial")
+        elif digest(ruta) != registrada:
+            problemas.append(f"{nombre}: no es el que se aplicó ({registrada})")
+    return problemas
+
+
 def next_id() -> str:
     existing = sorted(SNAPSHOTS.glob("SNAP-*.json"))
     n = int(existing[-1].stem.split("-")[1]) + 1 if existing else 0
@@ -137,6 +172,11 @@ def create(label: str | None) -> int:
     if alteradas:
         print("ERROR ficheros de conversión que no son los que se aplicaron; "
               "no se crea un snapshot que los dé por buenos:\n  " + "\n  ".join(alteradas))
+        return 1
+    alterados = deltas_alterados()
+    if alterados:
+        print("ERROR deltas que no son los que se aplicaron; "
+              "no se crea un snapshot que los dé por buenos:\n  " + "\n  ".join(alterados))
         return 1
     manifest = json.loads(MANIFEST.read_text(encoding="utf-8"))
     state = gather()
@@ -197,6 +237,7 @@ def verify(snap_id: str | None) -> int:
     for f in set(state["files"]) - set(snapshot["files"]):
         problems.append(f"fichero nuevo no registrado: {f}")
     problems += [f"conversión alterada: {a}" for a in conversiones_alteradas()]
+    problems += [f"delta alterado: {a}" for a in deltas_alterados()]
 
     print(f"verificando {snapshot['snapshot_id']}")
     for p in problems:
