@@ -42,8 +42,8 @@ Formato del fichero de conversión:
     }
 
 Las fuentes se nombran por su clave del apéndice A con arroba («@S139») y no se
-declaran en `records`: se crean al citarlas o se reutilizan si ya existen. Una
-afirmación sin `epistemic_dimensions` toma los ejes de su primera fila.
+declaran en `records`: se crean al citarlas o se reutilizan si ya existen. Los
+ejes epistemológicos de afirmaciones e hipótesis salen siempre de su primera fila.
 """
 
 from __future__ import annotations
@@ -136,8 +136,10 @@ SIN_OBJETIVO = {"discarded_with_reason"}
 # operación de §16.4).
 DERIVADOS = ("id", "provenance", "source_ids", "first_introduced_in", "introduced_in", "raised_in",
              "entity_type", "claim_ids", "record_status")
-# Y en las afirmaciones, lo que se deduce de las evidencias que las citan.
-DERIVADOS_POR_FICHERO = {"claims.jsonl": ("evidence_ids", "counterevidence_ids")}
+# Y por fichero: en las afirmaciones, lo que se deduce de las evidencias que
+# las citan; en afirmaciones e hipótesis, los ejes, que salen de su fila.
+DERIVADOS_POR_FICHERO = {"claims.jsonl": ("evidence_ids", "counterevidence_ids", "epistemic_dimensions"),
+                         "hypotheses.jsonl": ("epistemic_dimensions",)}
 # Lo que identifica la obra. Si el apéndice activo lo corrigió, la fuente que ya
 # existe no es la que cita el corpus congelado.
 BIBLIOGRAFIA = ("authors", "year", "title", "container", "doi", "url", "source_type")
@@ -436,6 +438,10 @@ def construir(spec_path: Path, corpus: str) -> dict:
             errores.append(f"{r['key']}: fichero {r['file']} fuera de lo que convierte este paso")
         if not r.get("rows"):
             errores.append(f"{r['key']}: sin fila de origen (`rows`); la procedencia sale de ahí")
+        if r["file"] == "issues.jsonl" and (r.get("record", {}).get("resolution") or {"status": "open"}).get(
+                "status") != "open":
+            errores.append(f"{r['key']}: una incidencia nueva nace abierta (`resolution`); cerrarla es "
+                           "RESOLVE_ISSUE, otra operación de §16.4")
         for fila in r.get("rows", []):
             if fila not in filas:
                 errores.append(f"{r['key']}: la fila {fila} no es de la sección {sec}")
@@ -540,8 +546,11 @@ def construir(spec_path: Path, corpus: str) -> dict:
                 for p in origen.get(f, {}).get("passage_ids", []):
                     if p not in pasajes:
                         pasajes.append(p)
+            # Una afirmación con regla de derivación no es expresa de la fuente
+            # (§9.4): su origen lo dice.
             rec["provenance"] = {"section_ids": [sec_id], "passage_ids": pasajes, "source_ids": fuentes_r,
-                                 "operation_id": None, "dataset_revision": rev_despues, "origin": "ingestion"}
+                                 "operation_id": None, "dataset_revision": rev_despues,
+                                 "origin": "derived" if rec.get("derivation") else "ingestion"}
         if "source_ids" in props:
             rec["source_ids"] = fuentes_r
         # Un `source_id` dice de qué obra sale el registro (una evidencia, un
@@ -553,8 +562,7 @@ def construir(spec_path: Path, corpus: str) -> dict:
                 ajenas_a_la_procedencia.append(
                     f"{r['key']}: `source_id` {', '.join(sorted(propias))} no está entre las fuentes "
                     f"de su procedencia ({', '.join(fuentes_r) or 'ninguna'})")
-        if "epistemic_dimensions" in props and "epistemic_dimensions" not in rec and fichero in (
-                "claims.jsonl", "hypotheses.jsonl"):
+        if "epistemic_dimensions" in props and fichero in ("claims.jsonl", "hypotheses.jsonl"):
             if not filas_r:
                 raise SystemExit(f"ERROR {r['key']}: sin filas no hay de dónde sacar los ejes epistemológicos")
             rec["epistemic_dimensions"] = ejes(filas[filas_r[0]])
@@ -598,6 +606,22 @@ def construir(spec_path: Path, corpus: str) -> dict:
         propias = [c["id"] for c in afirmaciones
                    if c.get("subject_id") == rec["id"] or (c.get("object") or {}).get("entity_id") == rec["id"]]
         rec["claim_ids"] = sorted(set(propias))
+    # Un resultado dice de qué análisis sale; el análisis lista sus resultados.
+    # Los dos lados tienen que coincidir: si el fichero lista los resultados,
+    # tienen que ser justo los que lo nombran, y si no, se deducen.
+    clave_de = {rid: clave for clave, rid in ids.items()}
+    asimetricos = []
+    for fichero, rec in salida:
+        if fichero != "analyses.jsonl":
+            continue
+        suyos = [x["id"] for f, x in salida if f == "results.jsonl" and x.get("analysis_id") == rec["id"]]
+        if "result_ids" in rec and set(rec["result_ids"]) != set(suyos):
+            asimetricos.append(f"{clave_de.get(rec['id'], rec['id'])}: `result_ids` "
+                               f"{sorted(rec['result_ids'])} no son los resultados que lo nombran {sorted(suyos)}")
+        rec.setdefault("result_ids", suyos)
+    if asimetricos:
+        raise SystemExit("ERROR análisis y resultados que no se enlazan en los dos sentidos:\n  "
+                         + "\n  ".join(asimetricos))
 
     # --- menciones ----------------------------------------------------------------------
     actualizadas: list[tuple[dict, dict]] = []
@@ -658,6 +682,8 @@ def construir(spec_path: Path, corpus: str) -> dict:
                 enlazar(cid, "evidence_ids", rec["id"])
             for cid in rec.get("challenges_claim_ids", []):
                 enlazar(cid, "counterevidence_ids", rec["id"])
+        if fichero == "results.jsonl" and isinstance(rec.get("analysis_id"), str):
+            enlazar(rec["analysis_id"], "result_ids", rec["id"])
 
     # --- esquemas ----------------------------------------------------------------------------
     # Lo que va a escribir el delta tiene que validar ya: descubrirlo con
