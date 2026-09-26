@@ -69,8 +69,12 @@ def write_jsonl(path: Path, records: list[dict]) -> None:
     )
 
 
-def apply_ops(ops: list[dict], reverse: bool = False) -> list[str]:
-    """Aplica (o revierte) las operaciones. Devuelve el diario de lo hecho."""
+def apply_ops(ops: list[dict], reverse: bool = False, escribir: bool = True) -> list[str]:
+    """Aplica (o revierte) las operaciones. Devuelve el diario de lo hecho.
+
+    Con `escribir=False` sólo comprueba que se pueden aplicar: el ensayo en
+    seco se niega en los mismos casos que la orden de verdad.
+    """
     diario: list[str] = []
     secuencia = list(reversed(ops)) if reverse else ops
 
@@ -91,27 +95,30 @@ def apply_ops(ops: list[dict], reverse: bool = False) -> list[str]:
         idx = next((i for i, r in enumerate(recs) if r.get("id") == rid), None)
         modo = OPERATIONS[tipo]
 
+        # El registro tiene que estar como el delta espera: al aplicar, como su
+        # `before`; al revertir, como su `after`. Si otro cambio lo tocó entre
+        # medias, escribir encima lo borraría sin que nadie lo decidiera. Nada
+        # se escribe hasta el final, así que negarse aquí no deja nada a medias.
+        esperado = op["after"] if reverse else op["before"]
+        actual = recs[idx] if idx is not None else None
+        if actual != esperado:
+            raise ValueError(f"{tipo}: {rid} en {fichero} no está como "
+                             f"{'lo dejó este delta' if reverse else 'lo espera este delta'}; "
+                             "otro cambio lo tocó entre medias")
         if modo == "add":
             if not reverse:
-                if idx is not None:
-                    raise ValueError(f"{tipo}: {rid} ya existe en {fichero}")
                 recs.append(op["after"])
                 diario.append(f"+ {tipo} {rid}")
             else:
-                if idx is None:
-                    diario.append(f"~ {tipo} {rid} no estaba; nada que revertir")
-                else:
-                    recs.pop(idx)
-                    diario.append(f"- {tipo} {rid} retirado")
+                recs.pop(idx)
+                diario.append(f"- {tipo} {rid} retirado")
         else:  # update
-            estado = op["before"] if reverse else op["after"]
-            if idx is None:
-                raise ValueError(f"{tipo}: {rid} no existe en {fichero}")
-            recs[idx] = estado
+            recs[idx] = op["before"] if reverse else op["after"]
             diario.append(f"{'<' if reverse else '>'} {tipo} {rid}")
 
-    for fichero, recs in por_fichero.items():
-        write_jsonl(RECORDS / fichero, recs)
+    if escribir:
+        for fichero, recs in por_fichero.items():
+            write_jsonl(RECORDS / fichero, recs)
 
     return diario
 
@@ -175,7 +182,7 @@ def huella(path: Path) -> str:
 
 
 def numero(revision) -> int:
-    m = re.fullmatch(r"REV-(\d+)", revision or "") if isinstance(revision, str) else None
+    m = re.fullmatch(r"REV-(\d{6})", revision or "") if isinstance(revision, str) else None
     return int(m.group(1)) if m else -1
 
 
@@ -284,6 +291,11 @@ def cmd(path: Path, reverse: bool, dry: bool, full: bool = False) -> int:
         return 1
 
     if dry:
+        try:
+            apply_ops(ops, reverse, escribir=False)
+        except ValueError as exc:
+            print(f"ERROR {exc}")
+            return 1
         for linea in resumen(ops):
             print(linea)
         secuencia = list(reversed(ops)) if reverse else ops
