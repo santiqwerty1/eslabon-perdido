@@ -301,15 +301,16 @@ def evidencia_de_otra_fila(fila: str, destino: dict, definidas: dict[str, dict])
         if r.get("file") != "evidence.jsonl":
             errores.append(f"{fila}: una fila J sólo produce evidencias, y {k} va a {r.get('file')}")
             continue
-        sobre = [*r["record"].get("supports_claim_ids", []), *r["record"].get("challenges_claim_ids", [])]
+        sobre = [*(r["record"].get("supports_claim_ids") or []), *(r["record"].get("challenges_claim_ids") or [])]
         if not sobre:
             errores.append(f"{fila}: {k} no apoya ni cuestiona ninguna afirmación")
         for c in sobre:
             if isinstance(c, str) and LITERAL.match(c):
                 continue  # una afirmación que ya existe; si no existe, se rechaza más abajo
+            # Una afirmación que declare la fila J ya se rechazó arriba: sólo
+            # queda comprobar que es una afirmación.
             otra = definidas.get(c)
-            if otra is None or otra.get("file") != "claims.jsonl" \
-                    or not set(otra.get("rows", [])) - {fila}:
+            if otra is None or otra.get("file") != "claims.jsonl":
                 errores.append(f"{fila}: {k} trata de {c}, que no es una afirmación de otra fila")
     return errores
 
@@ -638,10 +639,10 @@ def construir(spec_path: Path, corpus: str) -> dict:
     afirmaciones = [rec for fichero, rec in salida if fichero == "claims.jsonl"]
     for fichero, rec in salida:
         if fichero == "evidence.jsonl":
-            for cid in rec.get("supports_claim_ids", []):
+            for cid in rec.get("supports_claim_ids") or []:
                 if cid in por_id and rec["id"] not in por_id[cid][1]["evidence_ids"]:
                     por_id[cid][1]["evidence_ids"].append(rec["id"])
-            for cid in rec.get("challenges_claim_ids", []):
+            for cid in rec.get("challenges_claim_ids") or []:
                 if cid in por_id and rec["id"] not in por_id[cid][1]["counterevidence_ids"]:
                     por_id[cid][1]["counterevidence_ids"].append(rec["id"])
     for fichero, rec in salida:
@@ -689,8 +690,10 @@ def construir(spec_path: Path, corpus: str) -> dict:
     if sin_datacion:
         raise SystemExit("ERROR fechas de eventos que no salen de sus dataciones:\n  " + "\n  ".join(sin_datacion))
 
-    # Una ocurrencia tiene una sola fecha, la de su afirmación `dated_to`: se
-    # deduce de ella, y si el fichero la fija tiene que ser esa.
+    # Una ocurrencia tiene una sola fecha, la de una afirmación `dated_to` que
+    # la fecha: con una sola, se deduce; con varias que compiten (fuentes que
+    # la datan distinto), el fichero elige cuál es la de la ocurrencia, y las
+    # otras quedan como afirmaciones. La fecha fijada tiene que ser de ellas.
     sin_datacion = []
     for fichero, rec in salida:
         if fichero != "occurrences.jsonl":
@@ -702,9 +705,10 @@ def construir(spec_path: Path, corpus: str) -> dict:
                 suyas.append(t)
         nombre = clave_de.get(rec["id"], rec["id"])
         propia = rec.get("temporal_expression_id")
-        if len(suyas) > 1:
+        if len(suyas) > 1 and propia is None:
             sin_datacion.append(f"{nombre}: {len(suyas)} afirmaciones dated_to con fechas distintas; "
-                                "una ocurrencia tiene una sola")
+                                "una ocurrencia tiene una sola, y el fichero tiene que fijar cuál "
+                                "(`temporal_expression_id`)")
         elif propia is not None and propia not in suyas:
             sin_datacion.append(f"{nombre}: `temporal_expression_id` {clave_de.get(propia, propia)} "
                                 "sin una afirmación dated_to de la ocurrencia que la use")
@@ -833,31 +837,29 @@ def construir(spec_path: Path, corpus: str) -> dict:
                 enlazar(rid, "claim_ids", c["id"])
     for fichero, rec in salida:
         if fichero == "evidence.jsonl":
-            for cid in rec.get("supports_claim_ids", []):
+            for cid in rec.get("supports_claim_ids") or []:
                 enlazar(cid, "evidence_ids", rec["id"])
-            for cid in rec.get("challenges_claim_ids", []):
+            for cid in rec.get("challenges_claim_ids") or []:
                 enlazar(cid, "counterevidence_ids", rec["id"])
         if fichero == "results.jsonl" and isinstance(rec.get("analysis_id"), str):
             enlazar(rec["analysis_id"], "result_ids", rec["id"])
-    ocurrencias_fechadas = []
+    fechas_nuevas: dict[str, list[str]] = {}
     for c in afirmaciones:
         t = (c.get("object") or {}).get("temporal_expression_id")
         if c.get("predicate") == "dated_to" and isinstance(t, str) and isinstance(c.get("subject_id"), str):
             enlazar(c["subject_id"], "temporal_expression_ids", t)
-            # La fecha de una ocurrencia que ya existía es un solo campo: se
-            # rellena si no la tenía, y si tenía otra, la datación la contradice.
             sid = c["subject_id"]
             if sid not in por_id and existentes_id.get(sid, (None,))[0] == "occurrences.jsonl":
-                _, antes = existentes_id[sid]
-                _, _, despues = cambios.setdefault(sid, ("occurrences.jsonl", antes, json.loads(json.dumps(antes))))
-                if despues.get("temporal_expression_id") in (None, t):
-                    despues["temporal_expression_id"] = t
-                else:
-                    ocurrencias_fechadas.append(f"{sid}: ya tiene la fecha {despues['temporal_expression_id']}, "
-                                                f"y {clave_de.get(c['id'], c['id'])} la fecha en {clave_de.get(t, t)}")
-    if ocurrencias_fechadas:
-        raise SystemExit("ERROR dataciones de ocurrencias que ya tienen otra fecha:\n  "
-                         + "\n  ".join(ocurrencias_fechadas))
+                if t not in fechas_nuevas.setdefault(sid, []):
+                    fechas_nuevas[sid].append(t)
+    # Una ocurrencia que ya existía sin fecha la toma de su datación nueva si
+    # es una sola. Con fecha, o con varias dataciones que compiten, se queda
+    # como está: las dataciones nuevas son afirmaciones con su fuente.
+    for sid, fechas in fechas_nuevas.items():
+        _, antes = existentes_id[sid]
+        if antes.get("temporal_expression_id") is None and len(fechas) == 1:
+            _, _, despues = cambios.setdefault(sid, ("occurrences.jsonl", antes, json.loads(json.dumps(antes))))
+            despues["temporal_expression_id"] = fechas[0]
 
     # Registros que ya existían y que una incidencia nueva afecta, e
     # incidencias que ya existían y que un registro nuevo nombra.

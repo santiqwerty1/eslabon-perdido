@@ -458,22 +458,45 @@ class Convertir(unittest.TestCase):
         [op] = [o for o in r["delta"]["operations"] if o["record_id"] == "OCC-000050"]
         self.assertEqual(op["after"]["temporal_expression_id"], t)
 
-    def test_la_datacion_de_una_ocurrencia_existente_con_otra_fecha_se_rechaza(self):
-        with self.assertRaises(SystemExit) as e:
-            self.entorno.construir(self.ocurrencia_existente("TIME-000050"))
-        self.assertIn("OCC-000050", str(e.exception))
+    def test_una_datacion_nueva_de_una_ocurrencia_fechada_no_la_cambia(self):
+        # Otra fuente la data distinto: es una afirmación que compite, no una
+        # razón para rehacer la ocurrencia ni para negarse.
+        r = self.entorno.construir(self.ocurrencia_existente("TIME-000050"))
+        [op] = [o for o in r["delta"]["operations"] if o["record_id"] == "OCC-000050"]
+        self.assertEqual(op["after"]["temporal_expression_id"], "TIME-000050")  # sólo gana el enlace a la afirmación
+        [claim] = [x for _, x in r["salida"] if x.get("subject_id") == "OCC-000050"]
+        self.assertEqual(claim["predicate"], "dated_to")
 
-    def test_una_ocurrencia_con_dos_dataciones_se_rechaza(self):
-        spec = self.ocurrencia(self.entorno.spec(), None)
+    def dos_dataciones(self, fija: str | None) -> dict:
+        spec = self.ocurrencia(self.entorno.spec(), fija)
         spec["records"] += [
             {"key": "@T2", "file": "temporal-expressions.jsonl", "rows": ["C-001"], "record": self.tiempo(800, 700)},
             {"key": "@CLO2", "file": "claims.jsonl", "rows": ["C-001"], "record": {
                 "claim_type": "temporal", "subject_id": "@OCC", "predicate": "dated_to",
                 "object": {"temporal_expression_id": "@T2"}}}]
         spec["rows"]["C-001"]["keys"] += ["@T2", "@CLO2"]
+        return spec
+
+    def test_dos_dataciones_de_una_ocurrencia_exigen_elegir_su_fecha(self):
         with self.assertRaises(SystemExit) as e:
-            self.entorno.construir(spec)
+            self.entorno.construir(self.dos_dataciones(None))
         self.assertIn("@OCC", str(e.exception))
+        self.assertIn("temporal_expression_id", str(e.exception))
+
+    def test_dos_dataciones_que_compiten_conviven_si_se_elige_la_fecha(self):
+        r = self.entorno.construir(self.dos_dataciones("@T2"))
+        recs = self.registros(r)
+        [occ] = [x for x in recs.values() if x["id"].startswith("OCC-")]
+        fechas = [c["object"]["temporal_expression_id"] for c in recs.values()
+                  if c.get("predicate") == "dated_to" and c.get("subject_id") == occ["id"]]
+        self.assertEqual(len(fechas), 2)
+        self.assertIn(occ["temporal_expression_id"], fechas)
+
+    def test_una_evidencia_J_con_listas_nulas_da_un_error_legible(self):
+        spec = self.contraevidencia(self.entorno.spec(), ["@CL1"])
+        spec["records"][-1]["record"]["supports_claim_ids"] = None
+        with self.assertRaises(SystemExit):
+            self.entorno.construir(spec)
 
     def test_una_mencion_resuelta_sin_destino_se_rechaza(self):
         spec = self.entorno.spec()
