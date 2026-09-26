@@ -26,6 +26,7 @@ Las rutas son constantes de módulo a propósito: las pruebas las reapuntan a
 
 from __future__ import annotations
 
+import hashlib
 import json
 import re
 from pathlib import Path
@@ -166,6 +167,43 @@ def _texts(rec: dict, keys) -> list[str]:
 
 # --- 1. registros superados conservados --------------------------------------
 
+def _retirados_despues(snap: dict, deltas_dir: Path) -> dict[str, int]:
+    """Lo que retiraron, por recuento, las reversiones posteriores al snapshot.
+
+    El historial sólo crece y el snapshot guarda su hash: lo que el snapshot ya
+    conocía es el prefijo con ese hash, y lo que viene detrás pasó después. Sin
+    ese hash no se sabe qué es posterior, y no se descuenta nada.
+    """
+    historial = deltas_dir / "historial.jsonl"
+    registrado = (snap.get("files") or {}).get("knowledge/deltas/historial.jsonl")
+    if not registrado or not historial.exists():
+        return {}
+    lineas = historial.read_bytes().splitlines(keepends=True)
+    corte = next((k for k in range(len(lineas), -1, -1)
+                  if "sha256:" + hashlib.sha256(b"".join(lineas[:k])).hexdigest() == registrado), None)
+    if corte is None:
+        return {}
+    retirados: dict[str, int] = {}
+    for linea in lineas[corte:]:
+        try:
+            h = json.loads(linea) if linea.strip() else None
+        except json.JSONDecodeError:
+            continue
+        if not isinstance(h, dict) or h.get("accion") != "revertir" or not isinstance(h.get("delta"), str):
+            continue
+        try:
+            delta = json.loads((deltas_dir / h["delta"]).read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            continue
+        for op in delta.get("operations") or []:
+            if not isinstance(op, dict) or op.get("operation") != "ADD_RECORD":
+                continue
+            for key, files in COUNT_FILES.items():
+                if op.get("file") in files:
+                    retirados[key] = retirados.get(key, 0) + 1
+    return retirados
+
+
 def _check_conservation(data, rep, snapshots_dir: Path, deltas_dir: Path) -> None:
     counts = {
         key: sum(len(data.get(f, [])) for f in files)
@@ -181,13 +219,19 @@ def _check_conservation(data, rep, snapshots_dir: Path, deltas_dir: Path) -> Non
     else:
         snap = _read_json(snaps[-1], rep) or {}
         snap_id = snap.get("snapshot_id", snaps[-1].stem)
+        # Revertir un delta después del snapshot retira lo que añadió, y eso sí
+        # está permitido: el mínimo es lo que había menos lo que retiraron.
+        retirados = _retirados_despues(snap, deltas_dir)
         for key, before in (snap.get("counts") or {}).items():
             if key not in counts or not isinstance(before, int):
                 continue
-            if counts[key] < before:
+            minimo = before - retirados.get(key, 0)
+            if counts[key] < minimo:
                 rep.error(
                     f"estado: {key}: {snap_id} registraba {before} y ahora hay "
-                    f"{counts[key]}; §0.1 y §16.4 no permiten que un registro "
+                    f"{counts[key]}"
+                    + (f" (las reversiones posteriores retiraron {retirados[key]})" if retirados.get(key) else "")
+                    + "; §0.1 y §16.4 no permiten que un registro "
                     "desaparezca — deprecar es cambiar record_status, no borrar la línea"
                 )
 
