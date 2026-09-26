@@ -682,6 +682,7 @@ def construir(spec_path: Path, corpus: str) -> dict:
 
     # --- menciones ----------------------------------------------------------------------
     actualizadas: list[tuple[dict, dict]] = []
+    menciones_de_cuestion: dict[str, list[str]] = {}
     for mid, ingerida in sorted(menciones.items()):
         # El estado del que parte es el proyectado: un delta intermedio pudo
         # anotar la mención, y el UPDATE no puede deshacerlo.
@@ -697,7 +698,18 @@ def construir(spec_path: Path, corpus: str) -> dict:
                                  "reason": destino.get("reason")}
         if destino.get("reason"):
             despues["notes"] = list(antes.get("notes", [])) + [f"destino: {destino['reason']}"]
+        # Una mención que señala una incidencia queda enlazada en los dos
+        # sentidos: su `issue_ids` y el `affects.mention_ids` de la incidencia.
+        cuestiones = [o for o in objetivos if isinstance(o, str) and o.startswith("ISSUE-")]
+        if cuestiones:
+            despues["issue_ids"] = list(dict.fromkeys([*(antes.get("issue_ids") or []), *cuestiones]))
+            for iid in cuestiones:
+                menciones_de_cuestion.setdefault(iid, []).append(mid)
         actualizadas.append((antes, despues))
+    for iid, mids in menciones_de_cuestion.items():
+        if iid in por_id:
+            afecta = por_id[iid][1].setdefault("affects", {})
+            afecta["mention_ids"] = list(dict.fromkeys([*afecta.get("mention_ids", []), *mids]))
 
     # --- identificadores escritos tal cual ----------------------------------------------------
     # Un registro de otra sección se cita por su identificador. Si no existe, el
@@ -745,6 +757,15 @@ def construir(spec_path: Path, corpus: str) -> dict:
         t = (c.get("object") or {}).get("temporal_expression_id")
         if c.get("predicate") == "dated_to" and isinstance(t, str) and isinstance(c.get("subject_id"), str):
             enlazar(c["subject_id"], "temporal_expression_ids", t)
+
+    # Y las incidencias que ya existían, desde las menciones que las señalan.
+    for iid, mids in menciones_de_cuestion.items():
+        if iid in por_id or iid not in existentes_id:
+            continue
+        fichero, antes = existentes_id[iid]
+        _, _, despues = cambios.setdefault(iid, (fichero, antes, json.loads(json.dumps(antes))))
+        afecta = despues.setdefault("affects", {})
+        afecta["mention_ids"] = list(dict.fromkeys([*afecta.get("mention_ids", []), *mids]))
 
     # --- esquemas ----------------------------------------------------------------------------
     # Sin jsonschema la validación no corre y sólo avisaría: se niega en vez de
