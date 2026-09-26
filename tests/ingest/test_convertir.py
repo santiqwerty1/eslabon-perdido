@@ -867,6 +867,47 @@ class Convertir(unittest.TestCase):
             self.assertEqual(delta_mod.cmd(deltas / "SEC-000001-conversion.json", True, False), 0)
             self.assertEqual(delta_mod.cmd(deltas / "SEC-000001.json", True, False), 0)
 
+    def test_un_alta_parte_de_la_ausencia_del_registro(self):
+        # Un alta con `before` igual a un registro que ya existe pasaría la
+        # comprobación de estado previo y duplicaría el identificador.
+        existente = {"id": "CLADE-000050", "entity_type": "clade", "preferred_label": "X",
+                     "record_status": "active"}
+        clades = self.entorno.records / "clades.jsonl"
+        clades.write_text(json.dumps(existente) + "\n", encoding="utf-8")
+        op = {"operation": "ADD_RECORD", "file": "clades.jsonl", "record_id": "CLADE-000050",
+              "before": existente, "after": {**existente, "preferred_label": "Y"}}
+        with self.assertRaises(ValueError) as e:
+            delta_mod.apply_ops([op])
+        self.assertIn("CLADE-000050", str(e.exception))
+        self.assertEqual(clades.read_text(encoding="utf-8").count("CLADE-000050"), 1)
+
+    def test_una_actualizacion_necesita_el_registro(self):
+        op = {"operation": "UPDATE_RECORD", "file": "clades.jsonl", "record_id": "CLADE-000051",
+              "before": None, "after": {"id": "CLADE-000051"}}
+        with self.assertRaises(ValueError) as e:
+            delta_mod.apply_ops([op])
+        self.assertIn("CLADE-000051", str(e.exception))
+
+    def test_no_se_aplica_encima_de_un_delta_aplicado_que_cambio(self):
+        # Los registros salieron de lo que el delta decía cuando se aplicó. Si
+        # el fichero cambió, apilar otro encima dejaría una pila que no se
+        # reconstruye desde sus deltas.
+        ruta = self.entorno.tmp / "spec.json"
+        ruta.write_text(json.dumps(self.entorno.spec(), ensure_ascii=False), encoding="utf-8")
+        deltas = self.entorno.tmp / "deltas"
+        with contextlib.redirect_stdout(io.StringIO()):
+            convertir.convertir(ruta, str(MINI), False)
+            self.assertEqual(delta_mod.cmd(deltas / "SEC-000001.json", False, False), 0)
+        seccion = deltas / "SEC-000001.json"
+        d = json.loads(seccion.read_text(encoding="utf-8"))
+        d["nota"] = "editado después de aplicarlo"
+        seccion.write_text(json.dumps(d), encoding="utf-8")
+        for seco in (True, False):
+            salida = io.StringIO()
+            with contextlib.redirect_stdout(salida):
+                self.assertEqual(delta_mod.cmd(deltas / "SEC-000001-conversion.json", False, seco), 1)
+            self.assertIn("SEC-000001.json", salida.getvalue())
+
     def test_sin_jsonschema_no_se_convierte(self):
         # Sin jsonschema la validación no corre: se niega en vez de escribir
         # un delta sin validar.

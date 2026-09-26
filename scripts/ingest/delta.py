@@ -101,6 +101,13 @@ def apply_ops(ops: list[dict], reverse: bool = False, escribir: bool = True) -> 
         # se escribe hasta el final, así que negarse aquí no deja nada a medias.
         esperado = op["after"] if reverse else op["before"]
         actual = recs[idx] if idx is not None else None
+        # Un alta parte de que el registro no exista: con un `before` igual a
+        # uno que ya está, la comparación pasaría y el identificador se duplicaría.
+        if modo == "add" and not reverse and (idx is not None or op["before"] is not None):
+            raise ValueError(f"{tipo}: {rid} ya está en {fichero}, o el delta no parte de su "
+                             "ausencia (`before` no es null); un alta no duplica un identificador")
+        if modo == "update" and idx is None:
+            raise ValueError(f"{tipo}: {rid} no está en {fichero}; no hay registro que actualizar")
         if actual != esperado:
             raise ValueError(f"{tipo}: {rid} en {fichero} no está como "
                              f"{'lo dejó este delta' if reverse else 'lo espera este delta'}; "
@@ -231,6 +238,17 @@ def fuera_de_orden(path: Path, delta: dict, reverse: bool) -> str | None:
             return (f"el historial no registra qué delta llevó el dataset a {origen}"
                     + (f" (el último aplicado, {pila[-1]}, dejó {llego})" if pila else "")
                     + ": no se aplica encima de una revisión sin constancia")
+        # Y los aplicados tienen que seguir siendo lo que se aplicó: si uno
+        # cambió, los registros no salieron de lo que dice y la pila no se
+        # reconstruiría desde sus deltas. El mismo criterio que el snapshot.
+        for anterior in pila:
+            primera = next((h.get("sha256") for h in read_jsonl(HISTORIAL)
+                            if h.get("delta") == anterior and h.get("accion") == "aplicar"), None)
+            ruta = DELTAS / anterior
+            if not primera or not ruta.exists() or huella(ruta) != primera:
+                return (f"{anterior}, ya aplicado, no es el que se aplicó"
+                        + (f" ({primera})" if primera else " (el historial no guarda su huella)")
+                        + ": no se apila otro delta encima")
     # El contenido tiene que ser el que se aplicó la primera vez: revertir
     # escribe sus `before`, y un revertido que vuelve a aplicarse editado
     # borraría la constancia de lo que se aplicó. Otro contenido, otro nombre.
