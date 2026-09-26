@@ -490,7 +490,10 @@ class Convertir(unittest.TestCase):
         fechas = [c["object"]["temporal_expression_id"] for c in recs.values()
                   if c.get("predicate") == "dated_to" and c.get("subject_id") == occ["id"]]
         self.assertEqual(len(fechas), 2)
-        self.assertIn(occ["temporal_expression_id"], fechas)
+        # La elegida es @T2, la segunda: no se pisa con la primera.
+        t2 = next(x["id"] for x in recs.values() if x["id"].startswith("TIME-")
+                  and (x.get("interval") or {}).get("oldest_bound") == 800)
+        self.assertEqual(occ["temporal_expression_id"], t2)
 
     def test_una_evidencia_J_con_listas_nulas_da_un_error_legible(self):
         spec = self.contraevidencia(self.entorno.spec(), ["@CL1"])
@@ -941,6 +944,34 @@ class Convertir(unittest.TestCase):
         self.assertEqual(iss["affects"]["record_ids"], [alfa["id"]])
         [op] = [o for o in r["delta"]["operations"] if o["record_id"] == "ISSUE-000050"]
         self.assertEqual(op["after"]["affects"]["claim_ids"], [claim["id"]])
+
+    def test_el_siguiente_del_manifiesto_reserva_los_anteriores(self):
+        # Un identificador por debajo del siguiente que declara el manifiesto
+        # ya se asignó aunque no esté en ningún fichero.
+        manifiesto = self.entorno.tmp / "dataset.json"
+        d = json.loads(manifiesto.read_text(encoding="utf-8"))
+        d["id_allocation"] = {"next": {"CLAIM": "CLAIM-000007"}}
+        manifiesto.write_text(json.dumps(d), encoding="utf-8")
+        with mock.patch.object(convertir.base, "MANIFEST", manifiesto):
+            r = self.entorno.construir(self.entorno.spec())
+        [claim] = [x["id"] for _, x in r["salida"] if x["id"].startswith("CLAIM-")]
+        self.assertEqual(claim, "CLAIM-000007")
+
+    def test_aplicar_un_delta_avanza_el_siguiente_del_manifiesto(self):
+        manifiesto = self.entorno.tmp / "dataset.json"
+        d = json.loads(manifiesto.read_text(encoding="utf-8"))
+        d["id_allocation"] = {"next": {"MENTION": "MENTION-000001"}}
+        manifiesto.write_text(json.dumps(d), encoding="utf-8")
+        with contextlib.redirect_stdout(io.StringIO()):
+            self.assertEqual(delta_mod.cmd(self.entorno.tmp / "deltas" / "SEC-000001.json", False, False), 0)
+        menciones = [o["record_id"] for o in self.entorno.delta_sec["operations"] if o["file"] == "mentions.jsonl"]
+        siguiente = json.loads(manifiesto.read_text(encoding="utf-8"))["id_allocation"]["next"]["MENTION"]
+        self.assertEqual(int(siguiente.split("-")[1]), max(int(m.split("-")[1]) for m in menciones) + 1)
+        # Al revertir no retrocede: los identificadores siguen reservados.
+        with contextlib.redirect_stdout(io.StringIO()):
+            self.assertEqual(delta_mod.cmd(self.entorno.tmp / "deltas" / "SEC-000001.json", True, False), 0)
+        self.assertEqual(json.loads(manifiesto.read_text(encoding="utf-8"))["id_allocation"]["next"]["MENTION"],
+                         siguiente)
 
     def test_una_clave_de_mencion_desconocida_se_rechaza(self):
         spec = self.entorno.spec()
