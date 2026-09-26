@@ -35,8 +35,9 @@ def linea(h: dict) -> str:
 
 
 class Reversiones(unittest.TestCase):
-    def caso(self, tmp: Path, *, historial: list[dict], conocido: int, claims: list[str]) -> list[str]:
-        """Un snapshot que conoce las `conocido` primeras líneas del historial y contaba dos afirmaciones."""
+    def caso(self, tmp: Path, *, historial: list[dict], conocido: int, claims: list[str], contaba: int = 2,
+             alta: str = "ADD_RECORD") -> list[str]:
+        """Un snapshot que conoce las `conocido` primeras líneas del historial y contaba `contaba` afirmaciones."""
         (tmp / "deltas").mkdir()
         (tmp / "snapshots").mkdir()
         (tmp / "claims.jsonl").write_text(
@@ -47,13 +48,13 @@ class Reversiones(unittest.TestCase):
                             "before": None, "after": {"id": "CLAIM-000001"}}]}), encoding="utf-8")
         (tmp / "deltas" / "SEC-000001-conversion.json").write_text(json.dumps({
             "dataset_revision_before": "REV-000001", "dataset_revision_after": "REV-000002",
-            "operations": [{"operation": "ADD_RECORD", "file": "claims.jsonl", "record_id": "CLAIM-000002",
+            "operations": [{"operation": alta, "file": "claims.jsonl", "record_id": "CLAIM-000002",
                             "before": None, "after": {"id": "CLAIM-000002"}}]}), encoding="utf-8")
         texto = "".join(linea(h) for h in historial)
         (tmp / "deltas" / "historial.jsonl").write_text(texto, encoding="utf-8")
         prefijo = "".join(linea(h) for h in historial[:conocido]).encode("utf-8")
         (tmp / "snapshots" / "SNAP-000001.json").write_text(json.dumps({
-            "snapshot_id": "SNAP-000001", "dataset_revision": "REV-000002", "counts": {"claims": 2},
+            "snapshot_id": "SNAP-000001", "dataset_revision": "REV-000002", "counts": {"claims": contaba},
             "files": {"knowledge/deltas/historial.jsonl": "sha256:" + hashlib.sha256(prefijo).hexdigest()}}),
             encoding="utf-8")
         return validate.run(["state"], records_dir=tmp).errors
@@ -85,6 +86,27 @@ class Reversiones(unittest.TestCase):
             errores = self.caso(Path(tmp), historial=[SECCION, CONVERSION, REVERSION], conocido=2, claims=[])
         [e] = self.recuento(errores)
         self.assertIn("retiraron 1", e)
+
+    def test_aplicar_y_revertir_despues_del_snapshot_no_abre_margen(self):
+        # El snapshot no incluía la conversión: revertirla no le quita nada, y
+        # la afirmación de la sección que falta es un borrado.
+        with tempfile.TemporaryDirectory() as tmp:
+            errores = self.caso(Path(tmp), historial=[SECCION, CONVERSION, REVERSION], conocido=1, claims=[],
+                                contaba=1)
+        self.assertEqual(len(self.recuento(errores)), 1)
+
+    def test_cuenta_toda_operacion_de_alta(self):
+        # ADD_CLAIM también es un alta: revertirla la retira igual que ADD_RECORD.
+        with tempfile.TemporaryDirectory() as tmp:
+            errores = self.caso(Path(tmp), historial=[SECCION, CONVERSION, REVERSION], conocido=2,
+                                claims=["CLAIM-000001"], alta="ADD_CLAIM")
+        self.assertEqual(self.recuento(errores), [])
+
+    def test_las_altas_son_las_de_delta_py(self):
+        sys.path.insert(0, str(ROOT / "scripts" / "ingest"))
+        import delta  # noqa: E402
+        from families import state  # noqa: E402
+        self.assertEqual(state.ADD_OPERATIONS, {op for op, modo in delta.OPERATIONS.items() if modo == "add"})
 
 
 if __name__ == "__main__":
