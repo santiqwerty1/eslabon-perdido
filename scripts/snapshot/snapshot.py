@@ -126,6 +126,37 @@ def conversiones_alteradas() -> list[str]:
     return problemas
 
 
+def cadena_rota(entradas: list[dict]) -> list[str]:
+    """Lo que falta para que el historial reconstruya la revisión del manifiesto.
+
+    Se rehace la pila: cada aplicación encima de la anterior y cada reversión
+    del último aplicado. Los aplicados tienen que ir de REV-000001 en adelante
+    sin huecos y terminar en la revisión que declara el manifiesto. Un historial
+    vaciado o recortado deja revisiones sin delta que las explique, y un
+    snapshot que lo diera por bueno no se podría reconstruir ni deshacer.
+    """
+    problemas, pila = [], []
+    for h in entradas:
+        if h.get("accion") == "aplicar":
+            pila.append((h.get("delta"), h.get("revision")))
+        elif h.get("accion") == "revertir":
+            if pila and pila[-1][0] == h.get("delta"):
+                pila.pop()
+            else:
+                problemas.append(f"historial.jsonl: revierte {h.get('delta')}, que no es el último aplicado")
+    revisiones = [r for _, r in pila]
+    esperadas = [f"REV-{n:06d}" for n in range(1, len(pila) + 1)]
+    if revisiones != esperadas:
+        problemas.append("historial.jsonl: los deltas aplicados no recorren las revisiones desde REV-000001 sin "
+                         f"huecos ({', '.join(f'{d} → {r}' for d, r in pila) or 'ninguno'})")
+    declarada = (json.loads(MANIFEST.read_text(encoding="utf-8")).get("dataset_revision")
+                 if MANIFEST.exists() else None)
+    if declarada and declarada != (revisiones[-1] if revisiones else "REV-000000"):
+        problemas.append(f"historial.jsonl: sus deltas aplicados dejan el dataset en "
+                         f"{revisiones[-1] if revisiones else 'REV-000000'}, y el manifiesto dice {declarada}")
+    return problemas
+
+
 def deltas_alterados() -> list[str]:
     """Deltas que ya no son los que se aplicaron, estén aplicados o revertidos.
 
@@ -146,13 +177,11 @@ def deltas_alterados() -> list[str]:
                     "deltas lo dejaron ahí ni con qué contenido"]
         return []
     primera: dict[str, str | None] = {}
-    for linea in historial.read_text(encoding="utf-8").splitlines():
-        if not linea.strip():
-            continue
-        h = json.loads(linea)
+    entradas = [json.loads(l) for l in historial.read_text(encoding="utf-8").splitlines() if l.strip()]
+    for h in entradas:
         if h.get("accion") == "aplicar":
             primera.setdefault(h.get("delta"), h.get("sha256"))
-    problemas = []
+    problemas = cadena_rota(entradas)
     for nombre, registrada in sorted(primera.items(), key=lambda par: str(par[0])):
         ruta = deltas / str(nombre)
         if not ruta.exists():
