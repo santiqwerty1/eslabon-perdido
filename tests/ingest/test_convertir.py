@@ -10,6 +10,7 @@ from __future__ import annotations
 import argparse
 import contextlib
 import csv
+import importlib.util
 import io
 import json
 import shutil
@@ -17,6 +18,7 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "scripts" / "ingest"))
@@ -113,6 +115,9 @@ class Entorno:
             return convertir.construir(ruta, str(MINI))
 
 
+# convertir.py no escribe un delta sin validarlo contra los esquemas: sin
+# jsonschema se niega, así que sus pruebas lo necesitan (la CI lo instala).
+@unittest.skipUnless(importlib.util.find_spec("jsonschema"), "convertir.py exige jsonschema")
 class Convertir(unittest.TestCase):
     def setUp(self):
         self._tmp = tempfile.TemporaryDirectory()
@@ -851,6 +856,14 @@ class Convertir(unittest.TestCase):
         with contextlib.redirect_stdout(io.StringIO()):
             self.assertEqual(delta_mod.cmd(deltas / "SEC-000001-conversion.json", True, False), 0)
             self.assertEqual(delta_mod.cmd(deltas / "SEC-000001.json", True, False), 0)
+
+    def test_sin_jsonschema_no_se_convierte(self):
+        # Sin jsonschema la validación no corre: se niega en vez de escribir
+        # un delta sin validar.
+        with mock.patch.dict(sys.modules, {"jsonschema": None}):
+            with self.assertRaises(SystemExit) as e:
+                self.entorno.construir(self.entorno.spec())
+        self.assertIn("jsonschema", str(e.exception))
 
     def test_el_fichero_de_conversion_tiene_que_estar_en_conversions(self):
         # El snapshot sólo registra knowledge/corpus/conversions/*.json: una

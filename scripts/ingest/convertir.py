@@ -747,6 +747,13 @@ def construir(spec_path: Path, corpus: str) -> dict:
             enlazar(c["subject_id"], "temporal_expression_ids", t)
 
     # --- esquemas ----------------------------------------------------------------------------
+    # Sin jsonschema la validación no corre y sólo avisaría: se niega en vez de
+    # escribir un delta que nadie ha validado.
+    try:
+        import jsonschema  # noqa: F401
+    except ImportError:
+        raise SystemExit("ERROR jsonschema no está instalado: convertir.py no escribe un delta sin "
+                         "validarlo contra los esquemas (make setup)")
     # Lo que va a escribir el delta tiene que validar ya: descubrirlo con
     # `make check` después de aplicarlo dejaría el libro mayor inválido hasta
     # revertir. Se validan los registros nuevos y las menciones; de los que ya
