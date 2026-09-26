@@ -933,6 +933,7 @@ La columna **Nivel** es un orden de construcción propio de este catálogo y **n
 | `Specimen` | Fósil, muestra o individuo estudiado | 2 |
 | `Site` | Yacimiento o localidad | 2 |
 | `Region` | Unidad geográfica o paleogeográfica | 2 |
+| `Molecule` | Compuesto químico, como un biomarcador; su hallazgo en una roca es una ocurrencia (`DEC-058`) | 2 |
 | `Occurrence` | Presencia en tiempo y espacio | 3 |
 | `Trait` | Carácter abstracto | 3 |
 | `TraitObservation` | Observación o inferencia de un carácter | 3 |
@@ -1396,6 +1397,7 @@ La lista original se conserva, pero no todos los predicados se almacenarán de l
 | `pierde_rasgo` | Evento o inferencia. |
 | `conserva_rasgo` | Afirmación comparativa. |
 | `presenta_evidencia_de` | Observación vinculada a evidencia. |
+| `biomarcador_de` | `biomarker_of`, desde el esquema `1.3.0` (`DEC-058`): de una molécula a quien la produce. El hallazgo de la molécula se lee como indicio del grupo; la especificidad de esa lectura viaja en sus ejes y su contraevidencia. |
 | `converge_con` | Afirmación comparativa dependiente de rasgo. |
 | `hereda_rasgo_de` | Inferencia dentro de una hipótesis. |
 | `desarrolla_independientemente` | Afirmación de homoplasia. |
@@ -1563,6 +1565,7 @@ No se utilizará un único archivo gigantesco como fuente de verdad. Tampoco se 
 │   │   ├── traits.jsonl
 │   │   ├── trait-observations.jsonl
 │   │   ├── methods.jsonl
+│   │   ├── molecules.jsonl
 │   │   ├── claims.jsonl
 │   │   ├── evidence.jsonl
 │   │   ├── datasets.jsonl
@@ -1668,8 +1671,9 @@ Prefijos consolidados:
 | `METHOD-` | método |
 | `RESEARCHER-` | investigador |
 | `CONFLICT-` | grupo de conflicto entre hipótesis |
+| `MOL-` | molécula |
 
-Los cinco últimos se añadieron el 8 de agosto de 2026 al detectar que §6.2 y §15.2 introducen entidades y grupos de conflicto sin prefijo, de modo que no podían tener identificador válido (`ISSUE-000034`, `ISSUE-000036`).
+`MOL-` se añadió con el esquema `1.3.0` (`DEC-058`), para los biomarcadores. Los cinco anteriores se añadieron el 8 de agosto de 2026 al detectar que §6.2 y §15.2 introducen entidades y grupos de conflicto sin prefijo, de modo que no podían tener identificador válido (`ISSUE-000034`, `ISSUE-000036`).
 
 `EDGE-` se reserva para aristas materializadas en una exportación o vista. No será la identidad canónica de una afirmación científica.
 
@@ -4535,6 +4539,7 @@ Una entidad no necesita estar científicamente “resuelta”. Está correctamen
 | `DEC-055` | DECIDIDO | Los grupos de conflicto pasan a registro propio con identificador opaco (`CONFLICT-000001`, `conflict-groups.jsonl`). Como cadenas libres no tenían integridad referencial y derivaron solas —los dos fixtures usaban convenciones distintas—, y no había dónde decir en qué consiste cada desacuerdo. Resuelve `ISSUE-000036`. Sube el esquema a 1.1.0. |
 | `DEC-056` | DECIDIDO | El corpus de la Campaña 1 se fija por **versión congelada**, no por fecha: commit y huella de la capa canónica del corredor (`data/` y `docs/secciones/`), registrados en `knowledge/corpus/manifests/` con `scripts/ingest/freeze.py`. La primera es `0.6.0-research-audit` en `af7e799`, con corte bibliográfico el 8 de agosto de 2026. Los resultados de auditoría posteriores entran como congelaciones nuevas que enlazan la anterior y se ingieren por diferencia, sección a sección; una congelación no se reescribe. Resuelve `OPEN-016` e `ISSUE-000013`. |
 | `DEC-057` | DECIDIDO | Las filas del corredor se convierten en registros **por fila**, no traduciendo predicados: cada sección tiene un fichero de conversión revisable que fija el destino de cada fila y cada mención (`docs/campaigns/C01-PREDICADOS.md`). Con él: el conocimiento metodológico entra con el vocabulario de §14.6, entidades `METHOD-` y evidencia de tipo `methodological` (esquema `1.2.0`, que añade también los tipos de mención `population` y `quantity`); cada nodo datado es un evento `divergence`, y sus dataciones, afirmaciones `dated_to` sobre él; cada estudio que produce una datación lleva la cadena de §6.4 completa —conjunto de datos, análisis, resultado y evidencia—, con un conjunto de datos de trazabilidad cuando el corpus no describe los datos; y las hipótesis que enuncian las filas se crean al convertirlas. |
+| `DEC-058` | DECIDIDO | La sección 5 del corredor se convierte con dos ampliaciones. Los **biomarcadores** entran como moléculas (`MOL-`, `molecules.jsonl`), con el predicado `biomarker_of` hacia quien las produce, evidencia `geochemical` y mención `molecule` (esquema `1.3.0`); su hallazgo en una roca es una ocurrencia. Y un destino de fila nuevo, **J**, para las filas que respaldan o cuestionan lo que afirma otra fila: producen evidencia sobre esa afirmación, no una afirmación sobre otra (§14.5). Las edades de fósiles y formaciones son ocurrencias fechadas, no eventos de divergencia, y las hipótesis del apéndice E del corredor que se apoyan en la sección se crean al convertirla. |
 
 ## 30.1. Relación entre decisiones nuevas y anteriores
 
@@ -4554,6 +4559,8 @@ Cuatro decisiones anteriores están supersedidas: `DEC-018` y `DEC-032` desde la
 Sobre `DEC-056`: se congela sin esperar al cierre de la auditoría del corredor porque la Fase 1 no puede fijar alcance, presupuesto ni controversias sobre un corpus que cambia bajo los pies, y porque esperar no garantiza un corpus final: una auditoría cerrada puede reabrirse. Lo que se fija no es una fecha sino una versión, y una versión nueva no deshace la anterior: se compara con ella (`freeze.py diff` separa corrección de renumeración, porque el corredor renumera sus `C-…`), y sólo las secciones que cambiaron producen deltas nuevos. El corte bibliográfico deja de ser una decisión aparte: es el que declara la congelación activa, y moverlo es congelar otra versión.
 
 Sobre `DEC-057`: la correspondencia no puede ser de predicado a predicado porque el corredor usa el mismo predicado para cosas distintas —`pierde_rasgo` sirve para la pérdida de un orgánulo (C-991) y para la de señal temporal de unas secuencias (C-781)—, y porque ninguno de sus 330 predicados es uno de los de §14. El conjunto de datos de trazabilidad no inventa datos: declara que el corpus no los describe y existe para que el análisis tenga el eslabón que `analysis.json` exige y la cadena de §6.4 sea la misma en todos los estudios. Se decidió sobre la sección 6, la más pequeña con contenido científico, y las reglas se extienden al resto del corpus sección a sección.
+
+Sobre `DEC-058`: un biomarcador no es un espécimen, que es un objeto físico individual (§7.7), ni un rasgo, que es de un organismo: es un compuesto que aparece en muchas rocas y que se interpreta, con más o menos especificidad, como huella de quien lo produjo. Sin tipo propio había que elegir entre forzarlo a espécimen o dejarlo en una categoría sin identidad, y las dos cosas perdían lo que la sección 5 discute: si un compuesto es exclusivo de un grupo (C-746 y C-747) o si es contaminación (C-741 y C-742). El destino J existe porque una afirmación `questioned_by` sobre otra afirmación dejaría la contraevidencia sin enlazar a lo que cuestiona. La sección se convierte desde la versión congelada `af7e799`: el checkpoint de trabajo del corredor del 26 de septiembre de 2026 cambia su prosa y algunos apéndices, pero no sus 63 filas, y está sin auditar; lo que cambie se absorberá con el diff de versiones de `DEC-056` cuando el corredor publique su versión auditada.
 
 Sobre `DEC-052`: seis dígitos dan un millón de registros por tipo. Si algún tipo se acercara a ese límite, la ampliación de ancho es una migración de esquema, no un cambio de identidad: los identificadores ya emitidos no se renumeran. El contador es central, lo que basta mientras el proyecto sea individual; el disparador para revisarlo es el del editor colaborativo de §25.9.
 

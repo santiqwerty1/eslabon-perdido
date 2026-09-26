@@ -186,10 +186,10 @@ def main() -> int:
     # De tests/validation/ sólo las que pasan en la base: las de estado,
     # separación, geografía, hipótesis y evidencia arrastran fallos anteriores
     # y se incorporarán cuando se corrijan.
-    pruebas += [ROOT / "tests" / "validation" / "test_reversiones.py"]
+    pruebas += [ROOT / "tests" / "validation" / f for f in ("test_reversiones.py", "test_moleculas.py")]
     if pruebas:
         import subprocess
-        print(f"\n{DIM}ingestión y validación — congelación, diff, secciones del corredor y reversiones{RESET}")
+        print(f"\n{DIM}ingestión y validación — congelación, diff, secciones del corredor, reversiones y moléculas{RESET}")
         for prueba in pruebas:
             r = subprocess.run([sys.executable, str(prueba)], capture_output=True, text=True)
             resumen = (r.stderr.strip().splitlines() or ["?"])[-1]

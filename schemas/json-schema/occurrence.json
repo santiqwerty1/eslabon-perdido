@@ -8,7 +8,7 @@
     "id": { "type": "string", "pattern": "^OCC-[0-9]{6}$" },
     "entity_id": {
       "$ref": "common.json#/$defs/id",
-      "description": "Entidad cuya presencia se registra: taxón, población, linaje o espécimen."
+      "description": "Entidad cuya presencia se registra: taxón, población, linaje, espécimen o, desde el esquema 1.3.0 (DEC-058), una molécula hallada en una roca, como un biomarcador."
     },
     "temporal_expression_id": {
       "oneOf": [{ "type": "string", "pattern": "^TIME-[0-9]{6}$" }, { "type": "null" }],

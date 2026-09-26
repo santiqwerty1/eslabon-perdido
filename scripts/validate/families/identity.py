@@ -15,6 +15,11 @@ Se añade además, por encargo explícito, la línea que §19.2 coloca bajo
 
 | «las fusiones conservan redirecciones»        | `_check_merges`      |
 
+Y, desde el esquema 1.3.0 (DEC-058), la que separa una molécula de quien la
+produce, con el mismo espíritu que la del espécimen:
+
+| «molécula y taxón diferenciados»              | `_check_molecule`    |
+
 Apoyos normativos usados: §7.1 (distinciones obligatorias), §7.2 (un nombre no
 contiene circunscripción), §7.3 (el concepto es el uso de un nombre *según una
 fuente*), §7.7 (un espécimen no se convierte en taxón), §7.9 (rasgo frente a
@@ -39,11 +44,11 @@ ID_RE = re.compile(
     r"\b(SEC|PASSAGE|MENTION|SRC|NAME|TAXCONCEPT|CLADE|LINEAGE|POP|SPECIMEN|SITE|"
     r"REGION|OCC|TRAIT|TRAITOBS|GENE|ALLELE|EVENT|CLAIM|EVID|DATASET|ANALYSIS|"
     r"RESULT|HYP|TAXVIEW|PHYVIEW|CAMP|CHAPTER|MECH|GAME|ISSUE|TERM|TIME|"
-    r"TECH|ECOSYS|METHOD|RESEARCHER|CONFLICT)-[0-9]{6}\b"
+    r"TECH|ECOSYS|METHOD|MOL|RESEARCHER|CONFLICT)-[0-9]{6}\b"
 )
 
 # Los ficheros que comparten entity.json (§16.2, Apéndice E.5); methods.jsonl
-# desde el esquema 1.2.0 (DEC-057).
+# desde el esquema 1.2.0 (DEC-057) y molecules.jsonl desde el 1.3.0 (DEC-058).
 ENTITY_FILES = (
     "clades.jsonl",
     "lineages.jsonl",
@@ -54,6 +59,7 @@ ENTITY_FILES = (
     "occurrences.jsonl",
     "traits.jsonl",
     "methods.jsonl",
+    "molecules.jsonl",
 )
 
 # entity_type -> prefijo obligatorio de §16.3.
@@ -67,6 +73,7 @@ TYPE_PREFIX = {
     "occurrence": "OCC",
     "trait": "TRAIT",
     "method": "METHOD",
+    "molecule": "MOL",
 }
 
 # Identidades taxonómicas: lo que un espécimen NO es (§7.7).
@@ -453,6 +460,53 @@ def _check_specimen(data: dict[str, list[dict]], rep, index) -> None:
             )
 
 
+# --- «molécula y taxón diferenciados» (DEC-058) -------------------------------
+
+# De quién puede ser biomarcador una molécula (§14.3): un grupo, una población
+# o la capacidad de fabricarla, nunca un espécimen, un yacimiento u otra molécula.
+BIOMARKER_TARGETS = ("CLADE", "TAXCONCEPT", "LINEAGE", "POP", "TRAIT")
+
+
+def _check_molecule(data: dict[str, list[dict]], rep, index) -> None:
+    """Una molécula no es un taxón: su relación con quien la produce es `biomarker_of`.
+
+    Un biomarcador hallado en una roca se lee como indicio de un grupo, y es
+    fácil que la lectura acabe escrita como si la molécula fuera el grupo. Se
+    comprueban las dos vías: `biomarker_of` con extremos que no le corresponden,
+    y una molécula usada como taxón o asignada a uno.
+    """
+    for claim in data.get("claims.jsonl", []):
+        cid = claim.get("id")
+        pred = claim.get("predicate")
+        sujeto, objeto = claim.get("subject_id"), _entity_object_id(claim)
+        if pred == "biomarker_of":
+            if _prefix(sujeto) != "MOL":
+                rep.error(
+                    f"identidad: {cid} usa biomarker_of con sujeto {sujeto}, que no es una "
+                    f"molécula (MOL-): biomarcador de algo sólo puede serlo un compuesto (§14.3)"
+                )
+            if _prefix(objeto) not in BIOMARKER_TARGETS:
+                rep.error(
+                    f"identidad: {cid} usa biomarker_of hacia {objeto}; su objeto es un grupo, "
+                    f"una población o un rasgo ({', '.join(p + '-' for p in BIOMARKER_TARGETS)})"
+                )
+            continue
+        moleculas = []
+        if pred in TAXON_ONLY_PREDICATES:
+            moleculas = [(papel, e) for papel, e in (("sujeto", sujeto), ("objeto", objeto)) if _prefix(e) == "MOL"]
+        elif pred in CONCEPT_TARGET_PREDICATES and _prefix(sujeto) == "MOL" \
+                and _prefix(objeto) in TAXONOMIC_PREFIXES:
+            # Clasificarla en una categoría («biomarcador singenético»,
+            # «contaminación») es legítimo; asignarla a un taxón, no.
+            moleculas = [("sujeto", sujeto)]
+        for papel, extremo in moleculas:
+            rep.error(
+                f"identidad: {cid} usa {pred} con la molécula {extremo} como {papel}; una "
+                f"molécula no es un taxón ni se asigna a uno. Su relación con quien la produce "
+                f"es 'biomarker_of' (§14.3, DEC-058)"
+            )
+
+
 # --- «las fusiones conservan redirecciones» ----------------------------------
 
 def _redirect_target(rec: dict, entrantes: dict[str, list[str]], index) -> str | None:
@@ -554,6 +608,7 @@ def check(data: dict[str, list[dict]], rep) -> None:
     _check_homonyms(data, rep, index)
     _check_name_concept(data, rep, index)
     _check_specimen(data, rep, index)
+    _check_molecule(data, rep, index)
     _check_merges(data, rep, index)
 
     conceptos = len(data.get("taxon-concepts.jsonl", []))
