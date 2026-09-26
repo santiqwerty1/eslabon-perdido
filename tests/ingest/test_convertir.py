@@ -561,6 +561,33 @@ class Convertir(unittest.TestCase):
         with contextlib.redirect_stdout(io.StringIO()):
             self.assertEqual(delta_mod.cmd(ruta, False, False), 0)
 
+    def test_delta_no_opera_sin_manifiesto(self):
+        # Sin manifiesto no hay revisión autorizada que comprobar ni que avanzar.
+        deltas = self.entorno.tmp / "deltas"
+        (self.entorno.tmp / "dataset.json").unlink()
+        antes = {f.name: f.read_bytes() for f in self.entorno.records.glob("*.jsonl")}
+        for seco in (True, False):
+            with self.subTest(en_seco=seco):
+                salida = io.StringIO()
+                with contextlib.redirect_stdout(salida):
+                    self.assertEqual(delta_mod.cmd(deltas / "SEC-000001.json", False, seco), 1)
+                self.assertIn("manifiesto", salida.getvalue())
+        self.assertEqual({f.name: f.read_bytes() for f in self.entorno.records.glob("*.jsonl")}, antes)
+
+    def test_un_registro_que_no_valida_contra_su_esquema_se_rechaza(self):
+        try:
+            import jsonschema  # noqa: F401
+        except ImportError:
+            self.skipTest("jsonschema no instalado")
+        spec = self.entorno.spec()
+        spec["records"][2]["record"]["claim_type"] = "inventado"
+        spec["mentions"]["FIX-Alfa"]["mention_type"] = "tampoco_existe"
+        with self.assertRaises(SystemExit) as e:
+            self.entorno.construir(spec)
+        self.assertIn("claims.jsonl", str(e.exception))
+        self.assertIn("inventado", str(e.exception))
+        self.assertIn("mentions.jsonl", str(e.exception))
+
     def test_el_fichero_de_conversion_tiene_que_estar_en_conversions(self):
         # El snapshot sólo registra knowledge/corpus/conversions/*.json: una
         # entrada revisada fuera de ahí no se podría recuperar ni verificar.

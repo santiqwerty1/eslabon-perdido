@@ -60,9 +60,12 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 
+sys.path.insert(0, str(HERE.parent / "validate"))
+
 import corredor  # noqa: E402
 import freeze  # noqa: E402
 import ingest as base  # noqa: E402
+import validate  # noqa: E402
 from parse_research import ACEPTACION, FUERZA, RESOLUCION, TIPO_FUENTE, VIGENCIA  # noqa: E402
 
 SCHEMAS = base.ROOT / "schemas" / "json-schema"
@@ -295,6 +298,24 @@ def fuente_de_apendice(fila: dict, col_doi: str) -> dict:
         "verification_status": "pending_verification",
         "record_status": "active",
     }
+
+
+def fallos_de_esquema(registros: list[tuple[str, dict]]) -> tuple[dict[str, set[str]], list[str]]:
+    """Los fallos de esquema de cada registro, por «fichero id», y los avisos."""
+    por_fichero: dict[str, list[dict]] = {}
+    for fichero, rec in registros:
+        por_fichero.setdefault(fichero, []).append(rec)
+    rep = validate.Report()
+    validate.v_schema(por_fichero, rep)
+    fallos: dict[str, set[str]] = {}
+    for error in rep.errors:
+        m = re.match(r"([^:]+):(\d+): (.*)", error, re.S)
+        if m and m.group(1) in por_fichero:
+            rec = por_fichero[m.group(1)][int(m.group(2)) - 1]
+            fallos.setdefault(f"{m.group(1)} {rec.get('id')}", set()).add(m.group(3))
+        else:
+            fallos.setdefault("esquemas", set()).add(error)
+    return fallos, rep.warnings
 
 
 def valores_de(valor, campo: str) -> set[str]:
@@ -625,6 +646,21 @@ def construir(spec_path: Path, corpus: str) -> dict:
                 enlazar(cid, "evidence_ids", rec["id"])
             for cid in rec.get("challenges_claim_ids", []):
                 enlazar(cid, "counterevidence_ids", rec["id"])
+
+    # --- esquemas ----------------------------------------------------------------------------
+    # Lo que va a escribir el delta tiene que validar ya: descubrirlo con
+    # `make check` después de aplicarlo dejaría el libro mayor inválido hasta
+    # revertir. Se validan los registros nuevos y las menciones; de los que ya
+    # existían, sólo lo que el enlace de vuelta estropea, no lo que ya traían.
+    escritos, avisos = fallos_de_esquema([*salida, *(("mentions.jsonl", d) for _, d in actualizadas),
+                                          *((f, despues) for f, _, despues in cambios.values())])
+    previos, _ = fallos_de_esquema([(f, antes) for f, antes, _ in cambios.values()])
+    for aviso in avisos:
+        print(f"AVISO {aviso}")
+    invalidos = [f"{donde}: {fallo}" for donde, fallos in sorted(escritos.items())
+                 for fallo in sorted(fallos - previos.get(donde, set()))]
+    if invalidos:
+        raise SystemExit("ERROR registros que no validan contra su esquema:\n  " + "\n  ".join(invalidos))
 
     # --- delta ------------------------------------------------------------------------------
     operaciones = [{"operation": "ADD_RECORD", "file": fichero, "record_id": rec["id"], "before": None, "after": rec}

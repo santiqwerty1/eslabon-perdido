@@ -191,8 +191,13 @@ def fuera_de_orden(path: Path, origen: str, reverse: bool) -> str | None:
     # conversión actualizó y dejaría sus registros sin procedencia. La revisión
     # no basta para saber cuál es el último: una conversión revertida y la que
     # la sustituye recorren las mismas revisiones. Lo dice el historial.
-    actual = (json.loads(MANIFEST.read_text(encoding="utf-8")).get("dataset_revision")
-              if MANIFEST.exists() else None)
+    # Sin manifiesto no hay revisión que comprobar ni que avanzar: aplicar o
+    # revertir dejaría el libro mayor sin revisión autorizada.
+    if not MANIFEST.exists():
+        return f"falta el manifiesto ({MANIFEST}): sin él no hay revisión con la que encadenar"
+    actual = json.loads(MANIFEST.read_text(encoding="utf-8")).get("dataset_revision")
+    if not actual:
+        return f"el manifiesto ({MANIFEST}) no declara `dataset_revision`"
     pila = aplicados()
     # Lo que se aplicó con este nombre. Sin historial no hay prueba de nada:
     # ni de que se aplicara ni de con qué contenido.
@@ -233,7 +238,7 @@ def fuera_de_orden(path: Path, origen: str, reverse: bool) -> str | None:
         if detras:
             return (f"{', '.join(detras)} va detrás de {path.name} y está sin aplicar: antes hay que "
                     "aplicarlo y revertirlo, o retirarlo de knowledge/deltas/ si no se va a aplicar")
-    if actual is not None and actual != origen:
+    if actual != origen:
         if reverse:
             return (f"el dataset está en {actual}, no en {origen}: antes hay que revertir "
                     f"{pila[-1] if pila else 'el delta que lo llevó ahí'}")
