@@ -194,21 +194,28 @@ def fuera_de_orden(path: Path, origen: str, reverse: bool) -> str | None:
     actual = (json.loads(MANIFEST.read_text(encoding="utf-8")).get("dataset_revision")
               if MANIFEST.exists() else None)
     pila = aplicados()
-    if reverse and HISTORIAL.exists() and (not pila or pila[-1] != path.name):
+    # Lo que se aplicó con este nombre. Sin historial no hay prueba de nada:
+    # ni de que se aplicara ni de con qué contenido.
+    previas = [h for h in read_jsonl(HISTORIAL) if h.get("delta") == path.name and h.get("accion") == "aplicar"]
+    if reverse and (not pila or pila[-1] != path.name):
         return (f"{path.name} no es el último delta aplicado"
-                + (f": antes hay que revertir {pila[-1]}" if pila else ": no hay ninguno aplicado"))
+                + (f": antes hay que revertir {pila[-1]}" if pila else ": el historial no registra ninguno aplicado"))
     if not reverse and path.name in pila:
         return f"{path.name} ya está aplicado"
-    if reverse:
-        # Revertir escribe los `before` del fichero: tienen que ser los del
-        # delta que se aplicó, no los de una versión editada después.
-        registrada = next((h.get("sha256") for h in reversed(read_jsonl(HISTORIAL))
-                           if h.get("delta") == path.name and h.get("accion") == "aplicar"), None)
-        if HISTORIAL.exists() and not registrada:
+    # El contenido tiene que ser el que se aplicó la primera vez: revertir
+    # escribe sus `before`, y un revertido que vuelve a aplicarse editado
+    # borraría la constancia de lo que se aplicó. Otro contenido, otro nombre.
+    if previas:
+        registrada = previas[0].get("sha256")
+        if not registrada:
             return (f"el historial no guarda la huella de {path.name} cuando se aplicó: "
                     "no se puede comprobar que sea el mismo contenido")
-        if registrada and registrada != huella(path):
-            return f"{path.name} cambió desde que se aplicó ({registrada}); no se revierte otro contenido"
+        if registrada != huella(path):
+            if reverse:
+                return f"{path.name} cambió desde que se aplicó ({registrada}); no se revierte otro contenido"
+            return (f"{path.name} se aplicó antes con otro contenido ({registrada}); "
+                    "un delta distinto tiene que llevar otro nombre")
+    if reverse:
         # Un delta generado detrás de este y sin aplicar parte de la revisión que
         # este deja: revertirlo lo dejaría colgando de una que ya no existe, y lo
         # que se generase después se encadenaría detrás de él.
