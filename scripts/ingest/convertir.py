@@ -46,8 +46,9 @@ Las fuentes se nombran por su clave del apéndice A con arroba («@S139») y no 
 declaran en `records`: se crean al citarlas o se reutilizan si ya existen. Los
 ejes epistemológicos de afirmaciones e hipótesis salen siempre de su primera fila.
 `occurrence_dates`, opcional, elige la fecha de una ocurrencia que ya existía
-sin fecha cuando varias afirmaciones `dated_to` nuevas compiten por ella; una
-ocurrencia nueva la elige en su propio registro.
+sin fecha cuando esta conversión la data y sus afirmaciones `dated_to`, las de
+antes y las nuevas, dan fechas distintas; una ocurrencia nueva la elige en su
+propio registro.
 """
 
 from __future__ import annotations
@@ -874,10 +875,21 @@ def construir(spec_path: Path, corpus: str) -> dict:
             if sid not in por_id and existentes_id.get(sid, (None,))[0] == "occurrences.jsonl":
                 if t not in fechas_nuevas.setdefault(sid, []):
                     fechas_nuevas[sid].append(t)
-    # Una ocurrencia que ya existía sin fecha la toma de su datación nueva si
-    # es una sola; si varias compiten, el fichero elige cuál en
-    # `occurrence_dates`, como una nueva la elige en su registro. Con fecha se
-    # queda como está: las dataciones nuevas son afirmaciones con su fuente.
+    # Las que ya la fechaban, de otras secciones, compiten igual que las
+    # nuevas; una afirmación retirada ya no afirma nada.
+    afirmadas: dict[str, list[str]] = {}
+    for fichero, c in existentes_id.values():
+        t = (c.get("object") or {}).get("temporal_expression_id")
+        if (fichero == "claims.jsonl" and c.get("predicate") == "dated_to" and isinstance(t, str)
+                and c.get("subject_id") in fechas_nuevas and c.get("record_status", "active") == "active"):
+            afirmadas.setdefault(c["subject_id"], []).append(t)
+    afirmadas = {sid: list(dict.fromkeys([*afirmadas.get(sid, []), *nuevas]))
+                 for sid, nuevas in fechas_nuevas.items()}
+    # Una ocurrencia que ya existía sin fecha la toma de su datación si, entre
+    # las de antes y las nuevas, hay una sola fecha; si varias compiten, el
+    # fichero elige cuál en `occurrence_dates`, como una nueva la elige en su
+    # registro. Con fecha se queda como está: las dataciones nuevas son
+    # afirmaciones con su fuente.
     elegidas = spec.get("occurrence_dates") or {}
     if not isinstance(elegidas, dict):
         raise SystemExit("ERROR `occurrence_dates` tiene que ser un objeto: ocurrencia → fecha")
@@ -892,10 +904,13 @@ def construir(spec_path: Path, corpus: str) -> dict:
             sin_datacion.append(f"{nombre}: `occurrence_dates` sólo elige la fecha de una ocurrencia que ya existe")
         elif (previa := existentes_id[oid][1].get("temporal_expression_id")) is not None:
             sin_datacion.append(f"{nombre}: ya tiene fecha ({previa}) y `occurrence_dates` no la pisa")
-        elif t not in fechas_nuevas.get(oid, []):
+        elif oid not in afirmadas:
+            sin_datacion.append(f"{nombre}: esta conversión no la fecha, así que `occurrence_dates` no elige su "
+                                "fecha; eso es un delta de corrección")
+        elif t not in afirmadas[oid]:
             sin_datacion.append(f"{nombre}: `occurrence_dates` elige {clave_de.get(t, t)}, que no es la fecha de "
-                                "ninguna de sus afirmaciones dated_to nuevas")
-    for sid, fechas in fechas_nuevas.items():
+                                "ninguna de sus afirmaciones dated_to")
+    for sid, fechas in afirmadas.items():
         _, antes = existentes_id[sid]
         if antes.get("temporal_expression_id") is not None:
             continue
@@ -904,8 +919,9 @@ def construir(spec_path: Path, corpus: str) -> dict:
         elif len(fechas) == 1:
             fecha = fechas[0]
         else:
-            sin_datacion.append(f"{sid}: {len(fechas)} afirmaciones dated_to nuevas con fechas distintas; una "
-                                "ocurrencia tiene una sola, y el fichero tiene que elegir cuál (`occurrence_dates`)")
+            sin_datacion.append(f"{sid}: {len(fechas)} fechas distintas entre sus afirmaciones dated_to, de antes y "
+                                "de esta conversión; una ocurrencia tiene una sola, y el fichero tiene que elegir "
+                                "cuál (`occurrence_dates`)")
             continue
         _, _, despues = cambios.setdefault(sid, ("occurrences.jsonl", antes, json.loads(json.dumps(antes))))
         despues["temporal_expression_id"] = fecha
