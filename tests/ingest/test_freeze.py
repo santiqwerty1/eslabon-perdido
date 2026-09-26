@@ -406,7 +406,9 @@ class Congelacion(unittest.TestCase):
             {"delta": "SEC-000001.json", "accion": "aplicar", "revision": "REV-000001"}) + "\n", encoding="utf-8")
         self.assertEqual(len(snapshot.deltas_alterados()), 1)
 
-    def test_un_delta_revertido_o_pendiente_no_se_compara(self):
+    def test_un_delta_revertido_tambien_es_el_que_se_aplico(self):
+        # Revertido, sigue siendo constancia y reserva sus identificadores, y
+        # delta.py sólo lo reaplicaría con el contenido de la primera vez.
         snapshot, deltas = self.snapshot_con_deltas()
         revertido = deltas / "SEC-000001.json"
         revertido.write_text('{"ops": []}\n', encoding="utf-8")
@@ -415,9 +417,25 @@ class Congelacion(unittest.TestCase):
                   {"delta": "SEC-000001.json", "accion": "revertir", "revision": "REV-000000"}]
         (deltas / "historial.jsonl").write_text(
             "".join(json.dumps(l) + "\n" for l in lineas), encoding="utf-8")
+        self.assertEqual(snapshot.deltas_alterados(), [])
         revertido.write_text('{"ops": [], "editado": true}\n', encoding="utf-8")
+        self.assertEqual(len(snapshot.deltas_alterados()), 1)
+
+    def test_un_delta_pendiente_no_se_compara(self):
+        snapshot, deltas = self.snapshot_con_deltas()
+        (deltas / "historial.jsonl").write_text("", encoding="utf-8")
         (deltas / "SEC-000002.json").write_text('{"ops": []}\n', encoding="utf-8")
         self.assertEqual(snapshot.deltas_alterados(), [])
+
+    def test_sin_historial_fuera_de_la_revision_inicial_no_hay_snapshot(self):
+        snapshot, deltas = self.snapshot_con_deltas()
+        (deltas / "SEC-000001.json").write_text('{"ops": []}\n', encoding="utf-8")
+        self.assertEqual(snapshot.deltas_alterados(), [])  # manifiesto sin revisión: la inicial
+        snapshot.MANIFEST.write_text(json.dumps({"dataset_revision": "REV-000003"}), encoding="utf-8")
+        [problema] = snapshot.deltas_alterados()
+        self.assertIn("REV-000003", problema)
+        self.assertEqual(self.ejecutar(lambda a: snapshot.create(None)), 1)
+        self.assertEqual(list(snapshot.SNAPSHOTS.iterdir()), [])
 
     def test_verify_informa_de_un_delta_aplicado_editado(self):
         snapshot, deltas = self.snapshot_con_deltas()
