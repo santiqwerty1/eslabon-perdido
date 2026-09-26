@@ -38,10 +38,12 @@ PHASE = None  # ejecutable: sólo usa tipos ya implementados
 ID_RE = re.compile(
     r"\b(SEC|PASSAGE|MENTION|SRC|NAME|TAXCONCEPT|CLADE|LINEAGE|POP|SPECIMEN|SITE|"
     r"REGION|OCC|TRAIT|TRAITOBS|GENE|ALLELE|EVENT|CLAIM|EVID|DATASET|ANALYSIS|"
-    r"RESULT|HYP|TAXVIEW|PHYVIEW|CAMP|CHAPTER|MECH|GAME|ISSUE|TERM|TIME)-[0-9]{6}\b"
+    r"RESULT|HYP|TAXVIEW|PHYVIEW|CAMP|CHAPTER|MECH|GAME|ISSUE|TERM|TIME|"
+    r"TECH|ECOSYS|METHOD|RESEARCHER|CONFLICT)-[0-9]{6}\b"
 )
 
-# Los ocho ficheros que comparten entity.json (§16.2, Apéndice E.5).
+# Los ficheros que comparten entity.json (§16.2, Apéndice E.5); methods.jsonl
+# desde el esquema 1.2.0 (DEC-057).
 ENTITY_FILES = (
     "clades.jsonl",
     "lineages.jsonl",
@@ -51,6 +53,7 @@ ENTITY_FILES = (
     "regions.jsonl",
     "occurrences.jsonl",
     "traits.jsonl",
+    "methods.jsonl",
 )
 
 # entity_type -> prefijo obligatorio de §16.3.
@@ -63,6 +66,7 @@ TYPE_PREFIX = {
     "region": "REGION",
     "occurrence": "OCC",
     "trait": "TRAIT",
+    "method": "METHOD",
 }
 
 # Identidades taxonómicas: lo que un espécimen NO es (§7.7).

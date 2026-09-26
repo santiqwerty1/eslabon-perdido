@@ -31,9 +31,10 @@
         "statistical",
         "historical",
         "nomenclatural",
-        "taxonomic"
+        "taxonomic",
+        "methodological"
       ],
-      "description": "Los veinte tipos previstos en E.7."
+      "description": "Los veinte tipos previstos en E.7, más 'methodological' desde el esquema 1.2.0 (DEC-057): la literatura que sostiene una relación metodológica de §14.6."
     },
     "description": {
       "type": "string",

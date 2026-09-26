@@ -74,9 +74,15 @@
         "requires_verification",
         "rejects_claim",
         "occurs_in",
-        "dated_to"
+        "dated_to",
+        "assumes",
+        "provides_bound",
+        "depends_on",
+        "may_bias",
+        "limits",
+        "calibrates"
       ],
-      "description": "Vocabulario cerrado de §14 más 'assigned_to' de E.6. Los predicados modales ('possible_ancestor_of') no se degradan nunca a ascendencia definitiva. Ampliarlo es un cambio de contrato y sube schema_version (§16.5)."
+      "description": "Vocabulario cerrado de §14 más 'assigned_to' de E.6. Los predicados modales ('possible_ancestor_of', 'may_bias') no se degradan nunca a afirmación categórica. Los seis últimos son las relaciones metodológicas de §14.6 (DEC-057, esquema 1.2.0). Ampliarlo es un cambio de contrato y sube schema_version (§16.5)."
     },
     "object": {
       "type": "object",

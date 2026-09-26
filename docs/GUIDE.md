@@ -1426,6 +1426,21 @@ La lista original se conserva, pero no todos los predicados se almacenarán de l
 | `clasificado_como_por` | Concepto taxonómico dentro de una vista. |
 | `requiere_verificacion` | Issue vinculado, no relación biológica. |
 
+## 14.6. Relaciones metodológicas
+
+Añadidas con el esquema `1.2.0` (`DEC-057`). Parte del corpus científico no habla de organismos sino de cómo se sabe lo que se sabe de ellos: qué supone un reloj relajado, qué aporta una calibración, qué sesga una estimación. Es conocimiento con fuente y con los mismos ejes epistemológicos que cualquier otro, y no cabía en §14.1–§14.5. Sus sujetos y objetos son sobre todo entidades de método (`METHOD-`): métodos, modelos, calibraciones y los fenómenos o condiciones que condicionan un método.
+
+| Relación propuesta | Predicado | Tratamiento |
+|---|---|---|
+| `supone` | `assumes` | Un método o modelo da por bueno un supuesto. El objeto suele ser una categoría. |
+| `aporta_limite` | `provides_bound` | Un método o un tipo de evidencia aporta una clase de límite —mínimo, máximo—, no una fecha. |
+| `depende_de` | `depends_on` | El valor o la validez de una estimación o de un método depende de algo. |
+| `puede_sesgar` | `may_bias` | Un fenómeno o una práctica puede sesgar una estimación o un método. Modal: no afirma que el sesgo ocurra en un análisis concreto. |
+| `limita` | `limits` | Una condición o un fenómeno restringe lo que un método puede resolver. |
+| `calibra` | `calibrates` | Un fósil, un espécimen o una datación calibra un análisis o una familia de análisis. |
+
+`incompatible_con` (§14.5) también relaciona métodos o modelos cuyos supuestos se excluyen.
+
 ---
 
 # 15. Hipótesis, escenarios y compatibilidad
@@ -1547,6 +1562,7 @@ No se utilizará un único archivo gigantesco como fuente de verdad. Tampoco se 
 │   │   ├── occurrences.jsonl
 │   │   ├── traits.jsonl
 │   │   ├── trait-observations.jsonl
+│   │   ├── methods.jsonl
 │   │   ├── claims.jsonl
 │   │   ├── evidence.jsonl
 │   │   ├── datasets.jsonl
@@ -4518,6 +4534,7 @@ Una entidad no necesita estar científicamente “resuelta”. Está correctamen
 | `DEC-054` | DECIDIDO | El eje `acceptance` gana `abandoned` para «ya no la sostiene nadie», en vez de expresarlo con `historical_status: rejected`: son ejes independientes (§10) y acoplarlos habría hecho indistinguible una idea rechazada con defensores de otra sin ellos. Resuelve `ISSUE-000037`. Sube el esquema a 1.1.0. |
 | `DEC-055` | DECIDIDO | Los grupos de conflicto pasan a registro propio con identificador opaco (`CONFLICT-000001`, `conflict-groups.jsonl`). Como cadenas libres no tenían integridad referencial y derivaron solas —los dos fixtures usaban convenciones distintas—, y no había dónde decir en qué consiste cada desacuerdo. Resuelve `ISSUE-000036`. Sube el esquema a 1.1.0. |
 | `DEC-056` | DECIDIDO | El corpus de la Campaña 1 se fija por **versión congelada**, no por fecha: commit y huella de la capa canónica del corredor (`data/` y `docs/secciones/`), registrados en `knowledge/corpus/manifests/` con `scripts/ingest/freeze.py`. La primera es `0.6.0-research-audit` en `af7e799`, con corte bibliográfico el 8 de agosto de 2026. Los resultados de auditoría posteriores entran como congelaciones nuevas que enlazan la anterior y se ingieren por diferencia, sección a sección; una congelación no se reescribe. Resuelve `OPEN-016` e `ISSUE-000013`. |
+| `DEC-057` | DECIDIDO | Las filas del corredor se convierten en registros **por fila**, no traduciendo predicados: cada sección tiene un fichero de conversión revisable que fija el destino de cada fila y cada mención (`docs/campaigns/C01-PREDICADOS.md`). Con él: el conocimiento metodológico entra con el vocabulario de §14.6, entidades `METHOD-` y evidencia de tipo `methodological` (esquema `1.2.0`, que añade también los tipos de mención `population` y `quantity`); cada nodo datado es un evento `divergence`, y sus dataciones, afirmaciones `dated_to` sobre él; cada estudio que produce una datación lleva la cadena de §6.4 completa —conjunto de datos, análisis, resultado y evidencia—, con un conjunto de datos de trazabilidad cuando el corpus no describe los datos; y las hipótesis que enuncian las filas se crean al convertirlas. |
 
 ## 30.1. Relación entre decisiones nuevas y anteriores
 
@@ -4535,6 +4552,8 @@ Cuatro decisiones anteriores están supersedidas: `DEC-018` y `DEC-032` desde la
 `DEC-051` a `DEC-053` resuelven las tres decisiones abiertas que bloqueaban la Fase 0. Sus ADR correspondientes se redactan al crear el repositorio, junto a `ADR-001`, `ADR-002` y `ADR-003`.
 
 Sobre `DEC-056`: se congela sin esperar al cierre de la auditoría del corredor porque la Fase 1 no puede fijar alcance, presupuesto ni controversias sobre un corpus que cambia bajo los pies, y porque esperar no garantiza un corpus final: una auditoría cerrada puede reabrirse. Lo que se fija no es una fecha sino una versión, y una versión nueva no deshace la anterior: se compara con ella (`freeze.py diff` separa corrección de renumeración, porque el corredor renumera sus `C-…`), y sólo las secciones que cambiaron producen deltas nuevos. El corte bibliográfico deja de ser una decisión aparte: es el que declara la congelación activa, y moverlo es congelar otra versión.
+
+Sobre `DEC-057`: la correspondencia no puede ser de predicado a predicado porque el corredor usa el mismo predicado para cosas distintas —`pierde_rasgo` sirve para la pérdida de un orgánulo (C-991) y para la de señal temporal de unas secuencias (C-781)—, y porque ninguno de sus 330 predicados es uno de los de §14. El conjunto de datos de trazabilidad no inventa datos: declara que el corpus no los describe y existe para que el análisis tenga el eslabón que `analysis.json` exige y la cadena de §6.4 sea la misma en todos los estudios. Se decidió sobre la sección 6, la más pequeña con contenido científico, y las reglas se extienden al resto del corpus sección a sección.
 
 Sobre `DEC-052`: seis dígitos dan un millón de registros por tipo. Si algún tipo se acercara a ese límite, la ampliación de ancho es una migración de esquema, no un cambio de identidad: los identificadores ya emitidos no se renumeran. El contador es central, lo que basta mientras el proyecto sea individual; el disparador para revisarlo es el del editor colaborativo de §25.9.
 

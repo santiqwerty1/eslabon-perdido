@@ -31,10 +31,10 @@ ID_RE = re.compile(
     r"TECH|ECOSYS|METHOD|RESEARCHER|CONFLICT)-[0-9]{6}$"
 )
 
-# Fichero JSONL -> esquema. Cubre los veintiún ficheros de knowledge/records/
-# listados en §16.2. Las ocho entidades biológicas comunes comparten entity.json
-# (Apéndice E.5): su entity_type discrimina, y el propio esquema exige que el
-# prefijo del identificador concuerde con él.
+# Fichero JSONL -> esquema. Cubre los ficheros de knowledge/records/ listados en
+# §16.2. Las ocho entidades biológicas comunes y los métodos (esquema 1.2.0,
+# DEC-057) comparten entity.json (Apéndice E.5): su entity_type discrimina, y el
+# propio esquema exige que el prefijo del identificador concuerde con él.
 #
 # Tres esquemas no aparecen aquí porque su registro no vive en records/:
 #   - game-projection.json  la capa 8 vive en game/projections/ (§6.8).
@@ -54,6 +54,7 @@ SCHEMA_BY_FILE = {
     "regions.jsonl": "entity.json",
     "occurrences.jsonl": "occurrence.json",
     "traits.jsonl": "entity.json",
+    "methods.jsonl": "entity.json",
     "trait-observations.jsonl": "trait-observation.json",
     "claims.jsonl": "claim.json",
     "evidence.jsonl": "evidence.json",

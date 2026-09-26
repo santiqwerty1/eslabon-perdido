@@ -2,7 +2,7 @@
 
 Una **base de conocimiento científico versionada y centrada en afirmaciones**, capaz de generar múltiples redes evolutivas coherentes y de proyectarlas hacia un juego poblacional desarrollado cronológicamente por campañas.
 
-**Estado:** Fase 0 completada y pipeline de las Fases 2–6 verificado contra fixtures. El corpus de la Campaña 1 está **congelado y sin ingerir** (`DEC-056`): siguen la Fase 1 y la ingestión sección por sección.
+**Estado:** Fase 0 completada y pipeline de las Fases 2–6 verificado contra fixtures. El corpus de la Campaña 1 está **congelado** (`DEC-056`) y su primera sección, la 6, ingerida y convertida en registros (`DEC-057`, `SEC-000001`): siguen la Fase 1 y la ingestión del resto, sección por sección.
 
 ---
 
@@ -35,8 +35,9 @@ La primera campaña cubre **Eukaryota → Holozoa**. La última, **Hominini → 
 docs/           guía activa, ADR, glosario, dossiers de campaña
 knowledge/      el núcleo científico
   corpus/       secciones, pasajes, manifiestos · inbox/ = recibido, sin ingerir
+                conversions/ fija, fila a fila, qué registros salen de cada sección
                 manifests/ guarda también cada versión congelada del corpus
-  records/      23 JSONL: menciones, fuentes, entidades, afirmaciones, evidencia…
+  records/      24 JSONL: menciones, fuentes, entidades, afirmaciones, evidencia…
   views/        vistas derivadas
   deltas/       un delta por sección ingerida, aplicable y reversible
   snapshots/    estados completos reconstruibles
@@ -59,7 +60,11 @@ El corpus de investigación vive en su propio repositorio, `corredor-eukaryota-h
 ```bash
 make corpus-verify CORPUS=../corredor-eukaryota-holozoa FREEZE=knowledge/corpus/manifests/corredor-v0.6.0-research-audit-af7e799.json
 make corpus-diff ANTES=../corredor-eukaryota-holozoa@af7e799 DESPUES=../corredor-eukaryota-holozoa
+make ingest  CORPUS=../corredor-eukaryota-holozoa SECCION=06 DRY=1   # sección, pasajes y menciones
+make convert CORPUS=../corredor-eukaryota-holozoa SECCION=06 DRY=1   # filas → registros (DEC-057)
 ```
+
+El orden completo, y lo que es juicio y no se automatiza, está en [`docs/INGESTION-C01.md`](docs/INGESTION-C01.md).
 
 `make help` lista todos los objetivos. Usa el entorno virtual si existe y el Python del sistema si no.
 

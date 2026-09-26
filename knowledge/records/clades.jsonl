@@ -1,0 +1,6 @@
+{"id": "CLADE-000001", "preferred_label": "Eukaryota", "description": "Clado de los eucariotas.", "entity_type": "clade", "first_introduced_in": "SEC-000001", "notes": [], "record_status": "active", "claim_ids": ["CLAIM-000007"]}
+{"id": "CLADE-000002", "preferred_label": "Opisthokonta", "description": "Clado de los opistocontos.", "entity_type": "clade", "first_introduced_in": "SEC-000001", "notes": [], "record_status": "active", "claim_ids": []}
+{"id": "CLADE-000003", "preferred_label": "Discoba", "description": "Clado de los discobas.", "entity_type": "clade", "first_introduced_in": "SEC-000001", "notes": [], "record_status": "active", "claim_ids": []}
+{"id": "CLADE-000004", "preferred_label": "Amorphea", "description": "Clado de los amorfeos.", "entity_type": "clade", "first_introduced_in": "SEC-000001", "notes": [], "record_status": "active", "claim_ids": []}
+{"id": "CLADE-000005", "preferred_label": "Choanoflagellata", "description": "Clado de los coanoflagelados.", "entity_type": "clade", "first_introduced_in": "SEC-000001", "notes": [], "record_status": "active", "claim_ids": ["CLAIM-000013"]}
+{"id": "CLADE-000006", "preferred_label": "Metazoa", "description": "Clado de los animales.", "entity_type": "clade", "first_introduced_in": "SEC-000001", "notes": [], "record_status": "active", "claim_ids": []}

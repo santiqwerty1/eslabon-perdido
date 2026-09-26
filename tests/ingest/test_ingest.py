@@ -45,11 +45,40 @@ def congelar(directorio: Path, destino: Path) -> Path:
     return destino
 
 
+class Aislado:
+    """Un libro mayor vacío dentro de `tmp`.
+
+    Las pruebas no pueden depender del dataset real: en cuanto se ingiere una
+    sección, sus revisiones e identificadores dejan de empezar en cero.
+    """
+
+    NOMBRES = ("RECORDS", "DELTAS", "PASSAGES", "SECTIONS", "REPORTS", "MANIFEST")
+
+    def __init__(self, tmp: Path):
+        base = tmp / "aislado"
+        (base / "records").mkdir(parents=True)
+        (base / "dataset.json").write_text(json.dumps({"dataset_revision": "REV-000000"}), encoding="utf-8")
+        self.valores = {"RECORDS": base / "records", "DELTAS": base / "deltas", "PASSAGES": base / "passages",
+                        "SECTIONS": base / "sections", "REPORTS": base / "reports",
+                        "MANIFEST": base / "dataset.json"}
+
+    def __enter__(self):
+        self.originales = {n: getattr(ingest, n) for n in self.NOMBRES}
+        for n, v in self.valores.items():
+            setattr(ingest, n, v)
+        return self
+
+    def __exit__(self, *exc):
+        for n, v in self.originales.items():
+            setattr(ingest, n, v)
+
+
 class Seccion(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls._tmp = tempfile.TemporaryDirectory()
         cls.tmp = Path(cls._tmp.name)
+        cls._aislado = Aislado(cls.tmp).__enter__()
         cls.congelacion = congelar(MINI, cls.tmp / "mini.json")
         cls.r = corredor.construir(str(MINI), "0", cls.congelacion)
         cls.texto = cls.r["texto"]
@@ -59,6 +88,7 @@ class Seccion(unittest.TestCase):
 
     @classmethod
     def tearDownClass(cls):
+        cls._aislado.__exit__(None, None, None)
         cls._tmp.cleanup()
 
     def test_solo_las_filas_de_la_seccion(self):
@@ -139,9 +169,11 @@ class Barreras(unittest.TestCase):
     def setUp(self):
         self._tmp = tempfile.TemporaryDirectory()
         self.tmp = Path(self._tmp.name)
+        self._aislado = Aislado(self.tmp).__enter__()
         self.congelacion = congelar(MINI, self.tmp / "mini.json")
 
     def tearDown(self):
+        self._aislado.__exit__(None, None, None)
         self._tmp.cleanup()
 
     def test_una_copia_que_no_es_la_congelada_no_se_ingiere(self):

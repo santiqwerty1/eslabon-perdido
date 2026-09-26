@@ -1,0 +1,431 @@
+[
+  {
+    "id": "PASSAGE-000001",
+    "section_id": "SEC-000001",
+    "ordinal": 1,
+    "text": "# 6. Tiempo: relojes moleculares y desacuerdo con las rocas",
+    "character_offsets": {
+      "start": 0,
+      "end": 59
+    },
+    "record_status": "active"
+  },
+  {
+    "id": "PASSAGE-000002",
+    "section_id": "SEC-000001",
+    "ordinal": 2,
+    "text": "## 6.1. Estimaciones publicadas",
+    "character_offsets": {
+      "start": 61,
+      "end": 92
+    },
+    "record_status": "active"
+  },
+  {
+    "id": "PASSAGE-000003",
+    "section_id": "SEC-000001",
+    "ordinal": 3,
+    "text": "Douzery y colaboradores estimaron que las principales divergencias eucariotas consideradas en su estudio ocurrieron entre 950 y 1259 Ma. [C-757; S142 resumen]",
+    "character_offsets": {
+      "start": 94,
+      "end": 252
+    },
+    "record_status": "active"
+  },
+  {
+    "id": "PASSAGE-000004",
+    "section_id": "SEC-000001",
+    "ordinal": 4,
+    "text": "Douzery y colaboradores estimaron la divergencia entre animales y coanoflagelados entre 761 y 957 Ma. [C-758; S142 resumen; tabla 1]",
+    "character_offsets": {
+      "start": 254,
+      "end": 386
+    },
+    "record_status": "active"
+  },
+  {
+    "id": "PASSAGE-000005",
+    "section_id": "SEC-000001",
+    "ordinal": 5,
+    "text": "El análisis de Douzery y colaboradores utilizó un reloj molecular relajado bayesiano y seis referencias fósiles. [C-759; S142 métodos]",
+    "character_offsets": {
+      "start": 388,
+      "end": 522
+    },
+    "record_status": "active"
+  },
+  {
+    "id": "PASSAGE-000006",
+    "section_id": "SEC-000001",
+    "ordinal": 6,
+    "text": "Parfrey y colaboradores estimaron la edad de LECA entre 1679 y 1866 Ma. [C-760; S139 resumen; resultados]",
+    "character_offsets": {
+      "start": 524,
+      "end": 629
+    },
+    "record_status": "active"
+  },
+  {
+    "id": "PASSAGE-000007",
+    "section_id": "SEC-000001",
+    "ordinal": 7,
+    "text": "Parfrey y colaboradores ampliaron el muestreo de eucariotas microbianos respecto de estudios anteriores. [C-761; S139 métodos]",
+    "character_offsets": {
+      "start": 631,
+      "end": 757
+    },
+    "record_status": "active"
+  },
+  {
+    "id": "PASSAGE-000008",
+    "section_id": "SEC-000001",
+    "ordinal": 8,
+    "text": "Eme y colaboradores obtuvieron estimaciones de LECA que abarcaron 1007–1898 Ma entre sus análisis. [C-762; S141 §Molecular clocks; fig. 3]",
+    "character_offsets": {
+      "start": 759,
+      "end": 897
+    },
+    "record_status": "active"
+  },
+  {
+    "id": "PASSAGE-000009",
+    "section_id": "SEC-000001",
+    "ordinal": 9,
+    "text": "Eme y colaboradores estimaron Opisthokonta entre 904 y 1579 Ma. [C-763; S141 fig. 3 y material suplementario]",
+    "character_offsets": {
+      "start": 899,
+      "end": 1008
+    },
+    "record_status": "active"
+  },
+  {
+    "id": "PASSAGE-000010",
+    "section_id": "SEC-000001",
+    "ordinal": 10,
+    "text": "En los análisis de Eme y colaboradores, el intervalo entre LECA y Opisthokonta varió entre 23 y 334 Ma. [C-764; S141 discusión]",
+    "character_offsets": {
+      "start": 1010,
+      "end": 1137
+    },
+    "record_status": "active"
+  },
+  {
+    "id": "PASSAGE-000011",
+    "section_id": "SEC-000001",
+    "ordinal": 11,
+    "text": "Strassert y colaboradores estimaron la edad de LECA entre 1958 y 2386 Ma. [C-765; S140 resumen; fig. 2]",
+    "character_offsets": {
+      "start": 1139,
+      "end": 1242
+    },
+    "record_status": "active"
+  },
+  {
+    "id": "PASSAGE-000012",
+    "section_id": "SEC-000001",
+    "ordinal": 12,
+    "text": "Strassert y colaboradores exploraron más de un modelo de reloj relajado, distribuciones alternativas de calibración y dos posiciones de raíz. [C-766; S140 métodos; Supplementary Data 1]",
+    "character_offsets": {
+      "start": 1244,
+      "end": 1429
+    },
+    "record_status": "active"
+  },
+  {
+    "id": "PASSAGE-000013",
+    "section_id": "SEC-000001",
+    "ordinal": 13,
+    "text": "La corrección publicada para Strassert y colaboradores no fue tratada en esta sesión como una nueva estimación temporal independiente. [C-767; S140 nota editorial]",
+    "character_offsets": {
+      "start": 1431,
+      "end": 1594
+    },
+    "record_status": "active"
+  },
+  {
+    "id": "PASSAGE-000014",
+    "section_id": "SEC-000001",
+    "ordinal": 14,
+    "text": "Betts y colaboradores integraron información genómica y fósil en una escala temporal común para la evolución temprana de la vida. [C-768; S177 resumen y métodos]",
+    "character_offsets": {
+      "start": 1596,
+      "end": 1757
+    },
+    "record_status": "active"
+  },
+  {
+    "id": "PASSAGE-000015",
+    "section_id": "SEC-000001",
+    "ordinal": 15,
+    "text": "Porter sostuvo que no existen fósiles inequívocos asignables a grupos corona de supergrupos eucariotas antes de aproximadamente 1.05 Ga. [C-769; S178 §3]",
+    "character_offsets": {
+      "start": 1759,
+      "end": 1912
+    },
+    "record_status": "active"
+  },
+  {
+    "id": "PASSAGE-000016",
+    "section_id": "SEC-000001",
+    "ordinal": 16,
+    "text": "La posición de un origen tardío de la diversidad eucariota viviente interpreta muchos fósiles paleoproterozoicos y mesoproterozoicos como grupos troncales o de posición indeterminada. [C-770; S178 discusión; S179 resumen]",
+    "character_offsets": {
+      "start": 1914,
+      "end": 2135
+    },
+    "record_status": "active"
+  },
+  {
+    "id": "PASSAGE-000017",
+    "section_id": "SEC-000001",
+    "ordinal": 17,
+    "text": "Un preprint de 2026 propuso un límite mínimo próximo a 1696 Ma para LECA a partir de dinámica de clados. [C-771; S181 resumen]",
+    "character_offsets": {
+      "start": 2137,
+      "end": 2263
+    },
+    "record_status": "active"
+  },
+  {
+    "id": "PASSAGE-000018",
+    "section_id": "SEC-000001",
+    "ordinal": 18,
+    "text": "No existe una estimación de consenso para la edad de LECA. [C-772; S139 resultados; S141 fig. 3; S140 fig. 2; S178 discusión]",
+    "character_offsets": {
+      "start": 2265,
+      "end": 2390
+    },
+    "record_status": "active"
+  },
+  {
+    "id": "PASSAGE-000019",
+    "section_id": "SEC-000001",
+    "ordinal": 19,
+    "text": "Las estimaciones recuperadas para LECA en esta parte abarcan desde 1007 Ma hasta 2386 Ma. [C-773; S141 fig. 3; S140 fig. 2]",
+    "character_offsets": {
+      "start": 2392,
+      "end": 2515
+    },
+    "record_status": "active"
+  },
+  {
+    "id": "PASSAGE-000020",
+    "section_id": "SEC-000001",
+    "ordinal": 20,
+    "text": "No se presenta una amplitud única para ese envolvente: la fila que restaba extremos de estudios distintos fue retirada como cálculo no publicado. [C-774; S141 fig. 3; S140 fig. 2]",
+    "character_offsets": {
+      "start": 2517,
+      "end": 2696
+    },
+    "record_status": "active"
+  },
+  {
+    "id": "PASSAGE-000021",
+    "section_id": "SEC-000001",
+    "ordinal": 21,
+    "text": "Sandin et al. analizaron 75,975 OTU con 77 calibraciones, 32 árboles y 100 réplicas de TreePL. [C-786; C-787; C-788; C-789] Publicaron para la raíz Discoba una mediana de 1.776 Ma y un máximo/mínimo de medianas de 1.897/1.670 Ma; para Amorphea, 1.773 Ma y 1.934/1.703 Ma. [C-790; C-791] En la sensibilidad que trata Rafatazmia como dudosa situaron LECA en 2.054 Ma, con límites 2.104–1.967 Ma. [C-792] Son estadísticas y escenarios publicados por el estudio: no se promedian ni se convierten en una amplitud propia. [C-786–C-792; S548 métodos; resultados]",
+    "character_offsets": {
+      "start": 2698,
+      "end": 3253
+    },
+    "record_status": "active"
+  },
+  {
+    "id": "PASSAGE-000022",
+    "section_id": "SEC-000001",
+    "ordinal": 22,
+    "text": "<!-- TABLE:table-36-6-1-estimaciones-publicadas -->",
+    "character_offsets": {
+      "start": 3255,
+      "end": 3306
+    },
+    "record_status": "active"
+  },
+  {
+    "id": "PASSAGE-000023",
+    "section_id": "SEC-000001",
+    "ordinal": 23,
+    "text": "## 6.2. El peso de *Bangiomorpha*",
+    "character_offsets": {
+      "start": 3308,
+      "end": 3341
+    },
+    "record_status": "active"
+  },
+  {
+    "id": "PASSAGE-000024",
+    "section_id": "SEC-000001",
+    "ordinal": 24,
+    "text": "Bangiomorpha pubescens ejerce un peso desproporcionado como calibración porque combina una edad radiométrica relativamente precisa con una posible asignación a Rhodophyta corona. [C-775; S160 discusión; S141 §calibrations; S140 métodos]",
+    "character_offsets": {
+      "start": 3343,
+      "end": 3579
+    },
+    "record_status": "active"
+  },
+  {
+    "id": "PASSAGE-000025",
+    "section_id": "SEC-000001",
+    "ordinal": 25,
+    "text": "Mover el nodo asignado a Bangiomorpha o tratarlo como fósil troncal modifica las restricciones mínimas de divergencias profundas. [C-776; S141 §calibration sensitivity; S178 discusión]",
+    "character_offsets": {
+      "start": 3581,
+      "end": 3765
+    },
+    "record_status": "active"
+  },
+  {
+    "id": "PASSAGE-000026",
+    "section_id": "SEC-000001",
+    "ordinal": 26,
+    "text": "## 6.3. Por qué no existe una edad de consenso",
+    "character_offsets": {
+      "start": 3767,
+      "end": 3813
+    },
+    "record_status": "active"
+  },
+  {
+    "id": "PASSAGE-000027",
+    "section_id": "SEC-000001",
+    "ordinal": 27,
+    "text": "Una calibración fósil suele aportar un mínimo para la edad de un nodo, no la fecha exacta de la divergencia. [C-777; S141 §Molecular clock methodology]",
+    "character_offsets": {
+      "start": 3815,
+      "end": 3966
+    },
+    "record_status": "active"
+  },
+  {
+    "id": "PASSAGE-000028",
+    "section_id": "SEC-000001",
+    "ordinal": 28,
+    "text": "Los límites máximos de calibración son más difíciles de justificar porque dependen de ausencia fósil y de modelos de preservación. [C-778; S141 §Molecular clock methodology; S177 métodos]",
+    "character_offsets": {
+      "start": 3968,
+      "end": 4155
+    },
+    "record_status": "active"
+  },
+  {
+    "id": "PASSAGE-000029",
+    "section_id": "SEC-000001",
+    "ordinal": 29,
+    "text": "Los relojes estrictos suponen una tasa única, mientras que los relojes relajados permiten variación de tasa entre ramas. [C-779; S142 métodos; S141 §Molecular clocks]",
+    "character_offsets": {
+      "start": 4157,
+      "end": 4323
+    },
+    "record_status": "active"
+  },
+  {
+    "id": "PASSAGE-000030",
+    "section_id": "SEC-000001",
+    "ordinal": 30,
+    "text": "Los relojes relajados autocorrelacionados y no autocorrelacionados hacen supuestos incompatibles sobre la dependencia de tasas entre ramas adyacentes. [C-780; S141 §Molecular clocks; S140 métodos]",
+    "character_offsets": {
+      "start": 4325,
+      "end": 4521
+    },
+    "record_status": "active"
+  },
+  {
+    "id": "PASSAGE-000031",
+    "section_id": "SEC-000001",
+    "ordinal": 31,
+    "text": "La saturación de sustituciones reduce la información temporal retenida en divergencias proterozoicas profundas. [C-781; S141 discusión]",
+    "character_offsets": {
+      "start": 4523,
+      "end": 4658
+    },
+    "record_status": "active"
+  },
+  {
+    "id": "PASSAGE-000032",
+    "section_id": "SEC-000001",
+    "ordinal": 32,
+    "text": "La heterotaquia puede hacer que un mismo sitio cambie de tasa a través del árbol y sesgar estimaciones si el modelo no la representa. [C-782; S141 discusión; S140 métodos]",
+    "character_offsets": {
+      "start": 4660,
+      "end": 4831
+    },
+    "record_status": "active"
+  },
+  {
+    "id": "PASSAGE-000033",
+    "section_id": "SEC-000001",
+    "ordinal": 33,
+    "text": "La ausencia de un grupo externo cercano a Eukaryota dificulta simultáneamente la raíz y la datación de divergencias profundas. [C-783; S141 discusión; S177 métodos]",
+    "character_offsets": {
+      "start": 4833,
+      "end": 4997
+    },
+    "record_status": "active"
+  },
+  {
+    "id": "PASSAGE-000034",
+    "section_id": "SEC-000001",
+    "ordinal": 34,
+    "text": "La propuesta de conciliación entre fósiles jóvenes y relojes antiguos sostiene que buena parte del registro proterozoico temprano pertenece al grupo tronco y no al grupo corona. [C-784; S171 discusión; S178 §4]",
+    "character_offsets": {
+      "start": 4999,
+      "end": 5209
+    },
+    "record_status": "active"
+  },
+  {
+    "id": "PASSAGE-000035",
+    "section_id": "SEC-000001",
+    "ordinal": 35,
+    "text": "## 6.4. Nodos sin intervalo comparable localizado",
+    "character_offsets": {
+      "start": 5211,
+      "end": 5260
+    },
+    "record_status": "active"
+  },
+  {
+    "id": "PASSAGE-000036",
+    "section_id": "SEC-000001",
+    "ordinal": 36,
+    "text": "Los relojes recuperados para divergencias profundas no comparten un único muestreo, modelo ni juego de calibraciones. [C-760–C-766; S139 resultados y métodos; S140 métodos; S141 §Molecular clocks]",
+    "character_offsets": {
+      "start": 5262,
+      "end": 5458
+    },
+    "record_status": "active"
+  },
+  {
+    "id": "PASSAGE-000037",
+    "section_id": "SEC-000001",
+    "ordinal": 37,
+    "text": "## 6.5. Registro de afirmaciones de la sección 6",
+    "character_offsets": {
+      "start": 5460,
+      "end": 5508
+    },
+    "record_status": "active"
+  },
+  {
+    "id": "PASSAGE-000038",
+    "section_id": "SEC-000001",
+    "ordinal": 38,
+    "text": "<!-- TABLE:claims-06 -->",
+    "character_offsets": {
+      "start": 5510,
+      "end": 5534
+    },
+    "record_status": "active"
+  },
+  {
+    "id": "PASSAGE-000039",
+    "section_id": "SEC-000001",
+    "ordinal": 39,
+    "text": "---\n",
+    "character_offsets": {
+      "start": 5536,
+      "end": 5540
+    },
+    "record_status": "active"
+  }
+]

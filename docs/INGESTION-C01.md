@@ -97,7 +97,7 @@ Todas las menciones quedan `pending` y de tipo `unresolved`: el tipo lo fija qui
 - el 79 % de las etiquetas no aparece en su pasaje como palabra completa, y otras 40 sólo con otra capitalización, porque el registro usa como sujeto u objeto frases y listas —«tallo de Eukaryota entre FECA y LECA; Eukaryota; Amorphea…»— y no nombres;
 - el contraste de las secciones 9, 10 y 11 no cuadra por siete filas del apéndice B que no son entidades: tres marcadores de hueco y cuatro cifras. El informe las nombra.
 
-**Qué no hace todavía.** Ingerir los apéndices como tales: las fuentes del apéndice A no se convierten en registros `SOURCE-`, y eventos, fechas, hipótesis y magnitudes no se leen por este camino. Tampoco convierte filas en afirmaciones: eso es el paso 6 y espera a la correspondencia de predicados (ver abajo).
+**Qué no hace.** Convertir filas en registros: eso es el paso 6, `make convert`, que se explica abajo. Tampoco ingiere los apéndices como tales. Las fuentes del apéndice A entran cuando las cita una fila convertida, y eventos, fechas, hipótesis y magnitudes no se leen por este camino.
 
 ## 6 · Lo que hay que hacer a mano
 
@@ -115,17 +115,25 @@ La revisión se escribe en `generated/identity/<corpus>-<huella>/`, una carpeta 
 
 Sobre la versión congelada salen 3.725 etiquetas distintas, sinónimos incluidos: 1.934 sin ambigüedad y **1.737 decisiones humanas**, casi todas pares parecidos. El hash que ata la revisión marcada a su mapa es la huella de la congelación, así que una revisión hecha sobre otra versión no se puede aplicar a ésta.
 
-**Correspondencia de predicados.** Antes del paso 6. El esquema admite 48 predicados y el corredor usa 330: 22 del vocabulario del prompt (1.135 filas) y 308 inventados (817 filas), sin definir. Varios de los 22 no son afirmaciones en el modelo sino otros registros —`tiene_valor_medido` es soporte cuantitativo, `posee_rasgo` una observación de rasgo, `clasificado_como_por` una vista de clasificación, `respaldado_por` o `cuestionado_por` procedencia—. Es decisión editorial y va antes de convertir ninguna fila.
+**Conversión de filas (paso 6).** El corredor usa 330 predicados y ninguno es de los de §14, y usa el mismo predicado para cosas distintas: la correspondencia es **por fila**, no por predicado (`DEC-057`). Cada sección tiene un fichero de conversión, `knowledge/corpus/conversions/corredor-NN.json`, escrito a mano, que fija qué registros salen de cada fila —con claves locales como `@LECA`, no identificadores— y qué destino tiene cada mención. Las reglas por predicado y la primera sección convertida, la 6, están en [`C01-PREDICADOS.md`](campaigns/C01-PREDICADOS.md).
+
+```bash
+make convert CORPUS=../corredor-eukaryota-holozoa SECCION=06 DRY=1   # ver sin escribir
+make convert CORPUS=../corredor-eukaryota-holozoa SECCION=06
+```
+
+`scripts/ingest/convertir.py` hace lo mecánico y se niega antes de escribir si la copia no es la versión congelada, si la sección no se ha ingerido o ya se convirtió, si queda una fila o una mención sin destino, o si se usa una clave sin definir. Asigna identificadores opacos sin reutilizar ninguno, crea las fuentes citadas del apéndice A o reutiliza las que ya existen, y rellena lo que se deduce: procedencia, ejes epistemológicos desde las columnas de la fila, `claim_ids` y `evidence_ids`. El delta, `SEC-….-conversion.json`, va detrás del de la sección y da destino a sus menciones.
 
 **Integración de hipótesis.** Decidir si una afirmación apoya, contradice, parte una hipótesis existente o crea un grupo de conflicto. No se mezclan topologías incompatibles en un árbol.
 
-Mientras queden menciones sin destino, `make validate` fallará por cobertura. Eso es correcto: §28.1 exige cobertura completa para dar una sección por terminada.
+Mientras queden menciones sin destino —entre aplicar el delta de la sección y el de su conversión—, `make validate` fallará por cobertura. Eso es correcto: §28.1 exige cobertura completa para dar una sección por terminada.
 
 ## 7 · Aplicar y verificar
 
 ```bash
 .venv/bin/python scripts/ingest/delta.py SEC-000001.json --dry-run
 .venv/bin/python scripts/ingest/delta.py SEC-000001.json
+.venv/bin/python scripts/ingest/delta.py SEC-000001-conversion.json
 make check
 ```
 
@@ -142,7 +150,7 @@ Si se ingiere otra sección antes de aplicar la anterior, su delta va detrás en
 ## 8 · Cerrar la sección
 
 ```bash
-make snapshot LABEL="SEC-000001 ingerida"
+make snapshot LABEL="SEC-000001 ingerida y convertida"
 ```
 
 Una sección está terminada cuando la cobertura es completa, la procedencia está vinculada, las validaciones pasan, existen delta e informe, y **el estado se reconstruye sin la conversación**. Ese último punto se comprueba solo: `make check` en un clon limpio.
