@@ -183,21 +183,19 @@ def main() -> int:
     # Los bordes del diff —filas que un diff equivocado haría desaparecer sin
     # aviso— y la ingestión de una sección del corredor sobre corredor-mini.
     pruebas = sorted((ROOT / "tests" / "ingest").glob("test_*.py"))
-    # De tests/validation/ sólo las que pasan en la base: las de estado,
-    # separación, geografía, hipótesis y evidencia arrastran fallos anteriores
-    # y se incorporarán cuando se corrijan.
-    pruebas += [ROOT / "tests" / "validation" / f for f in ("test_reversiones.py", "test_moleculas.py")]
+    pruebas += sorted((ROOT / "tests" / "validation").glob("test_*.py"))
     if pruebas:
         import subprocess
-        print(f"\n{DIM}ingestión y validación — congelación, diff, secciones del corredor, reversiones y moléculas{RESET}")
+        print(f"\n{DIM}ingestión y validación — congelación, diff, secciones del corredor y familias del validador{RESET}")
         for prueba in pruebas:
             r = subprocess.run([sys.executable, str(prueba)], capture_output=True, text=True)
-            resumen = (r.stderr.strip().splitlines() or ["?"])[-1]
+            # unittest resume en stderr; las pruebas por tabla, en stdout.
+            resumen = (r.stderr.strip().splitlines() or r.stdout.strip().splitlines() or ["?"])[-1]
             marca = f"{GREEN}PASA{RESET}" if r.returncode == 0 else f"{RED}FALLA{RESET}"
             print(f"  {marca}  {prueba.name}  {DIM}({resumen}){RESET}")
             if r.returncode != 0:
                 fallos.append(f"{prueba.parent.name}/{prueba.name}")
-                print(r.stderr[-3000:])
+                print((r.stderr or r.stdout)[-3000:])
         total_ver += len(pruebas)
 
     total = len(ordinarios) + len(ok_cases) + len(bad_cases) + total_fmt + total_ver

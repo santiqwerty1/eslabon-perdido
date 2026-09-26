@@ -114,6 +114,13 @@ class TestState(Base):
         # y el patrón global: los dos ejes se mueven juntos en todo el conjunto
         self.assertMessage(rep.warnings, "ideas superadas", "como uno solo")
 
+    def test_record_status_superseded_ya_no_es_valido(self):
+        # Se renombró a `replaced` el 8 de agosto de 2026 (ISSUE-000007): el
+        # valor antiguo es un error, no un sinónimo del nuevo.
+        rep = run_state(CASES / "state-bad" / "legacy-record-status")
+        for rid in ("CLAIM-000911", "CLAIM-000912"):
+            self.assertMessage(rep.errors, rid, "'superseded'", "se renombró a 'replaced'", "ISSUE-000007")
+
     def test_deprecacion_sin_reemplazo_ni_razon(self):
         rep = run_state(CASES / "state-bad" / "deprecation-without-reason")
         self.assertMessage(rep.errors, "CLADE-000921", "'deprecated'", "sin reemplazo ni razón")

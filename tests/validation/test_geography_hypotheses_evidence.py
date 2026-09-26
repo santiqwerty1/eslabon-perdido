@@ -72,8 +72,8 @@ EXPECTED: dict[str, dict[str, list[tuple[str, str]]]] = {
             ("§6.4 contraevidencia que respalda", "como evidencia contraria, pero EVID-000201 respalda"),
         ],
         "warnings": [
-            ("§19.2 requisito en registro superado", "cuyo registro está en 'superseded'"),
-            ("§10.6 selección de un registro superado", "incluye CLAIM-000207, en estado 'superseded'"),
+            ("§19.2 requisito en registro reemplazado", "cuyo registro está en 'replaced'"),
+            ("§10.6 selección de un registro reemplazado", "incluye CLAIM-000207, en estado 'replaced'"),
             ("§9.3 alcance que la hipótesis desconoce", "CLAIM-000206 limita su alcance a HYP-000201"),
             ("§9.3 vista que selecciona fuera de su alcance", "cuyo alcance se limita a ['HYP-000201']"),
             ("§15.1 hipótesis sin oposición registrada", "no registra contraevidencia ni fuentes opuestas"),
