@@ -680,6 +680,15 @@ class Convertir(unittest.TestCase):
         self.assertIn("@I1", str(e.exception))
         self.assertIn("resolution", str(e.exception))
 
+    def test_el_mapa_por_fila_incluye_los_registros_que_la_declaran(self):
+        # @Beta declara la fila C-001 en `rows` aunque la fila no la liste: el
+        # delta tiene que decir que salió de ahí.
+        spec = self.entorno.spec()
+        spec["rows"]["C-001"]["keys"].remove("@Beta")
+        r = self.entorno.construir(spec)
+        beta = next(rec["id"] for _, rec in r["salida"] if rec.get("preferred_label") == "FIX-Beta")
+        self.assertIn(beta, r["delta"]["conversion"]["rows"]["C-001"]["record_ids"])
+
     def test_el_fichero_de_conversion_tiene_que_estar_en_conversions(self):
         # El snapshot sólo registra knowledge/corpus/conversions/*.json: una
         # entrada revisada fuera de ahí no se podría recuperar ni verificar.
