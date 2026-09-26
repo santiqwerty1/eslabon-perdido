@@ -466,6 +466,17 @@ def _check_specimen(data: dict[str, list[dict]], rep, index) -> None:
 # o la capacidad de fabricarla, nunca un espécimen, un yacimiento u otra molécula.
 BIOMARKER_TARGETS = ("CLADE", "TAXCONCEPT", "LINEAGE", "POP", "TRAIT")
 
+# Lo que se puede afirmar de una molécula, o con ella como objeto. Todo lo
+# demás (ascendencia, pertenencia, rasgos, ecología) la trata como organismo.
+# Es una lista cerrada a propósito: la de predicados sólo de taxón está pensada
+# para especímenes y deja pasar cosas que una molécula no puede ser.
+MOLECULE_PREDICATES = {
+    "biomarker_of", "classified_as_by", "historically_classified_as", "occurs_in", "dated_to",
+    "temporally_overlaps_with", "proposed_by", "supported_by", "questioned_by", "requires_verification",
+    "rejects_claim", "incompatible_with", "alternative_to", "assumes", "provides_bound", "depends_on",
+    "may_bias", "limits", "calibrates",
+}
+
 
 def _check_molecule(data: dict[str, list[dict]], rep, index) -> None:
     """Una molécula no es un taxón: su relación con quien la produce es `biomarker_of`.
@@ -492,7 +503,7 @@ def _check_molecule(data: dict[str, list[dict]], rep, index) -> None:
                 )
             continue
         moleculas = []
-        if pred in TAXON_ONLY_PREDICATES:
+        if pred not in MOLECULE_PREDICATES:
             moleculas = [(papel, e) for papel, e in (("sujeto", sujeto), ("objeto", objeto)) if _prefix(e) == "MOL"]
         elif pred in CONCEPT_TARGET_PREDICATES:
             # Clasificarla en una categoría («biomarcador singenético»,
