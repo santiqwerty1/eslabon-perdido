@@ -96,6 +96,22 @@ class Identidad(unittest.TestCase):
         self.assertEqual(self.errores([afirmacion("CLAIM-000901", "MOL-000901", "occurs_in",
                                                   {"category": "rocas arcaicas"})]), [])
 
+    def test_una_molecula_como_objeto_no_es_ambiente_fuente_ni_metodo(self):
+        # Los predicados tienen dirección: que una molécula pueda estar en un
+        # ambiente no la convierte en uno.
+        for pred in ("occurs_in", "proposed_by", "limits"):
+            [e] = self.errores([afirmacion("CLAIM-000901", "CLADE-000901", pred, {"entity_id": "MOL-000901"})])
+            self.assertIn("objeto", e)
+
+    def test_una_molecula_con_alias_a_un_rasgo_falla(self):
+        for rid, alias in (("MOL-000901", "TRAIT-000901"), ("TRAIT-000901", "MOL-000901")):
+            rep = validate.Report()
+            fichero = "molecules.jsonl" if rid.startswith("MOL") else "traits.jsonl"
+            tipo = "molecule" if rid.startswith("MOL") else "trait"
+            identity.check({fichero: [{"id": rid, "entity_type": tipo, "preferred_label": "x",
+                                       "alias_ids": [alias]}]}, rep)
+            self.assertTrue(any("alias" in e and rid in e for e in rep.errors), rep.errors)
+
     def test_una_molecula_clasificada_en_una_categoria_pasa(self):
         # «interpretados como biomarcadores singenéticos» (C-741): una
         # categoría, no un taxón.

@@ -466,16 +466,16 @@ def _check_specimen(data: dict[str, list[dict]], rep, index) -> None:
 # o la capacidad de fabricarla, nunca un espécimen, un yacimiento u otra molécula.
 BIOMARKER_TARGETS = ("CLADE", "TAXCONCEPT", "LINEAGE", "POP", "TRAIT")
 
-# Lo que se puede afirmar de una molécula, o con ella como objeto. Todo lo
-# demás (ascendencia, pertenencia, rasgos, ecología) la trata como organismo.
-# Es una lista cerrada a propósito: la de predicados sólo de taxón está pensada
-# para especímenes y deja pasar cosas que una molécula no puede ser.
-MOLECULE_PREDICATES = {
+# Lo que se puede afirmar de una molécula, según el extremo que ocupe. Todo lo
+# demás (ascendencia, pertenencia, rasgos, ecología) la trata como organismo,
+# y como objeto la trataría como ambiente, fuente o método. Son listas
+# cerradas a propósito: la de predicados sólo de taxón está pensada para
+# especímenes y deja pasar cosas que una molécula no puede ser.
+MOLECULE_AS_SUBJECT = {
     "biomarker_of", "classified_as_by", "historically_classified_as", "occurs_in", "dated_to",
-    "temporally_overlaps_with", "proposed_by", "supported_by", "questioned_by", "requires_verification",
-    "rejects_claim", "incompatible_with", "alternative_to", "assumes", "provides_bound", "depends_on",
-    "may_bias", "limits", "calibrates",
+    "temporally_overlaps_with", "calibrates", "provides_bound",
 }
+MOLECULE_AS_OBJECT = {"temporally_overlaps_with", "depends_on"}
 
 
 def _check_molecule(data: dict[str, list[dict]], rep, index) -> None:
@@ -503,17 +503,17 @@ def _check_molecule(data: dict[str, list[dict]], rep, index) -> None:
                 )
             continue
         moleculas = []
-        if pred not in MOLECULE_PREDICATES:
-            moleculas = [(papel, e) for papel, e in (("sujeto", sujeto), ("objeto", objeto)) if _prefix(e) == "MOL"]
-        elif pred in CONCEPT_TARGET_PREDICATES:
+        if _prefix(sujeto) == "MOL" and pred not in MOLECULE_AS_SUBJECT:
+            moleculas.append(("sujeto", sujeto))
+        if _prefix(objeto) == "MOL" and pred not in MOLECULE_AS_OBJECT:
+            moleculas.append(("objeto", objeto))
+        if not moleculas and pred in CONCEPT_TARGET_PREDICATES:
             # Clasificarla en una categoría («biomarcador singenético»,
             # «contaminación») es legítimo; asignarla a un taxón o a una
             # población, o asignar algo a ella como si fuera un taxón, no. Un
             # nombre como objeto ya lo denuncia `_check_name_concept`.
             if _prefix(sujeto) == "MOL" and _prefix(objeto) in (set(TAXONOMIC_PREFIXES) - {"NAME"}) | {"POP"}:
                 moleculas.append(("sujeto", sujeto))
-            if _prefix(objeto) == "MOL":
-                moleculas.append(("objeto", objeto))
         for papel, extremo in moleculas:
             rep.error(
                 f"identidad: {cid} usa {pred} con la molécula {extremo} como {papel}; una "
@@ -526,7 +526,9 @@ def _check_molecule(data: dict[str, list[dict]], rep, index) -> None:
     for fname, rec in _entities(data):
         rid = rec.get("id")
         aliases = [a for a in (rec.get("alias_ids") or []) if isinstance(a, str)]
-        otros = set(TAXONOMIC_PREFIXES) | {"POP", "SPECIMEN"}
+        # Ni con un rasgo: el compuesto y la capacidad de fabricarlo son
+        # registros distintos a propósito (DEC-058).
+        otros = set(TAXONOMIC_PREFIXES) | {"POP", "SPECIMEN", "TRAIT"}
         if _prefix(rid) == "MOL":
             malos = [a for a in aliases if _prefix(a) in otros]
         elif _prefix(rid) in otros:
