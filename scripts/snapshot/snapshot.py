@@ -67,10 +67,13 @@ def gather() -> dict:
     # La congelación activa del corpus (DEC-056) es parte del estado: sin ella
     # no se puede demostrar qué versión se ingirió. Su ausencia se registra como
     # tal, para que verify la detecte en vez de fallar al leerla.
-    # Las copias del registro del corredor son la procedencia que declara cada
-    # delta (corpus_origin), y el historial de deltas decide qué está pendiente
-    # y qué se revirtió: cambiarlos cambia lo que el estado significa.
-    for p in sorted((corpus / "sections").glob("*.registro.csv")):
+    # Las secciones ingeridas y sus pasajes son el texto del que citan las
+    # menciones y la procedencia; las copias del registro del corredor son la
+    # procedencia que declara cada delta (corpus_origin), y el historial de
+    # deltas decide qué está pendiente y qué se revirtió: cambiarlos cambia lo
+    # que el estado significa, aunque no cambie cuántos son.
+    for p in sorted([*(corpus / "sections").glob("*.md"), *(corpus / "sections").glob("*.json"),
+                     *(corpus / "sections").glob("*.registro.csv"), *(corpus / "passages").glob("*.json")]):
         files[str(p.relative_to(ROOT))] = digest(p)
     # Y los ficheros de conversión: son la entrada revisada de la que salieron
     # los registros (DEC-057), y su delta sólo guarda su ruta y su hash.

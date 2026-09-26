@@ -305,6 +305,10 @@ class Congelacion(unittest.TestCase):
         snapshot.MANIFEST.write_text("{}", encoding="utf-8")
         (self.tmp / "knowledge" / "corpus" / "sections").mkdir(parents=True)
         (self.tmp / "knowledge" / "corpus" / "sections" / "SEC-000001.registro.csv").write_text("x\n", encoding="utf-8")
+        (self.tmp / "knowledge" / "corpus" / "sections" / "SEC-000001.md").write_text("x\n", encoding="utf-8")
+        (self.tmp / "knowledge" / "corpus" / "sections" / "SEC-000001.json").write_text("{}\n", encoding="utf-8")
+        (self.tmp / "knowledge" / "corpus" / "passages").mkdir(parents=True)
+        (self.tmp / "knowledge" / "corpus" / "passages" / "SEC-000001.json").write_text("{}\n", encoding="utf-8")
         (self.tmp / "knowledge" / "deltas").mkdir(parents=True)
         (self.tmp / "knowledge" / "deltas" / "historial.jsonl").write_text("{}\n", encoding="utf-8")
         (self.tmp / "knowledge" / "deltas" / "SEC-000001.json").write_text("{}\n", encoding="utf-8")
@@ -314,6 +318,9 @@ class Congelacion(unittest.TestCase):
         self.assertIn("knowledge/corpus/conversions/corredor-06.json", ficheros)
         self.assertIn("knowledge/deltas/SEC-000001.json", ficheros)
         self.assertIn("knowledge/corpus/sections/SEC-000001.registro.csv", ficheros)
+        self.assertIn("knowledge/corpus/sections/SEC-000001.md", ficheros)
+        self.assertIn("knowledge/corpus/sections/SEC-000001.json", ficheros)
+        self.assertIn("knowledge/corpus/passages/SEC-000001.json", ficheros)
         self.assertIn("knowledge/deltas/historial.jsonl", ficheros)
 
     def test_el_snapshot_cubre_la_congelacion_activa(self):
