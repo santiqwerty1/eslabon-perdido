@@ -723,6 +723,38 @@ class Convertir(unittest.TestCase):
         [act] = [o for o in r["delta"]["operations"] if o["record_id"] == op["record_id"]]
         self.assertEqual(act["after"]["resolution"]["target_ids"], [beta])
 
+    def cuestion_de_mencion(self, spec: dict, objetivo: str) -> tuple[dict, str]:
+        """La mención FIX-Beta pasa a señalar la incidencia `objetivo`."""
+        [op] = [o for o in self.entorno.delta_sec["operations"]
+                if o["file"] == "mentions.jsonl" and o["after"]["original_text"] == "FIX-Beta"]
+        spec["mentions"]["FIX-Beta"] = {"mention_type": "controversy", "disposition": "pending_question",
+                                        "targets": [objetivo], "reason": "pregunta abierta"}
+        return spec, op["record_id"]
+
+    def test_una_mencion_que_senala_una_incidencia_la_enlaza_en_los_dos_sentidos(self):
+        spec = self.entorno.spec()
+        spec["records"].append({"key": "@I1", "file": "issues.jsonl", "rows": ["C-001"], "record": {
+            "issue_type": "pending_question", "title": "Prueba", "severity": "INFO"}})
+        spec["rows"]["C-001"]["keys"].append("@I1")
+        spec, mid = self.cuestion_de_mencion(spec, "@I1")
+        r = self.entorno.construir(spec)
+        [iss] = [x for _, x in r["salida"] if x["id"].startswith("ISSUE-")]
+        [(_, mencion)] = [(a, d) for a, d in r["actualizadas"] if d["id"] == mid]
+        self.assertEqual(mencion["issue_ids"], [iss["id"]])
+        self.assertEqual(iss["affects"]["mention_ids"], [mid])
+
+    def test_una_mencion_que_senala_una_incidencia_existente_la_enlaza(self):
+        existente = {"id": "ISSUE-000050", "issue_type": "pending_question", "title": "X", "severity": "INFO",
+                     "raised_in": "SEC-000001", "affects": {"record_ids": [], "claim_ids": [], "mention_ids": []},
+                     "resolution": {"status": "open"}, "record_status": "active"}
+        (self.entorno.records / "issues.jsonl").write_text(json.dumps(existente) + "\n", encoding="utf-8")
+        spec, mid = self.cuestion_de_mencion(self.entorno.spec(), "ISSUE-000050")
+        r = self.entorno.construir(spec)
+        [op] = [o for o in r["delta"]["operations"] if o["record_id"] == "ISSUE-000050"]
+        self.assertEqual(op["after"]["affects"]["mention_ids"], [mid])
+        [(_, mencion)] = [(a, d) for a, d in r["actualizadas"] if d["id"] == mid]
+        self.assertEqual(mencion["issue_ids"], ["ISSUE-000050"])
+
     def test_una_clave_de_mencion_desconocida_se_rechaza(self):
         spec = self.entorno.spec()
         spec["mentions"]["MENTION-999999"] = {"mention_type": "clade", "disposition": "discarded_with_reason",
