@@ -381,9 +381,10 @@ def construir(spec_path: Path, corpus: str) -> dict:
         if "id" in r.get("record", {}):
             errores.append(f"{r['key']}: el fichero de conversión no fija identificadores (`id`); "
                            "los asigna convertir.py")
-        if "provenance" in r.get("record", {}):
-            errores.append(f"{r['key']}: el fichero de conversión no fija la procedencia (`provenance`); "
-                           "convertir.py la deduce de sus filas (`rows`)")
+        for campo in ("provenance", "first_introduced_in", "introduced_in", "raised_in"):
+            if campo in r.get("record", {}):
+                errores.append(f"{r['key']}: el fichero de conversión no fija `{campo}`; "
+                               "convertir.py lo deduce de la sección y de sus filas (`rows`)")
         if r["file"] not in PREFIJO or r["file"] == "sources.jsonl":
             errores.append(f"{r['key']}: fichero {r['file']} fuera de lo que convierte este paso")
         if not r.get("rows"):
@@ -472,11 +473,11 @@ def construir(spec_path: Path, corpus: str) -> dict:
         if fichero in TIPO_ENTIDAD:
             rec.setdefault("entity_type", TIPO_ENTIDAD[fichero])
         if "first_introduced_in" in props:
-            rec.setdefault("first_introduced_in", sec_id)
+            rec["first_introduced_in"] = sec_id
         if "introduced_in" in props:
-            rec.setdefault("introduced_in", sec_id)
+            rec["introduced_in"] = sec_id
         if "raised_in" in props:
-            rec.setdefault("raised_in", sec_id)
+            rec["raised_in"] = sec_id
         claves_fuente = r.get("sources")
         if claves_fuente is None:
             claves_fuente = sorted({s for f in filas_r for s in CITA.findall(filas[f].get("Fuente", ""))},
