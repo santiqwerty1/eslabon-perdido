@@ -373,6 +373,16 @@ class Convertir(unittest.TestCase):
         self.assertEqual(claim["counterevidence_ids"], [ev["id"]])
         self.assertEqual(r["delta"]["conversion"]["rows"]["C-002"]["destination"], "J")
 
+    def test_la_evaluacion_de_una_fila_J_queda_en_su_evidencia(self):
+        # La fila J no crea afirmación: sin la nota, su fuerza y su motivo se
+        # perderían al convertir.
+        r = self.entorno.construir(self.contraevidencia(self.entorno.spec(), ["@CL1"]))
+        [ev] = [e for _, e in r["salida"] if e["id"].startswith("EVID-") and e["challenges_claim_ids"]]
+        [nota] = [n for n in ev.get("quality_notes", []) if n.startswith("Evaluación de la fila C-002")]
+        self.assertIn("evidence_strength=medium", nota)
+        self.assertIn("Lo dicen los resultados.", nota)
+        self.assertIn("resolution=resolved", nota)
+
     def test_una_fila_J_sobre_una_afirmacion_existente_la_enlaza(self):
         existente = {"id": "CLAIM-000050", "claim_type": "relational", "subject_id": "CLADE-000050",
                      "predicate": "sister_group_of", "object": {"entity_id": "CLADE-000051"},

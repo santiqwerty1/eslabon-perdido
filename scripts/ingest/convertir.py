@@ -617,6 +617,18 @@ def construir(spec_path: Path, corpus: str) -> dict:
             if not filas_r:
                 raise SystemExit(f"ERROR {r['key']}: sin filas no hay de dónde sacar los ejes epistemológicos")
             rec["epistemic_dimensions"] = ejes(filas[filas_r[0]])
+        # Una fila J no crea afirmación, así que su evaluación (aceptación,
+        # fuerza y su motivo, resolución, vigencia) no tiene `epistemic_dimensions`
+        # donde quedar: va a sus evidencias, que no tienen ese campo, como nota.
+        if fichero == "evidence.jsonl":
+            for fila in filas_r:
+                if spec["rows"].get(fila, {}).get("destination") in SOLO_EVIDENCIA:
+                    e = ejes(filas[fila])
+                    nota = (f"Evaluación de la fila {fila} (destino J): acceptance={e['acceptance']}; "
+                            f"evidence_strength={e['evidence_strength']}"
+                            + (f" ({e['evidence_strength_reason']})" if e["evidence_strength_reason"] else "")
+                            + f"; resolution={e['resolution']}; historical_status={e['historical_status']}")
+                    rec["quality_notes"] = [*(rec.get("quality_notes") or []), nota]
         if fichero == "claims.jsonl":
             rec.setdefault("scope", {})
             for k in ("hypothesis_ids", "classification_view_ids", "temporal_expression_ids", "region_ids"):
