@@ -127,35 +127,38 @@ def conversiones_alteradas() -> list[str]:
 
 
 def deltas_alterados() -> list[str]:
-    """Deltas aplicados que ya no son los que se aplicaron.
+    """Deltas que ya no son los que se aplicaron, estén aplicados o revertidos.
 
     El historial guarda el hash de cada aplicación, y delta.py sólo acepta el
-    contenido de la primera. Si un delta aplicado cambió, los registros no
-    salieron de lo que dice y no se puede revertir: un snapshot que lo
-    registrara daría por bueno un estado que no se reconstruye.
+    contenido de la primera: al revertir y al reaplicar. Un delta revertido
+    sigue siendo constancia y sigue reservando identificadores, así que también
+    tiene que ser el que se aplicó. Si uno cambió, un snapshot que lo registrara
+    daría por bueno un estado que no se reconstruye. Sin historial no hay prueba
+    de qué se aplicó, y fuera de la revisión inicial eso también es un problema.
     """
     deltas = ROOT / "knowledge" / "deltas"
     historial = deltas / "historial.jsonl"
     if not historial.exists():
+        revision = (json.loads(MANIFEST.read_text(encoding="utf-8")).get("dataset_revision")
+                    if MANIFEST.exists() else None) or "REV-000000"
+        if revision != "REV-000000":
+            return [f"historial.jsonl: falta, y el dataset está en {revision}: no hay constancia de qué "
+                    "deltas lo dejaron ahí ni con qué contenido"]
         return []
-    ultima, primera = {}, {}
+    primera: dict[str, str | None] = {}
     for linea in historial.read_text(encoding="utf-8").splitlines():
         if not linea.strip():
             continue
         h = json.loads(linea)
-        ultima[h.get("delta")] = h.get("accion")
         if h.get("accion") == "aplicar":
             primera.setdefault(h.get("delta"), h.get("sha256"))
     problemas = []
-    for nombre, accion in sorted(ultima.items(), key=lambda par: str(par[0])):
-        if accion != "aplicar":
-            continue
+    for nombre, registrada in sorted(primera.items(), key=lambda par: str(par[0])):
         ruta = deltas / str(nombre)
-        registrada = primera.get(nombre)
         if not ruta.exists():
-            problemas.append(f"{nombre}: aplicado según el historial, pero falta")
+            problemas.append(f"{nombre}: se aplicó según el historial, pero falta")
         elif not registrada:
-            problemas.append(f"{nombre}: aplicado sin hash en el historial")
+            problemas.append(f"{nombre}: se aplicó sin hash en el historial")
         elif digest(ruta) != registrada:
             problemas.append(f"{nombre}: no es el que se aplicó ({registrada})")
     return problemas
