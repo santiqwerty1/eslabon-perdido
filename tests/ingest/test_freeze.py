@@ -437,6 +437,46 @@ class Congelacion(unittest.TestCase):
         self.assertEqual(self.ejecutar(lambda a: snapshot.create(None)), 1)
         self.assertEqual(list(snapshot.SNAPSHOTS.iterdir()), [])
 
+    def test_un_historial_recortado_no_reconstruye_la_revision(self):
+        # El manifiesto está en REV-000002 y sólo sobrevive la línea del
+        # segundo delta: su hash cuadra, pero nada explica REV-000001.
+        snapshot, deltas = self.snapshot_con_deltas()
+        snapshot.MANIFEST.write_text(json.dumps({"dataset_revision": "REV-000002"}), encoding="utf-8")
+        segundo = deltas / "SEC-000001-conversion.json"
+        segundo.write_text('{"ops": []}\n', encoding="utf-8")
+        (deltas / "historial.jsonl").write_text(json.dumps(
+            {"delta": segundo.name, "accion": "aplicar", "revision": "REV-000002",
+             "sha256": snapshot.digest(segundo)}) + "\n", encoding="utf-8")
+        [problema] = snapshot.deltas_alterados()
+        self.assertIn("sin huecos", problema)
+        self.assertEqual(self.ejecutar(lambda a: snapshot.create(None)), 1)
+
+    def test_un_historial_que_no_llega_al_manifiesto_se_denuncia(self):
+        snapshot, deltas = self.snapshot_con_deltas()
+        snapshot.MANIFEST.write_text(json.dumps({"dataset_revision": "REV-000003"}), encoding="utf-8")
+        primero = deltas / "SEC-000001.json"
+        primero.write_text('{"ops": []}\n', encoding="utf-8")
+        (deltas / "historial.jsonl").write_text(json.dumps(
+            {"delta": primero.name, "accion": "aplicar", "revision": "REV-000001",
+             "sha256": snapshot.digest(primero)}) + "\n", encoding="utf-8")
+        [problema] = snapshot.deltas_alterados()
+        self.assertIn("REV-000003", problema)
+
+    def test_una_cadena_completa_con_reversion_pasa(self):
+        snapshot, deltas = self.snapshot_con_deltas()
+        snapshot.MANIFEST.write_text(json.dumps({"dataset_revision": "REV-000002"}), encoding="utf-8")
+        lineas = []
+        for nombre, rev in (("SEC-000001.json", "REV-000001"), ("SEC-000001-conversion.json", "REV-000002")):
+            (deltas / nombre).write_text('{"ops": []}\n', encoding="utf-8")
+            lineas.append({"delta": nombre, "accion": "aplicar", "revision": rev,
+                           "sha256": snapshot.digest(deltas / nombre)})
+        (deltas / "SEC-000001-conversion-2.json").write_text('{"ops": [2]}\n', encoding="utf-8")
+        lineas += [{"delta": "SEC-000001-conversion.json", "accion": "revertir", "revision": "REV-000001"},
+                   {"delta": "SEC-000001-conversion-2.json", "accion": "aplicar", "revision": "REV-000002",
+                    "sha256": snapshot.digest(deltas / "SEC-000001-conversion-2.json")}]
+        (deltas / "historial.jsonl").write_text("".join(json.dumps(l) + "\n" for l in lineas), encoding="utf-8")
+        self.assertEqual(snapshot.deltas_alterados(), [])
+
     def test_verify_informa_de_un_delta_aplicado_editado(self):
         snapshot, deltas = self.snapshot_con_deltas()
         delta = deltas / "SEC-000001.json"
