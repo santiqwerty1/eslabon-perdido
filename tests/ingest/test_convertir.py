@@ -755,6 +755,50 @@ class Convertir(unittest.TestCase):
         [(_, mencion)] = [(a, d) for a, d in r["actualizadas"] if d["id"] == mid]
         self.assertEqual(mencion["issue_ids"], ["ISSUE-000050"])
 
+    def test_una_incidencia_enlaza_lo_que_afecta(self):
+        # Nueva o existente, cada registro que la incidencia afecta la lista en
+        # su `issue_ids`.
+        existente = {"id": "EVENT-000050", "event_type": "divergence", "label": "X",
+                     "participants": [{"entity_id": "CLADE-000050", "role": "participant", "notes": []}],
+                     "result_entity_ids": [], "temporal_expression_ids": [], "region_ids": [],
+                     "record_status": "active"}
+        (self.entorno.records / "events.jsonl").write_text(json.dumps(existente) + "\n", encoding="utf-8")
+        spec = self.entorno.spec()
+        spec["records"].append({"key": "@I1", "file": "issues.jsonl", "rows": ["C-001"], "record": {
+            "issue_type": "pending_question", "title": "Prueba", "severity": "INFO",
+            "affects": {"record_ids": ["@Alfa", "EVENT-000050"], "claim_ids": ["@CL1"], "mention_ids": []}}})
+        spec["rows"]["C-001"]["keys"].append("@I1")
+        r = self.entorno.construir(spec)
+        recs = self.registros(r)
+        [iss] = [x for x in recs.values() if x["id"].startswith("ISSUE-")]
+        alfa = next(e for e in recs.values() if e.get("preferred_label") == "FIX-Alfa")
+        [claim] = [c for c in recs.values() if c["id"].startswith("CLAIM-")]
+        self.assertEqual(alfa["issue_ids"], [iss["id"]])
+        self.assertEqual(claim["issue_ids"], [iss["id"]])
+        [op] = [o for o in r["delta"]["operations"] if o["record_id"] == "EVENT-000050"]
+        self.assertEqual(op["after"]["issue_ids"], [iss["id"]])
+
+    def test_un_registro_que_nombra_una_incidencia_queda_en_su_affects(self):
+        # El otro sentido: el registro lista la incidencia y ella no lo lista.
+        existente = {"id": "ISSUE-000050", "issue_type": "pending_question", "title": "X", "severity": "INFO",
+                     "raised_in": "SEC-000001", "affects": {"record_ids": [], "claim_ids": [], "mention_ids": []},
+                     "resolution": {"status": "open"}, "record_status": "active"}
+        (self.entorno.records / "issues.jsonl").write_text(json.dumps(existente) + "\n", encoding="utf-8")
+        spec = self.entorno.spec()
+        spec["records"][2]["record"]["issue_ids"] = ["ISSUE-000050"]
+        spec["records"].append({"key": "@I1", "file": "issues.jsonl", "rows": ["C-001"], "record": {
+            "issue_type": "pending_question", "title": "Prueba", "severity": "INFO"}})
+        spec["rows"]["C-001"]["keys"].append("@I1")
+        spec["records"][0]["record"]["issue_ids"] = ["@I1"]
+        r = self.entorno.construir(spec)
+        recs = self.registros(r)
+        [claim] = [c for c in recs.values() if c["id"].startswith("CLAIM-")]
+        [iss] = [x for x in recs.values() if x["id"].startswith("ISSUE-")]
+        alfa = next(e for e in recs.values() if e.get("preferred_label") == "FIX-Alfa")
+        self.assertEqual(iss["affects"]["record_ids"], [alfa["id"]])
+        [op] = [o for o in r["delta"]["operations"] if o["record_id"] == "ISSUE-000050"]
+        self.assertEqual(op["after"]["affects"]["claim_ids"], [claim["id"]])
+
     def test_una_clave_de_mencion_desconocida_se_rechaza(self):
         spec = self.entorno.spec()
         spec["mentions"]["MENTION-999999"] = {"mention_type": "clade", "disposition": "discarded_with_reason",
@@ -912,6 +956,22 @@ class Convertir(unittest.TestCase):
             delta_mod.apply_ops([op])
         self.assertIn("CLADE-000050", str(e.exception))
         self.assertEqual(clades.read_text(encoding="utf-8").count("CLADE-000050"), 1)
+
+    def test_el_contenido_de_una_operacion_lleva_su_identificador(self):
+        # Un alta con otro `id` quedaría en el fichero con ese otro, y revertirla
+        # buscaría el de la operación sin encontrarlo.
+        clades = self.entorno.records / "clades.jsonl"
+        clades.write_text(json.dumps({"id": "CLADE-000060", "record_status": "active"}) + "\n", encoding="utf-8")
+        original = clades.read_bytes()
+        for op in ({"operation": "ADD_RECORD", "file": "clades.jsonl", "record_id": "CLADE-000061",
+                    "before": None, "after": {"id": "CLADE-000062"}},
+                   {"operation": "UPDATE_RECORD", "file": "clades.jsonl", "record_id": "CLADE-000060",
+                    "before": {"id": "CLADE-000060", "record_status": "active"},
+                    "after": {"id": "CLADE-000063", "record_status": "active"}}):
+            with self.assertRaises(ValueError) as e:
+                delta_mod.apply_ops([op])
+            self.assertIn(op["record_id"], str(e.exception))
+            self.assertEqual(clades.read_bytes(), original)
 
     def test_una_actualizacion_necesita_el_registro(self):
         op = {"operation": "UPDATE_RECORD", "file": "clades.jsonl", "record_id": "CLADE-000051",
