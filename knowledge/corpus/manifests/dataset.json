@@ -1,8 +1,8 @@
 {
   "guide_version": "1.1.0",
   "schema_version": "1.2.0",
-  "dataset_revision": "REV-000003",
-  "snapshot_id": "SNAP-000013",
+  "dataset_revision": "REV-000004",
+  "snapshot_id": "SNAP-000014",
   "active_campaign": "CAMP-000001",
   "campaign_status": "planning",
   "corpus_freeze": {

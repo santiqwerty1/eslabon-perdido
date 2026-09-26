@@ -178,3 +178,9 @@ Errata en el mismo mapa: la fila C-757 lista el análisis de Douzery et al.
 procedencia del análisis es la correcta, la de C-759. El fichero de conversión
 no se corrige porque su hash es el que guarda el delta aplicado; `convertir.py`
 rechaza ya que una fila liste un registro que no la declara en `rows`.
+
+Los seis eventos de divergencia entraron con `temporal_expression_ids` vacío,
+aunque sus afirmaciones `dated_to` los fechan. `SEC-000001-correccion-2.json`
+(REV-000003 → REV-000004) les enlaza las expresiones temporales de esas
+afirmaciones (seis en el de LECA), y `SNAP-000014` registra el estado.
+`convertir.py` ya las deduce.

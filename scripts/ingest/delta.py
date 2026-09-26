@@ -179,8 +179,15 @@ def numero(revision) -> int:
     return int(m.group(1)) if m else -1
 
 
-def fuera_de_orden(path: Path, origen: str, reverse: bool) -> str | None:
+def fuera_de_orden(path: Path, delta: dict, reverse: bool) -> str | None:
     """Por qué este delta no se puede aplicar o revertir ahora, o None."""
+    antes, despues = delta.get("dataset_revision_before"), delta.get("dataset_revision_after")
+    # Un delta avanza la revisión en uno: ni la repite, ni retrocede, ni salta.
+    # Un salto quedaría grabado en el manifiesto y todo lo posterior partiría de él.
+    if numero(antes) < 0 or numero(despues) < 0 or numero(despues) != numero(antes) + 1:
+        return (f"{path.name} va de {antes} a {despues}: un delta avanza la revisión "
+                "exactamente en uno (REV-NNNNNN → la siguiente)")
+    origen = despues if reverse else antes
     # El historial y el snapshot sólo conocen los deltas de knowledge/deltas/:
     # una copia con el mismo nombre en otro sitio no es el delta registrado.
     if path.resolve() != (DELTAS / path.name).resolve():
@@ -207,6 +214,16 @@ def fuera_de_orden(path: Path, origen: str, reverse: bool) -> str | None:
                 + (f": antes hay que revertir {pila[-1]}" if pila else ": el historial no registra ninguno aplicado"))
     if not reverse and path.name in pila:
         return f"{path.name} ya está aplicado"
+    # Encima de la revisión de partida tiene que estar, en el historial, el
+    # delta que llevó el dataset hasta ella; si no, la pila no se podría
+    # deshacer ni reconstruir. Sólo REV-000000 no tiene predecesor.
+    if not reverse and numero(origen) > 0:
+        llego = next((h.get("revision") for h in reversed(read_jsonl(HISTORIAL))
+                      if pila and h.get("delta") == pila[-1] and h.get("accion") == "aplicar"), None)
+        if llego != origen:
+            return (f"el historial no registra qué delta llevó el dataset a {origen}"
+                    + (f" (el último aplicado, {pila[-1]}, dejó {llego})" if pila else "")
+                    + ": no se aplica encima de una revisión sin constancia")
     # El contenido tiene que ser el que se aplicó la primera vez: revertir
     # escribe sus `before`, y un revertido que vuelve a aplicarse editado
     # borraría la constancia de lo que se aplicó. Otro contenido, otro nombre.
@@ -261,7 +278,7 @@ def cmd(path: Path, reverse: bool, dry: bool, full: bool = False) -> int:
 
     # Antes del ensayo en seco: es el paso previo documentado, y tiene que
     # negarse igual que la orden de verdad.
-    problema = fuera_de_orden(path, origen, reverse)
+    problema = fuera_de_orden(path, delta, reverse)
     if problema:
         print(f"ERROR {problema}")
         return 1

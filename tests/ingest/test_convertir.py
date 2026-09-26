@@ -726,6 +726,88 @@ class Convertir(unittest.TestCase):
             self.entorno.construir(spec)
         self.assertIn("MENTION-999999", str(e.exception))
 
+    @staticmethod
+    def tiempo(antiguo: int, reciente: int) -> dict:
+        return {"temporal_type": "divergence_estimate", "label": f"{antiguo}–{reciente} Ma",
+                "interval": {"oldest_bound": antiguo, "youngest_bound": reciente, "unit": "million_years",
+                             "reference_point": "before_present", "original_expression": f"{reciente}–{antiguo} Ma"},
+                "uncertainty": {"kind": "range_only", "description": "De prueba."},
+                "calibration": {"system": "molecular_clock", "curve_or_timescale": None},
+                "method": "reloj", "method_type": "molecular_clock", "determination": "modelled", "notes": []}
+
+    def datacion(self, spec: dict, tiempos_del_evento: list[str] | None) -> dict:
+        """Un evento de divergencia y una afirmación `dated_to` que lo fecha."""
+        evento = {"event_type": "divergence", "label": "Divergencia de prueba",
+                  "participants": [{"entity_id": "@Alfa", "role": "participant", "notes": []}],
+                  "result_entity_ids": [], "region_ids": [], "notes": []}
+        if tiempos_del_evento is not None:
+            evento["temporal_expression_ids"] = tiempos_del_evento
+        spec["records"] += [
+            {"key": "@T1", "file": "temporal-expressions.jsonl", "rows": ["C-001"], "record": self.tiempo(1000, 900)},
+            {"key": "@E1", "file": "events.jsonl", "rows": ["C-001"], "record": evento},
+            {"key": "@CLT", "file": "claims.jsonl", "rows": ["C-001"], "record": {
+                "claim_type": "temporal", "subject_id": "@E1", "predicate": "dated_to",
+                "object": {"temporal_expression_id": "@T1"}}},
+        ]
+        spec["rows"]["C-001"]["keys"] += ["@T1", "@E1", "@CLT"]
+        return spec
+
+    def test_las_fechas_de_un_evento_se_deducen_de_sus_dataciones(self):
+        r = self.entorno.construir(self.datacion(self.entorno.spec(), []))
+        recs = self.registros(r)
+        [ev] = [x for x in recs.values() if x["id"].startswith("EVENT-")]
+        [t] = [x for x in recs.values() if x["id"].startswith("TIME-")]
+        self.assertEqual(ev["temporal_expression_ids"], [t["id"]])
+
+    def test_una_fecha_de_evento_sin_datacion_se_rechaza(self):
+        spec = self.datacion(self.entorno.spec(), None)
+        spec["records"].append({"key": "@T2", "file": "temporal-expressions.jsonl", "rows": ["C-001"],
+                                "record": self.tiempo(800, 700)})
+        spec["rows"]["C-001"]["keys"].append("@T2")
+        spec["records"][-3]["record"]["temporal_expression_ids"] = ["@T2"]
+        with self.assertRaises(SystemExit) as e:
+            self.entorno.construir(spec)
+        self.assertIn("@E1", str(e.exception))
+        self.assertIn("temporal_expression_ids", str(e.exception))
+
+    def test_la_cadena_de_una_evidencia_tiene_que_ser_coherente(self):
+        # La evidencia cita un resultado de un análisis que no es el que lista.
+        spec = self.estudio(self.entorno.spec(), None)
+        spec["records"] += [
+            {"key": "@A2", "file": "analyses.jsonl", "rows": ["C-001"], "record": {
+                "analysis_type": "other", "method": "otro", "dataset_ids": ["@D1"]}}]
+        spec["rows"]["C-001"]["keys"].append("@A2")
+        spec["records"][3]["record"].update({"dataset_ids": ["@D1"], "analysis_ids": ["@A2"], "result_ids": ["@R1"]})
+        with self.assertRaises(SystemExit) as e:
+            self.entorno.construir(spec)
+        self.assertIn("@EV1", str(e.exception))
+        self.assertIn("@R1", str(e.exception))
+
+    def test_delta_exige_revisiones_consecutivas(self):
+        deltas = self.entorno.tmp / "deltas"
+        ruta = deltas / "SEC-000001.json"
+        d = json.loads(ruta.read_text(encoding="utf-8"))
+        d["dataset_revision_after"] = "REV-999999"
+        ruta.write_text(json.dumps(d), encoding="utf-8")
+        salida = io.StringIO()
+        with contextlib.redirect_stdout(salida):
+            self.assertEqual(delta_mod.cmd(ruta, False, True), 1)
+        self.assertIn("REV-999999", salida.getvalue())
+
+    def test_delta_exige_el_historial_de_los_anteriores(self):
+        # El manifiesto dice REV-000001 pero el historial no registra quién lo
+        # dejó ahí: aplicar encima dejaría una pila que no se puede deshacer.
+        (self.entorno.tmp / "dataset.json").write_text(json.dumps({"dataset_revision": "REV-000001"}),
+                                                       encoding="utf-8")
+        deltas = self.entorno.tmp / "deltas"
+        (deltas / "SEC-000009-conversion.json").write_text(json.dumps({
+            "dataset_revision_before": "REV-000001", "dataset_revision_after": "REV-000002",
+            "operations": []}), encoding="utf-8")
+        salida = io.StringIO()
+        with contextlib.redirect_stdout(salida):
+            self.assertEqual(delta_mod.cmd(deltas / "SEC-000009-conversion.json", False, True), 1)
+        self.assertIn("historial", salida.getvalue())
+
     def test_el_fichero_de_conversion_tiene_que_estar_en_conversions(self):
         # El snapshot sólo registra knowledge/corpus/conversions/*.json: una
         # entrada revisada fuera de ahí no se podría recuperar ni verificar.
