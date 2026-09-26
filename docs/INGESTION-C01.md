@@ -122,7 +122,7 @@ make convert CORPUS=../corredor-eukaryota-holozoa SECCION=06 DRY=1   # ver sin e
 make convert CORPUS=../corredor-eukaryota-holozoa SECCION=06
 ```
 
-`scripts/ingest/convertir.py` hace lo mecánico y se niega antes de escribir si la copia no es la versión congelada, si la sección no se ha ingerido o ya se convirtió, si queda una fila o una mención sin destino, o si se usa una clave sin definir. Asigna identificadores opacos sin reutilizar ninguno, crea las fuentes citadas del apéndice A o reutiliza las que ya existen, y rellena lo que se deduce: procedencia, ejes epistemológicos desde las columnas de la fila, `claim_ids` y `evidence_ids`. El delta, `SEC-….-conversion.json`, va detrás del de la sección y da destino a sus menciones.
+`scripts/ingest/convertir.py` hace lo mecánico y se niega antes de escribir si la copia no es la versión congelada, si la sección no se ha ingerido o ya se convirtió, si queda una fila o una mención sin destino, si un destino de fila no es A–I, si un registro no dice de qué filas sale, si una mención que no se descarta no apunta a ningún registro, si se usa una clave sin definir, o si una fuente que ya existe no coincide con el apéndice A activo. Asigna identificadores opacos sin reutilizar ninguno, crea las fuentes citadas del apéndice A o reutiliza las que ya existen, y rellena lo que se deduce: procedencia, ejes epistemológicos desde las columnas de la fila, `claim_ids` y `evidence_ids`. El delta, `SEC-….-conversion.json`, va detrás del de la sección y da destino a sus menciones.
 
 **Integración de hipótesis.** Decidir si una afirmación apoya, contradice, parte una hipótesis existente o crea un grupo de conflicto. No se mezclan topologías incompatibles en un árbol.
 
@@ -137,15 +137,18 @@ Mientras queden menciones sin destino —entre aplicar el delta de la sección y
 make check
 ```
 
-Si algo salió mal:
+Si algo salió mal, se revierte en el orden inverso: primero la conversión, después la sección.
 
 ```bash
+.venv/bin/python scripts/ingest/delta.py SEC-000001-conversion.json --revert
 .venv/bin/python scripts/ingest/delta.py SEC-000001.json --revert
 ```
 
+`delta.py` sólo aplica un delta sobre la revisión de la que parte y sólo revierte el último aplicado; fuera de ese orden se niega y dice cuál va antes. Revertir la sección con su conversión aplicada borraría las menciones que la conversión actualizó y dejaría sus registros sin procedencia.
+
 `delta.py` anota cada aplicación y cada reversión en `knowledge/deltas/historial.jsonl`. El delta revertido se queda en `knowledge/deltas/` como constancia, y por el historial `ingest.py` sabe que no está pendiente: la ingestión siguiente no se encadena detrás de él, y sus identificadores siguen reservados. Revertir no retira la sección, sus pasajes ni su informe, así que la sección no se puede ingerir otra vez sin más: o se vuelve a aplicar el mismo delta, o se retiran antes esos ficheros, que `ingest.py` enumera al negarse. El delta se queda: su número de `SEC` no se vuelve a emitir y sus identificadores siguen reservados. `make snapshot` registra el hash de las secciones, sus pasajes, los deltas, el historial y las copias del registro del corredor.
 
-Si se ingiere otra sección antes de aplicar la anterior, su delta va detrás en la cadena de revisiones —el de la anterior lleva a `REV-000001`, el nuevo parte de ahí— y no reutiliza sus identificadores. `ingest.py` lo avisa. `delta.py` no comprueba el orden: hay que aplicarlos en el de la cadena.
+Si se ingiere otra sección antes de aplicar la anterior, su delta va detrás en la cadena de revisiones —el de la anterior lleva a `REV-000001`, el nuevo parte de ahí— y no reutiliza sus identificadores. `ingest.py` lo avisa, y `delta.py` sólo los aplica en el orden de la cadena.
 
 ## 8 · Cerrar la sección
 
