@@ -588,6 +588,36 @@ class Convertir(unittest.TestCase):
         self.assertIn("inventado", str(e.exception))
         self.assertIn("mentions.jsonl", str(e.exception))
 
+    def test_una_fila_que_no_es_glosa_sin_registros_se_rechaza(self):
+        spec = self.entorno.spec()
+        spec["rows"]["C-002"] = {"destination": "A", "keys": []}
+        with self.assertRaises(SystemExit) as e:
+            self.entorno.construir(spec)
+        self.assertIn("C-002", str(e.exception))
+
+    def test_una_mencion_sin_disposicion_se_rechaza(self):
+        spec = self.entorno.spec()
+        spec["mentions"]["FIX-Alfa"]["disposition"] = None
+        with self.assertRaises(SystemExit) as e:
+            self.entorno.construir(spec)
+        self.assertIn("FIX-Alfa", str(e.exception))
+        self.assertIn("disposition", str(e.exception))
+
+    def test_las_menciones_parten_del_estado_proyectado(self):
+        # Un delta sin aplicar, detrás de la sección, ya anotó una mención: la
+        # conversión tiene que partir de esa nota, o al aplicarla la pisaría.
+        [op] = [o for o in self.entorno.delta_sec["operations"]
+                if o["file"] == "mentions.jsonl" and o["after"]["original_text"] == "FIX-Alfa"]
+        anotada = {**op["after"], "notes": list(op["after"].get("notes", [])) + ["nota intermedia"]}
+        (self.entorno.tmp / "deltas" / "SEC-000009-conversion.json").write_text(json.dumps({
+            "dataset_revision_before": "REV-000001", "dataset_revision_after": "REV-000002",
+            "operations": [{"operation": "UPDATE_RECORD", "file": "mentions.jsonl", "record_id": op["record_id"],
+                            "before": op["after"], "after": anotada}]}), encoding="utf-8")
+        r = self.entorno.construir(self.entorno.spec())
+        [act] = [o for o in r["delta"]["operations"] if o["record_id"] == op["record_id"]]
+        self.assertIn("nota intermedia", act["before"]["notes"])
+        self.assertIn("nota intermedia", act["after"]["notes"])
+
     def test_el_fichero_de_conversion_tiene_que_estar_en_conversions(self):
         # El snapshot sólo registra knowledge/corpus/conversions/*.json: una
         # entrada revisada fuera de ahí no se podría recuperar ni verificar.
