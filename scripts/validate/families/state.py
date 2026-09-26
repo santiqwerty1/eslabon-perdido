@@ -292,6 +292,12 @@ def _check_conservation(data, rep, snapshots_dir: Path, deltas_dir: Path) -> Non
                     "SUPERSEDE_RECORD y MERGE_CONFIRMED_IDENTITIES"
                 )
         for key in DELTA_RECORD_KEYS if not revertido else ():
+            if not isinstance(delta.get(key) or [], list):
+                rep.error(
+                    f"estado: el delta {path.name} declara '{key}' como {type(delta[key]).__name__}, "
+                    "no como lista de identificadores (§17 paso 13)"
+                )
+                continue
             for item in delta.get(key) or []:
                 rid = item.get("id") if isinstance(item, dict) else item
                 if not isinstance(rid, str) or not ID_RE.fullmatch(rid):

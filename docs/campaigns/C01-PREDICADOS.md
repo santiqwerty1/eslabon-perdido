@@ -184,3 +184,9 @@ aunque sus afirmaciones `dated_to` los fechan. `SEC-000001-correccion-2.json`
 (REV-000003 → REV-000004) les enlaza las expresiones temporales de esas
 afirmaciones (seis en el de LECA), y `SNAP-000014` registra el estado.
 `convertir.py` ya las deduce.
+
+La mención «no existe» (`MENTION-000028`) señala `ISSUE-000040` solo por
+`resolution.target_ids`: ni su `issue_ids` ni el `affects.mention_ids` de la
+incidencia la enlazaban. `SEC-000001-correccion-3.json` (REV-000004 →
+REV-000005) enlaza los dos sentidos, y `SNAP-000015` registra el estado.
+`convertir.py` ya lo hace con toda mención que señala una incidencia.

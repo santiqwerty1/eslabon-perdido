@@ -1,0 +1,157 @@
+{
+  "schema_version": "1.2.0",
+  "dataset_revision_before": "REV-000004",
+  "dataset_revision_after": "REV-000005",
+  "operations": [
+    {
+      "operation": "UPDATE_RECORD",
+      "file": "mentions.jsonl",
+      "record_id": "MENTION-000028",
+      "before": {
+        "id": "MENTION-000028",
+        "section_id": "SEC-000001",
+        "passage_id": "PASSAGE-000018",
+        "original_text": "no existe",
+        "normalized_form": "no existe",
+        "mention_type": "controversy",
+        "character_offsets": {
+          "start": 2265,
+          "end": 2274
+        },
+        "resolution": {
+          "status": "resolved",
+          "target_ids": [
+            "ISSUE-000040"
+          ],
+          "reason": "no hay estimación de consenso para la edad de LECA (C-772)"
+        },
+        "disposition": "pending_question",
+        "issue_ids": [],
+        "notes": [
+          "capa de registro: objeto en C-772",
+          "en el pasaje aparece como «No existe», con otra capitalización; los offsets señalan esa aparición",
+          "destino: no hay estimación de consenso para la edad de LECA (C-772)"
+        ],
+        "record_status": "active"
+      },
+      "after": {
+        "id": "MENTION-000028",
+        "section_id": "SEC-000001",
+        "passage_id": "PASSAGE-000018",
+        "original_text": "no existe",
+        "normalized_form": "no existe",
+        "mention_type": "controversy",
+        "character_offsets": {
+          "start": 2265,
+          "end": 2274
+        },
+        "resolution": {
+          "status": "resolved",
+          "target_ids": [
+            "ISSUE-000040"
+          ],
+          "reason": "no hay estimación de consenso para la edad de LECA (C-772)"
+        },
+        "disposition": "pending_question",
+        "issue_ids": [
+          "ISSUE-000040"
+        ],
+        "notes": [
+          "capa de registro: objeto en C-772",
+          "en el pasaje aparece como «No existe», con otra capitalización; los offsets señalan esa aparición",
+          "destino: no hay estimación de consenso para la edad de LECA (C-772)"
+        ],
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "UPDATE_RECORD",
+      "file": "issues.jsonl",
+      "record_id": "ISSUE-000040",
+      "before": {
+        "id": "ISSUE-000040",
+        "issue_type": "pending_question",
+        "title": "La edad de LECA no tiene estimación de consenso",
+        "description": "El corredor sintetiza (C-772, a partir de C-760, C-762 y C-765) que no existe una estimación de consenso para la edad de LECA: las recuperadas van de 1007 a 2386 Ma según el estudio, el método y la calibración.",
+        "severity": "INFO",
+        "affects": {
+          "record_ids": [
+            "EVENT-000003"
+          ],
+          "claim_ids": [
+            "CLAIM-000003",
+            "CLAIM-000004",
+            "CLAIM-000006",
+            "CLAIM-000008",
+            "CLAIM-000009",
+            "CLAIM-000012"
+          ],
+          "mention_ids": []
+        },
+        "evidence_locators": [
+          "S139 resultados",
+          "S141 fig. 3",
+          "S140 fig. 2",
+          "S178 discusión"
+        ],
+        "resolution": {
+          "status": "open"
+        },
+        "raised_in": "SEC-000001",
+        "record_status": "active"
+      },
+      "after": {
+        "id": "ISSUE-000040",
+        "issue_type": "pending_question",
+        "title": "La edad de LECA no tiene estimación de consenso",
+        "description": "El corredor sintetiza (C-772, a partir de C-760, C-762 y C-765) que no existe una estimación de consenso para la edad de LECA: las recuperadas van de 1007 a 2386 Ma según el estudio, el método y la calibración.",
+        "severity": "INFO",
+        "affects": {
+          "record_ids": [
+            "EVENT-000003"
+          ],
+          "claim_ids": [
+            "CLAIM-000003",
+            "CLAIM-000004",
+            "CLAIM-000006",
+            "CLAIM-000008",
+            "CLAIM-000009",
+            "CLAIM-000012"
+          ],
+          "mention_ids": [
+            "MENTION-000028"
+          ]
+        },
+        "evidence_locators": [
+          "S139 resultados",
+          "S141 fig. 3",
+          "S140 fig. 2",
+          "S178 discusión"
+        ],
+        "resolution": {
+          "status": "open"
+        },
+        "raised_in": "SEC-000001",
+        "record_status": "active"
+      }
+    }
+  ],
+  "records_added": [],
+  "records_updated": [
+    "MENTION-000028",
+    "ISSUE-000040"
+  ],
+  "claims_added": [],
+  "events_added": [],
+  "hypotheses_added": [],
+  "issues_added": [],
+  "issues_resolved": [],
+  "records_deprecated": [],
+  "views_invalidated": [],
+  "views_built": [],
+  "validation_results": {},
+  "correction": {
+    "of": "SEC-000001-conversion.json",
+    "reason": "La mención «no existe» (MENTION-000028) señala ISSUE-000040, pero sólo por `resolution.target_ids`: ni su `issue_ids` ni el `affects.mention_ids` de la incidencia la enlazaban, y recorrer la incidencia no llevaba a la mención que la plantea. Se enlazan los dos sentidos; convertir.py ya lo hace."
+  }
+}
