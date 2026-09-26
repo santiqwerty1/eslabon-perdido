@@ -505,6 +505,63 @@ class Convertir(unittest.TestCase):
                   and (x.get("interval") or {}).get("oldest_bound") == 800)
         self.assertEqual(occ["temporal_expression_id"], t2)
 
+    def dos_dataciones_existente(self, fecha: str | None) -> dict:
+        spec = self.ocurrencia_existente(fecha)
+        spec["records"] += [
+            {"key": "@T2", "file": "temporal-expressions.jsonl", "rows": ["C-001"], "record": self.tiempo(800, 700)},
+            {"key": "@CLO2", "file": "claims.jsonl", "rows": ["C-001"], "record": {
+                "claim_type": "temporal", "subject_id": "OCC-000050", "predicate": "dated_to",
+                "object": {"temporal_expression_id": "@T2"}}}]
+        spec["rows"]["C-001"]["keys"] += ["@T2", "@CLO2"]
+        return spec
+
+    def test_dos_dataciones_de_una_ocurrencia_existente_exigen_elegir_su_fecha(self):
+        # Sin elegir, la ocurrencia se quedaría sin fecha aunque sus fuentes la fechan.
+        with self.assertRaises(SystemExit) as e:
+            self.entorno.construir(self.dos_dataciones_existente(None))
+        self.assertIn("OCC-000050", str(e.exception))
+        self.assertIn("occurrence_dates", str(e.exception))
+
+    def test_la_fecha_elegida_de_una_ocurrencia_existente_se_aplica(self):
+        spec = self.dos_dataciones_existente(None)
+        spec["occurrence_dates"] = {"OCC-000050": "@T2"}
+        r = self.entorno.construir(spec)
+        t2 = next(x["id"] for _, x in r["salida"] if x["id"].startswith("TIME-")
+                  and (x.get("interval") or {}).get("oldest_bound") == 800)
+        [op] = [o for o in r["delta"]["operations"] if o["record_id"] == "OCC-000050"]
+        self.assertEqual(op["after"]["temporal_expression_id"], t2)
+
+    def test_elegir_la_fecha_de_una_ocurrencia_ya_fechada_se_rechaza(self):
+        # La fecha de una ocurrencia que ya existe no se pisa.
+        spec = self.dos_dataciones_existente("TIME-000050")
+        spec["occurrence_dates"] = {"OCC-000050": "@T2"}
+        with self.assertRaises(SystemExit) as e:
+            self.entorno.construir(spec)
+        self.assertIn("OCC-000050", str(e.exception))
+        self.assertIn("TIME-000050", str(e.exception))
+
+    def test_elegir_una_fecha_que_no_sale_de_sus_dataciones_se_rechaza(self):
+        spec = self.dos_dataciones_existente(None)
+        spec["records"].append({"key": "@T3", "file": "temporal-expressions.jsonl", "rows": ["C-001"],
+                                "record": self.tiempo(600, 500)})
+        spec["rows"]["C-001"]["keys"].append("@T3")
+        spec["occurrence_dates"] = {"OCC-000050": "@T3"}
+        with self.assertRaises(SystemExit) as e:
+            self.entorno.construir(spec)
+        self.assertIn("OCC-000050", str(e.exception))
+        self.assertIn("@T3", str(e.exception))
+
+    def test_elegir_la_fecha_de_una_ocurrencia_que_no_existia_se_rechaza(self):
+        # Una ocurrencia nueva elige en su propio registro; una que no existe no
+        # tiene fecha que elegir.
+        for occ in ("@OCC", "OCC-000999"):
+            spec = self.ocurrencia(self.entorno.spec(), None)
+            spec["occurrence_dates"] = {occ: "@TO"}
+            with self.assertRaises(SystemExit) as e:
+                self.entorno.construir(spec)
+            self.assertIn(occ, str(e.exception))
+            self.assertIn("occurrence_dates", str(e.exception))
+
     def test_una_evidencia_J_con_listas_nulas_da_un_error_legible(self):
         spec = self.contraevidencia(self.entorno.spec(), ["@CL1"])
         spec["records"][-1]["record"]["supports_claim_ids"] = None

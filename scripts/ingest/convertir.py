@@ -38,12 +38,16 @@ Formato del fichero de conversión:
       ],
       "rows": {"C-757": {"destination": "A", "keys": ["@..."], "note": "..."}},
       "mentions": {"LECA": {"mention_type": "...", "disposition": "...",
-                            "targets": ["@LECA"], "reason": "..."}}
+                            "targets": ["@LECA"], "reason": "..."}},
+      "occurrence_dates": {"OCC-000050": "@T..."}
     }
 
 Las fuentes se nombran por su clave del apéndice A con arroba («@S139») y no se
 declaran en `records`: se crean al citarlas o se reutilizan si ya existen. Los
 ejes epistemológicos de afirmaciones e hipótesis salen siempre de su primera fila.
+`occurrence_dates`, opcional, elige la fecha de una ocurrencia que ya existía
+sin fecha cuando varias afirmaciones `dated_to` nuevas compiten por ella; una
+ocurrencia nueva la elige en su propio registro.
 """
 
 from __future__ import annotations
@@ -871,13 +875,43 @@ def construir(spec_path: Path, corpus: str) -> dict:
                 if t not in fechas_nuevas.setdefault(sid, []):
                     fechas_nuevas[sid].append(t)
     # Una ocurrencia que ya existía sin fecha la toma de su datación nueva si
-    # es una sola. Con fecha, o con varias dataciones que compiten, se queda
-    # como está: las dataciones nuevas son afirmaciones con su fuente.
+    # es una sola; si varias compiten, el fichero elige cuál en
+    # `occurrence_dates`, como una nueva la elige en su registro. Con fecha se
+    # queda como está: las dataciones nuevas son afirmaciones con su fuente.
+    elegidas = spec.get("occurrence_dates") or {}
+    if not isinstance(elegidas, dict):
+        raise SystemExit("ERROR `occurrence_dates` tiene que ser un objeto: ocurrencia → fecha")
+    elegidas = {ids.get(o, o): ids.get(t, t) for o, t in elegidas.items()}
+    sin_datacion = []
+    for oid, t in elegidas.items():
+        nombre = clave_de.get(oid, oid)
+        if oid in por_id:
+            sin_datacion.append(f"{nombre}: es nueva y elige su fecha en su registro (`temporal_expression_id`), "
+                                "no en `occurrence_dates`")
+        elif existentes_id.get(oid, (None,))[0] != "occurrences.jsonl":
+            sin_datacion.append(f"{nombre}: `occurrence_dates` sólo elige la fecha de una ocurrencia que ya existe")
+        elif (previa := existentes_id[oid][1].get("temporal_expression_id")) is not None:
+            sin_datacion.append(f"{nombre}: ya tiene fecha ({previa}) y `occurrence_dates` no la pisa")
+        elif t not in fechas_nuevas.get(oid, []):
+            sin_datacion.append(f"{nombre}: `occurrence_dates` elige {clave_de.get(t, t)}, que no es la fecha de "
+                                "ninguna de sus afirmaciones dated_to nuevas")
     for sid, fechas in fechas_nuevas.items():
         _, antes = existentes_id[sid]
-        if antes.get("temporal_expression_id") is None and len(fechas) == 1:
-            _, _, despues = cambios.setdefault(sid, ("occurrences.jsonl", antes, json.loads(json.dumps(antes))))
-            despues["temporal_expression_id"] = fechas[0]
+        if antes.get("temporal_expression_id") is not None:
+            continue
+        if sid in elegidas:
+            fecha = elegidas[sid]
+        elif len(fechas) == 1:
+            fecha = fechas[0]
+        else:
+            sin_datacion.append(f"{sid}: {len(fechas)} afirmaciones dated_to nuevas con fechas distintas; una "
+                                "ocurrencia tiene una sola, y el fichero tiene que elegir cuál (`occurrence_dates`)")
+            continue
+        _, _, despues = cambios.setdefault(sid, ("occurrences.jsonl", antes, json.loads(json.dumps(antes))))
+        despues["temporal_expression_id"] = fecha
+    if sin_datacion:
+        raise SystemExit("ERROR fechas de ocurrencias que no salen de sus dataciones:\n  "
+                         + "\n  ".join(sin_datacion))
 
     # Registros que ya existían y que una incidencia nueva afecta, e
     # incidencias que ya existían y que un registro nuevo nombra.
