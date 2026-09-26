@@ -101,6 +101,13 @@ def apply_ops(ops: list[dict], reverse: bool = False, escribir: bool = True) -> 
         # se escribe hasta el final, así que negarse aquí no deja nada a medias.
         esperado = op["after"] if reverse else op["before"]
         actual = recs[idx] if idx is not None else None
+        # El contenido tiene que ser el del registro que nombra la operación: un
+        # alta con otro `id` quedaría en el fichero con ese otro, y revertirla
+        # buscaría `record_id` sin encontrarlo.
+        ajenos = [lado for lado in ("before", "after")
+                  if op.get(lado) is not None and (op[lado] or {}).get("id") != rid]
+        if ajenos:
+            raise ValueError(f"{tipo}: {rid} en {fichero}: el `id` de {' y '.join(ajenos)} no es {rid}")
         # Un alta parte de que el registro no exista: con un `before` igual a
         # uno que ya está, la comparación pasaría y el identificador se duplicaría.
         if modo == "add" and not reverse and (idx is not None or op["before"] is not None):

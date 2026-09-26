@@ -680,6 +680,34 @@ def construir(spec_path: Path, corpus: str) -> dict:
         raise SystemExit("ERROR evidencias con la cadena datos → análisis → resultado rota:\n  "
                          + "\n  ".join(rotas))
 
+    # Una incidencia y lo que afecta se enlazan en los dos sentidos: el
+    # `issue_ids` de cada registro afectado y el `affects` de la incidencia.
+    # Da igual en qué lado lo escribiera el fichero de conversión.
+    def lado_de(fichero: str) -> str:
+        return "claim_ids" if fichero == "claims.jsonl" else "record_ids"
+
+    afectados: dict[str, list[str]] = {}
+    for fichero, rec in salida:
+        if fichero == "issues.jsonl":
+            afecta = rec.get("affects") or {}
+            for rid in [*afecta.get("record_ids", []), *afecta.get("claim_ids", [])]:
+                afectados.setdefault(rid, []).append(rec["id"])
+    cuestiones_de_existentes: dict[str, list[tuple[str, str]]] = {}
+    for fichero, rec in salida:
+        if "issue_ids" not in propiedades(fichero) or fichero == "mentions.jsonl":
+            continue
+        for iid in rec.get("issue_ids") or []:
+            if iid in por_id and por_id[iid][0] == "issues.jsonl":
+                afecta = por_id[iid][1].setdefault("affects", {})
+                lista = afecta.setdefault(lado_de(fichero), [])
+                if rec["id"] not in lista:
+                    lista.append(rec["id"])
+            else:
+                cuestiones_de_existentes.setdefault(iid, []).append((lado_de(fichero), rec["id"]))
+        suyas = [i for i in afectados.get(rec["id"], []) if i not in (rec.get("issue_ids") or [])]
+        if suyas:
+            rec["issue_ids"] = [*(rec.get("issue_ids") or []), *suyas]
+
     # --- menciones ----------------------------------------------------------------------
     actualizadas: list[tuple[dict, dict]] = []
     menciones_de_cuestion: dict[str, list[str]] = {}
@@ -757,6 +785,21 @@ def construir(spec_path: Path, corpus: str) -> dict:
         t = (c.get("object") or {}).get("temporal_expression_id")
         if c.get("predicate") == "dated_to" and isinstance(t, str) and isinstance(c.get("subject_id"), str):
             enlazar(c["subject_id"], "temporal_expression_ids", t)
+
+    # Registros que ya existían y que una incidencia nueva afecta, e
+    # incidencias que ya existían y que un registro nuevo nombra.
+    for rid, iids in afectados.items():
+        for iid in iids:
+            enlazar(rid, "issue_ids", iid)
+    for iid, quienes in cuestiones_de_existentes.items():
+        if iid not in existentes_id or existentes_id[iid][0] != "issues.jsonl":
+            continue
+        fichero, antes = existentes_id[iid]
+        _, _, despues = cambios.setdefault(iid, (fichero, antes, json.loads(json.dumps(antes))))
+        afecta = despues.setdefault("affects", {})
+        for lado, rid in quienes:
+            if rid not in afecta.setdefault(lado, []):
+                afecta[lado].append(rid)
 
     # Y las incidencias que ya existían, desde las menciones que las señalan.
     for iid, mids in menciones_de_cuestion.items():
