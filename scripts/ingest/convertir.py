@@ -408,11 +408,15 @@ def construir(spec_path: Path, corpus: str) -> dict:
     ajenas = sorted(set(spec.get("rows", {})) - set(filas))
     if ajenas:
         errores.append(f"filas que la sección {sec} no tiene: {', '.join(ajenas)}")
+    # Una mención se decide por su texto o, si dos apariciones con el mismo
+    # texto son cosas distintas, por su identificador, que manda sobre el texto.
     etiquetas = {m["original_text"] for m in menciones.values()}
-    sin_mencion = sorted(etiquetas - set(spec.get("mentions", {})))
+    decididas = set(spec.get("mentions", {}))
+    sin_mencion = sorted({m["original_text"] for mid, m in menciones.items()
+                          if mid not in decididas and m["original_text"] not in decididas})
     if sin_mencion:
         errores.append(f"menciones sin destino: {'; '.join(sin_mencion)}")
-    sobran = sorted(set(spec.get("mentions", {})) - etiquetas)
+    sobran = sorted(decididas - etiquetas - set(menciones))
     if sobran:
         errores.append(f"menciones que la sección no tiene: {'; '.join(sobran)}")
     for etiqueta, destino in spec.get("mentions", {}).items():
@@ -449,6 +453,11 @@ def construir(spec_path: Path, corpus: str) -> dict:
                 errores.append(f"{r['key']}: la fila {fila} no es de la sección {sec}")
         definidas[r["key"]] = r
     for fila, destino in spec.get("rows", {}).items():
+        # La procedencia de un registro sale de sus `rows`: una fila que lo
+        # lista sin que él la declare diría que lo produjo sin haberlo hecho.
+        for k in destino.get("keys", []):
+            if k in definidas and fila not in definidas[k].get("rows", []):
+                errores.append(f"{fila}: lista {k}, que no declara esa fila en `rows`")
         if destino.get("destination") not in DESTINOS:
             errores.append(f"{fila}: destino {destino.get('destination')!r} fuera de A–I")
         elif destino["destination"] not in SIN_REGISTROS and not destino.get("keys"):
@@ -631,7 +640,7 @@ def construir(spec_path: Path, corpus: str) -> dict:
         # El estado del que parte es el proyectado: un delta intermedio pudo
         # anotar la mención, y el UPDATE no puede deshacerlo.
         antes = proy.get(mid, (None, ingerida))[1]
-        destino = spec["mentions"][ingerida["original_text"]]
+        destino = spec["mentions"].get(mid) or spec["mentions"][ingerida["original_text"]]
         objetivos = sustituir(destino.get("targets", []), ids, faltan)
         if faltan:
             raise SystemExit(f"ERROR claves usadas sin definir: {', '.join(sorted(faltan))}")

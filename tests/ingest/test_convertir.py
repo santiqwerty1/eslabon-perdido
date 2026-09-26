@@ -695,6 +695,37 @@ class Convertir(unittest.TestCase):
         self.assertEqual(convertir.CITA.findall("S07 supl. fig. S3; S139 tabla 2"), ["S07", "S139"])
         self.assertIsNone(convertir.FUENTE.match("@S3"))
 
+    def test_una_fila_no_lista_un_registro_que_no_la_declara(self):
+        # La procedencia sale de las filas del registro: si la fila C-001 lo
+        # lista y el registro no la declara, el mapa y la procedencia discrepan.
+        spec = self.entorno.spec()
+        spec["records"][0]["rows"] = ["C-002"]
+        with self.assertRaises(SystemExit) as e:
+            self.entorno.construir(spec)
+        self.assertIn("C-001", str(e.exception))
+        self.assertIn("@Alfa", str(e.exception))
+
+    def test_una_mencion_se_puede_decidir_por_su_identificador(self):
+        # Dos menciones con el mismo texto pueden ser cosas distintas: la que se
+        # nombra por su identificador no sigue la regla de su texto.
+        [op] = [o for o in self.entorno.delta_sec["operations"]
+                if o["file"] == "mentions.jsonl" and o["after"]["original_text"] == "FIX-Alfa"]
+        spec = self.entorno.spec()
+        spec["mentions"][op["record_id"]] = {"mention_type": "clade", "disposition": "new_entity",
+                                             "targets": ["@Beta"], "reason": "esta aparición es Beta"}
+        r = self.entorno.construir(spec)
+        beta = next(rec["id"] for _, rec in r["salida"] if rec.get("preferred_label") == "FIX-Beta")
+        [act] = [o for o in r["delta"]["operations"] if o["record_id"] == op["record_id"]]
+        self.assertEqual(act["after"]["resolution"]["target_ids"], [beta])
+
+    def test_una_clave_de_mencion_desconocida_se_rechaza(self):
+        spec = self.entorno.spec()
+        spec["mentions"]["MENTION-999999"] = {"mention_type": "clade", "disposition": "discarded_with_reason",
+                                              "targets": [], "reason": "no existe"}
+        with self.assertRaises(SystemExit) as e:
+            self.entorno.construir(spec)
+        self.assertIn("MENTION-999999", str(e.exception))
+
     def test_el_fichero_de_conversion_tiene_que_estar_en_conversions(self):
         # El snapshot sólo registra knowledge/corpus/conversions/*.json: una
         # entrada revisada fuera de ahí no se podría recuperar ni verificar.

@@ -328,6 +328,32 @@ class Congelacion(unittest.TestCase):
         self.assertIn("knowledge/corpus/passages/SEC-000001.json", ficheros)
         self.assertIn("knowledge/deltas/historial.jsonl", ficheros)
 
+    def test_el_snapshot_no_bendice_un_fichero_de_conversion_editado(self):
+        # El delta aplicado guarda el hash del fichero de conversión del que
+        # salió. Si el fichero cambia, un snapshot nuevo lo daría por bueno.
+        spec = importlib.util.spec_from_file_location("snapshot", ROOT / "scripts" / "snapshot" / "snapshot.py")
+        snapshot = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(snapshot)
+        snapshot.ROOT = self.tmp
+        snapshot.SNAPSHOTS = self.tmp / "snapshots"
+        snapshot.SNAPSHOTS.mkdir()
+        conversions = self.tmp / "knowledge" / "corpus" / "conversions"
+        conversions.mkdir(parents=True)
+        fichero = conversions / "corredor-06.json"
+        fichero.write_text('{"section": "06"}\n', encoding="utf-8")
+        deltas = self.tmp / "knowledge" / "deltas"
+        deltas.mkdir(parents=True)
+        (deltas / "SEC-000001-conversion.json").write_text(json.dumps({"conversion": {"spec": {
+            "path": "knowledge/corpus/conversions/corredor-06.json",
+            "sha256": snapshot.digest(fichero)}}}), encoding="utf-8")
+        self.assertEqual(snapshot.conversiones_alteradas(), [])
+        fichero.write_text('{"section": "06", "editado": true}\n', encoding="utf-8")
+        self.assertEqual(len(snapshot.conversiones_alteradas()), 1)
+        snapshot.MANIFEST = self.tmp / "dataset.json"
+        snapshot.MANIFEST.write_text("{}", encoding="utf-8")
+        self.assertEqual(self.ejecutar(lambda a: snapshot.create(None)), 1)
+        self.assertEqual(list(snapshot.SNAPSHOTS.iterdir()), [])
+
     def test_el_snapshot_cubre_la_congelacion_activa(self):
         spec = importlib.util.spec_from_file_location("snapshot", ROOT / "scripts" / "snapshot" / "snapshot.py")
         snapshot = importlib.util.module_from_spec(spec)
