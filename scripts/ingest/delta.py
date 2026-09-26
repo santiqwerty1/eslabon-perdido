@@ -15,6 +15,7 @@ queda en `knowledge/deltas/` como constancia de que ocurrió.
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import sys
 from datetime import datetime, timezone
@@ -168,6 +169,46 @@ def _muestra(miembros: list[dict], n: int = 3) -> list[str]:
     return out
 
 
+def huella(path: Path) -> str:
+    return "sha256:" + hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def fuera_de_orden(path: Path, origen: str, reverse: bool) -> str | None:
+    """Por qué este delta no se puede aplicar o revertir ahora, o None."""
+    # El historial y el snapshot sólo conocen los deltas de knowledge/deltas/:
+    # una copia con el mismo nombre en otro sitio no es el delta registrado.
+    if path.resolve() != (DELTAS / path.name).resolve():
+        return f"{path} no está en knowledge/deltas/, que es donde el historial y el snapshot lo buscan"
+    # La cadena de revisiones es el orden: un delta se aplica sobre la revisión
+    # de la que parte y sólo se revierte el último aplicado. Revertir la sección
+    # antes que su conversión, por ejemplo, borraría las menciones que la
+    # conversión actualizó y dejaría sus registros sin procedencia. La revisión
+    # no basta para saber cuál es el último: una conversión revertida y la que
+    # la sustituye recorren las mismas revisiones. Lo dice el historial.
+    actual = (json.loads(MANIFEST.read_text(encoding="utf-8")).get("dataset_revision")
+              if MANIFEST.exists() else None)
+    pila = aplicados()
+    if reverse and HISTORIAL.exists() and (not pila or pila[-1] != path.name):
+        return (f"{path.name} no es el último delta aplicado"
+                + (f": antes hay que revertir {pila[-1]}" if pila else ": no hay ninguno aplicado"))
+    if not reverse and path.name in pila:
+        return f"{path.name} ya está aplicado"
+    if reverse:
+        # Revertir escribe los `before` del fichero: tienen que ser los del
+        # delta que se aplicó, no los de una versión editada después.
+        registrada = next((h.get("sha256") for h in reversed(read_jsonl(HISTORIAL))
+                           if h.get("delta") == path.name and h.get("accion") == "aplicar"), None)
+        if registrada and registrada != huella(path):
+            return f"{path.name} cambió desde que se aplicó ({registrada}); no se revierte otro contenido"
+    if actual is not None and actual != origen:
+        if reverse:
+            return (f"el dataset está en {actual}, no en {origen}: antes hay que revertir "
+                    f"{pila[-1] if pila else 'el delta que lo llevó ahí'}")
+        return (f"el dataset está en {actual} y este delta parte de {origen}: "
+                "hay que aplicar los deltas en el orden de la cadena")
+    return None
+
+
 def cmd(path: Path, reverse: bool, dry: bool, full: bool = False) -> int:
     delta = json.loads(path.read_text(encoding="utf-8"))
     ops = delta.get("operations", [])
@@ -179,6 +220,13 @@ def cmd(path: Path, reverse: bool, dry: bool, full: bool = False) -> int:
     if reverse:
         origen, destino = destino, origen
     print(f"  revisión {origen} -> {destino}")
+
+    # Antes del ensayo en seco: es el paso previo documentado, y tiene que
+    # negarse igual que la orden de verdad.
+    problema = fuera_de_orden(path, origen, reverse)
+    if problema:
+        print(f"ERROR {problema}")
+        return 1
 
     if dry:
         for linea in resumen(ops):
@@ -193,31 +241,6 @@ def cmd(path: Path, reverse: bool, dry: bool, full: bool = False) -> int:
         print("\n(en seco: no se ha escrito nada)")
         return 0
 
-    # La cadena de revisiones es el orden: un delta se aplica sobre la revisión
-    # de la que parte y sólo se revierte el último aplicado. Revertir la sección
-    # antes que su conversión, por ejemplo, borraría las menciones que la
-    # conversión actualizó y dejaría sus registros sin procedencia. La revisión
-    # no basta para saber cuál es el último: una conversión revertida y la que
-    # la sustituye recorren las mismas revisiones. Lo dice el historial.
-    actual = (json.loads(MANIFEST.read_text(encoding="utf-8")).get("dataset_revision")
-              if MANIFEST.exists() else None)
-    pila = aplicados()
-    if reverse and HISTORIAL.exists() and (not pila or pila[-1] != path.name):
-        print(f"ERROR {path.name} no es el último delta aplicado"
-              + (f": antes hay que revertir {pila[-1]}" if pila else ": no hay ninguno aplicado"))
-        return 1
-    if not reverse and path.name in pila:
-        print(f"ERROR {path.name} ya está aplicado")
-        return 1
-    if actual is not None and actual != origen:
-        if reverse:
-            print(f"ERROR el dataset está en {actual}, no en {origen}: antes hay que revertir "
-                  f"{pila[-1] if pila else 'el delta que lo llevó ahí'}")
-        else:
-            print(f"ERROR el dataset está en {actual} y este delta parte de {origen}: "
-                  "hay que aplicar los deltas en el orden de la cadena")
-        return 1
-
     try:
         diario = apply_ops(ops, reverse)
     except ValueError as exc:
@@ -230,7 +253,8 @@ def cmd(path: Path, reverse: bool, dry: bool, full: bool = False) -> int:
         print(f"    … y {len(diario) - TOPE_LISTADO} más (--full para verlas todas)")
     bump_revision(delta, reverse)
     registrar(path.name, "revertir" if reverse else "aplicar",
-              delta["dataset_revision_before"] if reverse else delta["dataset_revision_after"])
+              delta["dataset_revision_before"] if reverse else delta["dataset_revision_after"],
+              huella(path))
     print(f"\n{len(diario)} operaciones {'revertidas' if reverse else 'aplicadas'}")
     return 0
 
@@ -246,12 +270,16 @@ def aplicados() -> list[str]:
     return pila
 
 
-def registrar(nombre: str, accion: str, revision: str) -> None:
+def registrar(nombre: str, accion: str, revision: str, sha256: str | None = None) -> None:
     HISTORIAL.parent.mkdir(parents=True, exist_ok=True)
+    entrada = {"delta": nombre, "accion": accion, "revision": revision,
+               "fecha": datetime.now(timezone.utc).isoformat(timespec="seconds")}
+    # El contenido exacto que se aplicó: revertir otro sería escribir `before`
+    # que nadie aplicó.
+    if sha256:
+        entrada["sha256"] = sha256
     with HISTORIAL.open("a", encoding="utf-8") as fh:
-        fh.write(json.dumps({"delta": nombre, "accion": accion, "revision": revision,
-                             "fecha": datetime.now(timezone.utc).isoformat(timespec="seconds")},
-                            ensure_ascii=False) + "\n")
+        fh.write(json.dumps(entrada, ensure_ascii=False) + "\n")
 
 
 def main() -> int:
