@@ -494,16 +494,38 @@ def _check_molecule(data: dict[str, list[dict]], rep, index) -> None:
         moleculas = []
         if pred in TAXON_ONLY_PREDICATES:
             moleculas = [(papel, e) for papel, e in (("sujeto", sujeto), ("objeto", objeto)) if _prefix(e) == "MOL"]
-        elif pred in CONCEPT_TARGET_PREDICATES and _prefix(sujeto) == "MOL" \
-                and _prefix(objeto) in TAXONOMIC_PREFIXES:
+        elif pred in CONCEPT_TARGET_PREDICATES:
             # Clasificarla en una categoría («biomarcador singenético»,
-            # «contaminación») es legítimo; asignarla a un taxón, no.
-            moleculas = [("sujeto", sujeto)]
+            # «contaminación») es legítimo; asignarla a un taxón o a una
+            # población, o asignar algo a ella como si fuera un taxón, no. Un
+            # nombre como objeto ya lo denuncia `_check_name_concept`.
+            if _prefix(sujeto) == "MOL" and _prefix(objeto) in (set(TAXONOMIC_PREFIXES) - {"NAME"}) | {"POP"}:
+                moleculas.append(("sujeto", sujeto))
+            if _prefix(objeto) == "MOL":
+                moleculas.append(("objeto", objeto))
         for papel, extremo in moleculas:
             rep.error(
                 f"identidad: {cid} usa {pred} con la molécula {extremo} como {papel}; una "
                 f"molécula no es un taxón ni se asigna a uno. Su relación con quien la produce "
                 f"es 'biomarker_of' (§14.3, DEC-058)"
+            )
+
+    # Un alias dice que dos registros son la misma cosa: una molécula no es la
+    # misma cosa que un taxón, una población o un espécimen.
+    for fname, rec in _entities(data):
+        rid = rec.get("id")
+        aliases = [a for a in (rec.get("alias_ids") or []) if isinstance(a, str)]
+        otros = set(TAXONOMIC_PREFIXES) | {"POP", "SPECIMEN"}
+        if _prefix(rid) == "MOL":
+            malos = [a for a in aliases if _prefix(a) in otros]
+        elif _prefix(rid) in otros:
+            malos = [a for a in aliases if _prefix(a) == "MOL"]
+        else:
+            malos = []
+        for a in malos:
+            rep.error(
+                f"identidad: {rid} declara alias a {a}: una molécula y quien la produce no son el "
+                f"mismo registro (DEC-058). La relación es 'biomarker_of'"
             )
 
 
