@@ -689,6 +689,12 @@ class Convertir(unittest.TestCase):
         beta = next(rec["id"] for _, rec in r["salida"] if rec.get("preferred_label") == "FIX-Beta")
         self.assertIn(beta, r["delta"]["conversion"]["rows"]["C-001"]["record_ids"])
 
+    def test_una_etiqueta_suplementaria_no_es_una_fuente(self):
+        # «S07 supl. fig. S3»: S3 es una figura suplementaria de S07. Las claves
+        # del apéndice A tienen al menos dos dígitos, como en parse_research.py.
+        self.assertEqual(convertir.CITA.findall("S07 supl. fig. S3; S139 tabla 2"), ["S07", "S139"])
+        self.assertIsNone(convertir.FUENTE.match("@S3"))
+
     def test_el_fichero_de_conversion_tiene_que_estar_en_conversions(self):
         # El snapshot sólo registra knowledge/corpus/conversions/*.json: una
         # entrada revisada fuera de ahí no se podría recuperar ni verificar.
