@@ -634,6 +634,52 @@ def construir(spec_path: Path, corpus: str) -> dict:
         raise SystemExit("ERROR análisis y resultados que no se enlazan en los dos sentidos:\n  "
                          + "\n  ".join(asimetricos))
 
+    # Las fechas de un evento son las de las afirmaciones `dated_to` que lo
+    # fechan; el validador temporal las lee de `temporal_expression_ids`. Si el
+    # fichero las lista, tienen que ser de esas.
+    dataciones = [c for c in afirmaciones if c.get("predicate") == "dated_to"
+                  and isinstance((c.get("object") or {}).get("temporal_expression_id"), str)]
+    sin_datacion = []
+    for fichero, rec in salida:
+        if fichero != "events.jsonl":
+            continue
+        suyas: list[str] = []
+        for c in dataciones:
+            t = c["object"]["temporal_expression_id"]
+            if c.get("subject_id") == rec["id"] and t not in suyas:
+                suyas.append(t)
+        ajenas = [clave_de.get(t, t) for t in rec.get("temporal_expression_ids") or [] if t not in suyas]
+        if ajenas:
+            sin_datacion.append(f"{clave_de.get(rec['id'], rec['id'])}: `temporal_expression_ids` "
+                                f"{ajenas} sin una afirmación dated_to del evento que las use")
+        rec["temporal_expression_ids"] = suyas
+    if sin_datacion:
+        raise SystemExit("ERROR fechas de eventos que no salen de sus dataciones:\n  " + "\n  ".join(sin_datacion))
+
+    # La cadena de una evidencia: cada resultado que cita sale de uno de los
+    # análisis que cita, y cada conjunto de datos, de uno de esos análisis.
+    conocido = {rid: rec for rid, (_, rec) in proy.items()}
+    conocido.update({rid: rec for rid, (_, rec) in por_id.items()})
+    rotas = []
+    for fichero, rec in salida:
+        if fichero != "evidence.jsonl":
+            continue
+        analisis = rec.get("analysis_ids") or []
+        for res in rec.get("result_ids") or []:
+            origen_res = (conocido.get(res) or {}).get("analysis_id")
+            if origen_res not in analisis:
+                rotas.append(f"{clave_de.get(rec['id'], rec['id'])}: el resultado {clave_de.get(res, res)} sale de "
+                             f"{clave_de.get(origen_res, origen_res)}, que no está en `analysis_ids`")
+        if analisis:
+            datos = {d for a in analisis for d in (conocido.get(a) or {}).get("dataset_ids") or []}
+            for d in rec.get("dataset_ids") or []:
+                if d not in datos:
+                    rotas.append(f"{clave_de.get(rec['id'], rec['id'])}: el conjunto de datos "
+                                 f"{clave_de.get(d, d)} no es de ninguno de sus `analysis_ids`")
+    if rotas:
+        raise SystemExit("ERROR evidencias con la cadena datos → análisis → resultado rota:\n  "
+                         + "\n  ".join(rotas))
+
     # --- menciones ----------------------------------------------------------------------
     actualizadas: list[tuple[dict, dict]] = []
     for mid, ingerida in sorted(menciones.items()):
@@ -695,6 +741,10 @@ def construir(spec_path: Path, corpus: str) -> dict:
                 enlazar(cid, "counterevidence_ids", rec["id"])
         if fichero == "results.jsonl" and isinstance(rec.get("analysis_id"), str):
             enlazar(rec["analysis_id"], "result_ids", rec["id"])
+    for c in afirmaciones:
+        t = (c.get("object") or {}).get("temporal_expression_id")
+        if c.get("predicate") == "dated_to" and isinstance(t, str) and isinstance(c.get("subject_id"), str):
+            enlazar(c["subject_id"], "temporal_expression_ids", t)
 
     # --- esquemas ----------------------------------------------------------------------------
     # Lo que va a escribir el delta tiene que validar ya: descubrirlo con
