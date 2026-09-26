@@ -1,0 +1,583 @@
+#!/usr/bin/env python3
+"""Paso 6 de §17 para el corredor: convierte las filas de una sección en registros.
+
+La correspondencia es por fila, no por predicado (DEC-057). El corredor usa el
+mismo predicado para cosas distintas —`pierde_rasgo` sirve para un orgánulo que
+se pierde y para la señal temporal de unas secuencias—, así que traducir
+predicados produciría afirmaciones falsas. Un fichero de conversión por sección,
+`knowledge/corpus/conversions/<corpus>-<sección>.json`, fija qué registros salen
+de cada fila y qué destino tiene cada mención, con claves locales («@LECA») en
+vez de identificadores. Es juicio y se revisa como tal
+(`docs/campaigns/C01-PREDICADOS.md`).
+
+Este script hace lo mecánico, y se niega antes de escribir nada si:
+
+- la copia del corpus no es la versión congelada que declara el fichero;
+- la sección no se ha ingerido, o ya se convirtió;
+- alguna fila de la sección o alguna de sus menciones queda sin destino, o el
+  fichero nombra filas o menciones que la sección no tiene;
+- alguna clave se usa sin definir o se define dos veces.
+
+Después asigna identificadores opacos sin reutilizar ninguno ya emitido, crea
+las fuentes del apéndice A que se citan y no existen, y rellena lo que se deduce
+de la fila: procedencia (sección, pasajes, fuentes y revisión), ejes
+epistemológicos desde sus columnas, `claim_ids` de entidades y eventos y
+`evidence_ids` de las afirmaciones. Escribe un delta que añade los registros y
+da destino a las menciones, y un informe. **No aplica nada**: el delta va detrás
+del de la sección y se aplica con delta.py.
+
+Formato del fichero de conversión:
+
+    {
+      "freeze": {"version": "...", "fingerprint": "sha256:..."},
+      "section": "06",
+      "decision": "DEC-057",
+      "records": [
+        {"key": "@LECA", "file": "populations.jsonl", "rows": ["C-760"],
+         "sources": ["S139"], "record": {...}}
+      ],
+      "rows": {"C-757": {"destination": "A", "keys": ["@..."], "note": "..."}},
+      "mentions": {"LECA": {"mention_type": "...", "disposition": "...",
+                            "targets": ["@LECA"], "reason": "..."}}
+    }
+
+Las fuentes se nombran por su clave del apéndice A con arroba («@S139») y no se
+declaran en `records`: se crean al citarlas o se reutilizan si ya existen. Una
+afirmación sin `epistemic_dimensions` toma los ejes de su primera fila.
+"""
+
+from __future__ import annotations
+
+import argparse
+import csv
+import hashlib
+import json
+import re
+import sys
+from datetime import date
+from pathlib import Path
+
+HERE = Path(__file__).resolve().parent
+sys.path.insert(0, str(HERE))
+
+import corredor  # noqa: E402
+import freeze  # noqa: E402
+import ingest as base  # noqa: E402
+from parse_research import ACEPTACION, FUERZA, RESOLUCION, TIPO_FUENTE, VIGENCIA  # noqa: E402
+
+SCHEMAS = base.ROOT / "schemas" / "json-schema"
+CONVERSIONS = base.CORPUS / "conversions"
+
+# Fichero -> prefijo de §16.3. Sólo los ficheros que una conversión puede escribir.
+PREFIJO = {
+    "sources.jsonl": "SRC",
+    "taxonomic-names.jsonl": "NAME",
+    "taxon-concepts.jsonl": "TAXCONCEPT",
+    "clades.jsonl": "CLADE",
+    "lineages.jsonl": "LINEAGE",
+    "populations.jsonl": "POP",
+    "specimens.jsonl": "SPECIMEN",
+    "sites.jsonl": "SITE",
+    "regions.jsonl": "REGION",
+    "occurrences.jsonl": "OCC",
+    "traits.jsonl": "TRAIT",
+    "trait-observations.jsonl": "TRAITOBS",
+    "methods.jsonl": "METHOD",
+    "claims.jsonl": "CLAIM",
+    "evidence.jsonl": "EVID",
+    "datasets.jsonl": "DATASET",
+    "analyses.jsonl": "ANALYSIS",
+    "results.jsonl": "RESULT",
+    "events.jsonl": "EVENT",
+    "hypotheses.jsonl": "HYP",
+    "temporal-expressions.jsonl": "TIME",
+    "conflict-groups.jsonl": "CONFLICT",
+    "issues.jsonl": "ISSUE",
+}
+# Fichero -> esquema (el mismo reparto que scripts/validate/validate.py).
+ESQUEMA = {
+    "sources.jsonl": "source.json", "taxonomic-names.jsonl": "taxonomic-name.json",
+    "taxon-concepts.jsonl": "taxon-concept.json", "occurrences.jsonl": "occurrence.json",
+    "trait-observations.jsonl": "trait-observation.json", "claims.jsonl": "claim.json",
+    "evidence.jsonl": "evidence.json", "datasets.jsonl": "dataset.json",
+    "analyses.jsonl": "analysis.json", "results.jsonl": "result.json",
+    "events.jsonl": "event.json", "hypotheses.jsonl": "hypothesis.json",
+    "temporal-expressions.jsonl": "temporal-expression.json",
+    "conflict-groups.jsonl": "conflict-group.json", "issues.jsonl": "issue.json",
+}
+TIPO_ENTIDAD = {
+    "clades.jsonl": "clade", "lineages.jsonl": "biological_lineage",
+    "populations.jsonl": "population", "specimens.jsonl": "specimen",
+    "sites.jsonl": "site", "regions.jsonl": "region", "traits.jsonl": "trait",
+    "methods.jsonl": "method",
+}
+for _f in TIPO_ENTIDAD:
+    ESQUEMA[_f] = "entity.json"
+
+CLAVE = re.compile(r"^@[A-Za-z0-9_.\-]+$")
+FUENTE = re.compile(r"^@(S\d+)$")
+CITA = re.compile(r"\bS\d+\b")
+
+
+def propiedades(fichero: str) -> set[str]:
+    esquema = json.loads((SCHEMAS / ESQUEMA[fichero]).read_text(encoding="utf-8"))
+    return set(esquema.get("properties", {}))
+
+
+def sha256(data: bytes) -> str:
+    return "sha256:" + hashlib.sha256(data).hexdigest()
+
+
+# ---------------------------------------------------------------------------
+# Lo que ya existe
+# ---------------------------------------------------------------------------
+
+def delta_de_seccion(sec: str) -> tuple[Path, dict]:
+    """El delta de ingestión de la sección, que no esté revertido."""
+    revertidos = {d for d, a in base.ultima_accion().items() if a == "revertir"}
+    for p in sorted(base.DELTAS.glob("*.json")):
+        if p.name in revertidos:
+            continue
+        try:
+            d = json.loads(p.read_text(encoding="utf-8"))
+        except json.JSONDecodeError:
+            continue
+        if (d.get("corpus_origin") or {}).get("section") == sec:
+            return p, d
+    raise SystemExit(f"ERROR la sección {sec} no se ha ingerido: la conversión parte de su delta "
+                     "(make ingest CORPUS=… SECCION=…)")
+
+
+def ya_convertida(sec_id: str) -> str | None:
+    revertidos = {d for d, a in base.ultima_accion().items() if a == "revertir"}
+    for p in sorted(base.DELTAS.glob("*.json")):
+        if p.name in revertidos:
+            continue
+        try:
+            d = json.loads(p.read_text(encoding="utf-8"))
+        except json.JSONDecodeError:
+            continue
+        if (d.get("conversion") or {}).get("of") == sec_id:
+            return p.name
+    return None
+
+
+def registros(fichero: str) -> list[dict]:
+    ruta = base.RECORDS / fichero
+    if not ruta.exists():
+        return []
+    return [json.loads(l) for l in ruta.read_text(encoding="utf-8").splitlines() if l.strip()]
+
+
+def pendientes(fichero: str) -> list[dict]:
+    """Registros que añade a `fichero` algún delta sin aplicar todavía."""
+    manifiesto = json.loads(base.MANIFEST.read_text(encoding="utf-8")) if base.MANIFEST.exists() else {}
+    _, _, sin_aplicar = base.revision_siguiente(manifiesto)
+    out = []
+    for nombre in sin_aplicar:
+        d = json.loads((base.DELTAS / nombre).read_text(encoding="utf-8"))
+        out += [op["after"] for op in d.get("operations", [])
+                if op.get("file") == fichero and op.get("operation", "").startswith("ADD") and op.get("after")]
+    return out
+
+
+def usados(prefijo: str) -> set[str]:
+    """Todo identificador con ese prefijo ya emitido: en registros, en deltas o reservado."""
+    out = set(base.reservados_por_deltas(prefijo))
+    for fichero, p in PREFIJO.items():
+        if p == prefijo:
+            out |= {r.get("id") for r in registros(fichero) if isinstance(r.get("id"), str)}
+    if prefijo == "PASSAGE":
+        out |= base.ids_de_pasajes()
+    manifiesto = json.loads(base.MANIFEST.read_text(encoding="utf-8")) if base.MANIFEST.exists() else {}
+    rango = ((manifiesto.get("id_allocation") or {}).get("reserved") or {}).get(prefijo)
+    if rango:
+        desde, hasta = (int(rango[k].split("-")[1]) for k in ("from", "to"))
+        out |= {f"{prefijo}-{n:06d}" for n in range(desde, hasta + 1)}
+    return out
+
+
+# ---------------------------------------------------------------------------
+# Construcción
+# ---------------------------------------------------------------------------
+
+def ejes(fila: dict) -> dict:
+    def mapa(tabla: dict, columna: str) -> str:
+        valor = (fila.get(columna) or "").strip().lower()
+        if valor not in tabla:
+            raise SystemExit(f"ERROR {fila['#']}: «{fila.get(columna)}» en la columna {columna} "
+                             "no tiene equivalente en §10")
+        return tabla[valor]
+    motivo = (fila.get("Motivo") or "").strip()
+    return {
+        "acceptance": mapa(ACEPTACION, "Aceptación"),
+        "evidence_strength": mapa(FUERZA, "Fuerza"),
+        "evidence_strength_reason": motivo or None,
+        "resolution": mapa(RESOLUCION, "Resolución"),
+        "historical_status": mapa(VIGENCIA, "Vigencia"),
+    }
+
+
+def fuente_de_apendice(fila: dict, col_doi: str) -> dict:
+    enlace = (fila.get(col_doi) or "").strip()
+    doi = enlace if enlace.startswith("https://doi.org/") else None
+    url = enlace if enlace.startswith("http") and not doi else None
+    anio = (fila.get("año") or "").strip()
+    tipo = (fila.get("tipo") or "").strip().lower()
+    return {
+        "citation_key": fila["clave"].strip(),
+        "authors": [a.strip() for a in (fila.get("autores") or "").split(";") if a.strip()],
+        "year": int(anio) if anio.isdigit() else None,
+        "title": (fila.get("título") or "").strip(),
+        "container": (fila.get("publicación o repositorio") or "").strip() or None,
+        "doi": doi,
+        "url": url,
+        "source_type": TIPO_FUENTE.get(tipo, "other"),
+        "quality_notes": [n] if (n := (fila.get("notas de calidad") or "").strip()) else [],
+        "consulted_at": (fila.get("fecha de consulta") or "").strip() or None,
+        # La consultó el corredor; eslabón no ha comprobado la referencia.
+        "verification_status": "pending_verification",
+        "record_status": "active",
+    }
+
+
+def sustituir(valor, ids: dict[str, str], faltan: set[str]):
+    if isinstance(valor, str) and CLAVE.match(valor):
+        if valor in ids:
+            return ids[valor]
+        faltan.add(valor)
+        return valor
+    if isinstance(valor, list):
+        return [sustituir(v, ids, faltan) for v in valor]
+    if isinstance(valor, dict):
+        return {k: sustituir(v, ids, faltan) for k, v in valor.items()}
+    return valor
+
+
+def claves_usadas(valor) -> set[str]:
+    if isinstance(valor, str):
+        return {valor} if CLAVE.match(valor) else set()
+    if isinstance(valor, list):
+        return set().union(*(claves_usadas(v) for v in valor)) if valor else set()
+    if isinstance(valor, dict):
+        return set().union(*(claves_usadas(v) for v in valor.values())) if valor else set()
+    return set()
+
+
+def construir(spec_path: Path, corpus: str) -> dict:
+    spec_bytes = spec_path.read_bytes()
+    spec = json.loads(spec_bytes)
+    sec = spec["section"]
+
+    # --- el corpus es el congelado ------------------------------------------
+    src = freeze.abrir(corpus)
+    ruta, congelada = corredor.congelacion(None)
+    if spec.get("freeze", {}).get("fingerprint") != congelada["fingerprint"]:
+        raise SystemExit("ERROR el fichero de conversión se escribió para otra versión del corpus "
+                         f"({spec.get('freeze', {}).get('fingerprint')}); la activa es "
+                         f"{congelada['fingerprint']}. Una versión nueva entra por diferencia")
+    corredor.verificar(src, ruta, congelada)
+
+    # --- la sección ya se ingirió ---------------------------------------------
+    delta_path, delta_sec = delta_de_seccion(sec)
+    sec_id = delta_sec["section_id"]
+    previa = ya_convertida(sec_id)
+    if previa:
+        raise SystemExit(f"ERROR {sec_id} ya se convirtió ({previa})")
+    origen = delta_sec["corpus_origin"]["rows"]
+    menciones = {op["after"]["id"]: op["after"] for op in delta_sec["operations"]
+                 if op.get("file") == "mentions.jsonl"}
+
+    _, registro_csv = corredor.ficheros_de_seccion(src.base, sec)
+    with registro_csv.open(encoding="utf-8", newline="") as fh:
+        filas = {f["#"].strip(): f for f in csv.DictReader(fh) if (f.get("#") or "").strip()}
+
+    # --- cobertura -----------------------------------------------------------
+    errores: list[str] = []
+    sin_destino = sorted(set(filas) - set(spec.get("rows", {})))
+    if sin_destino:
+        errores.append(f"filas sin destino: {', '.join(sin_destino)}")
+    ajenas = sorted(set(spec.get("rows", {})) - set(filas))
+    if ajenas:
+        errores.append(f"filas que la sección {sec} no tiene: {', '.join(ajenas)}")
+    etiquetas = {m["original_text"] for m in menciones.values()}
+    sin_mencion = sorted(etiquetas - set(spec.get("mentions", {})))
+    if sin_mencion:
+        errores.append(f"menciones sin destino: {'; '.join(sin_mencion)}")
+    sobran = sorted(set(spec.get("mentions", {})) - etiquetas)
+    if sobran:
+        errores.append(f"menciones que la sección no tiene: {'; '.join(sobran)}")
+
+    definidas: dict[str, dict] = {}
+    for r in spec.get("records", []):
+        if r["key"] in definidas:
+            errores.append(f"clave definida dos veces: {r['key']}")
+        if not CLAVE.match(r["key"]) or FUENTE.match(r["key"]):
+            errores.append(f"clave inválida: {r['key']} (las fuentes no se declaran: se citan)")
+        if r["file"] not in PREFIJO or r["file"] == "sources.jsonl":
+            errores.append(f"{r['key']}: fichero {r['file']} fuera de lo que convierte este paso")
+        for fila in r.get("rows", []):
+            if fila not in filas:
+                errores.append(f"{r['key']}: la fila {fila} no es de la sección {sec}")
+        definidas[r["key"]] = r
+    for fila, destino in spec.get("rows", {}).items():
+        for k in destino.get("keys", []):
+            if k not in definidas:
+                errores.append(f"{fila}: la clave {k} no está definida")
+    if errores:
+        raise SystemExit("ERROR el fichero de conversión no cubre la sección:\n  " + "\n  ".join(errores))
+
+    # --- fuentes citadas ---------------------------------------------------------
+    citadas = set()
+    for r in spec.get("records", []):
+        citadas |= {m.group(1) for k in claves_usadas(r["record"]) if (m := FUENTE.match(k))}
+        citadas |= set(r.get("sources", []))
+    for destino in spec.get("mentions", {}).values():
+        citadas |= {m.group(1) for k in destino.get("targets", []) if (m := FUENTE.match(k))}
+    # Y las de la columna Fuente de las filas de cada registro que no las declara:
+    # son las que irán a su procedencia.
+    for r in spec.get("records", []):
+        if r.get("sources") is None:
+            for fila in r.get("rows", []):
+                citadas |= set(CITA.findall(filas[fila].get("Fuente", "")))
+
+    apendice = src.base / "data" / "apendices" / "A_fuentes.csv"
+    with apendice.open(encoding="utf-8", newline="") as fh:
+        lector = list(csv.DictReader(fh))
+    col_doi = next(c for c in lector[0] if c.strip().lower().startswith("doi"))
+    por_clave = {f["clave"].strip(): f for f in lector}
+    no_estan = sorted(citadas - set(por_clave), key=lambda s: int(s[1:]))
+    if no_estan:
+        raise SystemExit(f"ERROR fuentes citadas que el apéndice A no tiene: {', '.join(no_estan)}")
+
+    existentes = {r.get("citation_key"): r["id"] for r in registros("sources.jsonl") + pendientes("sources.jsonl")
+                  if r.get("citation_key")}
+
+    # --- identificadores -----------------------------------------------------------
+    rev_antes, rev_despues, sin_aplicar = base.revision_siguiente(
+        json.loads(base.MANIFEST.read_text(encoding="utf-8")) if base.MANIFEST.exists() else {})
+    ids: dict[str, str] = {}
+    contador: dict[str, int] = {}
+
+    def nuevo(prefijo: str) -> str:
+        if prefijo not in contador:
+            contador[prefijo] = base.siguiente_libre(prefijo, usados(prefijo))
+        n = contador[prefijo]
+        contador[prefijo] += 1
+        return f"{prefijo}-{n:06d}"
+
+    fuentes_nuevas: list[dict] = []
+    for clave in sorted(citadas, key=lambda s: int(s[1:])):
+        if clave in existentes:
+            ids[f"@{clave}"] = existentes[clave]
+        else:
+            rid = nuevo("SRC")
+            ids[f"@{clave}"] = rid
+            fuentes_nuevas.append({"id": rid, **fuente_de_apendice(por_clave[clave], col_doi)})
+    for r in spec.get("records", []):
+        ids[r["key"]] = nuevo(PREFIJO[r["file"]])
+
+    # --- registros -----------------------------------------------------------------
+    faltan: set[str] = set()
+    salida: list[tuple[str, dict]] = [("sources.jsonl", f) for f in fuentes_nuevas]
+    for r in spec.get("records", []):
+        fichero = r["file"]
+        props = propiedades(fichero)
+        rec = {"id": ids[r["key"]], **sustituir(r["record"], ids, faltan)}
+        filas_r = r.get("rows", [])
+        if fichero in TIPO_ENTIDAD:
+            rec.setdefault("entity_type", TIPO_ENTIDAD[fichero])
+        if "first_introduced_in" in props:
+            rec.setdefault("first_introduced_in", sec_id)
+        if "introduced_in" in props:
+            rec.setdefault("introduced_in", sec_id)
+        if "raised_in" in props:
+            rec.setdefault("raised_in", sec_id)
+        claves_fuente = r.get("sources")
+        if claves_fuente is None:
+            claves_fuente = sorted({s for f in filas_r for s in CITA.findall(filas[f].get("Fuente", ""))},
+                                   key=lambda s: int(s[1:]))
+        fuentes_r = [ids[f"@{s}"] for s in claves_fuente]
+        if "provenance" in props and "provenance" not in rec:
+            pasajes = []
+            for f in filas_r:
+                for p in origen.get(f, {}).get("passage_ids", []):
+                    if p not in pasajes:
+                        pasajes.append(p)
+            rec["provenance"] = {"section_ids": [sec_id], "passage_ids": pasajes, "source_ids": fuentes_r,
+                                 "operation_id": None, "dataset_revision": rev_despues, "origin": "ingestion"}
+        if "source_ids" in props and "source_ids" not in rec:
+            rec["source_ids"] = fuentes_r
+        if "epistemic_dimensions" in props and "epistemic_dimensions" not in rec and fichero in (
+                "claims.jsonl", "hypotheses.jsonl"):
+            if not filas_r:
+                raise SystemExit(f"ERROR {r['key']}: sin filas no hay de dónde sacar los ejes epistemológicos")
+            rec["epistemic_dimensions"] = ejes(filas[filas_r[0]])
+        if fichero == "claims.jsonl":
+            rec.setdefault("scope", {})
+            for k in ("hypothesis_ids", "classification_view_ids", "temporal_expression_ids", "region_ids"):
+                rec["scope"].setdefault(k, [])
+            rec.setdefault("quantitative_support", [])
+            rec.setdefault("evidence_ids", [])
+            rec.setdefault("counterevidence_ids", [])
+            rec.setdefault("derivation", None)
+        if fichero == "issues.jsonl":
+            rec.setdefault("affects", {})
+            for k in ("record_ids", "claim_ids", "mention_ids"):
+                rec["affects"].setdefault(k, [])
+            rec.setdefault("resolution", {"status": "open"})
+        if "notes" in props:
+            rec.setdefault("notes", [])
+        rec.setdefault("record_status", "active")
+        salida.append((fichero, rec))
+    if faltan:
+        raise SystemExit(f"ERROR claves usadas sin definir: {', '.join(sorted(faltan))}")
+
+    # --- enlaces que se deducen -----------------------------------------------------
+    por_id = {rec["id"]: (fichero, rec) for fichero, rec in salida}
+    afirmaciones = [rec for fichero, rec in salida if fichero == "claims.jsonl"]
+    for fichero, rec in salida:
+        if fichero == "evidence.jsonl":
+            for cid in rec.get("supports_claim_ids", []):
+                if cid in por_id and rec["id"] not in por_id[cid][1]["evidence_ids"]:
+                    por_id[cid][1]["evidence_ids"].append(rec["id"])
+            for cid in rec.get("challenges_claim_ids", []):
+                if cid in por_id and rec["id"] not in por_id[cid][1]["counterevidence_ids"]:
+                    por_id[cid][1]["counterevidence_ids"].append(rec["id"])
+    for fichero, rec in salida:
+        if fichero == "claims.jsonl" or "claim_ids" not in propiedades(fichero):
+            continue
+        propias = [c["id"] for c in afirmaciones
+                   if c.get("subject_id") == rec["id"] or (c.get("object") or {}).get("entity_id") == rec["id"]]
+        rec["claim_ids"] = sorted(set(rec.get("claim_ids", [])) | set(propias))
+
+    # --- menciones ----------------------------------------------------------------------
+    actualizadas: list[tuple[dict, dict]] = []
+    for mid, antes in sorted(menciones.items()):
+        destino = spec["mentions"][antes["original_text"]]
+        objetivos = sustituir(destino.get("targets", []), ids, faltan)
+        if faltan:
+            raise SystemExit(f"ERROR claves usadas sin definir: {', '.join(sorted(faltan))}")
+        despues = dict(antes)
+        despues["mention_type"] = destino["mention_type"]
+        despues["disposition"] = destino["disposition"]
+        despues["resolution"] = {"status": "resolved", "target_ids": objetivos,
+                                 "reason": destino.get("reason")}
+        if destino.get("reason"):
+            despues["notes"] = list(antes.get("notes", [])) + [f"destino: {destino['reason']}"]
+        actualizadas.append((antes, despues))
+
+    # --- delta ------------------------------------------------------------------------------
+    operaciones = [{"operation": "ADD_RECORD", "file": fichero, "record_id": rec["id"], "before": None, "after": rec}
+                   for fichero, rec in salida]
+    operaciones += [{"operation": "UPDATE_RECORD", "file": "mentions.jsonl", "record_id": d["id"],
+                     "before": a, "after": d} for a, d in actualizadas]
+    de = lambda f: [rec["id"] for fichero, rec in salida if fichero == f]
+    filas_destino = {}
+    for fila, destino in spec["rows"].items():
+        filas_destino[fila] = {"destination": destino["destination"],
+                               "record_ids": [ids[k] for k in destino.get("keys", [])],
+                               **({"note": destino["note"]} if destino.get("note") else {})}
+    delta = {
+        "section_id": sec_id,
+        "schema_version": base.SCHEMA_VERSION,
+        "dataset_revision_before": rev_antes,
+        "dataset_revision_after": rev_despues,
+        "operations": operaciones,
+        "records_added": [rec["id"] for _, rec in salida],
+        "records_updated": [d["id"] for _, d in actualizadas],
+        "claims_added": de("claims.jsonl"),
+        "events_added": de("events.jsonl"),
+        "hypotheses_added": de("hypotheses.jsonl"),
+        "issues_added": de("issues.jsonl"),
+        "issues_resolved": [], "records_deprecated": [], "views_invalidated": [], "views_built": [],
+        "validation_results": {},
+        "conversion": {
+            "of": sec_id,
+            "section_delta": delta_path.name,
+            "spec": {"path": corredor._rel(spec_path), "sha256": sha256(spec_bytes)},
+            "decision": spec.get("decision"),
+            "freeze": {"path": corredor._rel(Path(ruta)), "fingerprint": congelada["fingerprint"]},
+            "rows": filas_destino,
+        },
+    }
+    return {"sec": sec, "sec_id": sec_id, "delta": delta, "salida": salida, "actualizadas": actualizadas,
+            "filas": filas, "spec": spec, "rev": (rev_antes, rev_despues), "pendientes": sin_aplicar,
+            "fuentes_reutilizadas": sorted(set(citadas) & set(existentes))}
+
+
+# ---------------------------------------------------------------------------
+# Informe y escritura
+# ---------------------------------------------------------------------------
+
+def informe(r: dict) -> list[str]:
+    spec, delta = r["spec"], r["delta"]
+    por_fichero: dict[str, int] = {}
+    for fichero, _ in r["salida"]:
+        por_fichero[fichero] = por_fichero.get(fichero, 0) + 1
+    por_destino: dict[str, list[str]] = {}
+    for fila, d in spec["rows"].items():
+        por_destino.setdefault(d["destination"], []).append(fila)
+    disposiciones: dict[str, int] = {}
+    for _, d in r["actualizadas"]:
+        disposiciones[d["disposition"]] = disposiciones.get(d["disposition"], 0) + 1
+    lineas = [
+        f"# Conversión de {r['sec_id']} · sección {r['sec']} del corredor",
+        "",
+        f"- Fecha: {date.today().isoformat()}",
+        f"- Revisión: {r['rev'][0]} → {r['rev'][1]}",
+        f"- Fichero de conversión: `{delta['conversion']['spec']['path']}` ({delta['conversion']['spec']['sha256'][:19]}…)",
+        f"- Decisión: {spec.get('decision')}",
+        "",
+        "## Filas por destino",
+        "",
+        "| Destino | Filas |",
+        "|---|---|",
+    ]
+    lineas += [f"| {k} | {', '.join(sorted(v))} |" for k, v in sorted(por_destino.items())]
+    lineas += ["", "## Registros nuevos", "", "| Fichero | Registros |", "|---|---:|"]
+    lineas += [f"| `{f}` | {n} |" for f, n in sorted(por_fichero.items())]
+    if r["fuentes_reutilizadas"]:
+        lineas += ["", f"Fuentes que ya existían y se reutilizan: {', '.join(r['fuentes_reutilizadas'])}."]
+    lineas += ["", "## Menciones", "", "| Destino | Menciones |", "|---|---:|"]
+    lineas += [f"| `{k}` | {n} |" for k, n in sorted(disposiciones.items())]
+    notas = [(fila, d["note"]) for fila, d in spec["rows"].items() if d.get("note")]
+    if notas:
+        lineas += ["", "## Notas de conversión", ""]
+        lineas += [f"- **{fila}**: {nota}" for fila, nota in notas]
+    if r["pendientes"]:
+        lineas += ["", f"Va detrás de deltas sin aplicar: {', '.join(r['pendientes'])}."]
+    return lineas
+
+
+def convertir(spec_path: Path, corpus: str, dry: bool) -> int:
+    r = construir(spec_path, corpus)
+    lineas = informe(r)
+    print("\n".join(lineas))
+    if dry:
+        print("\n(en seco: no se ha escrito nada)")
+        return 0
+    nombre = f"{r['sec_id']}-conversion"
+    base.DELTAS.mkdir(parents=True, exist_ok=True)
+    base.REPORTS.mkdir(parents=True, exist_ok=True)
+    (base.DELTAS / f"{nombre}.json").write_text(
+        json.dumps(r["delta"], indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    (base.REPORTS / f"{nombre}.md").write_text("\n".join(lineas) + "\n", encoding="utf-8")
+    print(f"\n  delta     knowledge/deltas/{nombre}.json")
+    print(f"  informe   generated/reports/{nombre}.md")
+    print(f"\n  el delta NO se ha aplicado. Va detrás del de la sección:")
+    print(f"    python scripts/ingest/delta.py {nombre}.json")
+    return 0
+
+
+def main() -> int:
+    ap = argparse.ArgumentParser(description="Convierte las filas de una sección del corredor en registros (§17 paso 6, DEC-057)")
+    ap.add_argument("spec", help="fichero de conversión de la sección")
+    ap.add_argument("--corpus", required=True, help="copia del corredor, o directorio@commit")
+    ap.add_argument("--dry-run", action="store_true")
+    a = ap.parse_args()
+    return convertir(Path(a.spec).resolve(), a.corpus, a.dry_run)
+
+
+if __name__ == "__main__":
+    sys.exit(main())

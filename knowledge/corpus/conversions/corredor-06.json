@@ -1,0 +1,3544 @@
+{
+  "freeze": {
+    "version": "0.6.0-research-audit",
+    "fingerprint": "sha256:b53f15ad613451387591f519d7ec8d4144a774aed83fbaaabd5e5207a18aa415"
+  },
+  "section": "06",
+  "decision": "DEC-057",
+  "records": [
+    {
+      "key": "@LECA",
+      "file": "populations.jsonl",
+      "rows": [
+        "C-760",
+        "C-762",
+        "C-765",
+        "C-771",
+        "C-772",
+        "C-773",
+        "C-792"
+      ],
+      "record": {
+        "preferred_label": "LECA",
+        "description": "Último ancestro común de los eucariotas actuales, como población reconstruida.",
+        "notes": [
+          "El corredor la tipa como población reconstruida en el apéndice B, en dos filas con la misma etiqueta (C-188 y C-1387); la resolución de identidad del corpus entero decidirá si son la misma."
+        ]
+      }
+    },
+    {
+      "key": "@Eukaryota",
+      "file": "clades.jsonl",
+      "rows": [
+        "C-757",
+        "C-769"
+      ],
+      "record": {
+        "preferred_label": "Eukaryota",
+        "description": "Clado de los eucariotas."
+      }
+    },
+    {
+      "key": "@Opisthokonta",
+      "file": "clades.jsonl",
+      "rows": [
+        "C-763"
+      ],
+      "record": {
+        "preferred_label": "Opisthokonta",
+        "description": "Clado de los opistocontos."
+      }
+    },
+    {
+      "key": "@Discoba",
+      "file": "clades.jsonl",
+      "rows": [
+        "C-790"
+      ],
+      "record": {
+        "preferred_label": "Discoba",
+        "description": "Clado de los discobas."
+      }
+    },
+    {
+      "key": "@Amorphea",
+      "file": "clades.jsonl",
+      "rows": [
+        "C-791"
+      ],
+      "record": {
+        "preferred_label": "Amorphea",
+        "description": "Clado de los amorfeos."
+      }
+    },
+    {
+      "key": "@Choanoflagellata",
+      "file": "clades.jsonl",
+      "rows": [
+        "C-758",
+        "C-785"
+      ],
+      "record": {
+        "preferred_label": "Choanoflagellata",
+        "description": "Clado de los coanoflagelados."
+      }
+    },
+    {
+      "key": "@Metazoa",
+      "file": "clades.jsonl",
+      "rows": [
+        "C-758"
+      ],
+      "record": {
+        "preferred_label": "Metazoa",
+        "description": "Clado de los animales."
+      }
+    },
+    {
+      "key": "@Especimen_CapasBlancas",
+      "file": "specimens.jsonl",
+      "rows": [
+        "C-785"
+      ],
+      "record": {
+        "preferred_label": "material orgánico de la Formación Capas Blancas",
+        "description": "Material orgánico del Cenomaniano–Turoniano descrito por Fonseca et al. 2023 como ocurrencia putativa de coanoflagelados."
+      }
+    },
+    {
+      "key": "@N_Bangiomorpha",
+      "file": "taxonomic-names.jsonl",
+      "rows": [
+        "C-775"
+      ],
+      "record": {
+        "canonical_spelling": "Bangiomorpha pubescens",
+        "original_spellings": [
+          "Bangiomorpha pubescens"
+        ],
+        "authorship": null,
+        "nomenclatural_status": "not_stated",
+        "rank_when_established": "not_stated",
+        "notes": []
+      },
+      "sources": [
+        "S160"
+      ]
+    },
+    {
+      "key": "@TC_Bangiomorpha",
+      "file": "taxon-concepts.jsonl",
+      "rows": [
+        "C-775"
+      ],
+      "record": {
+        "name_id": "@N_Bangiomorpha",
+        "according_to_source_id": "@S160",
+        "circumscription": {
+          "included_entity_ids": [],
+          "excluded_entity_ids": [],
+          "definition_text": null
+        },
+        "rank_assignment": {
+          "rank": "not_stated",
+          "parent_concept_id": null
+        },
+        "taxonomic_status": "not_stated",
+        "phylogenetic_interpretation": "not_assessed",
+        "notes": [
+          "Taxón fósil tal como lo usa S160; el corpus no detalla su circunscripción. Su posición —grupo corona de Rhodophyta o tronco— es la hipótesis H36 del corredor, en la sección 5."
+        ]
+      },
+      "sources": [
+        "S160"
+      ]
+    },
+    {
+      "key": "@M_reloj_relajado",
+      "file": "methods.jsonl",
+      "rows": [
+        "C-757",
+        "C-779"
+      ],
+      "record": {
+        "preferred_label": "reloj molecular relajado",
+        "description": "Modelo de reloj molecular que permite que la tasa de sustitución varíe entre ramas.",
+        "notes": [
+          "El apéndice B del corredor lo registra como entidad de tipo método (C-757); sinónimo: relaxed molecular clock."
+        ]
+      }
+    },
+    {
+      "key": "@M_reloj_estricto",
+      "file": "methods.jsonl",
+      "rows": [
+        "C-779"
+      ],
+      "record": {
+        "preferred_label": "reloj molecular estricto",
+        "description": "Modelo de reloj molecular con una tasa de sustitución única.",
+        "notes": []
+      }
+    },
+    {
+      "key": "@M_relajado_autocorrelacionado",
+      "file": "methods.jsonl",
+      "rows": [
+        "C-780"
+      ],
+      "record": {
+        "preferred_label": "reloj relajado autocorrelacionado",
+        "description": "Reloj relajado en el que la tasa de una rama depende de la de la rama adyacente.",
+        "notes": []
+      }
+    },
+    {
+      "key": "@M_relajado_no_autocorrelacionado",
+      "file": "methods.jsonl",
+      "rows": [
+        "C-780"
+      ],
+      "record": {
+        "preferred_label": "reloj relajado no autocorrelacionado",
+        "description": "Reloj relajado en el que las tasas de ramas adyacentes son independientes.",
+        "notes": []
+      }
+    },
+    {
+      "key": "@M_calibracion_nodal",
+      "file": "methods.jsonl",
+      "rows": [
+        "C-777"
+      ],
+      "record": {
+        "preferred_label": "calibración fósil nodal",
+        "description": "Uso de un fósil asignado a un nodo para acotar su edad.",
+        "notes": []
+      }
+    },
+    {
+      "key": "@M_limite_maximo",
+      "file": "methods.jsonl",
+      "rows": [
+        "C-778"
+      ],
+      "record": {
+        "preferred_label": "límite máximo de calibración",
+        "description": "Cota superior de la edad de un nodo en una calibración.",
+        "notes": []
+      }
+    },
+    {
+      "key": "@M_heterotaquia",
+      "file": "methods.jsonl",
+      "rows": [
+        "C-782"
+      ],
+      "record": {
+        "preferred_label": "heterotaquia",
+        "description": "Cambio de la tasa de sustitución de un mismo sitio a través del árbol.",
+        "notes": []
+      }
+    },
+    {
+      "key": "@M_saturacion",
+      "file": "methods.jsonl",
+      "rows": [
+        "C-781"
+      ],
+      "record": {
+        "preferred_label": "saturación de sustituciones",
+        "description": "Acumulación de sustituciones sucesivas en un mismo sitio, que borra la señal de divergencias antiguas.",
+        "notes": []
+      }
+    },
+    {
+      "key": "@M_datacion_profunda",
+      "file": "methods.jsonl",
+      "rows": [
+        "C-775",
+        "C-776",
+        "C-781",
+        "C-783"
+      ],
+      "record": {
+        "preferred_label": "datación molecular de divergencias eucariotas profundas",
+        "description": "Estimación por reloj molecular de las divergencias proterozoicas de Eukaryota.",
+        "notes": []
+      }
+    },
+    {
+      "key": "@M_enraizamiento",
+      "file": "methods.jsonl",
+      "rows": [
+        "C-783"
+      ],
+      "record": {
+        "preferred_label": "enraizamiento del árbol eucariota",
+        "description": "Determinación de la posición de la raíz de Eukaryota.",
+        "notes": []
+      }
+    },
+    {
+      "key": "@M_relojes_sin_heterotaquia",
+      "file": "methods.jsonl",
+      "rows": [
+        "C-782"
+      ],
+      "record": {
+        "preferred_label": "relojes moleculares que no modelan cambios de tasa por sitio",
+        "description": "Estimaciones de reloj cuyo modelo no representa la heterotaquia.",
+        "notes": []
+      }
+    },
+    {
+      "key": "@M_grupo_externo",
+      "file": "methods.jsonl",
+      "rows": [
+        "C-783"
+      ],
+      "record": {
+        "preferred_label": "lejanía del grupo externo de Eukaryota",
+        "description": "Condición de los datos: no hay un grupo externo cercano a Eukaryota.",
+        "notes": []
+      }
+    },
+    {
+      "key": "@D_Douzery",
+      "file": "datasets.jsonl",
+      "rows": [
+        "C-757",
+        "C-758",
+        "C-759"
+      ],
+      "record": {
+        "dataset_type": "other",
+        "title": "Datos analizados por Douzery et al. 2004",
+        "description": "El corpus no describe estos datos.",
+        "notes": [
+          "Conjunto de datos de trazabilidad (DEC-057): el corpus no describe estos datos; existe para que el análisis tenga el eslabón que exige analysis.json."
+        ]
+      },
+      "sources": [
+        "S142"
+      ]
+    },
+    {
+      "key": "@A_Douzery",
+      "file": "analyses.jsonl",
+      "rows": [
+        "C-759"
+      ],
+      "record": {
+        "analysis_type": "molecular_clock_dating",
+        "method": "reloj molecular relajado bayesiano con seis calibraciones fósiles",
+        "dataset_ids": [
+          "@D_Douzery"
+        ],
+        "result_ids": [
+          "@R757",
+          "@R758"
+        ],
+        "model": "reloj relajado bayesiano",
+        "parameters": [
+          {
+            "name": "calibraciones fósiles",
+            "value": 6
+          }
+        ]
+      },
+      "sources": [
+        "S142"
+      ]
+    },
+    {
+      "key": "@E757",
+      "file": "events.jsonl",
+      "rows": [
+        "C-757"
+      ],
+      "record": {
+        "event_type": "divergence",
+        "label": "principales divergencias eucariotas del estudio de Douzery et al. 2004",
+        "participants": [
+          {
+            "entity_id": "@Eukaryota",
+            "role": "participant",
+            "notes": [
+              "La fila agrupa varias divergencias internas de Eukaryota sin separarlas."
+            ]
+          }
+        ],
+        "result_entity_ids": [],
+        "temporal_expression_ids": [],
+        "region_ids": [],
+        "notes": [
+          "No es la edad de la corona eucariota: es el intervalo de las divergencias que considera el estudio."
+        ]
+      }
+    },
+    {
+      "key": "@T757",
+      "file": "temporal-expressions.jsonl",
+      "rows": [
+        "C-757"
+      ],
+      "record": {
+        "temporal_type": "divergence_estimate",
+        "label": "principales divergencias eucariotas según Douzery et al. 2004",
+        "interval": {
+          "oldest_bound": 1259,
+          "youngest_bound": 950,
+          "unit": "million_years",
+          "reference_point": "before_present",
+          "original_expression": "950–1259 Ma"
+        },
+        "uncertainty": {
+          "kind": "range_only",
+          "description": "El corpus da el intervalo sin decir de qué tipo es."
+        },
+        "calibration": {
+          "system": "molecular_clock",
+          "curve_or_timescale": null
+        },
+        "method": "reloj molecular relajado bayesiano con seis calibraciones fósiles",
+        "method_type": "molecular_clock",
+        "determination": "modelled",
+        "notes": []
+      }
+    },
+    {
+      "key": "@R757",
+      "file": "results.jsonl",
+      "rows": [
+        "C-757"
+      ],
+      "record": {
+        "analysis_id": "@A_Douzery",
+        "result_type": "divergence_time_estimate",
+        "description": "Intervalo de las principales divergencias eucariotas consideradas en el estudio.",
+        "value": "950–1259",
+        "unit": "Ma",
+        "temporal_expression_ids": [
+          "@T757"
+        ],
+        "applies_to_ids": [
+          "@E757"
+        ]
+      },
+      "sources": [
+        "S142"
+      ]
+    },
+    {
+      "key": "@CL757",
+      "file": "claims.jsonl",
+      "rows": [
+        "C-757"
+      ],
+      "record": {
+        "claim_type": "temporal",
+        "subject_id": "@E757",
+        "predicate": "dated_to",
+        "object": {
+          "temporal_expression_id": "@T757"
+        },
+        "notes": []
+      }
+    },
+    {
+      "key": "@EV757",
+      "file": "evidence.jsonl",
+      "rows": [
+        "C-757"
+      ],
+      "record": {
+        "evidence_type": "molecular",
+        "description": "Estimación por reloj molecular relajado de las principales divergencias eucariotas.",
+        "source_id": "@S142",
+        "locator": "resumen",
+        "dataset_ids": [
+          "@D_Douzery"
+        ],
+        "analysis_ids": [
+          "@A_Douzery"
+        ],
+        "result_ids": [
+          "@R757"
+        ],
+        "supports_claim_ids": [
+          "@CL757"
+        ],
+        "challenges_claim_ids": []
+      },
+      "sources": [
+        "S142"
+      ]
+    },
+    {
+      "key": "@E758",
+      "file": "events.jsonl",
+      "rows": [
+        "C-758"
+      ],
+      "record": {
+        "event_type": "divergence",
+        "label": "divergencia Choanoflagellata–Metazoa",
+        "participants": [
+          {
+            "entity_id": "@Choanoflagellata",
+            "role": "diverging_lineage"
+          },
+          {
+            "entity_id": "@Metazoa",
+            "role": "diverging_lineage"
+          }
+        ],
+        "result_entity_ids": [],
+        "temporal_expression_ids": [],
+        "region_ids": [],
+        "notes": []
+      }
+    },
+    {
+      "key": "@T758",
+      "file": "temporal-expressions.jsonl",
+      "rows": [
+        "C-758"
+      ],
+      "record": {
+        "temporal_type": "divergence_estimate",
+        "label": "divergencia Choanoflagellata–Metazoa según Douzery et al. 2004",
+        "interval": {
+          "oldest_bound": 957,
+          "youngest_bound": 761,
+          "unit": "million_years",
+          "reference_point": "before_present",
+          "original_expression": "761–957 Ma"
+        },
+        "uncertainty": {
+          "kind": "range_only",
+          "description": "El corpus da el intervalo sin decir de qué tipo es."
+        },
+        "calibration": {
+          "system": "molecular_clock",
+          "curve_or_timescale": null
+        },
+        "method": "reloj molecular relajado bayesiano con seis calibraciones fósiles",
+        "method_type": "molecular_clock",
+        "determination": "modelled",
+        "notes": []
+      }
+    },
+    {
+      "key": "@R758",
+      "file": "results.jsonl",
+      "rows": [
+        "C-758"
+      ],
+      "record": {
+        "analysis_id": "@A_Douzery",
+        "result_type": "divergence_time_estimate",
+        "description": "Divergencia entre animales y coanoflagelados.",
+        "value": "761–957",
+        "unit": "Ma",
+        "temporal_expression_ids": [
+          "@T758"
+        ],
+        "applies_to_ids": [
+          "@E758"
+        ]
+      },
+      "sources": [
+        "S142"
+      ]
+    },
+    {
+      "key": "@CL758",
+      "file": "claims.jsonl",
+      "rows": [
+        "C-758"
+      ],
+      "record": {
+        "claim_type": "temporal",
+        "subject_id": "@E758",
+        "predicate": "dated_to",
+        "object": {
+          "temporal_expression_id": "@T758"
+        },
+        "notes": []
+      }
+    },
+    {
+      "key": "@EV758",
+      "file": "evidence.jsonl",
+      "rows": [
+        "C-758"
+      ],
+      "record": {
+        "evidence_type": "molecular",
+        "description": "Estimación por reloj molecular relajado de la divergencia entre animales y coanoflagelados.",
+        "source_id": "@S142",
+        "locator": "resumen; tabla 1",
+        "dataset_ids": [
+          "@D_Douzery"
+        ],
+        "analysis_ids": [
+          "@A_Douzery"
+        ],
+        "result_ids": [
+          "@R758"
+        ],
+        "supports_claim_ids": [
+          "@CL758"
+        ],
+        "challenges_claim_ids": []
+      },
+      "sources": [
+        "S142"
+      ]
+    },
+    {
+      "key": "@E_LECA",
+      "file": "events.jsonl",
+      "rows": [
+        "C-760",
+        "C-762",
+        "C-765",
+        "C-771",
+        "C-773",
+        "C-792"
+      ],
+      "record": {
+        "event_type": "divergence",
+        "label": "diversificación de la corona eucariota a partir de LECA",
+        "participants": [
+          {
+            "entity_id": "@LECA",
+            "role": "ancestral_population"
+          }
+        ],
+        "result_entity_ids": [],
+        "temporal_expression_ids": [],
+        "region_ids": [],
+        "notes": [
+          "Los linajes que divergen primero dependen de la posición de la raíz eucariota, que el corpus trata en la sección 4; no se nombran aquí.",
+          "Sus dataciones conviven sin promediarse: cada una es una afirmación con su fuente."
+        ]
+      }
+    },
+    {
+      "key": "@D_Parfrey",
+      "file": "datasets.jsonl",
+      "rows": [
+        "C-760",
+        "C-761"
+      ],
+      "record": {
+        "dataset_type": "other",
+        "title": "Datos analizados por Parfrey et al. 2011",
+        "description": "El corpus no describe estos datos, salvo su muestreo.",
+        "notes": [
+          "Conjunto de datos de trazabilidad (DEC-057): el corpus no describe estos datos; existe para que el análisis tenga el eslabón que exige analysis.json."
+        ],
+        "sampling_notes": [
+          "Muestreo ampliado de eucariotas microbianos respecto de estudios anteriores (C-761)."
+        ]
+      },
+      "sources": [
+        "S139"
+      ]
+    },
+    {
+      "key": "@A_Parfrey",
+      "file": "analyses.jsonl",
+      "rows": [
+        "C-760"
+      ],
+      "record": {
+        "analysis_type": "molecular_clock_dating",
+        "method": "reloj molecular; el corpus no detalla el método",
+        "dataset_ids": [
+          "@D_Parfrey"
+        ],
+        "result_ids": [
+          "@R760"
+        ]
+      },
+      "sources": [
+        "S139"
+      ]
+    },
+    {
+      "key": "@T760",
+      "file": "temporal-expressions.jsonl",
+      "rows": [
+        "C-760"
+      ],
+      "record": {
+        "temporal_type": "divergence_estimate",
+        "label": "edad de LECA según Parfrey et al. 2011",
+        "interval": {
+          "oldest_bound": 1866,
+          "youngest_bound": 1679,
+          "unit": "million_years",
+          "reference_point": "before_present",
+          "original_expression": "1679–1866 Ma"
+        },
+        "uncertainty": {
+          "kind": "range_only",
+          "description": "El corpus da el intervalo sin decir de qué tipo es."
+        },
+        "calibration": {
+          "system": "molecular_clock",
+          "curve_or_timescale": null
+        },
+        "method": "reloj molecular",
+        "method_type": "molecular_clock",
+        "determination": "modelled",
+        "notes": []
+      }
+    },
+    {
+      "key": "@R760",
+      "file": "results.jsonl",
+      "rows": [
+        "C-760"
+      ],
+      "record": {
+        "analysis_id": "@A_Parfrey",
+        "result_type": "divergence_time_estimate",
+        "description": "Edad estimada de LECA.",
+        "value": "1679–1866",
+        "unit": "Ma",
+        "temporal_expression_ids": [
+          "@T760"
+        ],
+        "applies_to_ids": [
+          "@E_LECA"
+        ]
+      },
+      "sources": [
+        "S139"
+      ]
+    },
+    {
+      "key": "@CL760",
+      "file": "claims.jsonl",
+      "rows": [
+        "C-760"
+      ],
+      "record": {
+        "claim_type": "temporal",
+        "subject_id": "@E_LECA",
+        "predicate": "dated_to",
+        "object": {
+          "temporal_expression_id": "@T760"
+        },
+        "notes": [],
+        "issue_ids": [
+          "@I772"
+        ]
+      }
+    },
+    {
+      "key": "@EV760",
+      "file": "evidence.jsonl",
+      "rows": [
+        "C-760"
+      ],
+      "record": {
+        "evidence_type": "molecular",
+        "description": "Estimación por reloj molecular de la edad de LECA.",
+        "source_id": "@S139",
+        "locator": "resumen; resultados",
+        "dataset_ids": [
+          "@D_Parfrey"
+        ],
+        "analysis_ids": [
+          "@A_Parfrey"
+        ],
+        "result_ids": [
+          "@R760"
+        ],
+        "supports_claim_ids": [
+          "@CL760"
+        ],
+        "challenges_claim_ids": []
+      },
+      "sources": [
+        "S139"
+      ]
+    },
+    {
+      "key": "@D_Eme",
+      "file": "datasets.jsonl",
+      "rows": [
+        "C-762",
+        "C-763"
+      ],
+      "record": {
+        "dataset_type": "other",
+        "title": "Datos analizados por Eme et al. 2014",
+        "description": "El corpus no describe estos datos.",
+        "notes": [
+          "Conjunto de datos de trazabilidad (DEC-057): el corpus no describe estos datos; existe para que el análisis tenga el eslabón que exige analysis.json."
+        ]
+      },
+      "sources": [
+        "S141"
+      ]
+    },
+    {
+      "key": "@A_Eme",
+      "file": "analyses.jsonl",
+      "rows": [
+        "C-762",
+        "C-763",
+        "C-764"
+      ],
+      "record": {
+        "analysis_type": "molecular_clock_dating",
+        "method": "varios análisis de reloj molecular; el corpus no los detalla",
+        "dataset_ids": [
+          "@D_Eme"
+        ],
+        "result_ids": [
+          "@R762",
+          "@R763"
+        ]
+      },
+      "sources": [
+        "S141"
+      ]
+    },
+    {
+      "key": "@T762",
+      "file": "temporal-expressions.jsonl",
+      "rows": [
+        "C-762"
+      ],
+      "record": {
+        "temporal_type": "divergence_estimate",
+        "label": "edad de LECA según Eme et al. 2014",
+        "interval": {
+          "oldest_bound": 1898,
+          "youngest_bound": 1007,
+          "unit": "million_years",
+          "reference_point": "before_present",
+          "original_expression": "1007–1898 Ma"
+        },
+        "uncertainty": {
+          "kind": "range_only",
+          "description": "Intervalo que abarcan las estimaciones de LECA entre los análisis del estudio, no el de uno solo."
+        },
+        "calibration": {
+          "system": "molecular_clock",
+          "curve_or_timescale": null
+        },
+        "method": "varios análisis de reloj molecular",
+        "method_type": "molecular_clock",
+        "determination": "modelled",
+        "notes": []
+      }
+    },
+    {
+      "key": "@R762",
+      "file": "results.jsonl",
+      "rows": [
+        "C-762"
+      ],
+      "record": {
+        "analysis_id": "@A_Eme",
+        "result_type": "divergence_time_estimate",
+        "description": "Intervalo que abarcan las estimaciones de LECA entre los análisis del estudio.",
+        "value": "1007–1898",
+        "unit": "Ma",
+        "temporal_expression_ids": [
+          "@T762"
+        ],
+        "applies_to_ids": [
+          "@E_LECA"
+        ]
+      },
+      "sources": [
+        "S141"
+      ]
+    },
+    {
+      "key": "@CL762",
+      "file": "claims.jsonl",
+      "rows": [
+        "C-762"
+      ],
+      "record": {
+        "claim_type": "temporal",
+        "subject_id": "@E_LECA",
+        "predicate": "dated_to",
+        "object": {
+          "temporal_expression_id": "@T762"
+        },
+        "notes": [],
+        "issue_ids": [
+          "@I772"
+        ]
+      }
+    },
+    {
+      "key": "@EV762",
+      "file": "evidence.jsonl",
+      "rows": [
+        "C-762"
+      ],
+      "record": {
+        "evidence_type": "molecular",
+        "description": "Estimaciones por reloj molecular de la edad de LECA.",
+        "source_id": "@S141",
+        "locator": "§Molecular clocks; fig. 3",
+        "dataset_ids": [
+          "@D_Eme"
+        ],
+        "analysis_ids": [
+          "@A_Eme"
+        ],
+        "result_ids": [
+          "@R762"
+        ],
+        "supports_claim_ids": [
+          "@CL762",
+          "@CL773"
+        ],
+        "challenges_claim_ids": []
+      },
+      "sources": [
+        "S141"
+      ]
+    },
+    {
+      "key": "@E763",
+      "file": "events.jsonl",
+      "rows": [
+        "C-763"
+      ],
+      "record": {
+        "event_type": "divergence",
+        "label": "diversificación de la corona de Opisthokonta",
+        "participants": [
+          {
+            "entity_id": "@Opisthokonta",
+            "role": "participant",
+            "notes": [
+              "Clado cuya corona se data; la fila no nombra los linajes que divergen."
+            ]
+          }
+        ],
+        "result_entity_ids": [],
+        "temporal_expression_ids": [],
+        "region_ids": [],
+        "notes": []
+      }
+    },
+    {
+      "key": "@T763",
+      "file": "temporal-expressions.jsonl",
+      "rows": [
+        "C-763"
+      ],
+      "record": {
+        "temporal_type": "divergence_estimate",
+        "label": "Opisthokonta según Eme et al. 2014",
+        "interval": {
+          "oldest_bound": 1579,
+          "youngest_bound": 904,
+          "unit": "million_years",
+          "reference_point": "before_present",
+          "original_expression": "904–1579 Ma"
+        },
+        "uncertainty": {
+          "kind": "range_only",
+          "description": "El corpus da el intervalo sin decir de qué tipo es."
+        },
+        "calibration": {
+          "system": "molecular_clock",
+          "curve_or_timescale": null
+        },
+        "method": "varios análisis de reloj molecular",
+        "method_type": "molecular_clock",
+        "determination": "modelled",
+        "notes": []
+      }
+    },
+    {
+      "key": "@R763",
+      "file": "results.jsonl",
+      "rows": [
+        "C-763"
+      ],
+      "record": {
+        "analysis_id": "@A_Eme",
+        "result_type": "divergence_time_estimate",
+        "description": "Edad estimada de Opisthokonta.",
+        "value": "904–1579",
+        "unit": "Ma",
+        "temporal_expression_ids": [
+          "@T763"
+        ],
+        "applies_to_ids": [
+          "@E763"
+        ]
+      },
+      "sources": [
+        "S141"
+      ]
+    },
+    {
+      "key": "@CL763",
+      "file": "claims.jsonl",
+      "rows": [
+        "C-763",
+        "C-764"
+      ],
+      "record": {
+        "claim_type": "temporal",
+        "subject_id": "@E763",
+        "predicate": "dated_to",
+        "object": {
+          "temporal_expression_id": "@T763"
+        },
+        "notes": [],
+        "quantitative_support": [
+          {
+            "measure_type": "duración del tallo entre LECA y Opisthokonta",
+            "value": "23–334",
+            "scale": "Ma",
+            "method": "reloj molecular",
+            "applies_to": "tallo entre LECA y Opisthokonta",
+            "source_id": "@S141",
+            "locator": "discusión",
+            "analysis_conditions": "varía entre los análisis del estudio (C-764)"
+          }
+        ]
+      }
+    },
+    {
+      "key": "@EV763",
+      "file": "evidence.jsonl",
+      "rows": [
+        "C-763"
+      ],
+      "record": {
+        "evidence_type": "molecular",
+        "description": "Estimación por reloj molecular de la edad de Opisthokonta.",
+        "source_id": "@S141",
+        "locator": "fig. 3 y material suplementario",
+        "dataset_ids": [
+          "@D_Eme"
+        ],
+        "analysis_ids": [
+          "@A_Eme"
+        ],
+        "result_ids": [
+          "@R763"
+        ],
+        "supports_claim_ids": [
+          "@CL763"
+        ],
+        "challenges_claim_ids": []
+      },
+      "sources": [
+        "S141"
+      ]
+    },
+    {
+      "key": "@D_Strassert",
+      "file": "datasets.jsonl",
+      "rows": [
+        "C-765",
+        "C-766"
+      ],
+      "record": {
+        "dataset_type": "other",
+        "title": "Datos analizados por Strassert et al. 2021",
+        "description": "El corpus no describe estos datos.",
+        "notes": [
+          "Conjunto de datos de trazabilidad (DEC-057): el corpus no describe estos datos; existe para que el análisis tenga el eslabón que exige analysis.json."
+        ]
+      },
+      "sources": [
+        "S140"
+      ]
+    },
+    {
+      "key": "@A_Strassert",
+      "file": "analyses.jsonl",
+      "rows": [
+        "C-765",
+        "C-766",
+        "C-767"
+      ],
+      "record": {
+        "analysis_type": "molecular_clock_dating",
+        "method": "más de un modelo de reloj relajado, distribuciones alternativas de calibración y dos posiciones de raíz",
+        "dataset_ids": [
+          "@D_Strassert"
+        ],
+        "result_ids": [
+          "@R765"
+        ],
+        "notes": [
+          "La corrección publicada del estudio no se trata como una estimación temporal independiente (C-767)."
+        ]
+      },
+      "sources": [
+        "S140"
+      ]
+    },
+    {
+      "key": "@T765",
+      "file": "temporal-expressions.jsonl",
+      "rows": [
+        "C-765"
+      ],
+      "record": {
+        "temporal_type": "divergence_estimate",
+        "label": "edad de LECA según Strassert et al. 2021",
+        "interval": {
+          "oldest_bound": 2386,
+          "youngest_bound": 1958,
+          "unit": "million_years",
+          "reference_point": "before_present",
+          "original_expression": "1958–2386 Ma"
+        },
+        "uncertainty": {
+          "kind": "range_only",
+          "description": "El corpus da el intervalo sin decir de qué tipo es."
+        },
+        "calibration": {
+          "system": "molecular_clock",
+          "curve_or_timescale": null
+        },
+        "method": "varios modelos de reloj relajado con calibraciones alternativas",
+        "method_type": "molecular_clock",
+        "determination": "modelled",
+        "notes": []
+      }
+    },
+    {
+      "key": "@R765",
+      "file": "results.jsonl",
+      "rows": [
+        "C-765"
+      ],
+      "record": {
+        "analysis_id": "@A_Strassert",
+        "result_type": "divergence_time_estimate",
+        "description": "Edad estimada de LECA.",
+        "value": "1958–2386",
+        "unit": "Ma",
+        "temporal_expression_ids": [
+          "@T765"
+        ],
+        "applies_to_ids": [
+          "@E_LECA"
+        ]
+      },
+      "sources": [
+        "S140"
+      ]
+    },
+    {
+      "key": "@CL765",
+      "file": "claims.jsonl",
+      "rows": [
+        "C-765"
+      ],
+      "record": {
+        "claim_type": "temporal",
+        "subject_id": "@E_LECA",
+        "predicate": "dated_to",
+        "object": {
+          "temporal_expression_id": "@T765"
+        },
+        "notes": [],
+        "issue_ids": [
+          "@I772"
+        ]
+      }
+    },
+    {
+      "key": "@EV765",
+      "file": "evidence.jsonl",
+      "rows": [
+        "C-765"
+      ],
+      "record": {
+        "evidence_type": "molecular",
+        "description": "Estimación por reloj molecular de la edad de LECA.",
+        "source_id": "@S140",
+        "locator": "resumen; fig. 2",
+        "dataset_ids": [
+          "@D_Strassert"
+        ],
+        "analysis_ids": [
+          "@A_Strassert"
+        ],
+        "result_ids": [
+          "@R765"
+        ],
+        "supports_claim_ids": [
+          "@CL765",
+          "@CL773"
+        ],
+        "challenges_claim_ids": []
+      },
+      "sources": [
+        "S140"
+      ]
+    },
+    {
+      "key": "@D_Betts",
+      "file": "datasets.jsonl",
+      "rows": [
+        "C-768"
+      ],
+      "record": {
+        "dataset_type": "other",
+        "title": "Datos genómicos y fósiles integrados por Betts et al. 2018",
+        "description": "Información genómica y fósil integrada en una escala temporal común (C-768).",
+        "notes": []
+      },
+      "sources": [
+        "S177"
+      ]
+    },
+    {
+      "key": "@A_Betts",
+      "file": "analyses.jsonl",
+      "rows": [
+        "C-768"
+      ],
+      "record": {
+        "analysis_type": "molecular_clock_dating",
+        "method": "integración de datos genómicos y fósiles en una escala temporal común",
+        "dataset_ids": [
+          "@D_Betts"
+        ],
+        "result_ids": []
+      },
+      "sources": [
+        "S177"
+      ]
+    },
+    {
+      "key": "@D_Porter",
+      "file": "datasets.jsonl",
+      "rows": [
+        "C-769"
+      ],
+      "record": {
+        "dataset_type": "literature_compilation",
+        "title": "Registro fósil eucariota revisado por Porter 2020",
+        "description": "El corpus no detalla qué registros revisa.",
+        "notes": [
+          "Conjunto de datos de trazabilidad (DEC-057): el corpus no describe estos datos; existe para que el análisis tenga el eslabón que exige analysis.json."
+        ]
+      },
+      "sources": [
+        "S178"
+      ]
+    },
+    {
+      "key": "@A_Porter",
+      "file": "analyses.jsonl",
+      "rows": [
+        "C-769"
+      ],
+      "record": {
+        "analysis_type": "comparative_qualitative",
+        "method": "revisión del registro fósil de grupos corona eucariotas",
+        "dataset_ids": [
+          "@D_Porter"
+        ],
+        "result_ids": [
+          "@R769"
+        ]
+      },
+      "sources": [
+        "S178"
+      ]
+    },
+    {
+      "key": "@T769",
+      "file": "temporal-expressions.jsonl",
+      "rows": [
+        "C-769"
+      ],
+      "record": {
+        "temporal_type": "observed_taxon_range",
+        "label": "registro fósil inequívoco de grupos corona eucariotas",
+        "interval": {
+          "oldest_bound": 1050,
+          "youngest_bound": null,
+          "unit": "million_years",
+          "reference_point": "before_present",
+          "original_expression": "aproximadamente 1.05 Ga"
+        },
+        "uncertainty": {
+          "kind": "unknown",
+          "description": "«Aproximadamente»: el corpus no da incertidumbre."
+        },
+        "calibration": {
+          "system": "unknown",
+          "curve_or_timescale": null
+        },
+        "method": "registro fósil",
+        "method_type": "literature_report",
+        "determination": "observed",
+        "notes": [
+          "El límite reciente queda abierto: la fila sólo fija el comienzo del registro."
+        ]
+      }
+    },
+    {
+      "key": "@R769",
+      "file": "results.jsonl",
+      "rows": [
+        "C-769"
+      ],
+      "record": {
+        "analysis_id": "@A_Porter",
+        "result_type": "date_estimate",
+        "description": "Ningún fósil inequívoco asignable a grupos corona de supergrupos eucariotas antes de aproximadamente 1,05 Ga.",
+        "value": "≈1050",
+        "unit": "Ma",
+        "temporal_expression_ids": [
+          "@T769"
+        ],
+        "applies_to_ids": [
+          "@Eukaryota"
+        ]
+      },
+      "sources": [
+        "S178"
+      ]
+    },
+    {
+      "key": "@CL769",
+      "file": "claims.jsonl",
+      "rows": [
+        "C-769"
+      ],
+      "record": {
+        "claim_type": "temporal",
+        "subject_id": "@Eukaryota",
+        "predicate": "dated_to",
+        "object": {
+          "temporal_expression_id": "@T769"
+        },
+        "notes": [
+          "Se refiere a los grupos corona de los supergrupos eucariotas."
+        ]
+      }
+    },
+    {
+      "key": "@EV769",
+      "file": "evidence.jsonl",
+      "rows": [
+        "C-769"
+      ],
+      "record": {
+        "evidence_type": "fossil",
+        "description": "Ausencia de fósiles inequívocos de grupos corona eucariotas antes de aproximadamente 1,05 Ga.",
+        "source_id": "@S178",
+        "locator": "§3",
+        "dataset_ids": [
+          "@D_Porter"
+        ],
+        "analysis_ids": [
+          "@A_Porter"
+        ],
+        "result_ids": [
+          "@R769"
+        ],
+        "supports_claim_ids": [
+          "@CL769"
+        ],
+        "challenges_claim_ids": []
+      },
+      "sources": [
+        "S178"
+      ]
+    },
+    {
+      "key": "@D_Loron",
+      "file": "datasets.jsonl",
+      "rows": [
+        "C-771"
+      ],
+      "record": {
+        "dataset_type": "other",
+        "title": "Datos analizados por Loron y Rogers 2026",
+        "description": "El corpus no describe estos datos.",
+        "notes": [
+          "Conjunto de datos de trazabilidad (DEC-057): el corpus no describe estos datos; existe para que el análisis tenga el eslabón que exige analysis.json."
+        ]
+      },
+      "sources": [
+        "S181"
+      ]
+    },
+    {
+      "key": "@A_Loron",
+      "file": "analyses.jsonl",
+      "rows": [
+        "C-771"
+      ],
+      "record": {
+        "analysis_type": "other",
+        "method": "dinámica de clados",
+        "dataset_ids": [
+          "@D_Loron"
+        ],
+        "result_ids": [
+          "@R771"
+        ]
+      },
+      "sources": [
+        "S181"
+      ]
+    },
+    {
+      "key": "@T771",
+      "file": "temporal-expressions.jsonl",
+      "rows": [
+        "C-771"
+      ],
+      "record": {
+        "temporal_type": "divergence_estimate",
+        "label": "edad mínima de LECA según Loron y Rogers 2026",
+        "interval": {
+          "oldest_bound": null,
+          "youngest_bound": 1696,
+          "unit": "million_years",
+          "reference_point": "before_present",
+          "original_expression": "mínimo próximo a 1696 Ma"
+        },
+        "uncertainty": {
+          "kind": "unknown",
+          "description": "«Próximo a»: el corpus no da incertidumbre."
+        },
+        "calibration": {
+          "system": "unknown",
+          "curve_or_timescale": null
+        },
+        "method": "dinámica de clados",
+        "method_type": "other",
+        "determination": "modelled",
+        "notes": [
+          "Es un límite mínimo: el extremo antiguo queda abierto."
+        ]
+      }
+    },
+    {
+      "key": "@R771",
+      "file": "results.jsonl",
+      "rows": [
+        "C-771"
+      ],
+      "record": {
+        "analysis_id": "@A_Loron",
+        "result_type": "date_estimate",
+        "description": "Límite mínimo de la edad de LECA.",
+        "value": "≥1696",
+        "unit": "Ma",
+        "temporal_expression_ids": [
+          "@T771"
+        ],
+        "applies_to_ids": [
+          "@E_LECA"
+        ]
+      },
+      "sources": [
+        "S181"
+      ]
+    },
+    {
+      "key": "@CL771",
+      "file": "claims.jsonl",
+      "rows": [
+        "C-771"
+      ],
+      "record": {
+        "claim_type": "temporal",
+        "subject_id": "@E_LECA",
+        "predicate": "dated_to",
+        "object": {
+          "temporal_expression_id": "@T771"
+        },
+        "notes": [
+          "Procede de un preprint."
+        ],
+        "issue_ids": [
+          "@I772"
+        ]
+      }
+    },
+    {
+      "key": "@EV771",
+      "file": "evidence.jsonl",
+      "rows": [
+        "C-771"
+      ],
+      "record": {
+        "evidence_type": "statistical",
+        "description": "Límite mínimo para LECA a partir de dinámica de clados.",
+        "source_id": "@S181",
+        "locator": "resumen",
+        "dataset_ids": [
+          "@D_Loron"
+        ],
+        "analysis_ids": [
+          "@A_Loron"
+        ],
+        "result_ids": [
+          "@R771"
+        ],
+        "supports_claim_ids": [
+          "@CL771"
+        ],
+        "challenges_claim_ids": []
+      },
+      "sources": [
+        "S181"
+      ]
+    },
+    {
+      "key": "@T773",
+      "file": "temporal-expressions.jsonl",
+      "rows": [
+        "C-773"
+      ],
+      "record": {
+        "temporal_type": "divergence_estimate",
+        "label": "envolvente de las estimaciones de LECA de S141 y S140",
+        "interval": {
+          "oldest_bound": 2386,
+          "youngest_bound": 1007,
+          "unit": "million_years",
+          "reference_point": "before_present",
+          "original_expression": "1007–2386 Ma"
+        },
+        "uncertainty": {
+          "kind": "range_only",
+          "description": "Envolvente de las estimaciones de Eme et al. 2014 y Strassert et al. 2021; no es el intervalo de un análisis."
+        },
+        "calibration": {
+          "system": "molecular_clock",
+          "curve_or_timescale": null
+        },
+        "method": "envolvente de estimaciones publicadas",
+        "method_type": "molecular_clock",
+        "determination": "modelled",
+        "notes": []
+      }
+    },
+    {
+      "key": "@CL773",
+      "file": "claims.jsonl",
+      "rows": [
+        "C-773"
+      ],
+      "record": {
+        "claim_type": "temporal",
+        "subject_id": "@E_LECA",
+        "predicate": "dated_to",
+        "object": {
+          "temporal_expression_id": "@T773"
+        },
+        "notes": [],
+        "issue_ids": [
+          "@I772"
+        ],
+        "derivation": {
+          "rule": "envolvente: el límite más reciente y el más antiguo de las estimaciones que sintetiza",
+          "depends_on_ids": [
+            "@CL762",
+            "@CL765"
+          ],
+          "derived_in_view_id": null
+        }
+      }
+    },
+    {
+      "key": "@D_Sandin",
+      "file": "datasets.jsonl",
+      "rows": [
+        "C-786"
+      ],
+      "record": {
+        "dataset_type": "other",
+        "title": "OTU ambientales de Sandin et al. 2026",
+        "description": "75.975 unidades taxonómicas operativas (C-786).",
+        "notes": [],
+        "size": {
+          "n_taxa": 75975
+        }
+      },
+      "sources": [
+        "S548"
+      ]
+    },
+    {
+      "key": "@A_Sandin",
+      "file": "analyses.jsonl",
+      "rows": [
+        "C-787",
+        "C-788",
+        "C-789"
+      ],
+      "record": {
+        "analysis_type": "molecular_clock_dating",
+        "method": "datación con TreePL sobre 32 árboles filogenéticos con 77 calibraciones temporales",
+        "dataset_ids": [
+          "@D_Sandin"
+        ],
+        "result_ids": [
+          "@R790",
+          "@R791",
+          "@R792"
+        ],
+        "software": "TreePL",
+        "parameters": [
+          {
+            "name": "calibraciones temporales",
+            "value": 77
+          },
+          {
+            "name": "árboles filogenéticos",
+            "value": 32
+          },
+          {
+            "name": "réplicas de TreePL",
+            "value": 100
+          }
+        ]
+      },
+      "sources": [
+        "S548"
+      ]
+    },
+    {
+      "key": "@E790",
+      "file": "events.jsonl",
+      "rows": [
+        "C-790"
+      ],
+      "record": {
+        "event_type": "divergence",
+        "label": "diversificación de la corona de Discoba",
+        "participants": [
+          {
+            "entity_id": "@Discoba",
+            "role": "participant",
+            "notes": [
+              "Clado cuya raíz se data; la fila no nombra los linajes que divergen."
+            ]
+          }
+        ],
+        "result_entity_ids": [],
+        "temporal_expression_ids": [],
+        "region_ids": [],
+        "notes": []
+      }
+    },
+    {
+      "key": "@T790",
+      "file": "temporal-expressions.jsonl",
+      "rows": [
+        "C-790"
+      ],
+      "record": {
+        "temporal_type": "divergence_estimate",
+        "label": "raíz de Discoba según Sandin et al. 2026",
+        "interval": {
+          "oldest_bound": 1897,
+          "youngest_bound": 1670,
+          "unit": "million_years",
+          "reference_point": "before_present",
+          "original_expression": "mediana 1.776 Ma; máximo/mínimo de medianas 1.897/1.670 Ma"
+        },
+        "uncertainty": {
+          "kind": "range_only",
+          "description": "Mediana 1776 Ma; los límites son el máximo y el mínimo de las medianas de los árboles."
+        },
+        "calibration": {
+          "system": "molecular_clock",
+          "curve_or_timescale": null
+        },
+        "method": "TreePL sobre 32 árboles con 77 calibraciones",
+        "method_type": "molecular_clock",
+        "determination": "modelled",
+        "notes": []
+      }
+    },
+    {
+      "key": "@R790",
+      "file": "results.jsonl",
+      "rows": [
+        "C-790"
+      ],
+      "record": {
+        "analysis_id": "@A_Sandin",
+        "result_type": "divergence_time_estimate",
+        "description": "Raíz de Discoba: mediana y extremos de las medianas entre árboles.",
+        "value": 1776,
+        "unit": "Ma",
+        "temporal_expression_ids": [
+          "@T790"
+        ],
+        "applies_to_ids": [
+          "@E790"
+        ]
+      },
+      "sources": [
+        "S548"
+      ]
+    },
+    {
+      "key": "@CL790",
+      "file": "claims.jsonl",
+      "rows": [
+        "C-790"
+      ],
+      "record": {
+        "claim_type": "temporal",
+        "subject_id": "@E790",
+        "predicate": "dated_to",
+        "object": {
+          "temporal_expression_id": "@T790"
+        },
+        "notes": []
+      }
+    },
+    {
+      "key": "@EV790",
+      "file": "evidence.jsonl",
+      "rows": [
+        "C-790"
+      ],
+      "record": {
+        "evidence_type": "molecular",
+        "description": "Datación con TreePL de la raíz de Discoba.",
+        "source_id": "@S548",
+        "locator": "resultados; resumen nodal de Discoba",
+        "dataset_ids": [
+          "@D_Sandin"
+        ],
+        "analysis_ids": [
+          "@A_Sandin"
+        ],
+        "result_ids": [
+          "@R790"
+        ],
+        "supports_claim_ids": [
+          "@CL790"
+        ],
+        "challenges_claim_ids": []
+      },
+      "sources": [
+        "S548"
+      ]
+    },
+    {
+      "key": "@E791",
+      "file": "events.jsonl",
+      "rows": [
+        "C-791"
+      ],
+      "record": {
+        "event_type": "divergence",
+        "label": "diversificación de la corona de Amorphea",
+        "participants": [
+          {
+            "entity_id": "@Amorphea",
+            "role": "participant",
+            "notes": [
+              "Clado cuya corona se data; la fila no nombra los linajes que divergen."
+            ]
+          }
+        ],
+        "result_entity_ids": [],
+        "temporal_expression_ids": [],
+        "region_ids": [],
+        "notes": []
+      }
+    },
+    {
+      "key": "@T791",
+      "file": "temporal-expressions.jsonl",
+      "rows": [
+        "C-791"
+      ],
+      "record": {
+        "temporal_type": "divergence_estimate",
+        "label": "Amorphea según Sandin et al. 2026",
+        "interval": {
+          "oldest_bound": 1934,
+          "youngest_bound": 1703,
+          "unit": "million_years",
+          "reference_point": "before_present",
+          "original_expression": "mediana 1.773 Ma; máximo/mínimo de medianas 1.934/1.703 Ma"
+        },
+        "uncertainty": {
+          "kind": "range_only",
+          "description": "Mediana 1773 Ma; los límites son el máximo y el mínimo de las medianas de los árboles."
+        },
+        "calibration": {
+          "system": "molecular_clock",
+          "curve_or_timescale": null
+        },
+        "method": "TreePL sobre 32 árboles con 77 calibraciones",
+        "method_type": "molecular_clock",
+        "determination": "modelled",
+        "notes": []
+      }
+    },
+    {
+      "key": "@R791",
+      "file": "results.jsonl",
+      "rows": [
+        "C-791"
+      ],
+      "record": {
+        "analysis_id": "@A_Sandin",
+        "result_type": "divergence_time_estimate",
+        "description": "Amorphea: mediana y extremos de las medianas entre árboles.",
+        "value": 1773,
+        "unit": "Ma",
+        "temporal_expression_ids": [
+          "@T791"
+        ],
+        "applies_to_ids": [
+          "@E791"
+        ]
+      },
+      "sources": [
+        "S548"
+      ]
+    },
+    {
+      "key": "@CL791",
+      "file": "claims.jsonl",
+      "rows": [
+        "C-791"
+      ],
+      "record": {
+        "claim_type": "temporal",
+        "subject_id": "@E791",
+        "predicate": "dated_to",
+        "object": {
+          "temporal_expression_id": "@T791"
+        },
+        "notes": []
+      }
+    },
+    {
+      "key": "@EV791",
+      "file": "evidence.jsonl",
+      "rows": [
+        "C-791"
+      ],
+      "record": {
+        "evidence_type": "molecular",
+        "description": "Datación con TreePL de Amorphea.",
+        "source_id": "@S548",
+        "locator": "resultados; resumen nodal de Amorphea",
+        "dataset_ids": [
+          "@D_Sandin"
+        ],
+        "analysis_ids": [
+          "@A_Sandin"
+        ],
+        "result_ids": [
+          "@R791"
+        ],
+        "supports_claim_ids": [
+          "@CL791"
+        ],
+        "challenges_claim_ids": []
+      },
+      "sources": [
+        "S548"
+      ]
+    },
+    {
+      "key": "@T792",
+      "file": "temporal-expressions.jsonl",
+      "rows": [
+        "C-792"
+      ],
+      "record": {
+        "temporal_type": "divergence_estimate",
+        "label": "edad de LECA según Sandin et al. 2026 con Rafatazmia dudosa",
+        "interval": {
+          "oldest_bound": 2104,
+          "youngest_bound": 1967,
+          "unit": "million_years",
+          "reference_point": "before_present",
+          "original_expression": "2.054 Ma; límites 2.104–1.967 Ma"
+        },
+        "uncertainty": {
+          "kind": "range_only",
+          "description": "Valor 2054 Ma con límites publicados; el corpus no dice de qué tipo son."
+        },
+        "calibration": {
+          "system": "molecular_clock",
+          "curve_or_timescale": null
+        },
+        "method": "TreePL sobre 32 árboles con 77 calibraciones",
+        "method_type": "molecular_clock",
+        "determination": "modelled",
+        "notes": [
+          "Escenario que trata Rafatazmia como dudosa."
+        ]
+      }
+    },
+    {
+      "key": "@R792",
+      "file": "results.jsonl",
+      "rows": [
+        "C-792"
+      ],
+      "record": {
+        "analysis_id": "@A_Sandin",
+        "result_type": "divergence_time_estimate",
+        "description": "LECA en el escenario que trata Rafatazmia como dudosa.",
+        "value": 2054,
+        "unit": "Ma",
+        "temporal_expression_ids": [
+          "@T792"
+        ],
+        "applies_to_ids": [
+          "@E_LECA"
+        ]
+      },
+      "sources": [
+        "S548"
+      ]
+    },
+    {
+      "key": "@CL792",
+      "file": "claims.jsonl",
+      "rows": [
+        "C-792"
+      ],
+      "record": {
+        "claim_type": "temporal",
+        "subject_id": "@E_LECA",
+        "predicate": "dated_to",
+        "object": {
+          "temporal_expression_id": "@T792"
+        },
+        "notes": [
+          "En el escenario que trata Rafatazmia como dudosa."
+        ],
+        "issue_ids": [
+          "@I772"
+        ]
+      }
+    },
+    {
+      "key": "@EV792",
+      "file": "evidence.jsonl",
+      "rows": [
+        "C-792"
+      ],
+      "record": {
+        "evidence_type": "molecular",
+        "description": "Datación con TreePL de LECA en el escenario que trata Rafatazmia como dudosa.",
+        "source_id": "@S548",
+        "locator": "resultados; sensibilidad a Rafatazmia",
+        "dataset_ids": [
+          "@D_Sandin"
+        ],
+        "analysis_ids": [
+          "@A_Sandin"
+        ],
+        "result_ids": [
+          "@R792"
+        ],
+        "supports_claim_ids": [
+          "@CL792"
+        ],
+        "challenges_claim_ids": []
+      },
+      "sources": [
+        "S548"
+      ]
+    },
+    {
+      "key": "@CL785",
+      "file": "claims.jsonl",
+      "rows": [
+        "C-785"
+      ],
+      "record": {
+        "claim_type": "relational",
+        "subject_id": "@Especimen_CapasBlancas",
+        "predicate": "assigned_to",
+        "object": {
+          "entity_id": "@Choanoflagellata"
+        },
+        "notes": [
+          "Asignación putativa: la fuente la presenta como ocurrencia putativa de coanoflagelados."
+        ]
+      }
+    },
+    {
+      "key": "@EV785",
+      "file": "evidence.jsonl",
+      "rows": [
+        "C-785"
+      ],
+      "record": {
+        "evidence_type": "fossil",
+        "description": "Material orgánico del Cenomaniano–Turoniano de la Formación Capas Blancas descrito como ocurrencia putativa de coanoflagelados.",
+        "source_id": "@S500",
+        "locator": "título; resumen; resultados y discusión",
+        "dataset_ids": [],
+        "analysis_ids": [],
+        "result_ids": [],
+        "supports_claim_ids": [
+          "@CL785"
+        ],
+        "challenges_claim_ids": [],
+        "specimen_ids": [
+          "@Especimen_CapasBlancas"
+        ]
+      },
+      "sources": [
+        "S500"
+      ]
+    },
+    {
+      "key": "@CL775",
+      "file": "claims.jsonl",
+      "rows": [
+        "C-775"
+      ],
+      "record": {
+        "claim_type": "relational",
+        "subject_id": "@TC_Bangiomorpha",
+        "predicate": "calibrates",
+        "object": {
+          "entity_id": "@M_datacion_profunda"
+        },
+        "notes": [
+          "Pesa de forma desproporcionada: combina una edad radiométrica relativamente precisa con una posible asignación a Rhodophyta corona."
+        ]
+      }
+    },
+    {
+      "key": "@CL776",
+      "file": "claims.jsonl",
+      "rows": [
+        "C-776"
+      ],
+      "record": {
+        "claim_type": "relational",
+        "subject_id": "@M_datacion_profunda",
+        "predicate": "depends_on",
+        "object": {
+          "entity_id": "@TC_Bangiomorpha"
+        },
+        "notes": [
+          "Mover el nodo asignado a Bangiomorpha, o tratarlo como fósil troncal, modifica las restricciones mínimas de las divergencias profundas."
+        ]
+      }
+    },
+    {
+      "key": "@CL777",
+      "file": "claims.jsonl",
+      "rows": [
+        "C-777"
+      ],
+      "record": {
+        "claim_type": "categorical",
+        "subject_id": "@M_calibracion_nodal",
+        "predicate": "provides_bound",
+        "object": {
+          "category": "edad mínima del nodo",
+          "vocabulary": "tipo de límite"
+        },
+        "notes": [
+          "No aporta la fecha exacta de la divergencia."
+        ]
+      }
+    },
+    {
+      "key": "@CL778",
+      "file": "claims.jsonl",
+      "rows": [
+        "C-778"
+      ],
+      "record": {
+        "claim_type": "categorical",
+        "subject_id": "@M_limite_maximo",
+        "predicate": "depends_on",
+        "object": {
+          "category": "ausencia fósil y modelos de preservación",
+          "vocabulary": null
+        },
+        "notes": [
+          "Por eso los límites máximos son más difíciles de justificar."
+        ]
+      }
+    },
+    {
+      "key": "@CL779a",
+      "file": "claims.jsonl",
+      "rows": [
+        "C-779"
+      ],
+      "record": {
+        "claim_type": "categorical",
+        "subject_id": "@M_reloj_estricto",
+        "predicate": "assumes",
+        "object": {
+          "category": "tasa de sustitución única en todas las ramas",
+          "vocabulary": null
+        },
+        "notes": []
+      }
+    },
+    {
+      "key": "@CL779b",
+      "file": "claims.jsonl",
+      "rows": [
+        "C-779"
+      ],
+      "record": {
+        "claim_type": "categorical",
+        "subject_id": "@M_reloj_relajado",
+        "predicate": "assumes",
+        "object": {
+          "category": "variación de la tasa de sustitución entre ramas",
+          "vocabulary": null
+        },
+        "notes": []
+      }
+    },
+    {
+      "key": "@CL780",
+      "file": "claims.jsonl",
+      "rows": [
+        "C-780"
+      ],
+      "record": {
+        "claim_type": "relational",
+        "subject_id": "@M_relajado_autocorrelacionado",
+        "predicate": "incompatible_with",
+        "object": {
+          "entity_id": "@M_relajado_no_autocorrelacionado"
+        },
+        "notes": [
+          "Hacen supuestos incompatibles sobre la dependencia de tasas entre ramas adyacentes."
+        ]
+      }
+    },
+    {
+      "key": "@CL781",
+      "file": "claims.jsonl",
+      "rows": [
+        "C-781"
+      ],
+      "record": {
+        "claim_type": "relational",
+        "subject_id": "@M_saturacion",
+        "predicate": "limits",
+        "object": {
+          "entity_id": "@M_datacion_profunda"
+        },
+        "notes": [
+          "Reduce la información temporal retenida en divergencias proterozoicas profundas."
+        ]
+      }
+    },
+    {
+      "key": "@CL782",
+      "file": "claims.jsonl",
+      "rows": [
+        "C-782"
+      ],
+      "record": {
+        "claim_type": "relational",
+        "subject_id": "@M_heterotaquia",
+        "predicate": "may_bias",
+        "object": {
+          "entity_id": "@M_relojes_sin_heterotaquia"
+        },
+        "notes": [
+          "Un mismo sitio puede cambiar de tasa a través del árbol."
+        ]
+      }
+    },
+    {
+      "key": "@CL783a",
+      "file": "claims.jsonl",
+      "rows": [
+        "C-783"
+      ],
+      "record": {
+        "claim_type": "relational",
+        "subject_id": "@M_grupo_externo",
+        "predicate": "limits",
+        "object": {
+          "entity_id": "@M_enraizamiento"
+        },
+        "notes": []
+      }
+    },
+    {
+      "key": "@CL783b",
+      "file": "claims.jsonl",
+      "rows": [
+        "C-783"
+      ],
+      "record": {
+        "claim_type": "relational",
+        "subject_id": "@M_grupo_externo",
+        "predicate": "limits",
+        "object": {
+          "entity_id": "@M_datacion_profunda"
+        },
+        "notes": []
+      }
+    },
+    {
+      "key": "@EVM_775_S160",
+      "file": "evidence.jsonl",
+      "rows": [
+        "C-775"
+      ],
+      "record": {
+        "evidence_type": "methodological",
+        "description": "Bangiomorpha pubescens ejerce un peso desproporcionado como calibración porque combina una edad radiométrica relativamente precisa con una posible asignación a Rhodophyta corona.",
+        "source_id": "@S160",
+        "locator": "discusión",
+        "dataset_ids": [],
+        "analysis_ids": [],
+        "result_ids": [],
+        "supports_claim_ids": [
+          "@CL775"
+        ],
+        "challenges_claim_ids": []
+      },
+      "sources": [
+        "S160"
+      ]
+    },
+    {
+      "key": "@EVM_775_S141",
+      "file": "evidence.jsonl",
+      "rows": [
+        "C-775"
+      ],
+      "record": {
+        "evidence_type": "methodological",
+        "description": "Bangiomorpha pubescens ejerce un peso desproporcionado como calibración porque combina una edad radiométrica relativamente precisa con una posible asignación a Rhodophyta corona.",
+        "source_id": "@S141",
+        "locator": "§calibrations",
+        "dataset_ids": [],
+        "analysis_ids": [],
+        "result_ids": [],
+        "supports_claim_ids": [
+          "@CL775"
+        ],
+        "challenges_claim_ids": []
+      },
+      "sources": [
+        "S141"
+      ]
+    },
+    {
+      "key": "@EVM_775_S140",
+      "file": "evidence.jsonl",
+      "rows": [
+        "C-775"
+      ],
+      "record": {
+        "evidence_type": "methodological",
+        "description": "Bangiomorpha pubescens ejerce un peso desproporcionado como calibración porque combina una edad radiométrica relativamente precisa con una posible asignación a Rhodophyta corona.",
+        "source_id": "@S140",
+        "locator": "métodos",
+        "dataset_ids": [],
+        "analysis_ids": [],
+        "result_ids": [],
+        "supports_claim_ids": [
+          "@CL775"
+        ],
+        "challenges_claim_ids": []
+      },
+      "sources": [
+        "S140"
+      ]
+    },
+    {
+      "key": "@EVM_776_S141",
+      "file": "evidence.jsonl",
+      "rows": [
+        "C-776"
+      ],
+      "record": {
+        "evidence_type": "methodological",
+        "description": "Mover el nodo asignado a Bangiomorpha o tratarlo como fósil troncal modifica las restricciones mínimas de divergencias profundas.",
+        "source_id": "@S141",
+        "locator": "§calibration sensitivity",
+        "dataset_ids": [],
+        "analysis_ids": [],
+        "result_ids": [],
+        "supports_claim_ids": [
+          "@CL776"
+        ],
+        "challenges_claim_ids": []
+      },
+      "sources": [
+        "S141"
+      ]
+    },
+    {
+      "key": "@EVM_776_S178",
+      "file": "evidence.jsonl",
+      "rows": [
+        "C-776"
+      ],
+      "record": {
+        "evidence_type": "methodological",
+        "description": "Mover el nodo asignado a Bangiomorpha o tratarlo como fósil troncal modifica las restricciones mínimas de divergencias profundas.",
+        "source_id": "@S178",
+        "locator": "discusión",
+        "dataset_ids": [],
+        "analysis_ids": [],
+        "result_ids": [],
+        "supports_claim_ids": [
+          "@CL776"
+        ],
+        "challenges_claim_ids": []
+      },
+      "sources": [
+        "S178"
+      ]
+    },
+    {
+      "key": "@EVM_777_S141",
+      "file": "evidence.jsonl",
+      "rows": [
+        "C-777"
+      ],
+      "record": {
+        "evidence_type": "methodological",
+        "description": "Una calibración fósil suele aportar un mínimo para la edad de un nodo, no la fecha exacta de la divergencia.",
+        "source_id": "@S141",
+        "locator": "§Molecular clock methodology",
+        "dataset_ids": [],
+        "analysis_ids": [],
+        "result_ids": [],
+        "supports_claim_ids": [
+          "@CL777"
+        ],
+        "challenges_claim_ids": []
+      },
+      "sources": [
+        "S141"
+      ]
+    },
+    {
+      "key": "@EVM_778_S141",
+      "file": "evidence.jsonl",
+      "rows": [
+        "C-778"
+      ],
+      "record": {
+        "evidence_type": "methodological",
+        "description": "Los límites máximos de calibración son más difíciles de justificar porque dependen de ausencia fósil y de modelos de preservación.",
+        "source_id": "@S141",
+        "locator": "§Molecular clock methodology",
+        "dataset_ids": [],
+        "analysis_ids": [],
+        "result_ids": [],
+        "supports_claim_ids": [
+          "@CL778"
+        ],
+        "challenges_claim_ids": []
+      },
+      "sources": [
+        "S141"
+      ]
+    },
+    {
+      "key": "@EVM_778_S177",
+      "file": "evidence.jsonl",
+      "rows": [
+        "C-778"
+      ],
+      "record": {
+        "evidence_type": "methodological",
+        "description": "Los límites máximos de calibración son más difíciles de justificar porque dependen de ausencia fósil y de modelos de preservación.",
+        "source_id": "@S177",
+        "locator": "métodos",
+        "dataset_ids": [],
+        "analysis_ids": [],
+        "result_ids": [],
+        "supports_claim_ids": [
+          "@CL778"
+        ],
+        "challenges_claim_ids": []
+      },
+      "sources": [
+        "S177"
+      ]
+    },
+    {
+      "key": "@EVM_779_S142",
+      "file": "evidence.jsonl",
+      "rows": [
+        "C-779"
+      ],
+      "record": {
+        "evidence_type": "methodological",
+        "description": "Los relojes estrictos suponen una tasa única, mientras que los relojes relajados permiten variación de tasa entre ramas.",
+        "source_id": "@S142",
+        "locator": "métodos",
+        "dataset_ids": [],
+        "analysis_ids": [],
+        "result_ids": [],
+        "supports_claim_ids": [
+          "@CL779a",
+          "@CL779b"
+        ],
+        "challenges_claim_ids": []
+      },
+      "sources": [
+        "S142"
+      ]
+    },
+    {
+      "key": "@EVM_779_S141",
+      "file": "evidence.jsonl",
+      "rows": [
+        "C-779"
+      ],
+      "record": {
+        "evidence_type": "methodological",
+        "description": "Los relojes estrictos suponen una tasa única, mientras que los relojes relajados permiten variación de tasa entre ramas.",
+        "source_id": "@S141",
+        "locator": "§Molecular clocks",
+        "dataset_ids": [],
+        "analysis_ids": [],
+        "result_ids": [],
+        "supports_claim_ids": [
+          "@CL779a",
+          "@CL779b"
+        ],
+        "challenges_claim_ids": []
+      },
+      "sources": [
+        "S141"
+      ]
+    },
+    {
+      "key": "@EVM_780_S141",
+      "file": "evidence.jsonl",
+      "rows": [
+        "C-780"
+      ],
+      "record": {
+        "evidence_type": "methodological",
+        "description": "Los relojes relajados autocorrelacionados y no autocorrelacionados hacen supuestos incompatibles sobre la dependencia de tasas entre ramas adyacentes.",
+        "source_id": "@S141",
+        "locator": "§Molecular clocks",
+        "dataset_ids": [],
+        "analysis_ids": [],
+        "result_ids": [],
+        "supports_claim_ids": [
+          "@CL780"
+        ],
+        "challenges_claim_ids": []
+      },
+      "sources": [
+        "S141"
+      ]
+    },
+    {
+      "key": "@EVM_780_S140",
+      "file": "evidence.jsonl",
+      "rows": [
+        "C-780"
+      ],
+      "record": {
+        "evidence_type": "methodological",
+        "description": "Los relojes relajados autocorrelacionados y no autocorrelacionados hacen supuestos incompatibles sobre la dependencia de tasas entre ramas adyacentes.",
+        "source_id": "@S140",
+        "locator": "métodos",
+        "dataset_ids": [],
+        "analysis_ids": [],
+        "result_ids": [],
+        "supports_claim_ids": [
+          "@CL780"
+        ],
+        "challenges_claim_ids": []
+      },
+      "sources": [
+        "S140"
+      ]
+    },
+    {
+      "key": "@EVM_781_S141",
+      "file": "evidence.jsonl",
+      "rows": [
+        "C-781"
+      ],
+      "record": {
+        "evidence_type": "methodological",
+        "description": "La saturación de sustituciones reduce la información temporal retenida en divergencias proterozoicas profundas.",
+        "source_id": "@S141",
+        "locator": "discusión",
+        "dataset_ids": [],
+        "analysis_ids": [],
+        "result_ids": [],
+        "supports_claim_ids": [
+          "@CL781"
+        ],
+        "challenges_claim_ids": []
+      },
+      "sources": [
+        "S141"
+      ]
+    },
+    {
+      "key": "@EVM_782_S141",
+      "file": "evidence.jsonl",
+      "rows": [
+        "C-782"
+      ],
+      "record": {
+        "evidence_type": "methodological",
+        "description": "La heterotaquia puede hacer que un mismo sitio cambie de tasa a través del árbol y sesgar estimaciones si el modelo no la representa.",
+        "source_id": "@S141",
+        "locator": "discusión",
+        "dataset_ids": [],
+        "analysis_ids": [],
+        "result_ids": [],
+        "supports_claim_ids": [
+          "@CL782"
+        ],
+        "challenges_claim_ids": []
+      },
+      "sources": [
+        "S141"
+      ]
+    },
+    {
+      "key": "@EVM_782_S140",
+      "file": "evidence.jsonl",
+      "rows": [
+        "C-782"
+      ],
+      "record": {
+        "evidence_type": "methodological",
+        "description": "La heterotaquia puede hacer que un mismo sitio cambie de tasa a través del árbol y sesgar estimaciones si el modelo no la representa.",
+        "source_id": "@S140",
+        "locator": "métodos",
+        "dataset_ids": [],
+        "analysis_ids": [],
+        "result_ids": [],
+        "supports_claim_ids": [
+          "@CL782"
+        ],
+        "challenges_claim_ids": []
+      },
+      "sources": [
+        "S140"
+      ]
+    },
+    {
+      "key": "@EVM_783_S141",
+      "file": "evidence.jsonl",
+      "rows": [
+        "C-783"
+      ],
+      "record": {
+        "evidence_type": "methodological",
+        "description": "La ausencia de un grupo externo cercano a Eukaryota dificulta simultáneamente la raíz y la datación de divergencias profundas.",
+        "source_id": "@S141",
+        "locator": "discusión",
+        "dataset_ids": [],
+        "analysis_ids": [],
+        "result_ids": [],
+        "supports_claim_ids": [
+          "@CL783a",
+          "@CL783b"
+        ],
+        "challenges_claim_ids": []
+      },
+      "sources": [
+        "S141"
+      ]
+    },
+    {
+      "key": "@EVM_783_S177",
+      "file": "evidence.jsonl",
+      "rows": [
+        "C-783"
+      ],
+      "record": {
+        "evidence_type": "methodological",
+        "description": "La ausencia de un grupo externo cercano a Eukaryota dificulta simultáneamente la raíz y la datación de divergencias profundas.",
+        "source_id": "@S177",
+        "locator": "métodos",
+        "dataset_ids": [],
+        "analysis_ids": [],
+        "result_ids": [],
+        "supports_claim_ids": [
+          "@CL783a",
+          "@CL783b"
+        ],
+        "challenges_claim_ids": []
+      },
+      "sources": [
+        "S177"
+      ]
+    },
+    {
+      "key": "@H_origen_tardio",
+      "file": "hypotheses.jsonl",
+      "rows": [
+        "C-770",
+        "C-784"
+      ],
+      "record": {
+        "name": "Origen tardío de la diversidad eucariota viviente",
+        "description": "Los grupos corona de Eukaryota diversificaron tarde, y muchos fósiles paleoproterozoicos y mesoproterozoicos son grupos troncales o de posición indeterminada. Así se concilian los fósiles jóvenes con los relojes antiguos (C-770, C-784).",
+        "included_claim_ids": [
+          "@CL769"
+        ],
+        "assumptions": [
+          "Buena parte del registro proterozoico temprano pertenece al grupo tronco y no al grupo corona (C-784)."
+        ],
+        "supporting_evidence_ids": [
+          "@EV769"
+        ],
+        "supporting_source_ids": [
+          "@S178",
+          "@S179",
+          "@S171"
+        ],
+        "opposing_source_ids": [
+          "@S181"
+        ],
+        "counterevidence_ids": [],
+        "notes": [
+          "S181 se cita en contra por su título («Clade dynamics support an early origin of crown eukaryotes») y por su límite mínimo para LECA (C-771); el corpus no la enfrenta a esta hipótesis en ninguna fila."
+        ]
+      }
+    },
+    {
+      "key": "@I772",
+      "file": "issues.jsonl",
+      "rows": [
+        "C-772"
+      ],
+      "record": {
+        "issue_type": "pending_question",
+        "title": "La edad de LECA no tiene estimación de consenso",
+        "description": "El corredor sintetiza (C-772, a partir de C-760, C-762 y C-765) que no existe una estimación de consenso para la edad de LECA: las recuperadas van de 1007 a 2386 Ma según el estudio, el método y la calibración.",
+        "severity": "INFO",
+        "affects": {
+          "record_ids": [
+            "@E_LECA"
+          ],
+          "claim_ids": [
+            "@CL760",
+            "@CL762",
+            "@CL765",
+            "@CL771",
+            "@CL773",
+            "@CL792"
+          ],
+          "mention_ids": []
+        },
+        "evidence_locators": [
+          "S139 resultados",
+          "S141 fig. 3",
+          "S140 fig. 2",
+          "S178 discusión"
+        ],
+        "resolution": {
+          "status": "open"
+        }
+      }
+    }
+  ],
+  "rows": {
+    "C-757": {
+      "destination": "A",
+      "keys": [
+        "@E757",
+        "@T757",
+        "@R757",
+        "@CL757",
+        "@EV757",
+        "@D_Douzery",
+        "@A_Douzery"
+      ]
+    },
+    "C-758": {
+      "destination": "A",
+      "keys": [
+        "@E758",
+        "@T758",
+        "@R758",
+        "@CL758",
+        "@EV758"
+      ]
+    },
+    "C-759": {
+      "destination": "D",
+      "keys": [
+        "@A_Douzery"
+      ]
+    },
+    "C-760": {
+      "destination": "A",
+      "keys": [
+        "@E_LECA",
+        "@T760",
+        "@R760",
+        "@CL760",
+        "@EV760",
+        "@D_Parfrey",
+        "@A_Parfrey"
+      ]
+    },
+    "C-761": {
+      "destination": "D",
+      "keys": [
+        "@D_Parfrey"
+      ]
+    },
+    "C-762": {
+      "destination": "A",
+      "keys": [
+        "@T762",
+        "@R762",
+        "@CL762",
+        "@EV762",
+        "@D_Eme",
+        "@A_Eme"
+      ]
+    },
+    "C-763": {
+      "destination": "A",
+      "keys": [
+        "@E763",
+        "@T763",
+        "@R763",
+        "@CL763",
+        "@EV763"
+      ]
+    },
+    "C-764": {
+      "destination": "C",
+      "keys": [
+        "@CL763"
+      ]
+    },
+    "C-765": {
+      "destination": "A",
+      "keys": [
+        "@T765",
+        "@R765",
+        "@CL765",
+        "@EV765",
+        "@D_Strassert",
+        "@A_Strassert"
+      ]
+    },
+    "C-766": {
+      "destination": "D",
+      "keys": [
+        "@A_Strassert"
+      ]
+    },
+    "C-767": {
+      "destination": "H",
+      "keys": [
+        "@A_Strassert"
+      ],
+      "note": "Glosa del corredor: queda como nota del análisis de Strassert et al."
+    },
+    "C-768": {
+      "destination": "D",
+      "keys": [
+        "@D_Betts",
+        "@A_Betts"
+      ]
+    },
+    "C-769": {
+      "destination": "A",
+      "keys": [
+        "@T769",
+        "@R769",
+        "@CL769",
+        "@EV769",
+        "@D_Porter",
+        "@A_Porter"
+      ]
+    },
+    "C-770": {
+      "destination": "E",
+      "keys": [
+        "@H_origen_tardio"
+      ]
+    },
+    "C-771": {
+      "destination": "A",
+      "keys": [
+        "@T771",
+        "@R771",
+        "@CL771",
+        "@EV771",
+        "@D_Loron",
+        "@A_Loron"
+      ]
+    },
+    "C-772": {
+      "destination": "I",
+      "keys": [
+        "@I772"
+      ]
+    },
+    "C-773": {
+      "destination": "F",
+      "keys": [
+        "@T773",
+        "@CL773"
+      ]
+    },
+    "C-774": {
+      "destination": "H",
+      "keys": [],
+      "note": "Cálculo propio del corredor que el propio corredor retiró (Vigencia: superada). No se ingiere."
+    },
+    "C-775": {
+      "destination": "G",
+      "keys": [
+        "@EVM_775_S160",
+        "@EVM_775_S141",
+        "@EVM_775_S140",
+        "@CL775",
+        "@N_Bangiomorpha",
+        "@TC_Bangiomorpha",
+        "@M_datacion_profunda"
+      ]
+    },
+    "C-776": {
+      "destination": "G",
+      "keys": [
+        "@EVM_776_S141",
+        "@EVM_776_S178",
+        "@CL776"
+      ]
+    },
+    "C-777": {
+      "destination": "G",
+      "keys": [
+        "@EVM_777_S141",
+        "@CL777",
+        "@M_calibracion_nodal"
+      ]
+    },
+    "C-778": {
+      "destination": "G",
+      "keys": [
+        "@EVM_778_S141",
+        "@EVM_778_S177",
+        "@CL778",
+        "@M_limite_maximo"
+      ]
+    },
+    "C-779": {
+      "destination": "G",
+      "keys": [
+        "@EVM_779_S142",
+        "@EVM_779_S141",
+        "@CL779a",
+        "@CL779b",
+        "@M_reloj_estricto",
+        "@M_reloj_relajado"
+      ]
+    },
+    "C-780": {
+      "destination": "G",
+      "keys": [
+        "@EVM_780_S141",
+        "@EVM_780_S140",
+        "@CL780",
+        "@M_relajado_autocorrelacionado",
+        "@M_relajado_no_autocorrelacionado"
+      ]
+    },
+    "C-781": {
+      "destination": "G",
+      "keys": [
+        "@EVM_781_S141",
+        "@CL781",
+        "@M_saturacion"
+      ]
+    },
+    "C-782": {
+      "destination": "G",
+      "keys": [
+        "@EVM_782_S141",
+        "@EVM_782_S140",
+        "@CL782",
+        "@M_heterotaquia",
+        "@M_relojes_sin_heterotaquia"
+      ]
+    },
+    "C-783": {
+      "destination": "G",
+      "keys": [
+        "@EVM_783_S141",
+        "@EVM_783_S177",
+        "@CL783a",
+        "@CL783b",
+        "@M_grupo_externo",
+        "@M_enraizamiento"
+      ]
+    },
+    "C-784": {
+      "destination": "E",
+      "keys": [
+        "@H_origen_tardio"
+      ]
+    },
+    "C-785": {
+      "destination": "B",
+      "keys": [
+        "@CL785",
+        "@EV785",
+        "@Especimen_CapasBlancas",
+        "@Choanoflagellata"
+      ]
+    },
+    "C-786": {
+      "destination": "D",
+      "keys": [
+        "@D_Sandin"
+      ]
+    },
+    "C-787": {
+      "destination": "D",
+      "keys": [
+        "@A_Sandin"
+      ]
+    },
+    "C-788": {
+      "destination": "D",
+      "keys": [
+        "@A_Sandin"
+      ]
+    },
+    "C-789": {
+      "destination": "D",
+      "keys": [
+        "@A_Sandin"
+      ]
+    },
+    "C-790": {
+      "destination": "A",
+      "keys": [
+        "@E790",
+        "@T790",
+        "@R790",
+        "@CL790",
+        "@EV790",
+        "@Discoba"
+      ]
+    },
+    "C-791": {
+      "destination": "A",
+      "keys": [
+        "@E791",
+        "@T791",
+        "@R791",
+        "@CL791",
+        "@EV791",
+        "@Amorphea"
+      ]
+    },
+    "C-792": {
+      "destination": "A",
+      "keys": [
+        "@T792",
+        "@R792",
+        "@CL792",
+        "@EV792"
+      ]
+    }
+  },
+  "mentions": {
+    "diversificación eucariota en Douzery et al. 2004": {
+      "mention_type": "event",
+      "disposition": "event_part",
+      "targets": [
+        "@E757"
+      ],
+      "reason": "evento de divergencia datado en C-757"
+    },
+    "950–1259 Ma": {
+      "mention_type": "range",
+      "disposition": "contextual_attribute",
+      "targets": [
+        "@T757"
+      ],
+      "reason": "intervalo de la datación de C-757"
+    },
+    "nodo Choanoflagellata–Metazoa": {
+      "mention_type": "event",
+      "disposition": "event_part",
+      "targets": [
+        "@E758"
+      ],
+      "reason": "evento de divergencia datado en C-758"
+    },
+    "761–957 Ma": {
+      "mention_type": "range",
+      "disposition": "contextual_attribute",
+      "targets": [
+        "@T758"
+      ],
+      "reason": "intervalo de la datación de C-758"
+    },
+    "análisis de Douzery et al. 2004": {
+      "mention_type": "method",
+      "disposition": "evidence",
+      "targets": [
+        "@A_Douzery"
+      ],
+      "reason": "análisis que produce C-757 y C-758"
+    },
+    "reloj relajado bayesiano con seis calibraciones": {
+      "mention_type": "method",
+      "disposition": "contextual_attribute",
+      "targets": [
+        "@A_Douzery"
+      ],
+      "reason": "método del análisis de Douzery et al. (C-759)"
+    },
+    "LECA": {
+      "mention_type": "population",
+      "disposition": "new_entity",
+      "targets": [
+        "@LECA"
+      ],
+      "reason": "población reconstruida, como la tipa el apéndice B"
+    },
+    "1679–1866 Ma": {
+      "mention_type": "range",
+      "disposition": "contextual_attribute",
+      "targets": [
+        "@T760"
+      ],
+      "reason": "intervalo de la datación de C-760"
+    },
+    "análisis de Parfrey et al. 2011": {
+      "mention_type": "method",
+      "disposition": "evidence",
+      "targets": [
+        "@A_Parfrey"
+      ],
+      "reason": "análisis que produce C-760"
+    },
+    "muestreo ampliado de eucariotas microbianos": {
+      "mention_type": "method",
+      "disposition": "contextual_attribute",
+      "targets": [
+        "@D_Parfrey"
+      ],
+      "reason": "muestreo de los datos de Parfrey et al. (C-761)"
+    },
+    "1007–1898 Ma": {
+      "mention_type": "range",
+      "disposition": "contextual_attribute",
+      "targets": [
+        "@T762"
+      ],
+      "reason": "intervalo de la datación de C-762"
+    },
+    "Opisthokonta": {
+      "mention_type": "clade",
+      "disposition": "new_entity",
+      "targets": [
+        "@Opisthokonta"
+      ],
+      "reason": "clado cuya corona se data en C-763"
+    },
+    "904–1579 Ma": {
+      "mention_type": "range",
+      "disposition": "contextual_attribute",
+      "targets": [
+        "@T763"
+      ],
+      "reason": "intervalo de la datación de C-763"
+    },
+    "tallo entre LECA y Opisthokonta": {
+      "mention_type": "range",
+      "disposition": "contextual_attribute",
+      "targets": [
+        "@CL763"
+      ],
+      "reason": "soporte cuantitativo de C-763 (C-764)"
+    },
+    "23–334 Ma": {
+      "mention_type": "quantity",
+      "disposition": "contextual_attribute",
+      "targets": [
+        "@CL763"
+      ],
+      "reason": "duración del tallo, soporte cuantitativo de C-763 (C-764)"
+    },
+    "1958–2386 Ma": {
+      "mention_type": "range",
+      "disposition": "contextual_attribute",
+      "targets": [
+        "@T765"
+      ],
+      "reason": "intervalo de la datación de C-765"
+    },
+    "análisis de Strassert et al. 2021": {
+      "mention_type": "method",
+      "disposition": "evidence",
+      "targets": [
+        "@A_Strassert"
+      ],
+      "reason": "análisis que produce C-765"
+    },
+    "modelos y calibraciones alternativos": {
+      "mention_type": "method",
+      "disposition": "contextual_attribute",
+      "targets": [
+        "@A_Strassert"
+      ],
+      "reason": "método del análisis de Strassert et al. (C-766)"
+    },
+    "corrección de Strassert et al. 2021": {
+      "mention_type": "source",
+      "disposition": "contextual_attribute",
+      "targets": [
+        "@A_Strassert"
+      ],
+      "reason": "nota del análisis: la corrección no es una estimación independiente (C-767)"
+    },
+    "corrección del mismo estudio": {
+      "mention_type": "source",
+      "disposition": "contextual_attribute",
+      "targets": [
+        "@A_Strassert"
+      ],
+      "reason": "nota del análisis (C-767)"
+    },
+    "análisis de Betts et al. 2018": {
+      "mention_type": "method",
+      "disposition": "evidence",
+      "targets": [
+        "@A_Betts"
+      ],
+      "reason": "análisis de S177 (C-768)"
+    },
+    "integración de datos genómicos y fósiles": {
+      "mention_type": "method",
+      "disposition": "contextual_attribute",
+      "targets": [
+        "@A_Betts",
+        "@D_Betts"
+      ],
+      "reason": "método y datos de Betts et al. (C-768)"
+    },
+    "registro fósil de eucariotas corona": {
+      "mention_type": "fossil",
+      "disposition": "evidence",
+      "targets": [
+        "@Eukaryota",
+        "@D_Porter"
+      ],
+      "reason": "registro que revisa Porter 2020 para C-769"
+    },
+    "aproximadamente 1.05 Ga": {
+      "mention_type": "date",
+      "disposition": "contextual_attribute",
+      "targets": [
+        "@T769"
+      ],
+      "reason": "comienzo del rango observado de C-769"
+    },
+    "hipótesis de origen tardío de Eukaryota corona": {
+      "mention_type": "hypothesis",
+      "disposition": "new_entity",
+      "targets": [
+        "@H_origen_tardio"
+      ],
+      "reason": "hipótesis de C-770 y C-784"
+    },
+    "lectura troncal del registro antiguo": {
+      "mention_type": "hypothesis",
+      "disposition": "contextual_attribute",
+      "targets": [
+        "@H_origen_tardio"
+      ],
+      "reason": "supuesto de la hipótesis (C-770)"
+    },
+    "mínimo próximo a 1696 Ma": {
+      "mention_type": "date",
+      "disposition": "contextual_attribute",
+      "targets": [
+        "@T771"
+      ],
+      "reason": "límite mínimo de C-771"
+    },
+    "no existe": {
+      "mention_type": "controversy",
+      "disposition": "pending_question",
+      "targets": [
+        "@I772"
+      ],
+      "reason": "no hay estimación de consenso para la edad de LECA (C-772)"
+    },
+    "1007–2386 Ma": {
+      "mention_type": "range",
+      "disposition": "contextual_attribute",
+      "targets": [
+        "@T773"
+      ],
+      "reason": "envolvente de C-773"
+    },
+    "antigua amplitud única del envolvente de LECA": {
+      "mention_type": "range",
+      "disposition": "discarded_with_reason",
+      "targets": [],
+      "reason": "cálculo del corredor que el propio corredor retiró (C-774)"
+    },
+    "cálculo derivado no publicado": {
+      "mention_type": "unresolved",
+      "disposition": "discarded_with_reason",
+      "targets": [],
+      "reason": "cálculo del corredor que el propio corredor retiró (C-774)"
+    },
+    "Bangiomorpha pubescens": {
+      "mention_type": "taxonomic_name",
+      "disposition": "new_entity",
+      "targets": [
+        "@N_Bangiomorpha",
+        "@TC_Bangiomorpha"
+      ],
+      "reason": "taxón fósil de C-775"
+    },
+    "calibración influyente de relojes eucariotas": {
+      "mention_type": "method",
+      "disposition": "contextual_attribute",
+      "targets": [
+        "@CL775"
+      ],
+      "reason": "papel de Bangiomorpha como calibración (C-775)"
+    },
+    "calibración de Bangiomorpha": {
+      "mention_type": "method",
+      "disposition": "contextual_attribute",
+      "targets": [
+        "@TC_Bangiomorpha",
+        "@CL776"
+      ],
+      "reason": "Bangiomorpha usado como calibración (C-776)"
+    },
+    "estimaciones de divergencia": {
+      "mention_type": "method",
+      "disposition": "new_entity",
+      "targets": [
+        "@M_datacion_profunda"
+      ],
+      "reason": "datación molecular de divergencias profundas"
+    },
+    "calibración fósil nodal": {
+      "mention_type": "method",
+      "disposition": "new_entity",
+      "targets": [
+        "@M_calibracion_nodal"
+      ],
+      "reason": "entidad de método de C-777"
+    },
+    "edad mínima": {
+      "mention_type": "method",
+      "disposition": "contextual_attribute",
+      "targets": [
+        "@CL777"
+      ],
+      "reason": "límite que aporta la calibración nodal (C-777)"
+    },
+    "límite máximo de calibración": {
+      "mention_type": "method",
+      "disposition": "new_entity",
+      "targets": [
+        "@M_limite_maximo"
+      ],
+      "reason": "entidad de método de C-778"
+    },
+    "mayor dependencia del registro negativo": {
+      "mention_type": "method",
+      "disposition": "contextual_attribute",
+      "targets": [
+        "@CL778"
+      ],
+      "reason": "dependencia de C-778"
+    },
+    "modelo de reloj molecular": {
+      "mention_type": "method",
+      "disposition": "contextual_attribute",
+      "targets": [
+        "@CL779a",
+        "@CL779b"
+      ],
+      "reason": "C-779 compara dos modelos de reloj"
+    },
+    "reloj estricto y reloj relajado": {
+      "mention_type": "method",
+      "disposition": "new_entity",
+      "targets": [
+        "@M_reloj_estricto",
+        "@M_reloj_relajado"
+      ],
+      "reason": "entidades de método de C-779"
+    },
+    "modelos de reloj relajado": {
+      "mention_type": "method",
+      "disposition": "new_entity",
+      "targets": [
+        "@M_relajado_autocorrelacionado",
+        "@M_relajado_no_autocorrelacionado"
+      ],
+      "reason": "las dos familias de reloj relajado de C-780"
+    },
+    "supuestos alternativos de correlación de tasas": {
+      "mention_type": "method",
+      "disposition": "contextual_attribute",
+      "targets": [
+        "@CL780"
+      ],
+      "reason": "incompatibilidad de C-780"
+    },
+    "secuencias moleculares antiguamente divergentes": {
+      "mention_type": "method",
+      "disposition": "contextual_attribute",
+      "targets": [
+        "@CL781"
+      ],
+      "reason": "C-781: la saturación limita la datación profunda"
+    },
+    "señal temporal por saturación": {
+      "mention_type": "method",
+      "disposition": "new_entity",
+      "targets": [
+        "@M_saturacion"
+      ],
+      "reason": "entidad de método de C-781"
+    },
+    "heterotaquia": {
+      "mention_type": "method",
+      "disposition": "new_entity",
+      "targets": [
+        "@M_heterotaquia"
+      ],
+      "reason": "entidad de método de C-782"
+    },
+    "estimaciones de reloj que no modelan cambios de tasa por sitio": {
+      "mention_type": "method",
+      "disposition": "new_entity",
+      "targets": [
+        "@M_relojes_sin_heterotaquia"
+      ],
+      "reason": "entidad de método de C-782"
+    },
+    "árbol eucariota": {
+      "mention_type": "method",
+      "disposition": "new_entity",
+      "targets": [
+        "@M_enraizamiento",
+        "@M_datacion_profunda"
+      ],
+      "reason": "enraizamiento y datación del árbol eucariota (C-783)"
+    },
+    "grupo externo distante": {
+      "mention_type": "method",
+      "disposition": "new_entity",
+      "targets": [
+        "@M_grupo_externo"
+      ],
+      "reason": "entidad de método de C-783"
+    },
+    "desacuerdo entre fósiles y relojes": {
+      "mention_type": "controversy",
+      "disposition": "contextual_attribute",
+      "targets": [
+        "@H_origen_tardio"
+      ],
+      "reason": "desacuerdo que la hipótesis concilia (C-784)"
+    },
+    "distinción tallo–corona": {
+      "mention_type": "hypothesis",
+      "disposition": "contextual_attribute",
+      "targets": [
+        "@H_origen_tardio"
+      ],
+      "reason": "supuesto de la hipótesis (C-784)"
+    },
+    "material orgánico de la Formación Capas Blancas": {
+      "mention_type": "specimen",
+      "disposition": "new_entity",
+      "targets": [
+        "@Especimen_CapasBlancas"
+      ],
+      "reason": "espécimen de C-785"
+    },
+    "Choanoflagellata putativa": {
+      "mention_type": "clade",
+      "disposition": "new_entity",
+      "targets": [
+        "@Choanoflagellata"
+      ],
+      "reason": "clado al que se asigna el espécimen de C-785"
+    },
+    "muestreo de Sandin et al.": {
+      "mention_type": "method",
+      "disposition": "evidence",
+      "targets": [
+        "@D_Sandin"
+      ],
+      "reason": "datos de S548 (C-786)"
+    },
+    "75,975 OTU": {
+      "mention_type": "quantity",
+      "disposition": "contextual_attribute",
+      "targets": [
+        "@D_Sandin"
+      ],
+      "reason": "tamaño de los datos de S548 (C-786)"
+    },
+    "análisis temporal de Sandin et al.": {
+      "mention_type": "method",
+      "disposition": "evidence",
+      "targets": [
+        "@A_Sandin"
+      ],
+      "reason": "análisis de S548 (C-787)"
+    },
+    "77 calibraciones": {
+      "mention_type": "quantity",
+      "disposition": "contextual_attribute",
+      "targets": [
+        "@A_Sandin"
+      ],
+      "reason": "parámetro del análisis de S548 (C-787)"
+    },
+    "análisis filogenético de Sandin et al.": {
+      "mention_type": "method",
+      "disposition": "evidence",
+      "targets": [
+        "@A_Sandin"
+      ],
+      "reason": "análisis de S548 (C-788)"
+    },
+    "32 árboles": {
+      "mention_type": "quantity",
+      "disposition": "contextual_attribute",
+      "targets": [
+        "@A_Sandin"
+      ],
+      "reason": "parámetro del análisis de S548 (C-788)"
+    },
+    "análisis TreePL de Sandin et al.": {
+      "mention_type": "method",
+      "disposition": "evidence",
+      "targets": [
+        "@A_Sandin"
+      ],
+      "reason": "análisis de S548 (C-789)"
+    },
+    "100 réplicas": {
+      "mention_type": "quantity",
+      "disposition": "contextual_attribute",
+      "targets": [
+        "@A_Sandin"
+      ],
+      "reason": "parámetro del análisis de S548 (C-789)"
+    },
+    "raíz Discoba en S548": {
+      "mention_type": "event",
+      "disposition": "event_part",
+      "targets": [
+        "@E790",
+        "@Discoba"
+      ],
+      "reason": "evento datado en C-790"
+    },
+    "mediana 1.776 Ma; máximo/mínimo de medianas 1.897/1.670 Ma": {
+      "mention_type": "range",
+      "disposition": "contextual_attribute",
+      "targets": [
+        "@T790"
+      ],
+      "reason": "datación de C-790"
+    },
+    "Amorphea en S548": {
+      "mention_type": "event",
+      "disposition": "event_part",
+      "targets": [
+        "@E791",
+        "@Amorphea"
+      ],
+      "reason": "evento datado en C-791"
+    },
+    "mediana 1.773 Ma; máximo/mínimo de medianas 1.934/1.703 Ma": {
+      "mention_type": "range",
+      "disposition": "contextual_attribute",
+      "targets": [
+        "@T791"
+      ],
+      "reason": "datación de C-791"
+    },
+    "LECA en el escenario Rafatazmia dudosa de S548": {
+      "mention_type": "event",
+      "disposition": "event_part",
+      "targets": [
+        "@E_LECA",
+        "@R792"
+      ],
+      "reason": "LECA en un escenario de S548 (C-792)"
+    },
+    "2.054 Ma; límites 2.104–1.967 Ma": {
+      "mention_type": "range",
+      "disposition": "contextual_attribute",
+      "targets": [
+        "@T792"
+      ],
+      "reason": "datación de C-792"
+    },
+    "reloj molecular relajado": {
+      "mention_type": "method",
+      "disposition": "new_entity",
+      "targets": [
+        "@M_reloj_relajado"
+      ],
+      "reason": "entidad del apéndice B que aparece por primera vez en C-757"
+    }
+  }
+}

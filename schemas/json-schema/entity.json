@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://eslabon-perdido.local/schemas/entity.json",
   "title": "Entity",
-  "description": "Entidad biológica común. Apéndice E.5. Es deliberadamente delgada: identidad, etiqueta y enlaces. Los datos temporales, geográficos, filogenéticos o epistemológicos NO se colocan aquí como verdades planas; viajan en ocurrencias y afirmaciones, donde llevan procedencia, alcance y contraevidencia. Cubre clades.jsonl, lineages.jsonl, populations.jsonl, specimens.jsonl, sites.jsonl, regions.jsonl, occurrences.jsonl y traits.jsonl.",
+  "description": "Entidad biológica común. Apéndice E.5. Es deliberadamente delgada: identidad, etiqueta y enlaces. Los datos temporales, geográficos, filogenéticos o epistemológicos NO se colocan aquí como verdades planas; viajan en ocurrencias y afirmaciones, donde llevan procedencia, alcance y contraevidencia. Cubre clades.jsonl, lineages.jsonl, populations.jsonl, specimens.jsonl, sites.jsonl, regions.jsonl, occurrences.jsonl, traits.jsonl y, desde el esquema 1.2.0, methods.jsonl.",
   "type": "object",
   "properties": {
     "id": {
@@ -23,7 +23,7 @@
         "method",
         "researcher"
       ],
-      "description": "Discriminante de §7 y §8. Los ocho primeros tienen prefijo consolidado en §16.3 y fichero propio en knowledge/records/. Los cuatro últimos están previstos por el modelo pero todavía no tienen prefijo ni fichero canónico: no se almacenan hasta que §16.3 los incorpore. `occurrence` se retiró: tiene esquema propio porque §7.8 la define por su tiempo y su lugar, y esta entidad es delgada por exigencia de E.5 (ISSUE-000035)."
+      "description": "Discriminante de §7 y §8. Los ocho primeros y 'method' tienen prefijo consolidado en §16.3 y fichero propio en knowledge/records/; 'method' se incorporó con el esquema 1.2.0 (DEC-057) y vive en methods.jsonl. 'technology', 'ecosystem' y 'researcher' están previstos por el modelo pero todavía no tienen fichero canónico: no se almacenan hasta que §16.2 los incorpore. `occurrence` se retiró: tiene esquema propio porque §7.8 la define por su tiempo y su lugar, y esta entidad es delgada por exigencia de E.5 (ISSUE-000035)."
     },
     "preferred_label": {
       "type": "string",
@@ -249,6 +249,25 @@
         "properties": {
           "id": {
             "pattern": "^TRAIT-[0-9]{6}$"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "entity_type": {
+            "const": "method"
+          }
+        },
+        "required": [
+          "entity_type"
+        ]
+      },
+      "then": {
+        "properties": {
+          "id": {
+            "pattern": "^METHOD-[0-9]{6}$"
           }
         }
       }

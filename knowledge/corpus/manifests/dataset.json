@@ -1,8 +1,8 @@
 {
   "guide_version": "1.1.0",
-  "schema_version": "1.1.0",
-  "dataset_revision": "REV-000000",
-  "snapshot_id": "SNAP-000011",
+  "schema_version": "1.2.0",
+  "dataset_revision": "REV-000002",
+  "snapshot_id": "SNAP-000012",
   "active_campaign": "CAMP-000001",
   "campaign_status": "planning",
   "corpus_freeze": {
@@ -13,22 +13,22 @@
     "decision": "DEC-056"
   },
   "counts": {
-    "sections": 0,
-    "passages": 0,
-    "mentions": 0,
-    "claims": 0,
-    "events": 0,
-    "hypotheses": 0,
-    "sources": 0,
-    "issues": 2,
-    "entities": 0,
+    "sections": 1,
+    "passages": 1,
+    "mentions": 68,
+    "claims": 24,
+    "events": 6,
+    "hypotheses": 1,
+    "sources": 12,
+    "issues": 3,
+    "entities": 22,
     "views": 0
   },
   "guides": {
     "active": {
       "path": "docs/GUIDE.md",
       "version": "1.1.0",
-      "content_hash": "sha256:efb6fd73ef351faef7d37a4d0d34495c592c170d075a387c7c0900fe65bbb629"
+      "content_hash": "sha256:1e38583e7c278086e5f4aa7cc510184c2253b637f5b12d3d085428ce6558a303"
     },
     "archived": [
       {
@@ -49,7 +49,7 @@
       }
     },
     "next": {
-      "ISSUE": "ISSUE-000040"
+      "ISSUE": "ISSUE-000041"
     }
   }
 }

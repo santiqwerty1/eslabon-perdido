@@ -43,12 +43,14 @@ CORPUS = ROOT / "knowledge" / "corpus"
 SECTIONS = CORPUS / "sections"
 PASSAGES = CORPUS / "passages"
 MANIFEST = CORPUS / "manifests" / "dataset.json"
+RECORDS = ROOT / "knowledge" / "records"
 DELTAS = ROOT / "knowledge" / "deltas"
 REPORTS = ROOT / "generated" / "reports"
 
-# La del contrato vigente (schemas/migrations/1.0.0-a-1.1.0.md). Escribir 1.0.0
-# en registros nuevos los declararía anteriores a DEC-054 y DEC-055.
-SCHEMA_VERSION = "1.1.0"
+# La del contrato vigente (schemas/migrations/1.1.0-a-1.2.0.md). Escribir una
+# anterior en registros nuevos los declararía anteriores a DEC-054, DEC-055 o
+# DEC-057, y los predicados metodológicos no validarían contra ella.
+SCHEMA_VERSION = "1.2.0"
 
 # Heurísticas del paso 3. Proponen, no deciden: cada acierto y cada falso
 # positivo acaban igualmente en el libro mayor de menciones, y es el paso 5 quien
@@ -137,7 +139,7 @@ def ids_en_uso(fichero: str, prefijo: str) -> set[str]:
     aborta con «ya existe». El manual manda una SEC- por sección de nivel 2, así
     que ese caso no es raro: es el normal.
     """
-    ruta = ROOT / "knowledge" / "records" / fichero
+    ruta = RECORDS / fichero
     if not ruta.exists():
         return set()
     out = set()
@@ -551,7 +553,8 @@ def escribir(sec_id: str, texto: str, seccion: dict, pasajes: list[dict], delta:
 
     print(f"\n  sección   knowledge/corpus/sections/{sec_id}.md")
     for ruta in extras or {}:
-        print(f"            {ruta.relative_to(ROOT)}")
+        # Fuera del repositorio —un directorio de pruebas— se imprime tal cual.
+        print(f"            {ruta.relative_to(ROOT) if ruta.is_relative_to(ROOT) else ruta}")
     print(f"  pasajes   knowledge/corpus/passages/{sec_id}.json")
     print(f"  delta     knowledge/deltas/{sec_id}.json")
     print(f"  informe   generated/reports/{sec_id}.md")

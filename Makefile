@@ -10,7 +10,7 @@
 VENV   := .venv
 PYTHON := $(shell [ -x $(VENV)/bin/python ] && echo $(VENV)/bin/python || echo python3)
 
-.PHONY: help setup validate verify snapshot test check clean-generated ingest corpus-freeze corpus-verify corpus-diff
+.PHONY: help setup validate verify snapshot test check clean-generated ingest corpus-freeze corpus-verify corpus-diff convert
 
 help: ## Muestra estos objetivos
 	@grep -hE '^[a-z-]+:.*?## ' $(MAKEFILE_LIST) \
@@ -47,6 +47,10 @@ ingest: ## Ingiere una sección: make ingest CORPUS=../corredor SECCION=03 [DRY=
 		test -n "$(FILE)" || { echo "uso: make ingest CORPUS=ruta[@ref] SECCION=NN, o make ingest FILE=ruta/al/texto.md"; exit 1; }; \
 		$(PYTHON) scripts/ingest/ingest.py "$(FILE)" $(if $(TITLE),--title "$(TITLE)",) $(if $(DRY),--dry-run,); \
 	fi
+
+convert: ## Convierte en registros una sección ya ingerida: make convert CORPUS=../corredor SECCION=06 [DRY=1]
+	@test -n "$(CORPUS)" -a -n "$(SECCION)" || { echo "uso: make convert CORPUS=ruta[@ref] SECCION=NN [DRY=1]"; exit 1; }
+	@$(PYTHON) scripts/ingest/convertir.py "knowledge/corpus/conversions/corredor-$(SECCION).json" --corpus "$(CORPUS)" $(if $(DRY),--dry-run,)
 
 corpus-freeze: ## Congela una versión del corpus: make corpus-freeze CORPUS=../corredor@ref DEC=DEC-…
 	@test -n "$(CORPUS)" || { echo "uso: make corpus-freeze CORPUS=ruta[@ref] [DEC=DEC-…] [SUSTITUYE=manifiesto]"; exit 1; }

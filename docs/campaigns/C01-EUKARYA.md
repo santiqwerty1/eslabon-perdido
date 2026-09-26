@@ -29,7 +29,7 @@ Termina en Holozoa, en el umbral de la historia animal. **No** pretende poblar e
 | **Lista explícita de exclusiones** | pendiente |
 | Controversias obligatorias | en el corpus congelado —81 hipótesis, con sus incompatibilidades declaradas en el apéndice E—; falta elegir cuáles son obligatorias |
 | Evento de endosimbiosis y sus requisitos | pendiente |
-| Corpus científico inicial | **congelado**, sin ingerir: corredor `0.6.0-research-audit` en `af7e799` (`DEC-056`) |
+| Corpus científico inicial | **congelado**: corredor `0.6.0-research-audit` en `af7e799` (`DEC-056`). Ingerida y convertida la sección 6 (`SEC-000001`, `DEC-057`); el resto, pendiente |
 | Fecha de corte bibliográfico | **8 de agosto de 2026**, la de la versión congelada (`DEC-056`) |
 | Criterios de aceptación científica | pendiente |
 | **Presupuesto máximo** de entidades, afirmaciones y vistas | pendiente |

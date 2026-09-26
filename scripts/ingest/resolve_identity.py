@@ -104,7 +104,7 @@ VIGENCIA_ES = {"historical": "históricas", "superseded": "superadas",
 FICHEROS_CORPUS = [
     "clades.jsonl", "lineages.jsonl", "populations.jsonl", "specimens.jsonl",
     "sites.jsonl", "regions.jsonl", "traits.jsonl", "taxon-concepts.jsonl",
-    "taxonomic-names.jsonl",
+    "taxonomic-names.jsonl", "methods.jsonl",
 ]
 
 
