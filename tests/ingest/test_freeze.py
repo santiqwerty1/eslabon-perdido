@@ -354,6 +354,85 @@ class Congelacion(unittest.TestCase):
         self.assertEqual(self.ejecutar(lambda a: snapshot.create(None)), 1)
         self.assertEqual(list(snapshot.SNAPSHOTS.iterdir()), [])
 
+    def snapshot_con_deltas(self):
+        spec = importlib.util.spec_from_file_location("snapshot", ROOT / "scripts" / "snapshot" / "snapshot.py")
+        snapshot = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(snapshot)
+        snapshot.ROOT = self.tmp
+        snapshot.SNAPSHOTS = self.tmp / "snapshots"
+        snapshot.SNAPSHOTS.mkdir()
+        snapshot.MANIFEST = self.tmp / "dataset.json"
+        snapshot.MANIFEST.write_text("{}", encoding="utf-8")
+        deltas = self.tmp / "knowledge" / "deltas"
+        deltas.mkdir(parents=True)
+        return snapshot, deltas
+
+    def test_el_snapshot_no_bendice_un_delta_aplicado_editado(self):
+        # El historial guarda el hash con el que se aplicó cada delta. Si el
+        # delta cambia después, los registros no salieron de lo que dice, y
+        # delta.py se negaría a revertirlo: el snapshot no sería reconstruible.
+        snapshot, deltas = self.snapshot_con_deltas()
+        delta = deltas / "SEC-000001.json"
+        delta.write_text('{"ops": []}\n', encoding="utf-8")
+        (deltas / "historial.jsonl").write_text(json.dumps(
+            {"delta": "SEC-000001.json", "accion": "aplicar", "revision": "REV-000001",
+             "sha256": snapshot.digest(delta)}) + "\n", encoding="utf-8")
+        self.assertEqual(snapshot.deltas_alterados(), [])
+        delta.write_text('{"ops": [], "editado": true}\n', encoding="utf-8")
+        self.assertEqual(len(snapshot.deltas_alterados()), 1)
+        self.assertEqual(self.ejecutar(lambda a: snapshot.create(None)), 1)
+        self.assertEqual(list(snapshot.SNAPSHOTS.iterdir()), [])
+
+    def test_el_hash_que_cuenta_es_el_de_la_primera_aplicacion(self):
+        # delta.py sólo reaplica el contenido de la primera aplicación: una
+        # segunda línea con otro hash no legitima el delta editado.
+        snapshot, deltas = self.snapshot_con_deltas()
+        delta = deltas / "SEC-000001.json"
+        delta.write_text('{"ops": []}\n', encoding="utf-8")
+        primera = snapshot.digest(delta)
+        delta.write_text('{"ops": [], "editado": true}\n', encoding="utf-8")
+        lineas = [{"delta": "SEC-000001.json", "accion": "aplicar", "revision": "REV-000001", "sha256": primera},
+                  {"delta": "SEC-000001.json", "accion": "revertir", "revision": "REV-000000"},
+                  {"delta": "SEC-000001.json", "accion": "aplicar", "revision": "REV-000001",
+                   "sha256": snapshot.digest(delta)}]
+        (deltas / "historial.jsonl").write_text(
+            "".join(json.dumps(l) + "\n" for l in lineas), encoding="utf-8")
+        self.assertEqual(len(snapshot.deltas_alterados()), 1)
+
+    def test_un_delta_aplicado_sin_hash_en_el_historial_cuenta_como_alterado(self):
+        snapshot, deltas = self.snapshot_con_deltas()
+        (deltas / "SEC-000001.json").write_text('{"ops": []}\n', encoding="utf-8")
+        (deltas / "historial.jsonl").write_text(json.dumps(
+            {"delta": "SEC-000001.json", "accion": "aplicar", "revision": "REV-000001"}) + "\n", encoding="utf-8")
+        self.assertEqual(len(snapshot.deltas_alterados()), 1)
+
+    def test_un_delta_revertido_o_pendiente_no_se_compara(self):
+        snapshot, deltas = self.snapshot_con_deltas()
+        revertido = deltas / "SEC-000001.json"
+        revertido.write_text('{"ops": []}\n', encoding="utf-8")
+        lineas = [{"delta": "SEC-000001.json", "accion": "aplicar", "revision": "REV-000001",
+                   "sha256": snapshot.digest(revertido)},
+                  {"delta": "SEC-000001.json", "accion": "revertir", "revision": "REV-000000"}]
+        (deltas / "historial.jsonl").write_text(
+            "".join(json.dumps(l) + "\n" for l in lineas), encoding="utf-8")
+        revertido.write_text('{"ops": [], "editado": true}\n', encoding="utf-8")
+        (deltas / "SEC-000002.json").write_text('{"ops": []}\n', encoding="utf-8")
+        self.assertEqual(snapshot.deltas_alterados(), [])
+
+    def test_verify_informa_de_un_delta_aplicado_editado(self):
+        snapshot, deltas = self.snapshot_con_deltas()
+        delta = deltas / "SEC-000001.json"
+        delta.write_text('{"ops": []}\n', encoding="utf-8")
+        (deltas / "historial.jsonl").write_text(json.dumps(
+            {"delta": "SEC-000001.json", "accion": "aplicar", "revision": "REV-000001",
+             "sha256": snapshot.digest(delta)}) + "\n", encoding="utf-8")
+        snapshot.gather = lambda: {"counts": {}, "files": {}}
+        (snapshot.SNAPSHOTS / "SNAP-000000.json").write_text(json.dumps(
+            {"snapshot_id": "SNAP-000000", "counts": {}, "files": {}}), encoding="utf-8")
+        self.assertEqual(self.ejecutar(lambda a: snapshot.verify(None)), 0)
+        delta.write_text('{"ops": [], "editado": true}\n', encoding="utf-8")
+        self.assertEqual(self.ejecutar(lambda a: snapshot.verify(None)), 1)
+
     def test_el_snapshot_cubre_la_congelacion_activa(self):
         spec = importlib.util.spec_from_file_location("snapshot", ROOT / "scripts" / "snapshot" / "snapshot.py")
         snapshot = importlib.util.module_from_spec(spec)
