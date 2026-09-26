@@ -308,13 +308,18 @@ class Congelacion(unittest.TestCase):
         (self.tmp / "knowledge" / "corpus" / "sections" / "SEC-000001.md").write_text("x\n", encoding="utf-8")
         (self.tmp / "knowledge" / "corpus" / "sections" / "SEC-000001.json").write_text("{}\n", encoding="utf-8")
         (self.tmp / "knowledge" / "corpus" / "passages").mkdir(parents=True)
-        (self.tmp / "knowledge" / "corpus" / "passages" / "SEC-000001.json").write_text("{}\n", encoding="utf-8")
+        (self.tmp / "knowledge" / "corpus" / "passages" / "SEC-000001.json").write_text(
+            json.dumps([{"id": "PASSAGE-000001"}, {"id": "PASSAGE-000002"}, {"id": "PASSAGE-000003"}]),
+            encoding="utf-8")
         (self.tmp / "knowledge" / "deltas").mkdir(parents=True)
         (self.tmp / "knowledge" / "deltas" / "historial.jsonl").write_text("{}\n", encoding="utf-8")
         (self.tmp / "knowledge" / "deltas" / "SEC-000001.json").write_text("{}\n", encoding="utf-8")
         (self.tmp / "knowledge" / "corpus" / "conversions").mkdir(parents=True)
         (self.tmp / "knowledge" / "corpus" / "conversions" / "corredor-06.json").write_text("{}\n", encoding="utf-8")
-        ficheros = snapshot.gather()["files"]
+        estado = snapshot.gather()
+        ficheros = estado["files"]
+        # Se cuentan los pasajes, no los ficheros que los agrupan por sección.
+        self.assertEqual(estado["counts"]["passages"], 3)
         self.assertIn("knowledge/corpus/conversions/corredor-06.json", ficheros)
         self.assertIn("knowledge/deltas/SEC-000001.json", ficheros)
         self.assertIn("knowledge/corpus/sections/SEC-000001.registro.csv", ficheros)

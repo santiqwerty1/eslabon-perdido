@@ -198,6 +198,9 @@ def fuera_de_orden(path: Path, origen: str, reverse: bool) -> str | None:
         # delta que se aplicó, no los de una versión editada después.
         registrada = next((h.get("sha256") for h in reversed(read_jsonl(HISTORIAL))
                            if h.get("delta") == path.name and h.get("accion") == "aplicar"), None)
+        if HISTORIAL.exists() and not registrada:
+            return (f"el historial no guarda la huella de {path.name} cuando se aplicó: "
+                    "no se puede comprobar que sea el mismo contenido")
         if registrada and registrada != huella(path):
             return f"{path.name} cambió desde que se aplicó ({registrada}); no se revierte otro contenido"
     if actual is not None and actual != origen:

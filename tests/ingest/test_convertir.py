@@ -457,6 +457,31 @@ class Convertir(unittest.TestCase):
         self.assertIn("@Alfa", str(e.exception))
         self.assertIn("first_introduced_in", str(e.exception))
 
+    def test_delta_no_revierte_sin_la_huella_de_cuando_se_aplico(self):
+        ruta = self.entorno.tmp / "spec.json"
+        ruta.write_text(json.dumps(self.entorno.spec(), ensure_ascii=False), encoding="utf-8")
+        deltas = self.entorno.tmp / "deltas"
+        with contextlib.redirect_stdout(io.StringIO()):
+            convertir.convertir(ruta, str(MINI), False)
+            self.assertEqual(delta_mod.cmd(deltas / "SEC-000001.json", False, False), 0)
+        historial = deltas / "historial.jsonl"
+        entradas = [json.loads(l) for l in historial.read_text(encoding="utf-8").splitlines()]
+        self.assertTrue(entradas[-1]["sha256"].startswith("sha256:"))
+        del entradas[-1]["sha256"]
+        historial.write_text("".join(json.dumps(e) + "\n" for e in entradas), encoding="utf-8")
+        salida = io.StringIO()
+        with contextlib.redirect_stdout(salida):
+            self.assertEqual(delta_mod.cmd(deltas / "SEC-000001.json", True, False), 1)
+        self.assertIn("huella", salida.getvalue())
+
+    def test_las_fuentes_del_registro_no_se_fijan_en_el_fichero(self):
+        spec = self.entorno.spec()
+        spec["records"][3]["record"]["source_ids"] = ["@S01"]
+        with self.assertRaises(SystemExit) as e:
+            self.entorno.construir(spec)
+        self.assertIn("@EV1", str(e.exception))
+        self.assertIn("source_ids", str(e.exception))
+
     def test_el_fichero_de_conversion_tiene_que_estar_en_conversions(self):
         # El snapshot sólo registra knowledge/corpus/conversions/*.json: una
         # entrada revisada fuera de ahí no se podría recuperar ni verificar.
