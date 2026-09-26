@@ -206,6 +206,69 @@ class Convertir(unittest.TestCase):
             self.entorno.construir(self.entorno.spec())
         self.assertIn("ya se convirtió", str(e.exception))
 
+    def test_un_id_en_el_fichero_de_conversion_se_rechaza(self):
+        spec = self.entorno.spec()
+        spec["records"][0]["record"]["id"] = "CLADE-000001"
+        with self.assertRaises(SystemExit) as e:
+            self.entorno.construir(spec)
+        self.assertIn("@Alfa", str(e.exception))
+        self.assertIn("id", str(e.exception))
+
+    def test_un_identificador_literal_que_no_existe_se_rechaza(self):
+        spec = self.entorno.spec()
+        spec["records"][2]["record"]["object"]["entity_id"] = "CLADE-999999"
+        with self.assertRaises(SystemExit) as e:
+            self.entorno.construir(spec)
+        self.assertIn("CLADE-999999", str(e.exception))
+
+    def test_los_registros_existentes_reciben_sus_enlaces_de_vuelta(self):
+        # Una sección posterior afirma algo de una entidad que ya existe y
+        # respalda una afirmación que ya existe: las dos tienen que enlazarlo.
+        (self.entorno.records / "clades.jsonl").write_text(json.dumps({
+            "id": "CLADE-000050", "entity_type": "clade", "preferred_label": "FIX-Previo",
+            "claim_ids": [], "first_introduced_in": None, "record_status": "active"}) + "\n", encoding="utf-8")
+        (self.entorno.records / "claims.jsonl").write_text(json.dumps({
+            "id": "CLAIM-000050", "claim_type": "relational", "subject_id": "CLADE-000050",
+            "predicate": "member_of", "object": {"entity_id": "CLADE-000050"}, "evidence_ids": [],
+            "counterevidence_ids": [], "record_status": "active"}) + "\n", encoding="utf-8")
+        spec = self.entorno.spec()
+        spec["records"][2]["record"]["object"]["entity_id"] = "CLADE-000050"
+        spec["records"][3]["record"]["supports_claim_ids"] = ["@CL1", "CLAIM-000050"]
+        r = self.entorno.construir(spec)
+        nuevas = {op["record_id"]: op for op in r["delta"]["operations"] if op["operation"] == "UPDATE_RECORD"}
+        [claim] = [rec["id"] for _, rec in r["salida"] if rec["id"].startswith("CLAIM-")]
+        [ev] = [rec["id"] for _, rec in r["salida"] if rec["id"].startswith("EVID-")]
+        self.assertEqual(nuevas["CLADE-000050"]["after"]["claim_ids"], [claim])
+        self.assertEqual(nuevas["CLADE-000050"]["before"]["claim_ids"], [])
+        self.assertEqual(nuevas["CLAIM-000050"]["after"]["evidence_ids"], [ev])
+
+    def test_el_delta_de_la_seccion_tiene_que_ser_de_la_version_congelada(self):
+        ruta = self.entorno.tmp / "deltas" / "SEC-000001.json"
+        d = json.loads(ruta.read_text(encoding="utf-8"))
+        d["corpus_origin"]["freeze"]["fingerprint"] = "sha256:" + "1" * 64
+        ruta.write_text(json.dumps(d), encoding="utf-8")
+        with self.assertRaises(SystemExit) as e:
+            self.entorno.construir(self.entorno.spec())
+        self.assertIn("otra versión", str(e.exception))
+
+    def test_una_conversion_revertida_no_se_sobrescribe(self):
+        deltas = self.entorno.tmp / "deltas"
+        ruta = self.entorno.tmp / "spec.json"
+        ruta.write_text(json.dumps(self.entorno.spec(), ensure_ascii=False), encoding="utf-8")
+        with contextlib.redirect_stdout(io.StringIO()):
+            convertir.convertir(ruta, str(MINI), False)
+        primera = (deltas / "SEC-000001-conversion.json").read_bytes()
+        (deltas / "historial.jsonl").write_text(json.dumps(
+            {"delta": "SEC-000001-conversion.json", "accion": "revertir", "revision": "REV-000001"}) + "\n",
+            encoding="utf-8")
+        with contextlib.redirect_stdout(io.StringIO()):
+            convertir.convertir(ruta, str(MINI), False)
+        self.assertEqual((deltas / "SEC-000001-conversion.json").read_bytes(), primera)
+        segunda = json.loads((deltas / "SEC-000001-conversion-2.json").read_text(encoding="utf-8"))
+        # Los identificadores del revertido siguen reservados.
+        reservados = set(json.loads(primera)["records_added"])
+        self.assertFalse(reservados & set(segunda["records_added"]))
+
     def test_la_conversion_va_detras_del_delta_de_la_seccion(self):
         r = self.entorno.construir(self.entorno.spec())
         self.assertEqual(r["rev"], ("REV-000001", "REV-000002"))

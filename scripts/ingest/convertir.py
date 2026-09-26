@@ -115,6 +115,9 @@ for _f in TIPO_ENTIDAD:
     ESQUEMA[_f] = "entity.json"
 
 CLAVE = re.compile(r"^@[A-Za-z0-9_.\-]+$")
+# Un identificador opaco escrito tal cual, con los prefijos de §16.3.
+LITERAL = re.compile(json.loads((base.ROOT / "schemas" / "json-schema" / "common.json")
+                                .read_text(encoding="utf-8"))["$defs"]["id"]["pattern"])
 FUENTE = re.compile(r"^@(S\d+)$")
 CITA = re.compile(r"\bS\d+\b")
 
@@ -179,6 +182,30 @@ def pendientes(fichero: str) -> list[dict]:
         out += [op["after"] for op in d.get("operations", [])
                 if op.get("file") == fichero and op.get("operation", "").startswith("ADD") and op.get("after")]
     return out
+
+
+def existentes_por_id() -> dict[str, tuple[str, dict]]:
+    """Todo registro que ya existe o que añade un delta sin aplicar, por identificador."""
+    out: dict[str, tuple[str, dict]] = {}
+    for ruta in sorted(base.RECORDS.glob("*.jsonl")):
+        for r in registros(ruta.name):
+            if isinstance(r.get("id"), str):
+                out[r["id"]] = (ruta.name, r)
+    for fichero in PREFIJO:
+        for r in pendientes(fichero):
+            if isinstance(r.get("id"), str):
+                out[r["id"]] = (fichero, r)
+    return out
+
+
+def literales(valor) -> set[str]:
+    if isinstance(valor, str):
+        return {valor} if LITERAL.match(valor) else set()
+    if isinstance(valor, list):
+        return set().union(*(literales(v) for v in valor)) if valor else set()
+    if isinstance(valor, dict):
+        return set().union(*(literales(v) for v in valor.values())) if valor else set()
+    return set()
 
 
 def usados(prefijo: str) -> set[str]:
@@ -281,6 +308,12 @@ def construir(spec_path: Path, corpus: str) -> dict:
     # --- la sección ya se ingirió ---------------------------------------------
     delta_path, delta_sec = delta_de_seccion(sec)
     sec_id = delta_sec["section_id"]
+    huella_sec = ((delta_sec.get("corpus_origin") or {}).get("freeze") or {}).get("fingerprint")
+    if huella_sec != congelada["fingerprint"]:
+        # Sus pasajes y menciones son de otra versión: convertir con las filas de
+        # la activa mezclaría las dos.
+        raise SystemExit(f"ERROR {delta_path.name} se ingirió de otra versión del corpus ({huella_sec}); "
+                         f"la activa es {congelada['fingerprint']}. Una versión nueva entra por diferencia")
     previa = ya_convertida(sec_id)
     if previa:
         raise SystemExit(f"ERROR {sec_id} ya se convirtió ({previa})")
@@ -314,6 +347,9 @@ def construir(spec_path: Path, corpus: str) -> dict:
             errores.append(f"clave definida dos veces: {r['key']}")
         if not CLAVE.match(r["key"]) or FUENTE.match(r["key"]):
             errores.append(f"clave inválida: {r['key']} (las fuentes no se declaran: se citan)")
+        if "id" in r.get("record", {}):
+            errores.append(f"{r['key']}: el fichero de conversión no fija identificadores (`id`); "
+                           "los asigna convertir.py")
         if r["file"] not in PREFIJO or r["file"] == "sources.jsonl":
             errores.append(f"{r['key']}: fichero {r['file']} fuera de lo que convierte este paso")
         for fila in r.get("rows", []):
@@ -467,11 +503,54 @@ def construir(spec_path: Path, corpus: str) -> dict:
             despues["notes"] = list(antes.get("notes", [])) + [f"destino: {destino['reason']}"]
         actualizadas.append((antes, despues))
 
+    # --- identificadores escritos tal cual ----------------------------------------------------
+    # Un registro de otra sección se cita por su identificador. Si no existe, el
+    # validador sólo lo detectaría en los `*_ids` de primer nivel: un sujeto, un
+    # objeto o un participante colgando pasarían.
+    existentes_id = existentes_por_id()
+    conocidos = (set(por_id) | set(existentes_id) | base.ids_de_pasajes() | base.ids_de_secciones()
+                 | set(menciones))
+    colgando = []
+    for fichero, rec in salida:
+        colgando += [f"{rec['id']} → {x}" for x in sorted(literales(rec) - conocidos)]
+    for _, d in actualizadas:
+        colgando += [f"{d['id']} → {x}" for x in sorted(literales(d["resolution"]["target_ids"]) - conocidos)]
+    if colgando:
+        raise SystemExit("ERROR identificadores que no existen: " + "; ".join(colgando))
+
+    # --- enlaces de vuelta en registros que ya existían ------------------------------------
+    # Una afirmación sobre una entidad de otra sección, o una evidencia de una
+    # afirmación que ya existía, tiene que quedar enlazada también desde allí.
+    cambios: dict[str, tuple[str, dict, dict]] = {}
+
+    def enlazar(rid: str, campo: str, nuevo_id: str) -> None:
+        if rid in por_id or rid not in existentes_id:
+            return
+        fichero, antes = existentes_id[rid]
+        if fichero not in ESQUEMA or campo not in propiedades(fichero):
+            return
+        _, _, despues = cambios.setdefault(rid, (fichero, antes, json.loads(json.dumps(antes))))
+        if nuevo_id not in despues.setdefault(campo, []):
+            despues[campo].append(nuevo_id)
+
+    for c in afirmaciones:
+        for rid in (c.get("subject_id"), (c.get("object") or {}).get("entity_id")):
+            if isinstance(rid, str):
+                enlazar(rid, "claim_ids", c["id"])
+    for fichero, rec in salida:
+        if fichero == "evidence.jsonl":
+            for cid in rec.get("supports_claim_ids", []):
+                enlazar(cid, "evidence_ids", rec["id"])
+            for cid in rec.get("challenges_claim_ids", []):
+                enlazar(cid, "counterevidence_ids", rec["id"])
+
     # --- delta ------------------------------------------------------------------------------
     operaciones = [{"operation": "ADD_RECORD", "file": fichero, "record_id": rec["id"], "before": None, "after": rec}
                    for fichero, rec in salida]
     operaciones += [{"operation": "UPDATE_RECORD", "file": "mentions.jsonl", "record_id": d["id"],
                      "before": a, "after": d} for a, d in actualizadas]
+    operaciones += [{"operation": "UPDATE_RECORD", "file": fichero, "record_id": rid,
+                     "before": antes, "after": despues} for rid, (fichero, antes, despues) in sorted(cambios.items())]
     de = lambda f: [rec["id"] for fichero, rec in salida if fichero == f]
     filas_destino = {}
     for fila, destino in spec["rows"].items():
@@ -485,7 +564,7 @@ def construir(spec_path: Path, corpus: str) -> dict:
         "dataset_revision_after": rev_despues,
         "operations": operaciones,
         "records_added": [rec["id"] for _, rec in salida],
-        "records_updated": [d["id"] for _, d in actualizadas],
+        "records_updated": [d["id"] for _, d in actualizadas] + sorted(cambios),
         "claims_added": de("claims.jsonl"),
         "events_added": de("events.jsonl"),
         "hypotheses_added": de("hypotheses.jsonl"),
@@ -558,6 +637,12 @@ def convertir(spec_path: Path, corpus: str, dry: bool) -> int:
         print("\n(en seco: no se ha escrito nada)")
         return 0
     nombre = f"{r['sec_id']}-conversion"
+    # Una conversión revertida se queda como constancia: reserva sus
+    # identificadores y el historial la nombra. La nueva lleva otro nombre.
+    n = 2
+    while (base.DELTAS / f"{nombre}.json").exists():
+        nombre = f"{r['sec_id']}-conversion-{n}"
+        n += 1
     base.DELTAS.mkdir(parents=True, exist_ok=True)
     base.REPORTS.mkdir(parents=True, exist_ok=True)
     (base.DELTAS / f"{nombre}.json").write_text(
