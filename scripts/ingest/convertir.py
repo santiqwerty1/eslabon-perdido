@@ -289,6 +289,19 @@ def fuente_de_apendice(fila: dict, col_doi: str) -> dict:
     }
 
 
+def valores_de(valor, campo: str) -> set[str]:
+    """Los valores de `campo` a cualquier profundidad, fuera de la procedencia."""
+    if isinstance(valor, list):
+        return set().union(*(valores_de(v, campo) for v in valor)) if valor else set()
+    if not isinstance(valor, dict):
+        return set()
+    hallados = {valor[campo]} if isinstance(valor.get(campo), str) else set()
+    for k, v in valor.items():
+        if k != "provenance":
+            hallados |= valores_de(v, campo)
+    return hallados
+
+
 def sustituir(valor, ids: dict[str, str], faltan: set[str]):
     if isinstance(valor, str) and CLAVE.match(valor):
         if valor in ids:
@@ -464,6 +477,7 @@ def construir(spec_path: Path, corpus: str) -> dict:
 
     # --- registros -----------------------------------------------------------------
     faltan: set[str] = set()
+    ajenas_a_la_procedencia: list[str] = []
     salida: list[tuple[str, dict]] = [("sources.jsonl", f) for f in fuentes_nuevas]
     for r in spec.get("records", []):
         fichero = r["file"]
@@ -493,6 +507,15 @@ def construir(spec_path: Path, corpus: str) -> dict:
                                  "operation_id": None, "dataset_revision": rev_despues, "origin": "ingestion"}
         if "source_ids" in props:
             rec["source_ids"] = fuentes_r
+        # Un `source_id` dice de qué obra sale el registro (una evidencia, un
+        # apoyo cuantitativo): tiene que ser una de las de su procedencia. Las
+        # fuentes a favor o en contra de una hipótesis son argumentos, no origen.
+        if "provenance" in rec:
+            propias = valores_de(rec, "source_id") - set(fuentes_r)
+            if propias:
+                ajenas_a_la_procedencia.append(
+                    f"{r['key']}: `source_id` {', '.join(sorted(propias))} no está entre las fuentes "
+                    f"de su procedencia ({', '.join(fuentes_r) or 'ninguna'})")
         if "epistemic_dimensions" in props and "epistemic_dimensions" not in rec and fichero in (
                 "claims.jsonl", "hypotheses.jsonl"):
             if not filas_r:
@@ -517,6 +540,9 @@ def construir(spec_path: Path, corpus: str) -> dict:
         salida.append((fichero, rec))
     if faltan:
         raise SystemExit(f"ERROR claves usadas sin definir: {', '.join(sorted(faltan))}")
+    if ajenas_a_la_procedencia:
+        raise SystemExit("ERROR atribuciones que contradicen la procedencia:\n  "
+                         + "\n  ".join(ajenas_a_la_procedencia))
 
     # --- enlaces que se deducen -----------------------------------------------------
     por_id = {rec["id"]: (fichero, rec) for fichero, rec in salida}

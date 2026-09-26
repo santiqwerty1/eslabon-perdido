@@ -423,16 +423,15 @@ class Convertir(unittest.TestCase):
             self.assertEqual(delta_mod.cmd(deltas / "SEC-000001.json", False, True), 0)
             self.assertEqual(delta_mod.cmd(deltas / "SEC-000001.json", False, False), 0)
             self.assertEqual(delta_mod.cmd(deltas / "SEC-000001.json", False, True), 1)
-            self.assertEqual(delta_mod.cmd(deltas / "SEC-000001.json", True, True), 0)
+            self.assertEqual(delta_mod.cmd(deltas / "SEC-000001-conversion.json", False, False), 0)
+            self.assertEqual(delta_mod.cmd(deltas / "SEC-000001-conversion.json", True, True), 0)
+            self.assertEqual(delta_mod.cmd(deltas / "SEC-000001.json", True, True), 1)
 
     def test_delta_solo_revierte_el_fichero_que_se_aplico(self):
         # Una copia con el mismo nombre, o el mismo fichero editado después de
         # aplicarlo, no es el delta que el historial registró.
-        ruta = self.entorno.tmp / "spec.json"
-        ruta.write_text(json.dumps(self.entorno.spec(), ensure_ascii=False), encoding="utf-8")
         deltas = self.entorno.tmp / "deltas"
         with contextlib.redirect_stdout(io.StringIO()):
-            convertir.convertir(ruta, str(MINI), False)
             self.assertEqual(delta_mod.cmd(deltas / "SEC-000001.json", False, False), 0)
             copia = self.entorno.tmp / "otra" / "SEC-000001.json"
             copia.parent.mkdir()
@@ -458,11 +457,8 @@ class Convertir(unittest.TestCase):
         self.assertIn("first_introduced_in", str(e.exception))
 
     def test_delta_no_revierte_sin_la_huella_de_cuando_se_aplico(self):
-        ruta = self.entorno.tmp / "spec.json"
-        ruta.write_text(json.dumps(self.entorno.spec(), ensure_ascii=False), encoding="utf-8")
         deltas = self.entorno.tmp / "deltas"
         with contextlib.redirect_stdout(io.StringIO()):
-            convertir.convertir(ruta, str(MINI), False)
             self.assertEqual(delta_mod.cmd(deltas / "SEC-000001.json", False, False), 0)
         historial = deltas / "historial.jsonl"
         entradas = [json.loads(l) for l in historial.read_text(encoding="utf-8").splitlines()]
@@ -481,6 +477,30 @@ class Convertir(unittest.TestCase):
             self.entorno.construir(spec)
         self.assertIn("@EV1", str(e.exception))
         self.assertIn("source_ids", str(e.exception))
+
+    def test_delta_no_revierte_con_deltas_pendientes_detras(self):
+        # La conversión generada y sin aplicar parte de la revisión que deja la
+        # sección: revertir la sección la dejaría colgando de una que no existe.
+        ruta = self.entorno.tmp / "spec.json"
+        ruta.write_text(json.dumps(self.entorno.spec(), ensure_ascii=False), encoding="utf-8")
+        deltas = self.entorno.tmp / "deltas"
+        with contextlib.redirect_stdout(io.StringIO()):
+            convertir.convertir(ruta, str(MINI), False)
+            self.assertEqual(delta_mod.cmd(deltas / "SEC-000001.json", False, False), 0)
+        salida = io.StringIO()
+        with contextlib.redirect_stdout(salida):
+            self.assertEqual(delta_mod.cmd(deltas / "SEC-000001.json", True, False), 1)
+        self.assertIn("SEC-000001-conversion.json", salida.getvalue())
+
+    def test_la_fuente_de_una_evidencia_tiene_que_estar_en_su_procedencia(self):
+        # La evidencia dice venir de S01 y su procedencia, de S02: una de las
+        # dos atribuciones es falsa.
+        spec = self.entorno.spec()
+        spec["records"][3]["sources"] = ["S02"]
+        with self.assertRaises(SystemExit) as e:
+            self.entorno.construir(spec)
+        self.assertIn("@EV1", str(e.exception))
+        self.assertIn("source_id", str(e.exception))
 
     def test_el_fichero_de_conversion_tiene_que_estar_en_conversions(self):
         # El snapshot sólo registra knowledge/corpus/conversions/*.json: una
