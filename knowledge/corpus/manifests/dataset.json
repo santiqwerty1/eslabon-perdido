@@ -1,8 +1,8 @@
 {
   "guide_version": "1.1.0",
-  "schema_version": "1.2.0",
+  "schema_version": "1.3.0",
   "dataset_revision": "REV-000006",
-  "snapshot_id": "SNAP-000016",
+  "snapshot_id": "SNAP-000017",
   "active_campaign": "CAMP-000001",
   "campaign_status": "planning",
   "corpus_freeze": {
@@ -28,7 +28,7 @@
     "active": {
       "path": "docs/GUIDE.md",
       "version": "1.1.0",
-      "content_hash": "sha256:1e38583e7c278086e5f4aa7cc510184c2253b637f5b12d3d085428ce6558a303"
+      "content_hash": "sha256:57aa0681916617c0078da072ac25890f73077011ef26014cf57bb0cedaa44c0d"
     },
     "archived": [
       {

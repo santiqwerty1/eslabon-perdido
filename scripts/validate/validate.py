@@ -28,12 +28,12 @@ ID_RE = re.compile(
     r"^(SEC|PASSAGE|MENTION|SRC|NAME|TAXCONCEPT|CLADE|LINEAGE|POP|SPECIMEN|SITE|"
     r"REGION|OCC|TRAIT|TRAITOBS|GENE|ALLELE|EVENT|CLAIM|EVID|DATASET|ANALYSIS|"
     r"RESULT|HYP|TAXVIEW|PHYVIEW|CAMP|CHAPTER|MECH|GAME|ISSUE|TERM|TIME|"
-    r"TECH|ECOSYS|METHOD|RESEARCHER|CONFLICT)-[0-9]{6}$"
+    r"TECH|ECOSYS|METHOD|MOL|RESEARCHER|CONFLICT)-[0-9]{6}$"
 )
 
 # Fichero JSONL -> esquema. Cubre los ficheros de knowledge/records/ listados en
-# §16.2. Las ocho entidades biológicas comunes y los métodos (esquema 1.2.0,
-# DEC-057) comparten entity.json (Apéndice E.5): su entity_type discrimina, y el
+# §16.2. Las ocho entidades biológicas comunes, los métodos (esquema 1.2.0,
+# DEC-057) y las moléculas (esquema 1.3.0, DEC-058) comparten entity.json (Apéndice E.5): su entity_type discrimina, y el
 # propio esquema exige que el prefijo del identificador concuerde con él.
 #
 # Tres esquemas no aparecen aquí porque su registro no vive en records/:
@@ -55,6 +55,7 @@ SCHEMA_BY_FILE = {
     "occurrences.jsonl": "occurrence.json",
     "traits.jsonl": "entity.json",
     "methods.jsonl": "entity.json",
+    "molecules.jsonl": "entity.json",
     "trait-observations.jsonl": "trait-observation.json",
     "claims.jsonl": "claim.json",
     "evidence.jsonl": "evidence.json",

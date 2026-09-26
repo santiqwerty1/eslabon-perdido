@@ -87,6 +87,7 @@ PREFIJO = {
     "traits.jsonl": "TRAIT",
     "trait-observations.jsonl": "TRAITOBS",
     "methods.jsonl": "METHOD",
+    "molecules.jsonl": "MOL",
     "claims.jsonl": "CLAIM",
     "evidence.jsonl": "EVID",
     "datasets.jsonl": "DATASET",
@@ -114,6 +115,7 @@ TIPO_ENTIDAD = {
     "populations.jsonl": "population", "specimens.jsonl": "specimen",
     "sites.jsonl": "site", "regions.jsonl": "region", "traits.jsonl": "trait",
     "methods.jsonl": "method",
+    "molecules.jsonl": "molecule",
 }
 for _f in TIPO_ENTIDAD:
     ESQUEMA[_f] = "entity.json"

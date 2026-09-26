@@ -32,9 +32,10 @@
         "historical",
         "nomenclatural",
         "taxonomic",
-        "methodological"
+        "methodological",
+        "geochemical"
       ],
-      "description": "Los veinte tipos previstos en E.7, más 'methodological' desde el esquema 1.2.0 (DEC-057): la literatura que sostiene una relación metodológica de §14.6."
+      "description": "Los veinte tipos previstos en E.7, más 'methodological' desde el esquema 1.2.0 (DEC-057): la literatura que sostiene una relación metodológica de §14.6. 'geochemical' desde el 1.3.0 (DEC-058): biomarcadores y otros compuestos hallados en rocas, que no son morfología fósil ni secuencias."
     },
     "description": {
       "type": "string",
