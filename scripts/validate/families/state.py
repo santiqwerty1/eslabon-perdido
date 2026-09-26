@@ -12,9 +12,10 @@ Comprueba cuatro cosas:
 4. **dimensiones epistemológicas no mezcladas** — §10.
 
 La cuarta es la sutil. §10 rechaza un `epistemic_status` único porque mezclaba
-preguntas distintas, y separa seis ejes independientes. Dos de ellos comparten
-el valor `superseded`: §10.5 describe la vigencia de la IDEA y §10.6 el ciclo
-de vida del REGISTRO. Ahí es donde los ejes vuelven a fundirse en la práctica:
+preguntas distintas, y separa seis ejes independientes. Dos de ellos
+compartían el valor `superseded` hasta que el del registro se renombró a
+`replaced` (ISSUE-000007): §10.5 describe la vigencia de la IDEA y §10.6 el
+ciclo de vida del REGISTRO. Ahí es donde los ejes vuelven a fundirse en la práctica:
 se marca el registro como superado porque la idea lo está y, con eso, se pierde
 el registro de la idea superada, que es justo lo que §0.1 manda conservar. Una
 hipótesis abandonada en 1970 sigue teniendo un registro **activo**; lo superado
@@ -351,10 +352,10 @@ def _check_deprecations(data, rep, ids: set[str]) -> None:
             historical = dims.get("historical_status") if isinstance(dims, dict) else None
 
             if status in NEEDS_SUCCESSOR and successor is None:
-                if status == "superseded" and historical == "superseded":
+                if status == "replaced" and historical == "superseded":
                     rep.error(
-                        f"estado: {fname}:{rid} tiene record_status 'superseded' sin "
-                        "registro que lo reemplace, y su historical_status también es "
+                        f"estado: {fname}:{rid} tiene record_status 'replaced' sin "
+                        "registro que lo reemplace, y su historical_status es "
                         "'superseded': §10.5 (vigencia de la IDEA) y §10.6 (ciclo de "
                         "vida del REGISTRO) se están usando como sinónimos. Una idea "
                         "superada se conserva en un registro activo"
@@ -528,18 +529,18 @@ def _check_axes(data, rep) -> None:
                         "de opinión indistinguible de la aceptación (§10.1)"
                     )
 
-            # (a) los dos ejes que comparten 'superseded' no son sinónimos.
+            # (a) la idea superada y el registro reemplazado no son sinónimos.
             historical = dims.get("historical_status")
             if historical in ("superseded", "rejected"):
                 superseded_ideas += 1
-                if rec.get("record_status") == "superseded":
+                if rec.get("record_status") == "replaced":
                     mirrored.append(where)
 
     if superseded_ideas >= 2 and len(mirrored) == superseded_ideas:
         rep.warn(
             "estado: las "
             f"{superseded_ideas} ideas superadas o rechazadas del dataset llevan además "
-            "record_status 'superseded' sin excepción: los ejes §10.5 y §10.6 se están "
+            "record_status 'replaced' sin excepción: los ejes §10.5 y §10.6 se están "
             "moviendo como uno solo. Conservar una idea superada es mantener su registro "
             f"activo ({', '.join(sorted(mirrored)[:5])})"
         )

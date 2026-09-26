@@ -28,6 +28,7 @@ algunos se contradicen entre sí:
 ├── state-ok/
 ├── state-bad/
 │   ├── record-status-as-synonym/       §10.5 y §10.6 usados como sinónimos
+│   ├── legacy-record-status/           el `superseded` de registro, renombrado a `replaced`
 │   ├── deprecation-without-reason/     cerrar un registro sin decir hacia dónde
 │   ├── evidence-strength-without-reason/
 │   ├── collapsed-axes/                 un campo que resume varios ejes

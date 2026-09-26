@@ -175,7 +175,7 @@ def _check_requirements(hyps: list[dict], index: dict[str, dict], rep) -> None:
 
         for cid in sorted(included):
             target = index.get(cid)
-            if isinstance(target, dict) and target.get("record_status") in ("deprecated", "superseded"):
+            if isinstance(target, dict) and target.get("record_status") not in (None, "active"):
                 rep.warn(
                     f"hipótesis: {hid} incluye {cid}, en estado {target.get('record_status')!r}. "
                     "El registro se conserva (§10.6), pero seleccionarlo exige justificación"
