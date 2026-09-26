@@ -124,8 +124,10 @@ LITERAL = re.compile(json.loads((base.ROOT / "schemas" / "json-schema" / "common
                                 .read_text(encoding="utf-8"))["$defs"]["id"]["pattern"])
 FUENTE = re.compile(r"^@(S\d+)$")
 CITA = re.compile(r"\bS\d+\b")
-# Los destinos de fila de docs/campaigns/C01-PREDICADOS.md, A–I.
+# Los destinos de fila de docs/campaigns/C01-PREDICADOS.md, A–I. Sólo la
+# glosa (H) puede no producir registros: las demás filas son contenido.
 DESTINOS = set("ABCDEFGHI")
+SIN_REGISTROS = {"H"}
 # Sólo una mención descartada puede quedarse sin registro al que apunte.
 SIN_OBJETIVO = {"discarded_with_reason"}
 # Lo que convertir.py deduce y el fichero de conversión no puede fijar: escrito
@@ -410,7 +412,11 @@ def construir(spec_path: Path, corpus: str) -> dict:
     if sobran:
         errores.append(f"menciones que la sección no tiene: {'; '.join(sobran)}")
     for etiqueta, destino in spec.get("mentions", {}).items():
-        if destino.get("disposition") not in SIN_OBJETIVO and not destino.get("targets"):
+        if not destino.get("disposition"):
+            # El esquema admite null para la mención sin resolver; convertir es
+            # justo darle destino.
+            errores.append(f"mención {etiqueta}: sin `disposition`")
+        elif destino.get("disposition") not in SIN_OBJETIVO and not destino.get("targets"):
             errores.append(f"mención {etiqueta}: {destino.get('disposition')} sin `targets`; "
                            "sólo una descartada puede quedarse sin registro")
         if destino.get("disposition") in SIN_OBJETIVO and not (destino.get("reason") or "").strip():
@@ -437,6 +443,9 @@ def construir(spec_path: Path, corpus: str) -> dict:
     for fila, destino in spec.get("rows", {}).items():
         if destino.get("destination") not in DESTINOS:
             errores.append(f"{fila}: destino {destino.get('destination')!r} fuera de A–I")
+        elif destino["destination"] not in SIN_REGISTROS and not destino.get("keys"):
+            errores.append(f"{fila}: destino {destino['destination']} sin registros (`keys`); "
+                           "sólo una glosa (H) puede no producirlos")
         for k in destino.get("keys", []):
             if k not in definidas:
                 errores.append(f"{fila}: la clave {k} no está definida")
@@ -592,8 +601,11 @@ def construir(spec_path: Path, corpus: str) -> dict:
 
     # --- menciones ----------------------------------------------------------------------
     actualizadas: list[tuple[dict, dict]] = []
-    for mid, antes in sorted(menciones.items()):
-        destino = spec["mentions"][antes["original_text"]]
+    for mid, ingerida in sorted(menciones.items()):
+        # El estado del que parte es el proyectado: un delta intermedio pudo
+        # anotar la mención, y el UPDATE no puede deshacerlo.
+        antes = proy.get(mid, (None, ingerida))[1]
+        destino = spec["mentions"][ingerida["original_text"]]
         objetivos = sustituir(destino.get("targets", []), ids, faltan)
         if faltan:
             raise SystemExit(f"ERROR claves usadas sin definir: {', '.join(sorted(faltan))}")
