@@ -220,7 +220,8 @@ dónde y cuándo aparece un fósil, y eso es una **ocurrencia** (§7.8):
 - una afirmación `dated_to` sobre la ocurrencia, de la que `convertir.py` deduce
   la fecha de la ocurrencia. Si varias compiten, el fichero de conversión elige
   cuál: en el registro de la ocurrencia si es nueva, y en `occurrence_dates` si
-  ya existía sin fecha. La de una ocurrencia que ya tenía fecha no se pisa;
+  ya existía sin fecha, entre sus dataciones de antes y las nuevas. La de una
+  ocurrencia que ya tenía fecha no se pisa;
 - la cadena del estudio, con conjuntos de datos de trazabilidad.
 
 Cuando la fila fecha la propia formación (C-699, C-731), la afirmación

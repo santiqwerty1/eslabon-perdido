@@ -551,6 +551,52 @@ class Convertir(unittest.TestCase):
         self.assertIn("OCC-000050", str(e.exception))
         self.assertIn("@T3", str(e.exception))
 
+    def datacion_previa(self, estado: str = "active") -> None:
+        """Una afirmación `dated_to` de otra sección sobre OCC-000050."""
+        claim = {"id": "CLAIM-000050", "claim_type": "temporal", "subject_id": "OCC-000050",
+                 "predicate": "dated_to", "object": {"temporal_expression_id": "TIME-000050"},
+                 "record_status": estado}
+        (self.entorno.records / "claims.jsonl").write_text(json.dumps(claim) + "\n", encoding="utf-8")
+
+    def test_una_datacion_previa_compite_con_la_nueva(self):
+        # Una sola datación nueva no basta para fecharla si ya tenía otra.
+        spec = self.ocurrencia_existente(None)
+        self.datacion_previa()
+        with self.assertRaises(SystemExit) as e:
+            self.entorno.construir(spec)
+        self.assertIn("OCC-000050", str(e.exception))
+        self.assertIn("occurrence_dates", str(e.exception))
+
+    def test_la_fecha_elegida_puede_ser_la_de_una_datacion_previa(self):
+        spec = self.ocurrencia_existente(None)
+        self.datacion_previa()
+        spec["occurrence_dates"] = {"OCC-000050": "TIME-000050"}
+        r = self.entorno.construir(spec)
+        [op] = [o for o in r["delta"]["operations"] if o["record_id"] == "OCC-000050"]
+        self.assertEqual(op["after"]["temporal_expression_id"], "TIME-000050")
+
+    def test_una_datacion_previa_retirada_no_compite(self):
+        spec = self.ocurrencia_existente(None)
+        self.datacion_previa("deprecated")
+        r = self.entorno.construir(spec)
+        [t] = [x["id"] for _, x in r["salida"] if x["id"].startswith("TIME-")]
+        [op] = [o for o in r["delta"]["operations"] if o["record_id"] == "OCC-000050"]
+        self.assertEqual(op["after"]["temporal_expression_id"], t)
+
+    def test_elegir_la_fecha_de_una_ocurrencia_que_la_conversion_no_fecha_se_rechaza(self):
+        # Fijar la fecha de una ocurrencia que esta conversión no toca es una
+        # corrección, no parte de convertir la sección.
+        spec = self.ocurrencia_existente(None)
+        otra = {"id": "OCC-000051", "entity_id": "CLADE-000050", "temporal_expression_id": None,
+                "location_precision": "unknown", "evidence_basis": "observed", "record_status": "active"}
+        with (self.entorno.records / "occurrences.jsonl").open("a", encoding="utf-8") as fh:
+            fh.write(json.dumps(otra) + "\n")
+        spec["occurrence_dates"] = {"OCC-000051": "@TO"}
+        with self.assertRaises(SystemExit) as e:
+            self.entorno.construir(spec)
+        self.assertIn("OCC-000051", str(e.exception))
+        self.assertIn("occurrence_dates", str(e.exception))
+
     def test_elegir_la_fecha_de_una_ocurrencia_que_no_existia_se_rechaza(self):
         # Una ocurrencia nueva elige en su propio registro; una que no existe no
         # tiene fecha que elegir.
