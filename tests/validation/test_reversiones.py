@@ -108,6 +108,17 @@ class Reversiones(unittest.TestCase):
         from families import state  # noqa: E402
         self.assertEqual(state.ADD_OPERATIONS, {op for op, modo in delta.OPERATIONS.items() if modo == "add"})
 
+    def test_un_recuento_en_lugar_de_identificadores_es_un_error_y_no_un_fallo(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            caso = Path(tmp)
+            (caso / "deltas").mkdir()
+            (caso / "claims.jsonl").write_text("", encoding="utf-8")
+            (caso / "deltas" / "SEC-000001.json").write_text(json.dumps({
+                "dataset_revision_before": "REV-000000", "dataset_revision_after": "REV-000001",
+                "records_updated": 2}), encoding="utf-8")
+            errores = validate.run(["state"], records_dir=caso).errors
+        self.assertTrue(any("records_updated" in e and "lista" in e for e in errores), errores)
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
