@@ -119,7 +119,7 @@ ENTITY_FILES = (
     "taxonomic-names.jsonl", "taxon-concepts.jsonl", "clades.jsonl",
     "lineages.jsonl", "populations.jsonl", "specimens.jsonl", "sites.jsonl",
     "regions.jsonl", "occurrences.jsonl", "traits.jsonl",
-    "trait-observations.jsonl", "methods.jsonl",
+    "trait-observations.jsonl", "methods.jsonl", "molecules.jsonl",
 )
 COUNT_FILES = {
     "mentions": ("mentions.jsonl",),

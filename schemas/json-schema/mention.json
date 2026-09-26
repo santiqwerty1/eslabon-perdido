@@ -41,6 +41,7 @@
         "event",
         "trait",
         "gene",
+        "molecule",
         "technology",
         "behaviour",
         "controversy",

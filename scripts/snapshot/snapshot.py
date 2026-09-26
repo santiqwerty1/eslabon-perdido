@@ -33,7 +33,7 @@ COUNT_MAP = {
 ENTITY_FILES = [
     "taxonomic-names.jsonl", "taxon-concepts.jsonl", "clades.jsonl", "lineages.jsonl",
     "populations.jsonl", "specimens.jsonl", "sites.jsonl", "regions.jsonl",
-    "occurrences.jsonl", "traits.jsonl", "trait-observations.jsonl", "methods.jsonl",
+    "occurrences.jsonl", "traits.jsonl", "trait-observations.jsonl", "methods.jsonl", "molecules.jsonl",
 ]
 VIEW_DIR = ROOT / "knowledge" / "views"
 

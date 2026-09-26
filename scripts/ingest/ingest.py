@@ -47,10 +47,11 @@ RECORDS = ROOT / "knowledge" / "records"
 DELTAS = ROOT / "knowledge" / "deltas"
 REPORTS = ROOT / "generated" / "reports"
 
-# La del contrato vigente (schemas/migrations/1.1.0-a-1.2.0.md). Escribir una
-# anterior en registros nuevos los declararía anteriores a DEC-054, DEC-055 o
-# DEC-057, y los predicados metodológicos no validarían contra ella.
-SCHEMA_VERSION = "1.2.0"
+# La del contrato vigente (schemas/migrations/1.2.0-a-1.3.0.md). Escribir una
+# anterior en registros nuevos los declararía anteriores a DEC-054, DEC-055,
+# DEC-057 o DEC-058, y los predicados metodológicos, las moléculas y
+# `biomarker_of` no validarían contra ella.
+SCHEMA_VERSION = "1.3.0"
 
 # Heurísticas del paso 3. Proponen, no deciden: cada acierto y cada falso
 # positivo acaban igualmente en el libro mayor de menciones, y es el paso 5 quien
