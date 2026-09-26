@@ -1,0 +1,827 @@
+[
+  {
+    "id": "PASSAGE-000040",
+    "section_id": "SEC-000002",
+    "ordinal": 1,
+    "text": "# 5. El registro material: fósiles y biomarcadores",
+    "character_offsets": {
+      "start": 0,
+      "end": 50
+    },
+    "record_status": "active"
+  },
+  {
+    "id": "PASSAGE-000041",
+    "section_id": "SEC-000002",
+    "ordinal": 2,
+    "text": "## 5.1. Criterios de reconocimiento y límites de los acritarcos",
+    "character_offsets": {
+      "start": 52,
+      "end": 115
+    },
+    "record_status": "active"
+  },
+  {
+    "id": "PASSAGE-000042",
+    "section_id": "SEC-000002",
+    "ordinal": 3,
+    "text": "«Acritarco» designa una categoría artificial de microfósiles orgánicos de afinidad biológica incierta y no un clado. [C-694; S152 §2]",
+    "character_offsets": {
+      "start": 117,
+      "end": 250
+    },
+    "record_status": "active"
+  },
+  {
+    "id": "PASSAGE-000043",
+    "section_id": "SEC-000002",
+    "ordinal": 4,
+    "text": "La ornamentación compleja, los procesos huecos, las aberturas de excistamiento y una pared multicapa aumentan la probabilidad de afinidad eucariota, pero ningún carácter aislado es universalmente diagnóstico. [C-695; S151 resultados; S152 §2]",
+    "character_offsets": {
+      "start": 252,
+      "end": 494
+    },
+    "record_status": "active"
+  },
+  {
+    "id": "PASSAGE-000044",
+    "section_id": "SEC-000002",
+    "ordinal": 5,
+    "text": "El tamaño de una vesícula por sí solo no permite asignarla con seguridad a Eukaryota. [C-696; S152 §2]",
+    "character_offsets": {
+      "start": 496,
+      "end": 598
+    },
+    "record_status": "active"
+  },
+  {
+    "id": "PASSAGE-000045",
+    "section_id": "SEC-000002",
+    "ordinal": 6,
+    "text": "La microscopía electrónica de transmisión puede revelar capas de pared y organización submicrométrica no visibles con microscopía óptica. [C-697; S151 métodos y figs. 2–7]",
+    "character_offsets": {
+      "start": 600,
+      "end": 771
+    },
+    "record_status": "active"
+  },
+  {
+    "id": "PASSAGE-000046",
+    "section_id": "SEC-000002",
+    "ordinal": 7,
+    "text": "La química orgánica de la pared puede apoyar una afinidad biológica, pero la alteración térmica y la diagénesis limitan su especificidad. [C-698; S151 discusión; S161 métodos]",
+    "character_offsets": {
+      "start": 773,
+      "end": 948
+    },
+    "record_status": "active"
+  },
+  {
+    "id": "PASSAGE-000047",
+    "section_id": "SEC-000002",
+    "ordinal": 8,
+    "text": "## 5.2. Roper, Ruyang y otros registros de pared orgánica",
+    "character_offsets": {
+      "start": 950,
+      "end": 1007
+    },
+    "record_status": "active"
+  },
+  {
+    "id": "PASSAGE-000048",
+    "section_id": "SEC-000002",
+    "ordinal": 9,
+    "text": "Lechte et al. situaron los fósiles eucariotas más antiguos de su conjunto aproximadamente entre 1,75 y 1,4 Ga y observaron que aparecen casi restringidos a fondos marinos oxigenados. [C-751; C-752] Los autores infirieron de ese patrón aerobiosis con mitocondrias y hábito bentónico; esas dos propiedades son interpretaciones, no observaciones directas de las estructuras fósiles. [C-751; C-752; C-753; C-754; S547 resultados; discusión]",
+    "character_offsets": {
+      "start": 1009,
+      "end": 1445
+    },
+    "record_status": "active"
+  },
+  {
+    "id": "PASSAGE-000049",
+    "section_id": "SEC-000002",
+    "ordinal": 10,
+    "text": "La sucesión del Grupo Roper está constreñida por edades U–Pb y Re–Os entre aproximadamente 1492 ± 4 Ma y 1361 ± 21 Ma. [C-699; S150 §Geological setting]",
+    "character_offsets": {
+      "start": 1447,
+      "end": 1599
+    },
+    "record_status": "active"
+  },
+  {
+    "id": "PASSAGE-000050",
+    "section_id": "SEC-000002",
+    "ordinal": 11,
+    "text": "Tappania plana del Grupo Roper presenta procesos ramificados y morfologías que fueron interpretadas como crecimiento eucariota complejo. [C-700; S150 descripción sistemática; S152 fig. 2]",
+    "character_offsets": {
+      "start": 1601,
+      "end": 1788
+    },
+    "record_status": "active"
+  },
+  {
+    "id": "PASSAGE-000051",
+    "section_id": "SEC-000002",
+    "ordinal": 12,
+    "text": "Valeria lophostriata posee estriaciones concéntricas regulares en la pared de la vesícula. [C-701; S150 descripción sistemática; S153 fig. 2]",
+    "character_offsets": {
+      "start": 1790,
+      "end": 1931
+    },
+    "record_status": "active"
+  },
+  {
+    "id": "PASSAGE-000052",
+    "section_id": "SEC-000002",
+    "ordinal": 13,
+    "text": "Las estriaciones de Valeria lophostriata apoyan una afinidad eucariota, pero no resuelven su posición dentro del grupo corona. [C-702; S150 discusión]",
+    "character_offsets": {
+      "start": 1933,
+      "end": 2083
+    },
+    "record_status": "active"
+  },
+  {
+    "id": "PASSAGE-000053",
+    "section_id": "SEC-000002",
+    "ordinal": 14,
+    "text": "Dictyosphaera y Shuiyousphaeridium del Grupo Ruyang presentan ornamentación y organización de pared usadas para proponer afinidad eucariota. [C-703; S151 resultados; S152 §2]",
+    "character_offsets": {
+      "start": 2085,
+      "end": 2259
+    },
+    "record_status": "active"
+  },
+  {
+    "id": "PASSAGE-000054",
+    "section_id": "SEC-000002",
+    "ordinal": 15,
+    "text": "La edad del conjunto Ruyang está acotada de forma más amplia y menos directa que la del Grupo Roper. [C-704; S150 discusión estratigráfica]",
+    "character_offsets": {
+      "start": 2261,
+      "end": 2400
+    },
+    "record_status": "active"
+  },
+  {
+    "id": "PASSAGE-000055",
+    "section_id": "SEC-000002",
+    "ordinal": 16,
+    "text": "Qingshania magnifica procede de la Formación Chuanlinggou, datada en aproximadamente 1.63 Ga. [C-705; S154 resumen y §Geological setting]",
+    "character_offsets": {
+      "start": 2402,
+      "end": 2539
+    },
+    "record_status": "active"
+  },
+  {
+    "id": "PASSAGE-000056",
+    "section_id": "SEC-000002",
+    "ordinal": 17,
+    "text": "En 262 microfósiles medidos de *Qingshania magnifica*, el diámetro transversal fue 20–194 µm, con media 73 µm y desviación estándar 29 µm. [C-706] El máximo de 250 µm corresponde al material tipo de 1989 citado por el artículo, no a esta distribución nueva. [C-706; S154 Results, descripción morfológica; fig. 4B,F; Methods §Measurement of fossils]",
+    "character_offsets": {
+      "start": 2541,
+      "end": 2889
+    },
+    "record_status": "active"
+  },
+  {
+    "id": "PASSAGE-000057",
+    "section_id": "SEC-000002",
+    "ordinal": 18,
+    "text": "Miao y colaboradores interpretaron Qingshania magnifica como un eucariota multicelular, sin asignarlo con seguridad a un grupo corona viviente. [C-707; S154 discusión]",
+    "character_offsets": {
+      "start": 2891,
+      "end": 3058
+    },
+    "record_status": "active"
+  },
+  {
+    "id": "PASSAGE-000058",
+    "section_id": "SEC-000002",
+    "ordinal": 19,
+    "text": "## 5.3. Candidatos antiguos y discutidos",
+    "character_offsets": {
+      "start": 3060,
+      "end": 3100
+    },
+    "record_status": "active"
+  },
+  {
+    "id": "PASSAGE-000059",
+    "section_id": "SEC-000002",
+    "ordinal": 20,
+    "text": "Grypania spiralis fue interpretada como un alga eucariota macroscópica en la Formación de Hierro Negaunee de aproximadamente 2.1 Ga. [C-708; S155 resumen]",
+    "character_offsets": {
+      "start": 3102,
+      "end": 3256
+    },
+    "record_status": "active"
+  },
+  {
+    "id": "PASSAGE-000060",
+    "section_id": "SEC-000002",
+    "ordinal": 21,
+    "text": "Knoll y colaboradores consideraron muy probable el origen eucariota de Grypania spiralis, pero indicaron que sus relaciones filogenéticas no estaban bien restringidas. [C-709; S152 p. 1025, §3; fig. 2i]",
+    "character_offsets": {
+      "start": 3258,
+      "end": 3460
+    },
+    "record_status": "active"
+  },
+  {
+    "id": "PASSAGE-000061",
+    "section_id": "SEC-000002",
+    "ordinal": 22,
+    "text": "Rafatazmia chitrakootensis fue descrita en la Dolomía Tirohan de la cuenca Vindhyan y se le atribuyó una edad aproximada de 1.6 Ga. [C-710; S156 resumen y §Geological setting]",
+    "character_offsets": {
+      "start": 3462,
+      "end": 3637
+    },
+    "record_status": "active"
+  },
+  {
+    "id": "PASSAGE-000062",
+    "section_id": "SEC-000002",
+    "ordinal": 23,
+    "text": "Bengtson y colaboradores interpretaron Rafatazmia chitrakootensis como una rodófita del grupo corona. [C-711; S156 título; discusión]",
+    "character_offsets": {
+      "start": 3639,
+      "end": 3772
+    },
+    "record_status": "active"
+  },
+  {
+    "id": "PASSAGE-000063",
+    "section_id": "SEC-000002",
+    "ordinal": 24,
+    "text": "La asignación de Rafatazmia chitrakootensis a Rhodophyta corona es cuestionada por la ausencia de caracteres reproductivos inequívocos y por incertidumbres estratigráficas. [C-712; S152 discusión; S178 §fossil record]",
+    "character_offsets": {
+      "start": 3774,
+      "end": 3991
+    },
+    "record_status": "active"
+  },
+  {
+    "id": "PASSAGE-000064",
+    "section_id": "SEC-000002",
+    "ordinal": 25,
+    "text": "## 5.4. Microfósiles con forma de vasija (*vase-shaped microfossils*, VSM) y daño por perforación",
+    "character_offsets": {
+      "start": 3993,
+      "end": 4090
+    },
+    "record_status": "active"
+  },
+  {
+    "id": "PASSAGE-000065",
+    "section_id": "SEC-000002",
+    "ordinal": 26,
+    "text": "Los microfósiles con forma de vasija del Grupo Chuar fueron comparados con amebas testadas modernas y se interpretan habitualmente dentro de Amoebozoa o su grupo total. [C-713; S157 resumen y discusión]",
+    "character_offsets": {
+      "start": 4092,
+      "end": 4294
+    },
+    "record_status": "active"
+  },
+  {
+    "id": "PASSAGE-000066",
+    "section_id": "SEC-000002",
+    "ordinal": 27,
+    "text": "Las unidades portadoras de perforaciones estudiadas por Porter en el Grupo Chuar se sitúan entre 780 y 740 Ma. [C-714; S158 título; §Geological setting]",
+    "character_offsets": {
+      "start": 4296,
+      "end": 4448
+    },
+    "record_status": "active"
+  },
+  {
+    "id": "PASSAGE-000067",
+    "section_id": "SEC-000002",
+    "ordinal": 28,
+    "text": "Porter midió perforaciones circulares de 0.1–3.4 µm en siete especies de microfósiles orgánicos del Grupo Chuar. [C-715; S158 resultados; tabla 1]",
+    "character_offsets": {
+      "start": 4450,
+      "end": 4596
+    },
+    "record_status": "active"
+  },
+  {
+    "id": "PASSAGE-000068",
+    "section_id": "SEC-000002",
+    "ordinal": 29,
+    "text": "La regularidad, distribución taxonómica y semejanza con perforaciones de protistas vampirélidos apoyan una interpretación de depredación por perforación. [C-716; S158 discusión]",
+    "character_offsets": {
+      "start": 4598,
+      "end": 4775
+    },
+    "record_status": "active"
+  },
+  {
+    "id": "PASSAGE-000069",
+    "section_id": "SEC-000002",
+    "ordinal": 30,
+    "text": "La diagénesis, el daño post mortem y la preparación fueron evaluados como explicaciones alternativas para las perforaciones del Grupo Chuar. [C-717; S158 discusión]",
+    "character_offsets": {
+      "start": 4777,
+      "end": 4941
+    },
+    "record_status": "active"
+  },
+  {
+    "id": "PASSAGE-000070",
+    "section_id": "SEC-000002",
+    "ordinal": 31,
+    "text": "Algunos microfósiles con forma de vasija presentan perforaciones aproximadamente semicirculares o circulares de 15–35 µm. [C-718; S158 discusión; material comparativo]",
+    "character_offsets": {
+      "start": 4943,
+      "end": 5110
+    },
+    "record_status": "active"
+  },
+  {
+    "id": "PASSAGE-000071",
+    "section_id": "SEC-000002",
+    "ordinal": 32,
+    "text": "No se ha identificado taxonómicamente al organismo que produjo las perforaciones del Grupo Chuar. [C-719; S158 discusión]",
+    "character_offsets": {
+      "start": 5112,
+      "end": 5233
+    },
+    "record_status": "active"
+  },
+  {
+    "id": "PASSAGE-000072",
+    "section_id": "SEC-000002",
+    "ordinal": 33,
+    "text": "La evidencia de interacción se mantiene separada de la fila nodal de Amoebozoa: tamaño, interpretación, alternativas e identidad del productor ocupan celdas propias y remiten a C-715–C-719. [C-715–C-719; S158 resultados, tabla 1 y discusión]",
+    "character_offsets": {
+      "start": 5235,
+      "end": 5476
+    },
+    "record_status": "active"
+  },
+  {
+    "id": "PASSAGE-000073",
+    "section_id": "SEC-000002",
+    "ordinal": 34,
+    "text": "<!-- TABLE:table-33-5-4-evidencia-de-interaccion-en-perforaciones-del-grupo-chuar -->",
+    "character_offsets": {
+      "start": 5478,
+      "end": 5563
+    },
+    "record_status": "active"
+  },
+  {
+    "id": "PASSAGE-000074",
+    "section_id": "SEC-000002",
+    "ordinal": 35,
+    "text": "## 5.5. Fósiles con relevancia directa para el corredor",
+    "character_offsets": {
+      "start": 5565,
+      "end": 5620
+    },
+    "record_status": "active"
+  },
+  {
+    "id": "PASSAGE-000075",
+    "section_id": "SEC-000002",
+    "ordinal": 36,
+    "text": "Bangiomorpha pubescens presenta filamentos multicelulares con diferenciación basal y patrones de división comparados con bangiales vivientes. [C-720; S159 descripción; figs. 4–9]",
+    "character_offsets": {
+      "start": 5622,
+      "end": 5800
+    },
+    "record_status": "active"
+  },
+  {
+    "id": "PASSAGE-000076",
+    "section_id": "SEC-000002",
+    "ordinal": 37,
+    "text": "Butterfield interpretó etapas reproductivas diferenciadas de Bangiomorpha pubescens como evidencia de reproducción sexual. [C-721; S159 discusión]",
+    "character_offsets": {
+      "start": 5802,
+      "end": 5948
+    },
+    "record_status": "active"
+  },
+  {
+    "id": "PASSAGE-000077",
+    "section_id": "SEC-000002",
+    "ordinal": 38,
+    "text": "La sucesión que contiene Bangiomorpha pubescens fue datada en aproximadamente 1.047 Ga. [C-722; S160 resumen]",
+    "character_offsets": {
+      "start": 5950,
+      "end": 6059
+    },
+    "record_status": "active"
+  },
+  {
+    "id": "PASSAGE-000078",
+    "section_id": "SEC-000002",
+    "ordinal": 39,
+    "text": "Bangiomorpha pubescens funciona como calibración mínima para divergencias eucariotas solo si se acepta su asignación a Rhodophyta corona. [C-723; S160 discusión; S141 §calibrations]",
+    "character_offsets": {
+      "start": 6061,
+      "end": 6242
+    },
+    "record_status": "active"
+  },
+  {
+    "id": "PASSAGE-000079",
+    "section_id": "SEC-000002",
+    "ordinal": 40,
+    "text": "Ourasphaira giraldae está acotada aproximadamente entre 1010 y 890 Ma. [C-724; S161 resumen; métodos]",
+    "character_offsets": {
+      "start": 6244,
+      "end": 6345
+    },
+    "record_status": "active"
+  },
+  {
+    "id": "PASSAGE-000080",
+    "section_id": "SEC-000002",
+    "ordinal": 41,
+    "text": "Loron y colaboradores interpretaron Ourasphaira giraldae como un hongo sobre la base de morfología, ultraestructura y espectroscopía. [C-725; S161 resumen; figs. 1–3]",
+    "character_offsets": {
+      "start": 6347,
+      "end": 6513
+    },
+    "record_status": "active"
+  },
+  {
+    "id": "PASSAGE-000081",
+    "section_id": "SEC-000002",
+    "ordinal": 42,
+    "text": "La afinidad fúngica de Ourasphaira giraldae no permite asignarla con seguridad a Fungi corona ni fechar por sí sola Opisthokonta corona. [C-726; S161 discusión; S178 §fossil record]",
+    "character_offsets": {
+      "start": 6515,
+      "end": 6696
+    },
+    "record_status": "active"
+  },
+  {
+    "id": "PASSAGE-000082",
+    "section_id": "SEC-000002",
+    "ordinal": 43,
+    "text": "Bicellum brasieri procede de depósitos lacustres de la Formación Diabaig de aproximadamente 1.0 Ga. [C-727; S162 resumen; §Geological setting]",
+    "character_offsets": {
+      "start": 6698,
+      "end": 6840
+    },
+    "record_status": "active"
+  },
+  {
+    "id": "PASSAGE-000083",
+    "section_id": "SEC-000002",
+    "ordinal": 44,
+    "text": "Bicellum brasieri conserva una masa interna de células isodiamétricas rodeada por una capa de células alargadas. [C-728; S162 resultados; figs. 1–3]",
+    "character_offsets": {
+      "start": 6842,
+      "end": 6990
+    },
+    "record_status": "active"
+  },
+  {
+    "id": "PASSAGE-000084",
+    "section_id": "SEC-000002",
+    "ordinal": 45,
+    "text": "Strother y colaboradores consideraron que Bicellum brasieri es más consistente con una afinidad holozoa que con un alga de pared rígida. [C-729; S162 discusión]",
+    "character_offsets": {
+      "start": 6992,
+      "end": 7152
+    },
+    "record_status": "active"
+  },
+  {
+    "id": "PASSAGE-000085",
+    "section_id": "SEC-000002",
+    "ordinal": 46,
+    "text": "Los autores de Bicellum brasieri indicaron que no podían excluir por completo paredes celulares delgadas y flexibles. [C-730; S162 discusión: «cannot entirely rule out thin, flexible cell walls»]",
+    "character_offsets": {
+      "start": 7154,
+      "end": 7349
+    },
+    "record_status": "active"
+  },
+  {
+    "id": "PASSAGE-000086",
+    "section_id": "SEC-000002",
+    "ordinal": 47,
+    "text": "Fonseca y colaboradores describieron en la Formación Capas Blancas material orgánico del Cenomaniano–Turoniano como una ocurrencia putativa de coanoflagelados. [C-785; S500 título; resumen; resultados y discusión]",
+    "character_offsets": {
+      "start": 7351,
+      "end": 7564
+    },
+    "record_status": "active"
+  },
+  {
+    "id": "PASSAGE-000087",
+    "section_id": "SEC-000002",
+    "ordinal": 48,
+    "text": "## 5.6. Doushantuo y Weng’an: embriones, quistes y desarrollo holozoo",
+    "character_offsets": {
+      "start": 7566,
+      "end": 7635
+    },
+    "record_status": "active"
+  },
+  {
+    "id": "PASSAGE-000088",
+    "section_id": "SEC-000002",
+    "ordinal": 49,
+    "text": "La Formación Doushantuo fue depositada aproximadamente entre 635 y 551 Ma según dataciones U–Pb de circones en niveles volcánicos. [C-731; S168 resumen]",
+    "character_offsets": {
+      "start": 7637,
+      "end": 7789
+    },
+    "record_status": "active"
+  },
+  {
+    "id": "PASSAGE-000089",
+    "section_id": "SEC-000002",
+    "ordinal": 50,
+    "text": "La posición estratigráfica de la biota de Weng’an la acota como más antigua que 609 ± 5 Ma o próxima a esa edad. [C-732; S169 resumen]",
+    "character_offsets": {
+      "start": 7791,
+      "end": 7925
+    },
+    "record_status": "active"
+  },
+  {
+    "id": "PASSAGE-000090",
+    "section_id": "SEC-000002",
+    "ordinal": 51,
+    "text": "Tianzhushania y formas del ciclo Megasphaera fueron interpretadas históricamente como embriones animales por sus divisiones palintómicas. [C-733; S166 introducción; S168 contexto]",
+    "character_offsets": {
+      "start": 7927,
+      "end": 8106
+    },
+    "record_status": "active"
+  },
+  {
+    "id": "PASSAGE-000091",
+    "section_id": "SEC-000002",
+    "ordinal": 52,
+    "text": "Huldtgren y colaboradores reinterpretaron fósiles de Tianzhushania como protistas holozoos enquistantes con núcleos fosilizados y estructuras de germinación. [C-734; S163 título; resultados]",
+    "character_offsets": {
+      "start": 8108,
+      "end": 8298
+    },
+    "record_status": "active"
+  },
+  {
+    "id": "PASSAGE-000092",
+    "section_id": "SEC-000002",
+    "ordinal": 53,
+    "text": "Chen y colaboradores interpretaron estructuras internas de fósiles tipo Megasphaera como diferenciación celular y separación germen–soma. [C-735; S166 resumen; figs. 2–4]",
+    "character_offsets": {
+      "start": 8300,
+      "end": 8470
+    },
+    "record_status": "active"
+  },
+  {
+    "id": "PASSAGE-000093",
+    "section_id": "SEC-000002",
+    "ordinal": 54,
+    "text": "La interpretación de diferenciación germen–soma en fósiles tipo Megasphaera cuestiona una identificación exclusiva como protista unicelular enquistante. [C-736; S166 discusión]",
+    "character_offsets": {
+      "start": 8472,
+      "end": 8648
+    },
+    "record_status": "active"
+  },
+  {
+    "id": "PASSAGE-000094",
+    "section_id": "SEC-000002",
+    "ordinal": 55,
+    "text": "Moczydłowska y colaboradores propusieron afinidades algales para varios acritarcos de Doushantuo, incluido material relacionado con Tianzhushania. [C-737; S167 resumen y discusión]",
+    "character_offsets": {
+      "start": 8650,
+      "end": 8830
+    },
+    "record_status": "active"
+  },
+  {
+    "id": "PASSAGE-000095",
+    "section_id": "SEC-000002",
+    "ordinal": 56,
+    "text": "Caveasphaera muestra una secuencia de desarrollo con redistribución celular que fue comparada con embriología animal. [C-738; S164 resultados; fig. 3]",
+    "character_offsets": {
+      "start": 8832,
+      "end": 8982
+    },
+    "record_status": "active"
+  },
+  {
+    "id": "PASSAGE-000096",
+    "section_id": "SEC-000002",
+    "ordinal": 57,
+    "text": "La posición filogenética de Caveasphaera no está resuelta entre un holozoo no animal y un linaje relacionado con animales. [C-739; S164 discusión]",
+    "character_offsets": {
+      "start": 8984,
+      "end": 9130
+    },
+    "record_status": "active"
+  },
+  {
+    "id": "PASSAGE-000097",
+    "section_id": "SEC-000002",
+    "ordinal": 58,
+    "text": "Helicoforamina fue interpretada como holozoo mediante reconstrucción de etapas de desarrollo, pero su posición dentro de Holozoa permanece indeterminada. [C-740; S165 título; discusión]",
+    "character_offsets": {
+      "start": 9132,
+      "end": 9317
+    },
+    "record_status": "active"
+  },
+  {
+    "id": "PASSAGE-000098",
+    "section_id": "SEC-000002",
+    "ordinal": 59,
+    "text": "## 5.7. Biomarcadores",
+    "character_offsets": {
+      "start": 9319,
+      "end": 9340
+    },
+    "record_status": "active"
+  },
+  {
+    "id": "PASSAGE-000099",
+    "section_id": "SEC-000002",
+    "ordinal": 60,
+    "text": "Trabajos anteriores habían interpretado esteranos y hopanos de rocas arcaicas como biomarcadores singenéticos. [C-741] Rasmussen y colaboradores sometieron esa interpretación histórica a prueba y los reinterpretaron como contaminantes introducidos después de la litificación. [C-741; C-742; S170 introducción; resumen; figs. 1–3]",
+    "character_offsets": {
+      "start": 9342,
+      "end": 9671
+    },
+    "record_status": "active"
+  },
+  {
+    "id": "PASSAGE-000100",
+    "section_id": "SEC-000002",
+    "ordinal": 61,
+    "text": "La reinterpretación de los biomarcadores arcaicos retiró ese conjunto como evidencia segura de eucariotas arcaicos. [C-743; S170 discusión]",
+    "character_offsets": {
+      "start": 9673,
+      "end": 9812
+    },
+    "record_status": "active"
+  },
+  {
+    "id": "PASSAGE-000101",
+    "section_id": "SEC-000002",
+    "ordinal": 62,
+    "text": "La biota de protosteroides fue inferida a partir de productos diagenéticos de esteroles ancestrales abundantes en rocas mesoproterozoicas. [C-744; S171 resumen; figs. 1–4]",
+    "character_offsets": {
+      "start": 9814,
+      "end": 9985
+    },
+    "record_status": "active"
+  },
+  {
+    "id": "PASSAGE-000102",
+    "section_id": "SEC-000002",
+    "ordinal": 63,
+    "text": "Brocks y colaboradores interpretaron la biota de protosteroides como eucariotas del grupo tronco ecológicamente abundantes antes del ascenso de esteroles modernos de grupos corona. [C-745; S171 discusión]",
+    "character_offsets": {
+      "start": 9987,
+      "end": 10191
+    },
+    "record_status": "active"
+  },
+  {
+    "id": "PASSAGE-000103",
+    "section_id": "SEC-000002",
+    "ordinal": 64,
+    "text": "El 24-isopropilcolestano fue propuesto como biomarcador de demosponjas del Criogénico. [C-746; S172 resumen]",
+    "character_offsets": {
+      "start": 10193,
+      "end": 10301
+    },
+    "record_status": "active"
+  },
+  {
+    "id": "PASSAGE-000104",
+    "section_id": "SEC-000002",
+    "ordinal": 65,
+    "text": "La presencia de precursores y productos equivalentes en Rhizaria unicelulares cuestiona la especificidad animal del 24-isopropilcolestano. [C-747; S174 resumen]",
+    "character_offsets": {
+      "start": 10303,
+      "end": 10463
+    },
+    "record_status": "active"
+  },
+  {
+    "id": "PASSAGE-000105",
+    "section_id": "SEC-000002",
+    "ordinal": 66,
+    "text": "La genómica comparada de esponjas apoya la capacidad biosintética necesaria para producir esteroles C30, pero no demuestra exclusividad frente a otros eucariotas. [C-748; S173 resultados; fig. 2]",
+    "character_offsets": {
+      "start": 10465,
+      "end": 10660
+    },
+    "record_status": "active"
+  },
+  {
+    "id": "PASSAGE-000106",
+    "section_id": "SEC-000002",
+    "ordinal": 67,
+    "text": "Saccharomyces cerevisiae produjo esteroles en experimentos con 7 nM de O₂ disuelto. [C-749; S176 resumen; resultados]",
+    "character_offsets": {
+      "start": 10662,
+      "end": 10779
+    },
+    "record_status": "active"
+  },
+  {
+    "id": "PASSAGE-000107",
+    "section_id": "SEC-000002",
+    "ordinal": 68,
+    "text": "El umbral de 7 nM de O₂ para una levadura no puede convertirse directamente en un valor único de oxígeno atmosférico proterozoico. [C-750; S176 discusión]",
+    "character_offsets": {
+      "start": 10781,
+      "end": 10935
+    },
+    "record_status": "active"
+  },
+  {
+    "id": "PASSAGE-000108",
+    "section_id": "SEC-000002",
+    "ordinal": 69,
+    "text": "## 5.8. Asignación fósil más antigua localizada por nodo",
+    "character_offsets": {
+      "start": 10937,
+      "end": 10993
+    },
+    "record_status": "active"
+  },
+  {
+    "id": "PASSAGE-000109",
+    "section_id": "SEC-000002",
+    "ordinal": 70,
+    "text": "La tabla censa exactamente los 17 nodos desarrollados en las tablas nodales y separa una asignación positiva o candidata de un hueco explícito; un fósil anidado en un subclado no se convierte por ello en diagnóstico ni calibración del nodo superior. [C-713; C-723; C-726; C-729; C-785]",
+    "character_offsets": {
+      "start": 10995,
+      "end": 11280
+    },
+    "record_status": "active"
+  },
+  {
+    "id": "PASSAGE-000110",
+    "section_id": "SEC-000002",
+    "ordinal": 71,
+    "text": "Las búsquedas específicas Q-0171 y Q-0172 no localizaron fósiles con sinapomorfías diagnósticas directas para Amorphea ni para Obazoa. [C-755; C-756] Para Apusomonadida, Breviatea, Ichthyosporea, Pluriformea *sensu* Hehenberger et al. 2017, Corallochytrea y Filasterea solo se registra una ausencia documental del corpus al corte, que no demuestra inexistencia paleontológica ni sustituye una búsqueda específica. [C-1947–C-1952] Choanoflagellata conserva el material putativo de la Formación Capas Blancas, mientras que los candidatos de Weng’an no se promueven a Metazoa porque sus interpretaciones compiten y su posición sigue sin resolverse. [C-732–C-739; C-785]",
+    "character_offsets": {
+      "start": 11282,
+      "end": 11948
+    },
+    "record_status": "active"
+  },
+  {
+    "id": "PASSAGE-000111",
+    "section_id": "SEC-000002",
+    "ordinal": 72,
+    "text": "<!-- TABLE:table-34-5-8-asignacion-fosil-mas-antigua-localizada-por-nodo -->",
+    "character_offsets": {
+      "start": 11950,
+      "end": 12026
+    },
+    "record_status": "active"
+  },
+  {
+    "id": "PASSAGE-000112",
+    "section_id": "SEC-000002",
+    "ordinal": 73,
+    "text": "## 5.9. Registro de afirmaciones de la sección 5",
+    "character_offsets": {
+      "start": 12028,
+      "end": 12076
+    },
+    "record_status": "active"
+  },
+  {
+    "id": "PASSAGE-000113",
+    "section_id": "SEC-000002",
+    "ordinal": 74,
+    "text": "<!-- TABLE:claims-05 -->",
+    "character_offsets": {
+      "start": 12078,
+      "end": 12102
+    },
+    "record_status": "active"
+  },
+  {
+    "id": "PASSAGE-000114",
+    "section_id": "SEC-000002",
+    "ordinal": 75,
+    "text": "---\n",
+    "character_offsets": {
+      "start": 12104,
+      "end": 12108
+    },
+    "record_status": "active"
+  }
+]

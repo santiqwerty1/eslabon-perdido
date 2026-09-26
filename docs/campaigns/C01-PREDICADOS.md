@@ -234,7 +234,12 @@ ni un espécimen, ni un rasgo. El esquema `1.3.0` añade:
 - la evidencia `geochemical` y la mención `molecule`.
 
 Si otro grupo produce la misma molécula, eso es contraevidencia (C-747 contra
-C-746), no una segunda verdad.
+C-746), no una segunda verdad. Su hallazgo en rocas de un periodo es una
+ocurrencia de la molécula: sin localidad, porque la fila no la da, y fechada
+por el nombre del periodo tal como lo da la fila (unidad `geological_interval`,
+sin límites numéricos): esteranos y hopanos en el Arcaico (C-741),
+protosteroides en el Mesoproterozoico (C-744), 24-isopropilcolestano en el
+Criogénico (C-746).
 
 **Cuestionar otra fila es aportar evidencia.** Seis filas tienen por sujeto otra
 fila («afirmación C-711», «C-716»). Crear afirmaciones sobre afirmaciones dejaría
@@ -245,6 +250,11 @@ cuestionan o apoyan la afirmación de la otra fila:
 - C-742 y C-747 son B: además de cuestionar, afirman un hallazgo propio
   (contaminación, biosíntesis en Rhizaria), y su evidencia lo apoya a la vez que
   cuestiona la otra fila.
+
+Como una fila J no crea afirmación, su evaluación (aceptación, fuerza y su
+motivo, resolución, vigencia) no tendría `epistemic_dimensions` donde quedar:
+`convertir.py` la escribe como nota en `quality_notes` de cada una de sus
+evidencias.
 
 **El apéndice E tiene erratas y filas de otras secciones.**
 
@@ -337,12 +347,12 @@ Y tres de representación:
 | C-738 | `posee_rasgo` | B | *Caveasphaera*: desarrollo comparable al embrionario animal, `reconstruction` |
 | C-739 | `tiene_posicion*` | B | *Caveasphaera* `assigned_to` Holozoa, posición no resuelta |
 | C-740 | `clasificado_como_por` | B | *Helicoforamina* `assigned_to` Holozoa, posición indeterminada |
-| C-741 | `tiene_interpretacion*` | B | Esteranos y hopanos arcaicos `classified_as_by` biomarcadores singenéticos, histórica |
+| C-741 | `tiene_interpretacion*` | B | Esteranos y hopanos `classified_as_by` biomarcadores singenéticos, histórica; su hallazgo en rocas del Arcaico, ocurrencias sin localidad |
 | C-742 | `cuestionado_por` | B | Los mismos `classified_as_by` contaminación posterior a la litificación; su evidencia cuestiona C-741 |
 | C-743 | `pierde_valor_probatorio*` | F | Los esteranos arcaicos, sin valor probatorio seguro para Eukaryota en el Arcaico |
-| C-744 | `respaldado_por` | B | Protosteroides `biomarker_of` la biota de protosteroides |
+| C-744 | `respaldado_por` | B | Protosteroides `biomarker_of` la biota de protosteroides; su hallazgo en rocas del Mesoproterozoico |
 | C-745 | `linaje_troncal_de` | B | La biota de protosteroides `stem_lineage_of` Eukaryota |
-| C-746 | `clasificado_como_por` | B | 24-isopropilcolestano `biomarker_of` Demospongiae |
+| C-746 | `clasificado_como_por` | B | 24-isopropilcolestano `biomarker_of` Demospongiae; su hallazgo en rocas del Criogénico |
 | C-747 | `cuestionado_por` | B | Rhizaria sintetiza sus precursores; su evidencia cuestiona C-746 |
 | C-748 | `posee_rasgo` | B | Porifera: capacidad biosintética de esteroles C30, por genómica |
 | C-749 | `tiene_valor_medido` | B | *Saccharomyces cerevisiae* produce esteroles con 7 nM de O₂ |
@@ -363,11 +373,11 @@ ejes.
 
 | Registros | |
 |---|---:|
-| Afirmaciones | 59: 18 observaciones de rasgo (`shows_evidence_of`), 13 asignaciones, 11 dataciones, 7 clasificaciones, 5 metodológicas, 2 `biomarker_of`, 1 depredación, 1 linaje troncal y 1 ambiente |
-| Ocurrencias | 9, siete de fósiles y dos sin localidad |
-| Expresiones temporales | 11, todas `occurrence_date`: cuatro radiométricas, seis acotaciones estratigráficas (`inferred`) y un intervalo publicado |
-| Estudios | 12 conjuntos de datos, 12 análisis y 11 resultados, en Ma |
-| Evidencias | 66: 33 morfológicas, 8 metodológicas, 7 geoquímicas, 6 estratigráficas, 4 cronológicas, 3 sedimentológicas, 2 fósiles y una taxonómica, una genómica y una molecular |
+| Afirmaciones | 63: 18 observaciones de rasgo (`shows_evidence_of`), 15 dataciones, 13 asignaciones, 7 clasificaciones, 5 metodológicas, 2 `biomarker_of`, 1 depredación, 1 linaje troncal y 1 ambiente |
+| Ocurrencias | 13: nueve de fósiles y conjuntos (siete en su unidad estratigráfica, dos sin localidad) y cuatro de moléculas, sin localidad |
+| Expresiones temporales | 15, todas `occurrence_date`: tres radiométricas, seis acotaciones estratigráficas (`inferred`), una edad de formación sin método (C-708), un intervalo publicado y cuatro periodos geológicos por su nombre |
+| Estudios | 15 conjuntos de datos, 15 análisis y 15 resultados, en Ma salvo los de periodos geológicos |
+| Evidencias | 70: 33 morfológicas, 11 geoquímicas, 8 metodológicas, 6 estratigráficas, 4 cronológicas, 3 sedimentológicas, 2 fósiles y una taxonómica, una genómica y una molecular |
 | Entidades | 16 taxones fósiles y actuales (nombre y concepto), 8 clados, 9 unidades estratigráficas, 4 especímenes y conjuntos, 2 linajes, 5 moléculas, 16 rasgos con 18 observaciones y 8 métodos |
 | Fuentes | 25 nuevas; S141, S160, S171 y S178 se reutilizan |
 | Hipótesis y cuestiones | 8 (H35–H42) y 5 |
@@ -379,9 +389,15 @@ señalan su evidencia. Se descartan con razón 3: Apoikozoa y Choanozoa *sensu
 stricto*, que ninguna fila usa, y U–Pb CA-ID-TIMS, que el apéndice B sitúa en
 C-721 sin que la fila ni la prosa lo liguen a una datación.
 
-La conversión enlaza de vuelta tres registros de la sección 6, por las
-afirmaciones nuevas que los nombran: Eukaryota, Metazoa y el concepto de
-*Bangiomorpha*.
+La conversión (`SEC-000002-conversion.json`, REV-000007 → REV-000008, con
+`SNAP-000018`) enlaza de vuelta cinco registros de la sección 6:
+
+- Eukaryota, Metazoa y el concepto de *Bangiomorpha*, por las afirmaciones
+  nuevas que los nombran;
+- Opisthokonta y Amorphea, por las cuestiones que los afectan (C-726, C-755).
+
+`delta.py` avanza al aplicar el siguiente identificador que declara el
+manifiesto: tras la conversión, `ISSUE-000046`.
 
 Antes de aplicar la conversión se hizo una auditoría fila a fila contra las
 filas, la prosa y los apéndices. Encontró resultados en Ga con unidad Ma,
