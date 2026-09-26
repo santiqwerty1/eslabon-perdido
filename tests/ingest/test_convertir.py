@@ -502,6 +502,34 @@ class Convertir(unittest.TestCase):
         self.assertIn("@EV1", str(e.exception))
         self.assertIn("source_id", str(e.exception))
 
+    def test_los_campos_deducidos_no_se_fijan_en_el_fichero(self):
+        # Cada uno de estos lo deduce convertir.py; escrito a mano podría
+        # contradecir el fichero de destino, los enlaces o el ciclo de vida.
+        casos = [
+            (0, "entity_type", "technology"),
+            (0, "claim_ids", ["@CL1"]),
+            (0, "record_status", "deprecated"),
+            (2, "evidence_ids", ["@EV1"]),
+            (2, "counterevidence_ids", []),
+        ]
+        for i, campo, valor in casos:
+            with self.subTest(campo=campo):
+                spec = self.entorno.spec()
+                spec["records"][i]["record"][campo] = valor
+                with self.assertRaises(SystemExit) as e:
+                    self.entorno.construir(spec)
+                self.assertIn(spec["records"][i]["key"], str(e.exception))
+                self.assertIn(campo, str(e.exception))
+
+    def test_una_mencion_descartada_sin_razon_se_rechaza(self):
+        spec = self.entorno.spec()
+        etiqueta = next(e for e, d in spec["mentions"].items() if d["disposition"] == "discarded_with_reason")
+        del spec["mentions"][etiqueta]["reason"]
+        with self.assertRaises(SystemExit) as e:
+            self.entorno.construir(spec)
+        self.assertIn(etiqueta, str(e.exception))
+        self.assertIn("reason", str(e.exception))
+
     def test_el_fichero_de_conversion_tiene_que_estar_en_conversions(self):
         # El snapshot sólo registra knowledge/corpus/conversions/*.json: una
         # entrada revisada fuera de ahí no se podría recuperar ni verificar.

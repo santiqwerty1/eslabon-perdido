@@ -125,6 +125,14 @@ CITA = re.compile(r"\bS\d+\b")
 DESTINOS = set("ABCDEFGHI")
 # Sólo una mención descartada puede quedarse sin registro al que apunte.
 SIN_OBJETIVO = {"discarded_with_reason"}
+# Lo que convertir.py deduce y el fichero de conversión no puede fijar: escrito
+# a mano podría contradecir las filas, el fichero de destino, los enlaces de
+# vuelta o el ciclo de vida (un registro nuevo nace activo; deprecarlo es otra
+# operación de §16.4).
+DERIVADOS = ("id", "provenance", "source_ids", "first_introduced_in", "introduced_in", "raised_in",
+             "entity_type", "claim_ids", "record_status")
+# Y en las afirmaciones, lo que se deduce de las evidencias que las citan.
+DERIVADOS_POR_FICHERO = {"claims.jsonl": ("evidence_ids", "counterevidence_ids")}
 # Lo que identifica la obra. Si el apéndice activo lo corrigió, la fuente que ya
 # existe no es la que cita el corpus congelado.
 BIBLIOGRAFIA = ("authors", "year", "title", "container", "doi", "url", "source_type")
@@ -384,6 +392,8 @@ def construir(spec_path: Path, corpus: str) -> dict:
         if destino.get("disposition") not in SIN_OBJETIVO and not destino.get("targets"):
             errores.append(f"mención {etiqueta}: {destino.get('disposition')} sin `targets`; "
                            "sólo una descartada puede quedarse sin registro")
+        if destino.get("disposition") in SIN_OBJETIVO and not (destino.get("reason") or "").strip():
+            errores.append(f"mención {etiqueta}: descartada sin `reason`; la cobertura exige justificarla")
 
     definidas: dict[str, dict] = {}
     for r in spec.get("records", []):
@@ -391,13 +401,10 @@ def construir(spec_path: Path, corpus: str) -> dict:
             errores.append(f"clave definida dos veces: {r['key']}")
         if not CLAVE.match(r["key"]) or FUENTE.match(r["key"]):
             errores.append(f"clave inválida: {r['key']} (las fuentes no se declaran: se citan)")
-        if "id" in r.get("record", {}):
-            errores.append(f"{r['key']}: el fichero de conversión no fija identificadores (`id`); "
-                           "los asigna convertir.py")
-        for campo in ("provenance", "source_ids", "first_introduced_in", "introduced_in", "raised_in"):
+        for campo in DERIVADOS + DERIVADOS_POR_FICHERO.get(r["file"], ()):
             if campo in r.get("record", {}):
                 errores.append(f"{r['key']}: el fichero de conversión no fija `{campo}`; "
-                               "convertir.py lo deduce de la sección y de sus filas (`rows`)")
+                               "lo deduce convertir.py de la sección, las filas y los enlaces")
         if r["file"] not in PREFIJO or r["file"] == "sources.jsonl":
             errores.append(f"{r['key']}: fichero {r['file']} fuera de lo que convierte este paso")
         if not r.get("rows"):
@@ -485,7 +492,7 @@ def construir(spec_path: Path, corpus: str) -> dict:
         rec = {"id": ids[r["key"]], **sustituir(r["record"], ids, faltan)}
         filas_r = r.get("rows", [])
         if fichero in TIPO_ENTIDAD:
-            rec.setdefault("entity_type", TIPO_ENTIDAD[fichero])
+            rec["entity_type"] = TIPO_ENTIDAD[fichero]
         if "first_introduced_in" in props:
             rec["first_introduced_in"] = sec_id
         if "introduced_in" in props:
@@ -526,8 +533,8 @@ def construir(spec_path: Path, corpus: str) -> dict:
             for k in ("hypothesis_ids", "classification_view_ids", "temporal_expression_ids", "region_ids"):
                 rec["scope"].setdefault(k, [])
             rec.setdefault("quantitative_support", [])
-            rec.setdefault("evidence_ids", [])
-            rec.setdefault("counterevidence_ids", [])
+            rec["evidence_ids"] = []
+            rec["counterevidence_ids"] = []
             rec.setdefault("derivation", None)
         if fichero == "issues.jsonl":
             rec.setdefault("affects", {})
@@ -536,7 +543,7 @@ def construir(spec_path: Path, corpus: str) -> dict:
             rec.setdefault("resolution", {"status": "open"})
         if "notes" in props:
             rec.setdefault("notes", [])
-        rec.setdefault("record_status", "active")
+        rec["record_status"] = "active"
         salida.append((fichero, rec))
     if faltan:
         raise SystemExit(f"ERROR claves usadas sin definir: {', '.join(sorted(faltan))}")
@@ -560,7 +567,7 @@ def construir(spec_path: Path, corpus: str) -> dict:
             continue
         propias = [c["id"] for c in afirmaciones
                    if c.get("subject_id") == rec["id"] or (c.get("object") or {}).get("entity_id") == rec["id"]]
-        rec["claim_ids"] = sorted(set(rec.get("claim_ids", [])) | set(propias))
+        rec["claim_ids"] = sorted(set(propias))
 
     # --- menciones ----------------------------------------------------------------------
     actualizadas: list[tuple[dict, dict]] = []
