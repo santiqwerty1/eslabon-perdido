@@ -1,8 +1,12 @@
 # Correspondencia de predicados · Campaña 1
 
-**Estado:** decidida para la sección 6 del corredor (`DEC-057`) y aplicada:
-`SEC-000001`, convertida por
-[`knowledge/corpus/conversions/corredor-06.json`](../../knowledge/corpus/conversions/corredor-06.json).
+**Estado:** decidida y aplicada para dos secciones del corredor:
+
+- la **6**: `SEC-000001`, `DEC-057`, convertida por
+  [`corredor-06.json`](../../knowledge/corpus/conversions/corredor-06.json);
+- la **5**: `SEC-000002`, `DEC-058`, convertida por
+  [`corredor-05.json`](../../knowledge/corpus/conversions/corredor-05.json).
+
 Las reglas se extienden al resto del corpus sección a sección.
 
 El esquema admitía 48 predicados (§14 y `schemas/json-schema/claim.json`). El
@@ -75,6 +79,7 @@ de consenso»— es una cuestión `pending_question`.
 | **G** | Relación metodológica | Una afirmación con un predicado de §14.6 sobre entidades de método, y su evidencia |
 | **H** | Glosa editorial del corredor | Nada: nota en el registro al que se refiere, o descarte justificado |
 | **I** | Estado del conocimiento | Una cuestión `ISSUE-` de tipo `pending_question` |
+| **J** | Evidencia sobre otra fila | Evidencias que apoyan o cuestionan la afirmación de otra fila (§14.5, `DEC-058`). La fila no crea afirmaciones |
 
 ## Reglas para los 20 predicados de la sección 6
 
@@ -196,3 +201,197 @@ evento no la listaba en `issue_ids`. `SEC-000001-correccion-4.json`
 (REV-000005 → REV-000006) la enlaza, y `SNAP-000016` registra el estado.
 `convertir.py` ya enlaza los dos sentidos de toda incidencia: su `affects` y
 el `issue_ids` de lo que afecta.
+
+# Sección 5 · El registro material: fósiles y biomarcadores
+
+63 filas, 22 predicados (15 propios del corredor) y 29 fuentes, 25 de ellas
+nuevas. Se convierte desde la versión congelada `af7e799`. El checkpoint de
+trabajo del corredor del 26 de septiembre cambia la prosa de la sección y
+algunos apéndices, pero no sus filas (`DEC-058`).
+
+## Lo que enseñó la sección 5
+
+**Las edades de los fósiles no son divergencias.** En la sección 6, cada fecha
+era la de un nodo, y el destino A creaba un evento `divergence`. Aquí se fecha
+dónde y cuándo aparece un fósil, y eso es una **ocurrencia** (§7.8):
+
+- una `OCC-` con la entidad, su unidad estratigráfica y su precisión;
+- una expresión temporal `occurrence_date`;
+- una afirmación `dated_to` sobre la ocurrencia, de la que `convertir.py` deduce
+  la fecha de la ocurrencia;
+- la cadena del estudio, con conjuntos de datos de trazabilidad.
+
+Cuando la fila fecha la propia formación (C-699, C-731), la afirmación
+`dated_to` es sobre el yacimiento. Una acotación estratigráfica es `inferred` y
+no `observed`: la de C-714 acota las unidades portadoras de las perforaciones,
+no cada espécimen.
+
+**Los biomarcadores no cabían en el esquema.** Un esterano no es un organismo,
+ni un espécimen, ni un rasgo. El esquema `1.3.0` añade:
+
+- las moléculas (`MOL-`, `molecules.jsonl`);
+- el predicado `biomarker_of`, de la molécula a quien la produce;
+- la evidencia `geochemical` y la mención `molecule`.
+
+Si otro grupo produce la misma molécula, eso es contraevidencia (C-747 contra
+C-746), no una segunda verdad.
+
+**Cuestionar otra fila es aportar evidencia.** Seis filas tienen por sujeto otra
+fila («afirmación C-711», «C-716»). Crear afirmaciones sobre afirmaciones dejaría
+la contraevidencia sin enlazar. El destino **J** crea solo evidencias, que
+cuestionan o apoyan la afirmación de la otra fila:
+
+- C-712, C-717, C-730 y C-736 son J;
+- C-742 y C-747 son B: además de cuestionar, afirman un hallazgo propio
+  (contaminación, biosíntesis en Rhizaria), y su evidencia lo apoya a la vez que
+  cuestiona la otra fila.
+
+**El apéndice E tiene erratas y filas de otras secciones.**
+
+- H41 cita C-739–C-740, que tratan de *Caveasphaera* y *Helicoforamina*; la
+  afinidad algal que enuncia es C-737.
+- H42 incluye C-822, de otra sección, que se enlazará al convertirla.
+- H38 incluye C-730, que es contraevidencia (J): va en sus
+  `counterevidence_ids`, no en sus filas.
+
+Cada caso queda en las notas de su hipótesis.
+
+## Reglas nuevas
+
+| Predicado del corredor | Regla |
+|---|---|
+| `tiene_edad_estimada` | Fósil o conjunto: **A**, como ocurrencia fechada. Formación: `dated_to` sobre el yacimiento. Ga se pasa a Ma y la expresión original se conserva: «~1,75–1,4 Ga» usa coma decimal |
+| `posee_rasgo`, `infiere*`, `tiene_valor_medido` y `posee_vector_de_medición*` con un organismo o un espécimen | **B**: rasgo (`TRAIT-`), su observación (`TRAITOBS-`) y la afirmación `shows_evidence_of` con su evidencia. Una medida va en la observación y en el `quantitative_support` de la afirmación. Una inferencia es `reconstruction` |
+| `clasificado_como_por`, `tiene_estado*`, `tiene_posicion*`, `tiene_interpretacion*` | Hacia un clado: `assigned_to`, con la modalidad en una nota y en los ejes. Hacia una categoría: `classified_as_by` |
+| `cuestionado_por` | Solo duda sobre otra fila: **J**. Con un hallazgo propio: **B** |
+| `respaldado_por` | La afirmación implícita y su evidencia (**B**), o **G** si el sujeto es un método |
+| `no_diagnostica_por_si_solo*`, `respaldado_por` metodológico, `no_equivale_a*` | **G** (`limits`, `depends_on`) o **F** si es síntesis del corredor |
+| `observa_rasgo*` | **D**: la capacidad de un instrumento es una nota del análisis |
+| `calibra_minimo*` | **F**, `provides_bound` en el ámbito de la hipótesis que lo condiciona (H36) |
+| `pierde_valor_probatorio*` | **F**: la reclasificación que se sigue de la fila de la que depende |
+| `linaje_troncal_de` | **B**, `stem_lineage_of` |
+| `asociado_con*` | Un ambiente: `occurs_in` categórico. Una molécula con su productor: `biomarker_of` |
+| `tiene_identidad*` indeterminada, `no_resuelve*`, `posee_restriccion_estratigrafica*` sin cifras | **I** |
+| `no_localiza*` | **I**, con la búsqueda del corredor como localizador. Son glosas, pero H no puede anotar un clado que ya existe |
+
+Y tres de representación:
+
+- **Unidades estratigráficas.** Grupos, formaciones y dolomías son yacimientos
+  (`SITE-`) con ocurrencias de precisión `regional`. No hay un tipo de unidad
+  estratigráfica, y la sección no lo necesita para decir lo que dice.
+- **Taxones fósiles y morfotipos.** Son nombre y concepto según su fuente, como
+  *Bangiomorpha* en la sección 6. Los informales, como «acritarco» o los
+  microfósiles con forma de vasija, llevan `nomenclatural_status: informal`.
+- **Conjuntos y material.** La biota de Weng’an, los microfósiles perforados del
+  Grupo Chuar, los acritarcos de Doushantuo y los fósiles de Lechte et al. son
+  especímenes: objetos estudiados, no taxones.
+
+## Sección 5, fila a fila
+
+| Fila | Predicado | Destino | Qué se escribe |
+|---|---|---|---|
+| C-694 | `clasificado_como_por` | B | «Acritarco» (nombre informal y concepto según S152) `classified_as_by` taxón de forma artificial |
+| C-695 | `posee_rasgo` | G | La asignación de afinidad eucariota a microfósiles de pared orgánica `depends_on` indicadores no exclusivos |
+| C-696 | `no_diagnostica_por_si_solo*` | G | El tamaño de vesícula `limits` esa asignación |
+| C-697 | `observa_rasgo*` | D | Datos y análisis de S151 con microscopía electrónica de transmisión; método TEM |
+| C-698 | `respaldado_por` | G | La alteración térmica y la diagénesis `limits` la química de la pared |
+| C-699 | `tiene_edad_estimada` | A | Grupo Roper, 1492 ± 4 a 1361 ± 21 Ma por U–Pb y Re–Os (S150), `dated_to` sobre el yacimiento |
+| C-700 | `posee_rasgo` | B | *Tappania plana*: procesos ramificados y crecimiento complejo, en el Grupo Roper |
+| C-701 | `posee_rasgo` | B | *Valeria lophostriata*: estriaciones concéntricas regulares |
+| C-702 | `respaldado_por` | B | *Valeria* `assigned_to` Eukaryota, sin posición en la corona |
+| C-703 | `posee_rasgo` | B | *Dictyosphaera* y *Shuiyousphaeridium*: ornamentación compleja de pared, en el Grupo Ruyang |
+| C-704 | `posee_restriccion_estratigrafica*` | I | La edad de Ruyang no tiene cifras en el corpus |
+| C-705 | `tiene_edad_estimada` | A | *Qingshania magnifica* en la Formación Chuanlinggou, ≈1630 Ma |
+| C-706 | `posee_vector_de_medición*` | B | Diámetro de *Qingshania*: 20–194 µm, media 73, desviación 29, n = 262 |
+| C-707 | `clasificado_como_por` | B | *Qingshania* `assigned_to` Eukaryota, multicelular de posición incierta |
+| C-708 | `clasificado_como_por` | B | *Grypania spiralis* `assigned_to` Eukaryota (posible alga), y su ocurrencia en la Formación de Hierro Negaunee, ≈2100 Ma |
+| C-709 | `tiene_estado*` | B | *Grypania* `assigned_to` Eukaryota según S152: muy probable, relaciones no restringidas |
+| C-710 | `tiene_edad_estimada` | A | *Rafatazmia chitrakootensis* en la Dolomía Tirohan, ≈1600 Ma |
+| C-711 | `clasificado_como_por` | B | *Rafatazmia* `assigned_to` Rhodophyta (corona) |
+| C-712 | `cuestionado_por` | J | Contraevidencia de C-711 según S152 y S178 |
+| C-713 | `clasificado_como_por` | B | Microfósiles con forma de vasija del Grupo Chuar `assigned_to` Amoebozoa o su grupo total |
+| C-714 | `tiene_edad_estimada` | A | Microfósiles perforados del Grupo Chuar: unidades portadoras entre 780 y 740 Ma, acotación `inferred` |
+| C-715 | `tiene_valor_medido` | B | Perforaciones de 0.1–3.4 µm en esos microfósiles |
+| C-716 | `respaldado_por` | B | El perforador del Grupo Chuar `preys_on` esos microfósiles |
+| C-717 | `cuestionado_por` | J | Contraevidencia de C-716: diagénesis, daño post mortem y preparación |
+| C-718 | `tiene_valor_medido` | B | Perforaciones de ≈15–35 µm en microfósiles con forma de vasija |
+| C-719 | `tiene_identidad*` | I | El perforador no está identificado |
+| C-720 | `posee_rasgo` | B | *Bangiomorpha*: filamentos diferenciados y patrones de división bangiales |
+| C-721 | `posee_rasgo` | B | *Bangiomorpha*: reproducción sexual, `reconstruction` |
+| C-722 | `tiene_edad_estimada` | A | *Bangiomorpha*: la sucesión que la contiene, ≈1047 Ma, sin unidad nombrada |
+| C-723 | `calibra_minimo*` | F | *Bangiomorpha* `provides_bound` edad mínima de Rhodophyta corona, en H36 |
+| C-724 | `tiene_edad_estimada` | A | *Ourasphaira giraldae*, 1010–890 Ma, en la Formación Grassy Bay que da el apéndice B |
+| C-725 | `clasificado_como_por` | B | *Ourasphaira* `assigned_to` Fungi, candidato |
+| C-726 | `no_resuelve*` | I | Su afinidad fúngica no la sitúa en Fungi corona ni fecha Opisthokonta |
+| C-727 | `tiene_edad_estimada` | A | *Bicellum brasieri* en la Formación Diabaig, ≈1000 Ma, depósitos lacustres |
+| C-728 | `posee_rasgo` | B | *Bicellum*: dos morfotipos celulares diferenciados |
+| C-729 | `clasificado_como_por` | B | *Bicellum* `assigned_to` Holozoa, posible |
+| C-730 | `cuestionado_por` | J | Contraevidencia de C-729: paredes flexibles no excluidas |
+| C-731 | `tiene_edad_estimada` | A | Formación Doushantuo, 635–551 Ma por U–Pb de circones |
+| C-732 | `tiene_edad_estimada` | A | Biota de Weng’an: más antigua que 609 ± 5 Ma (U–Pb SIMS de una toba suprayacente, según S169) o próxima, límite antiguo abierto |
+| C-733 | `clasificado_como_por` | B | *Tianzhushania* y *Megasphaera* `assigned_to` Metazoa, interpretación histórica |
+| C-734 | `clasificado_como_por` | B | *Tianzhushania* `assigned_to` Holozoa: protistas holozoos enquistantes |
+| C-735 | `posee_rasgo` | B | *Megasphaera*: diferenciación germen–soma, `reconstruction`, homología disputada |
+| C-736 | `cuestionado_por` | J | Evidencia que apoya C-735 y cuestiona C-734 |
+| C-737 | `clasificado_como_por` | B | Acritarcos de Doushantuo `classified_as_by` quistes algales |
+| C-738 | `posee_rasgo` | B | *Caveasphaera*: desarrollo comparable al embrionario animal, `reconstruction` |
+| C-739 | `tiene_posicion*` | B | *Caveasphaera* `assigned_to` Holozoa, posición no resuelta |
+| C-740 | `clasificado_como_por` | B | *Helicoforamina* `assigned_to` Holozoa, posición indeterminada |
+| C-741 | `tiene_interpretacion*` | B | Esteranos y hopanos arcaicos `classified_as_by` biomarcadores singenéticos, histórica |
+| C-742 | `cuestionado_por` | B | Los mismos `classified_as_by` contaminación posterior a la litificación; su evidencia cuestiona C-741 |
+| C-743 | `pierde_valor_probatorio*` | F | Los esteranos arcaicos, sin valor probatorio seguro para Eukaryota en el Arcaico |
+| C-744 | `respaldado_por` | B | Protosteroides `biomarker_of` la biota de protosteroides |
+| C-745 | `linaje_troncal_de` | B | La biota de protosteroides `stem_lineage_of` Eukaryota |
+| C-746 | `clasificado_como_por` | B | 24-isopropilcolestano `biomarker_of` Demospongiae |
+| C-747 | `cuestionado_por` | B | Rhizaria sintetiza sus precursores; su evidencia cuestiona C-746 |
+| C-748 | `posee_rasgo` | B | Porifera: capacidad biosintética de esteroles C30, por genómica |
+| C-749 | `tiene_valor_medido` | B | *Saccharomyces cerevisiae* produce esteroles con 7 nM de O₂ |
+| C-750 | `no_equivale_a*` | F | Ese umbral `limits`: no se traduce en un valor de pO₂ atmosférica |
+| C-751 | `tiene_edad_estimada` | A | Los fósiles eucariotas más antiguos de Lechte et al., 1750–1400 Ma, sin localidad |
+| C-752 | `asociado_con*` | B | Esos fósiles `occurs_in` fondos marinos oxigenados |
+| C-753 | `infiere*` | B | Aerobiosis y mitocondrias, `reconstruction` |
+| C-754 | `infiere*` | B | Hábito bentónico, `reconstruction` |
+| C-755 | `no_localiza*` | I | Sin fósil diagnóstico de Amorphea en la búsqueda Q-0171 |
+| C-756 | `no_localiza*` | I | Sin fósil diagnóstico de Obazoa en la búsqueda Q-0172 |
+
+Las hipótesis H35–H42 del apéndice E se crean con las filas que las componen,
+en la sección 5. Su descripción y sus supuestos son literales del apéndice. La
+primera de sus filas es la que enuncia la hipótesis, porque de ella salen sus
+ejes.
+
+## Resultado de la sección 5
+
+| Registros | |
+|---|---:|
+| Afirmaciones | 59: 18 observaciones de rasgo (`shows_evidence_of`), 13 asignaciones, 11 dataciones, 7 clasificaciones, 5 metodológicas, 2 `biomarker_of`, 1 depredación, 1 linaje troncal y 1 ambiente |
+| Ocurrencias | 9, siete de fósiles y dos sin localidad |
+| Expresiones temporales | 11, todas `occurrence_date`: cuatro radiométricas, seis acotaciones estratigráficas (`inferred`) y un intervalo publicado |
+| Estudios | 12 conjuntos de datos, 12 análisis y 11 resultados, en Ma |
+| Evidencias | 66: 33 morfológicas, 8 metodológicas, 7 geoquímicas, 6 estratigráficas, 4 cronológicas, 3 sedimentológicas, 2 fósiles y una taxonómica, una genómica y una molecular |
+| Entidades | 16 taxones fósiles y actuales (nombre y concepto), 8 clados, 9 unidades estratigráficas, 4 especímenes y conjuntos, 2 linajes, 5 moléculas, 16 rasgos con 18 observaciones y 8 métodos |
+| Fuentes | 25 nuevas; S141, S160, S171 y S178 se reutilizan |
+| Hipótesis y cuestiones | 8 (H35–H42) y 5 |
+
+Las 140 menciones tienen destino: 64 crean entidad, 44 son atributo de un
+registro, 17 repiten una entidad (grafías en cursiva del apéndice B, o
+*Bangiomorpha* y Eukaryota, que ya existían), 7 son cuestiones pendientes y 5
+señalan su evidencia. Se descartan con razón 3: Apoikozoa y Choanozoa *sensu
+stricto*, que ninguna fila usa, y U–Pb CA-ID-TIMS, que el apéndice B sitúa en
+C-721 sin que la fila ni la prosa lo liguen a una datación.
+
+La conversión (`SEC-000002-conversion.json`, REV-000007 → REV-000008, con
+`SNAP-000018`) enlaza de vuelta cinco registros de la sección 6:
+
+- Eukaryota, Metazoa y el concepto de *Bangiomorpha*, por las afirmaciones
+  nuevas que los nombran;
+- Opisthokonta y Amorphea, por las cuestiones que los afectan (C-726, C-755).
+
+El manifiesto seguía declarando `ISSUE-000041` como siguiente incidencia
+cuando la conversión ya había dado de alta hasta `ISSUE-000045`. Se avanzó a
+mano a `ISSUE-000046` (`SNAP-000019`), y `delta.py` ya lo avanza al aplicar.
+
+Antes de aplicar la conversión se hizo una auditoría fila a fila contra las
+filas, la prosa y los apéndices. Encontró resultados en Ga con unidad Ma,
+hipótesis cuya primera fila no las enunciaba, métodos de datación que la fila sí
+daba, y detalles que el corpus no dice. Todo quedó corregido en el fichero de
+conversión.

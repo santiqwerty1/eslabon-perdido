@@ -144,6 +144,19 @@ def bump_revision(delta: dict, reverse: bool) -> None:
     m["dataset_revision"] = (
         delta["dataset_revision_before"] if reverse else delta["dataset_revision_after"]
     )
+    # El siguiente identificador que declara el manifiesto avanza por encima de
+    # lo que el delta da de alta. Al revertir no retrocede: los identificadores
+    # de un delta revertido siguen reservados.
+    siguientes = (m.get("id_allocation") or {}).get("next") or {}
+    if not reverse:
+        for op in delta.get("operations") or []:
+            rid = op.get("record_id")
+            if OPERATIONS.get(op.get("operation")) != "add" or not isinstance(rid, str) or "-" not in rid:
+                continue
+            prefijo, numero_id = rid.rsplit("-", 1)
+            actual = siguientes.get(prefijo)
+            if isinstance(actual, str) and numero_id.isdigit() and int(numero_id) >= int(actual.rsplit("-", 1)[1]):
+                siguientes[prefijo] = f"{prefijo}-{int(numero_id) + 1:06d}"
     MANIFEST.write_text(json.dumps(m, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
 
 

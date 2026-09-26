@@ -349,11 +349,157 @@ class Convertir(unittest.TestCase):
 
     def test_un_destino_fuera_del_vocabulario_se_rechaza(self):
         spec = self.entorno.spec()
-        spec["rows"]["C-001"]["destination"] = "J"
+        spec["rows"]["C-001"]["destination"] = "Z"
         with self.assertRaises(SystemExit) as e:
             self.entorno.construir(spec)
         self.assertIn("C-001", str(e.exception))
-        self.assertIn("J", str(e.exception))
+        self.assertIn("Z", str(e.exception))
+
+    def contraevidencia(self, spec: dict, afirmaciones: list[str], fichero: str = "evidence.jsonl") -> dict:
+        """La fila C-002 pasa a J: una evidencia de S02 que cuestiona `afirmaciones`."""
+        registro = {"evidence_type": "morphological", "description": "Otra lectura.", "source_id": "@S02",
+                    "locator": "resultados", "supports_claim_ids": [], "challenges_claim_ids": afirmaciones}
+        if fichero != "evidence.jsonl":
+            registro = {"preferred_label": "FIX-Gamma", "description": "No es una evidencia."}
+        spec["records"].append({"key": "@EVJ", "file": fichero, "rows": ["C-002"], "record": registro})
+        spec["rows"]["C-002"] = {"destination": "J", "keys": ["@EVJ"]}
+        return spec
+
+    def test_una_fila_J_registra_contraevidencia_de_otra_fila(self):
+        r = self.entorno.construir(self.contraevidencia(self.entorno.spec(), ["@CL1"]))
+        recs = self.registros(r)
+        [claim] = [c for c in recs.values() if c["id"].startswith("CLAIM-")]
+        [ev] = [e for e in recs.values() if e["id"].startswith("EVID-") and e["challenges_claim_ids"]]
+        self.assertEqual(claim["counterevidence_ids"], [ev["id"]])
+        self.assertEqual(r["delta"]["conversion"]["rows"]["C-002"]["destination"], "J")
+
+    def test_una_fila_J_sobre_una_afirmacion_existente_la_enlaza(self):
+        existente = {"id": "CLAIM-000050", "claim_type": "relational", "subject_id": "CLADE-000050",
+                     "predicate": "sister_group_of", "object": {"entity_id": "CLADE-000051"},
+                     "evidence_ids": [], "counterevidence_ids": [], "record_status": "active"}
+        (self.entorno.records / "claims.jsonl").write_text(json.dumps(existente) + "\n", encoding="utf-8")
+        r = self.entorno.construir(self.contraevidencia(self.entorno.spec(), ["CLAIM-000050"]))
+        [ev] = [e["id"] for _, e in r["salida"] if e["id"].startswith("EVID-") and e["challenges_claim_ids"]]
+        [op] = [o for o in r["delta"]["operations"] if o["record_id"] == "CLAIM-000050"]
+        self.assertEqual(op["after"]["counterevidence_ids"], [ev])
+
+    def test_una_fila_J_con_un_registro_que_no_es_evidencia_se_rechaza(self):
+        with self.assertRaises(SystemExit) as e:
+            self.entorno.construir(self.contraevidencia(self.entorno.spec(), ["@CL1"], fichero="clades.jsonl"))
+        self.assertIn("C-002", str(e.exception))
+        self.assertIn("@EVJ", str(e.exception))
+
+    def test_una_fila_J_sin_afirmacion_de_otra_fila_se_rechaza(self):
+        # Cuestionar una afirmación que sale de la propia fila no es
+        # contraevidencia de otra fila: sería una afirmación con su evidencia.
+        spec = self.contraevidencia(self.entorno.spec(), ["@CLJ"])
+        spec["records"].append({"key": "@CLJ", "file": "claims.jsonl", "rows": ["C-002"], "record": {
+            "claim_type": "relational", "subject_id": "@Alfa", "predicate": "sister_group_of",
+            "object": {"entity_id": "@Beta"}}})
+        with self.assertRaises(SystemExit) as e:
+            self.entorno.construir(spec)
+        self.assertIn("C-002", str(e.exception))
+        self.assertIn("@CLJ", str(e.exception))
+
+    def test_una_fila_J_sin_afirmaciones_se_rechaza(self):
+        with self.assertRaises(SystemExit) as e:
+            self.entorno.construir(self.contraevidencia(self.entorno.spec(), []))
+        self.assertIn("@EVJ", str(e.exception))
+
+    def ocurrencia(self, spec: dict, fecha_propia: str | None) -> dict:
+        """Una ocurrencia de @Alfa y una afirmación `dated_to` que la fecha."""
+        occ = {"entity_id": "@Alfa", "location_precision": "unknown", "evidence_basis": "observed",
+               "notes": []}
+        if fecha_propia is not None:
+            occ["temporal_expression_id"] = fecha_propia
+        tiempo = self.tiempo(1000, 900)
+        tiempo.update({"temporal_type": "occurrence_date", "determination": "observed", "method_type": "other",
+                       "calibration": {"system": "geological_timescale", "curve_or_timescale": None}})
+        spec["records"] += [
+            {"key": "@TO", "file": "temporal-expressions.jsonl", "rows": ["C-001"], "record": tiempo},
+            {"key": "@OCC", "file": "occurrences.jsonl", "rows": ["C-001"], "record": occ},
+            {"key": "@CLO", "file": "claims.jsonl", "rows": ["C-001"], "record": {
+                "claim_type": "temporal", "subject_id": "@OCC", "predicate": "dated_to",
+                "object": {"temporal_expression_id": "@TO"}}},
+        ]
+        spec["rows"]["C-001"]["keys"] += ["@TO", "@OCC", "@CLO"]
+        return spec
+
+    def test_la_fecha_de_una_ocurrencia_se_deduce_de_su_datacion(self):
+        r = self.entorno.construir(self.ocurrencia(self.entorno.spec(), None))
+        recs = self.registros(r)
+        [occ] = [x for x in recs.values() if x["id"].startswith("OCC-")]
+        [t] = [x for x in recs.values() if x["id"].startswith("TIME-")]
+        self.assertEqual(occ["temporal_expression_id"], t["id"])
+
+    def test_la_fecha_de_una_ocurrencia_que_no_sale_de_su_datacion_se_rechaza(self):
+        spec = self.ocurrencia(self.entorno.spec(), "@T2")
+        spec["records"].append({"key": "@T2", "file": "temporal-expressions.jsonl", "rows": ["C-001"],
+                                "record": self.tiempo(800, 700)})
+        spec["rows"]["C-001"]["keys"].append("@T2")
+        with self.assertRaises(SystemExit) as e:
+            self.entorno.construir(spec)
+        self.assertIn("@OCC", str(e.exception))
+        self.assertIn("temporal_expression_id", str(e.exception))
+
+    def ocurrencia_existente(self, fecha: str | None) -> dict:
+        occ = {"id": "OCC-000050", "entity_id": "CLADE-000050", "temporal_expression_id": fecha,
+               "location_precision": "unknown", "evidence_basis": "observed", "record_status": "active"}
+        (self.entorno.records / "occurrences.jsonl").write_text(json.dumps(occ) + "\n", encoding="utf-8")
+        spec = self.ocurrencia(self.entorno.spec(), None)
+        spec["records"] = [r for r in spec["records"] if r["key"] != "@OCC"]
+        spec["rows"]["C-001"]["keys"].remove("@OCC")
+        spec["records"][-1]["record"]["subject_id"] = "OCC-000050"
+        return spec
+
+    def test_la_datacion_de_una_ocurrencia_existente_la_fecha(self):
+        r = self.entorno.construir(self.ocurrencia_existente(None))
+        [t] = [x["id"] for _, x in r["salida"] if x["id"].startswith("TIME-")]
+        [op] = [o for o in r["delta"]["operations"] if o["record_id"] == "OCC-000050"]
+        self.assertEqual(op["after"]["temporal_expression_id"], t)
+
+    def test_una_datacion_nueva_de_una_ocurrencia_fechada_no_la_cambia(self):
+        # Otra fuente la data distinto: es una afirmación que compite, no una
+        # razón para rehacer la ocurrencia ni para negarse.
+        r = self.entorno.construir(self.ocurrencia_existente("TIME-000050"))
+        [op] = [o for o in r["delta"]["operations"] if o["record_id"] == "OCC-000050"]
+        self.assertEqual(op["after"]["temporal_expression_id"], "TIME-000050")  # sólo gana el enlace a la afirmación
+        [claim] = [x for _, x in r["salida"] if x.get("subject_id") == "OCC-000050"]
+        self.assertEqual(claim["predicate"], "dated_to")
+
+    def dos_dataciones(self, fija: str | None) -> dict:
+        spec = self.ocurrencia(self.entorno.spec(), fija)
+        spec["records"] += [
+            {"key": "@T2", "file": "temporal-expressions.jsonl", "rows": ["C-001"], "record": self.tiempo(800, 700)},
+            {"key": "@CLO2", "file": "claims.jsonl", "rows": ["C-001"], "record": {
+                "claim_type": "temporal", "subject_id": "@OCC", "predicate": "dated_to",
+                "object": {"temporal_expression_id": "@T2"}}}]
+        spec["rows"]["C-001"]["keys"] += ["@T2", "@CLO2"]
+        return spec
+
+    def test_dos_dataciones_de_una_ocurrencia_exigen_elegir_su_fecha(self):
+        with self.assertRaises(SystemExit) as e:
+            self.entorno.construir(self.dos_dataciones(None))
+        self.assertIn("@OCC", str(e.exception))
+        self.assertIn("temporal_expression_id", str(e.exception))
+
+    def test_dos_dataciones_que_compiten_conviven_si_se_elige_la_fecha(self):
+        r = self.entorno.construir(self.dos_dataciones("@T2"))
+        recs = self.registros(r)
+        [occ] = [x for x in recs.values() if x["id"].startswith("OCC-")]
+        fechas = [c["object"]["temporal_expression_id"] for c in recs.values()
+                  if c.get("predicate") == "dated_to" and c.get("subject_id") == occ["id"]]
+        self.assertEqual(len(fechas), 2)
+        # La elegida es @T2, la segunda: no se pisa con la primera.
+        t2 = next(x["id"] for x in recs.values() if x["id"].startswith("TIME-")
+                  and (x.get("interval") or {}).get("oldest_bound") == 800)
+        self.assertEqual(occ["temporal_expression_id"], t2)
+
+    def test_una_evidencia_J_con_listas_nulas_da_un_error_legible(self):
+        spec = self.contraevidencia(self.entorno.spec(), ["@CL1"])
+        spec["records"][-1]["record"]["supports_claim_ids"] = None
+        with self.assertRaises(SystemExit):
+            self.entorno.construir(spec)
 
     def test_una_mencion_resuelta_sin_destino_se_rechaza(self):
         spec = self.entorno.spec()
@@ -798,6 +944,34 @@ class Convertir(unittest.TestCase):
         self.assertEqual(iss["affects"]["record_ids"], [alfa["id"]])
         [op] = [o for o in r["delta"]["operations"] if o["record_id"] == "ISSUE-000050"]
         self.assertEqual(op["after"]["affects"]["claim_ids"], [claim["id"]])
+
+    def test_el_siguiente_del_manifiesto_reserva_los_anteriores(self):
+        # Un identificador por debajo del siguiente que declara el manifiesto
+        # ya se asignó aunque no esté en ningún fichero.
+        manifiesto = self.entorno.tmp / "dataset.json"
+        d = json.loads(manifiesto.read_text(encoding="utf-8"))
+        d["id_allocation"] = {"next": {"CLAIM": "CLAIM-000007"}}
+        manifiesto.write_text(json.dumps(d), encoding="utf-8")
+        with mock.patch.object(convertir.base, "MANIFEST", manifiesto):
+            r = self.entorno.construir(self.entorno.spec())
+        [claim] = [x["id"] for _, x in r["salida"] if x["id"].startswith("CLAIM-")]
+        self.assertEqual(claim, "CLAIM-000007")
+
+    def test_aplicar_un_delta_avanza_el_siguiente_del_manifiesto(self):
+        manifiesto = self.entorno.tmp / "dataset.json"
+        d = json.loads(manifiesto.read_text(encoding="utf-8"))
+        d["id_allocation"] = {"next": {"MENTION": "MENTION-000001"}}
+        manifiesto.write_text(json.dumps(d), encoding="utf-8")
+        with contextlib.redirect_stdout(io.StringIO()):
+            self.assertEqual(delta_mod.cmd(self.entorno.tmp / "deltas" / "SEC-000001.json", False, False), 0)
+        menciones = [o["record_id"] for o in self.entorno.delta_sec["operations"] if o["file"] == "mentions.jsonl"]
+        siguiente = json.loads(manifiesto.read_text(encoding="utf-8"))["id_allocation"]["next"]["MENTION"]
+        self.assertEqual(int(siguiente.split("-")[1]), max(int(m.split("-")[1]) for m in menciones) + 1)
+        # Al revertir no retrocede: los identificadores siguen reservados.
+        with contextlib.redirect_stdout(io.StringIO()):
+            self.assertEqual(delta_mod.cmd(self.entorno.tmp / "deltas" / "SEC-000001.json", True, False), 0)
+        self.assertEqual(json.loads(manifiesto.read_text(encoding="utf-8"))["id_allocation"]["next"]["MENTION"],
+                         siguiente)
 
     def test_una_clave_de_mencion_desconocida_se_rechaza(self):
         spec = self.entorno.spec()

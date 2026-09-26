@@ -50,6 +50,7 @@
         "loses_trait",
         "retains_trait",
         "shows_evidence_of",
+        "biomarker_of",
         "converges_with",
         "inherits_trait_from",
         "develops_independently",
@@ -82,7 +83,7 @@
         "limits",
         "calibrates"
       ],
-      "description": "Vocabulario cerrado de §14 más 'assigned_to' de E.6. Los predicados modales ('possible_ancestor_of', 'may_bias') no se degradan nunca a afirmación categórica. Los seis últimos son las relaciones metodológicas de §14.6 (DEC-057, esquema 1.2.0). Ampliarlo es un cambio de contrato y sube schema_version (§16.5)."
+      "description": "Vocabulario cerrado de §14 más 'assigned_to' de E.6. Los predicados modales ('possible_ancestor_of', 'may_bias') no se degradan nunca a afirmación categórica. Los seis últimos son las relaciones metodológicas de §14.6 (DEC-057, esquema 1.2.0). 'biomarker_of' (§14.3, DEC-058, esquema 1.3.0) va de una molécula (MOL-) a quien la produce: su hallazgo en una roca se lee como indicio de ese grupo, con la especificidad que la afirmación y su contraevidencia digan. Ampliarlo es un cambio de contrato y sube schema_version (§16.5)."
     },
     "object": {
       "type": "object",

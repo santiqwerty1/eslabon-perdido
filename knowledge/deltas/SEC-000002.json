@@ -1,0 +1,5065 @@
+{
+  "section_id": "SEC-000002",
+  "schema_version": "1.3.0",
+  "dataset_revision_before": "REV-000006",
+  "dataset_revision_after": "REV-000007",
+  "operations": [
+    {
+      "operation": "ADD_RECORD",
+      "file": "mentions.jsonl",
+      "record_id": "MENTION-000069",
+      "before": null,
+      "after": {
+        "id": "MENTION-000069",
+        "section_id": "SEC-000002",
+        "passage_id": "PASSAGE-000042",
+        "original_text": "acritarco",
+        "normalized_form": "acritarco",
+        "mention_type": "unresolved",
+        "character_offsets": {
+          "start": 118,
+          "end": 127
+        },
+        "resolution": {
+          "status": "pending",
+          "target_ids": [],
+          "reason": null
+        },
+        "disposition": null,
+        "issue_ids": [],
+        "notes": [
+          "capa de registro: sujeto en C-694; apéndice B en C-694",
+          "en el pasaje aparece como «Acritarco», con otra capitalización; los offsets señalan esa aparición",
+          "apéndice B: tipo declarado «categoría morfológica; taxón de forma artificial»"
+        ],
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "mentions.jsonl",
+      "record_id": "MENTION-000070",
+      "before": null,
+      "after": {
+        "id": "MENTION-000070",
+        "section_id": "SEC-000002",
+        "passage_id": "PASSAGE-000042",
+        "original_text": "taxón de forma artificial",
+        "normalized_form": "taxón de forma artificial",
+        "mention_type": "unresolved",
+        "character_offsets": {
+          "start": 117,
+          "end": 250
+        },
+        "resolution": {
+          "status": "pending",
+          "target_ids": [],
+          "reason": null
+        },
+        "disposition": null,
+        "issue_ids": [],
+        "notes": [
+          "capa de registro: objeto en C-694",
+          "la etiqueta no aparece literal en el pasaje; los offsets cubren el pasaje entero"
+        ],
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "mentions.jsonl",
+      "record_id": "MENTION-000071",
+      "before": null,
+      "after": {
+        "id": "MENTION-000071",
+        "section_id": "SEC-000002",
+        "passage_id": "PASSAGE-000043",
+        "original_text": "microfósil de pared orgánica",
+        "normalized_form": "microfósil de pared orgánica",
+        "mention_type": "unresolved",
+        "character_offsets": {
+          "start": 252,
+          "end": 494
+        },
+        "resolution": {
+          "status": "pending",
+          "target_ids": [],
+          "reason": null
+        },
+        "disposition": null,
+        "issue_ids": [],
+        "notes": [
+          "capa de registro: sujeto en C-695",
+          "la etiqueta no aparece literal en el pasaje; los offsets cubren el pasaje entero"
+        ],
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "mentions.jsonl",
+      "record_id": "MENTION-000072",
+      "before": null,
+      "after": {
+        "id": "MENTION-000072",
+        "section_id": "SEC-000002",
+        "passage_id": "PASSAGE-000043",
+        "original_text": "conjunto de indicadores eucariotas no exclusivos",
+        "normalized_form": "conjunto de indicadores eucariotas no exclusivos",
+        "mention_type": "unresolved",
+        "character_offsets": {
+          "start": 252,
+          "end": 494
+        },
+        "resolution": {
+          "status": "pending",
+          "target_ids": [],
+          "reason": null
+        },
+        "disposition": null,
+        "issue_ids": [],
+        "notes": [
+          "capa de registro: objeto en C-695",
+          "la etiqueta no aparece literal en el pasaje; los offsets cubren el pasaje entero"
+        ],
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "mentions.jsonl",
+      "record_id": "MENTION-000073",
+      "before": null,
+      "after": {
+        "id": "MENTION-000073",
+        "section_id": "SEC-000002",
+        "passage_id": "PASSAGE-000044",
+        "original_text": "tamaño de vesícula",
+        "normalized_form": "tamaño de vesícula",
+        "mention_type": "unresolved",
+        "character_offsets": {
+          "start": 496,
+          "end": 598
+        },
+        "resolution": {
+          "status": "pending",
+          "target_ids": [],
+          "reason": null
+        },
+        "disposition": null,
+        "issue_ids": [],
+        "notes": [
+          "capa de registro: sujeto en C-696",
+          "la etiqueta no aparece literal en el pasaje; los offsets cubren el pasaje entero"
+        ],
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "mentions.jsonl",
+      "record_id": "MENTION-000074",
+      "before": null,
+      "after": {
+        "id": "MENTION-000074",
+        "section_id": "SEC-000002",
+        "passage_id": "PASSAGE-000044",
+        "original_text": "Eukaryota",
+        "normalized_form": "Eukaryota",
+        "mention_type": "unresolved",
+        "character_offsets": {
+          "start": 571,
+          "end": 580
+        },
+        "resolution": {
+          "status": "pending",
+          "target_ids": [],
+          "reason": null
+        },
+        "disposition": null,
+        "issue_ids": [],
+        "notes": [
+          "capa de registro: objeto en C-696; objeto en C-745"
+        ],
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "mentions.jsonl",
+      "record_id": "MENTION-000075",
+      "before": null,
+      "after": {
+        "id": "MENTION-000075",
+        "section_id": "SEC-000002",
+        "passage_id": "PASSAGE-000045",
+        "original_text": "microscopía electrónica de transmisión",
+        "normalized_form": "microscopía electrónica de transmisión",
+        "mention_type": "unresolved",
+        "character_offsets": {
+          "start": 603,
+          "end": 641
+        },
+        "resolution": {
+          "status": "pending",
+          "target_ids": [],
+          "reason": null
+        },
+        "disposition": null,
+        "issue_ids": [],
+        "notes": [
+          "capa de registro: sujeto en C-697; apéndice B en C-695",
+          "apéndice B: tipo declarado «método»"
+        ],
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "mentions.jsonl",
+      "record_id": "MENTION-000076",
+      "before": null,
+      "after": {
+        "id": "MENTION-000076",
+        "section_id": "SEC-000002",
+        "passage_id": "PASSAGE-000045",
+        "original_text": "ultraestructura de pared",
+        "normalized_form": "ultraestructura de pared",
+        "mention_type": "unresolved",
+        "character_offsets": {
+          "start": 600,
+          "end": 771
+        },
+        "resolution": {
+          "status": "pending",
+          "target_ids": [],
+          "reason": null
+        },
+        "disposition": null,
+        "issue_ids": [],
+        "notes": [
+          "capa de registro: objeto en C-697",
+          "la etiqueta no aparece literal en el pasaje; los offsets cubren el pasaje entero"
+        ],
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "mentions.jsonl",
+      "record_id": "MENTION-000077",
+      "before": null,
+      "after": {
+        "id": "MENTION-000077",
+        "section_id": "SEC-000002",
+        "passage_id": "PASSAGE-000046",
+        "original_text": "química de pared fósil",
+        "normalized_form": "química de pared fósil",
+        "mention_type": "unresolved",
+        "character_offsets": {
+          "start": 773,
+          "end": 948
+        },
+        "resolution": {
+          "status": "pending",
+          "target_ids": [],
+          "reason": null
+        },
+        "disposition": null,
+        "issue_ids": [],
+        "notes": [
+          "capa de registro: sujeto en C-698",
+          "la etiqueta no aparece literal en el pasaje; los offsets cubren el pasaje entero"
+        ],
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "mentions.jsonl",
+      "record_id": "MENTION-000078",
+      "before": null,
+      "after": {
+        "id": "MENTION-000078",
+        "section_id": "SEC-000002",
+        "passage_id": "PASSAGE-000046",
+        "original_text": "espectroscopía con limitaciones tafonómicas",
+        "normalized_form": "espectroscopía con limitaciones tafonómicas",
+        "mention_type": "unresolved",
+        "character_offsets": {
+          "start": 773,
+          "end": 948
+        },
+        "resolution": {
+          "status": "pending",
+          "target_ids": [],
+          "reason": null
+        },
+        "disposition": null,
+        "issue_ids": [],
+        "notes": [
+          "capa de registro: objeto en C-698",
+          "la etiqueta no aparece literal en el pasaje; los offsets cubren el pasaje entero"
+        ],
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "mentions.jsonl",
+      "record_id": "MENTION-000079",
+      "before": null,
+      "after": {
+        "id": "MENTION-000079",
+        "section_id": "SEC-000002",
+        "passage_id": "PASSAGE-000049",
+        "original_text": "Grupo Roper",
+        "normalized_form": "Grupo Roper",
+        "mention_type": "unresolved",
+        "character_offsets": {
+          "start": 1463,
+          "end": 1474
+        },
+        "resolution": {
+          "status": "pending",
+          "target_ids": [],
+          "reason": null
+        },
+        "disposition": null,
+        "issue_ids": [],
+        "notes": [
+          "capa de registro: sujeto en C-699; apéndice B en C-699",
+          "apéndice B: tipo declarado «unidad estratigráfica»"
+        ],
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "mentions.jsonl",
+      "record_id": "MENTION-000080",
+      "before": null,
+      "after": {
+        "id": "MENTION-000080",
+        "section_id": "SEC-000002",
+        "passage_id": "PASSAGE-000049",
+        "original_text": "1492 ± 4 Ma a 1361 ± 21 Ma",
+        "normalized_form": "1492 ± 4 Ma a 1361 ± 21 Ma",
+        "mention_type": "unresolved",
+        "character_offsets": {
+          "start": 1447,
+          "end": 1599
+        },
+        "resolution": {
+          "status": "pending",
+          "target_ids": [],
+          "reason": null
+        },
+        "disposition": null,
+        "issue_ids": [],
+        "notes": [
+          "capa de registro: objeto en C-699",
+          "la etiqueta no aparece literal en el pasaje; los offsets cubren el pasaje entero"
+        ],
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "mentions.jsonl",
+      "record_id": "MENTION-000081",
+      "before": null,
+      "after": {
+        "id": "MENTION-000081",
+        "section_id": "SEC-000002",
+        "passage_id": "PASSAGE-000050",
+        "original_text": "Tappania plana",
+        "normalized_form": "Tappania plana",
+        "mention_type": "unresolved",
+        "character_offsets": {
+          "start": 1601,
+          "end": 1615
+        },
+        "resolution": {
+          "status": "pending",
+          "target_ids": [],
+          "reason": null
+        },
+        "disposition": null,
+        "issue_ids": [],
+        "notes": [
+          "capa de registro: sujeto en C-700"
+        ],
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "mentions.jsonl",
+      "record_id": "MENTION-000082",
+      "before": null,
+      "after": {
+        "id": "MENTION-000082",
+        "section_id": "SEC-000002",
+        "passage_id": "PASSAGE-000050",
+        "original_text": "procesos ramificados y crecimiento complejo",
+        "normalized_form": "procesos ramificados y crecimiento complejo",
+        "mention_type": "unresolved",
+        "character_offsets": {
+          "start": 1601,
+          "end": 1788
+        },
+        "resolution": {
+          "status": "pending",
+          "target_ids": [],
+          "reason": null
+        },
+        "disposition": null,
+        "issue_ids": [],
+        "notes": [
+          "capa de registro: objeto en C-700",
+          "la etiqueta no aparece literal en el pasaje; los offsets cubren el pasaje entero"
+        ],
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "mentions.jsonl",
+      "record_id": "MENTION-000083",
+      "before": null,
+      "after": {
+        "id": "MENTION-000083",
+        "section_id": "SEC-000002",
+        "passage_id": "PASSAGE-000051",
+        "original_text": "Valeria lophostriata",
+        "normalized_form": "Valeria lophostriata",
+        "mention_type": "unresolved",
+        "character_offsets": {
+          "start": 1790,
+          "end": 1810
+        },
+        "resolution": {
+          "status": "pending",
+          "target_ids": [],
+          "reason": null
+        },
+        "disposition": null,
+        "issue_ids": [],
+        "notes": [
+          "capa de registro: sujeto en C-701; sujeto en C-702"
+        ],
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "mentions.jsonl",
+      "record_id": "MENTION-000084",
+      "before": null,
+      "after": {
+        "id": "MENTION-000084",
+        "section_id": "SEC-000002",
+        "passage_id": "PASSAGE-000051",
+        "original_text": "estriaciones concéntricas regulares",
+        "normalized_form": "estriaciones concéntricas regulares",
+        "mention_type": "unresolved",
+        "character_offsets": {
+          "start": 1817,
+          "end": 1852
+        },
+        "resolution": {
+          "status": "pending",
+          "target_ids": [],
+          "reason": null
+        },
+        "disposition": null,
+        "issue_ids": [],
+        "notes": [
+          "capa de registro: objeto en C-701"
+        ],
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "mentions.jsonl",
+      "record_id": "MENTION-000085",
+      "before": null,
+      "after": {
+        "id": "MENTION-000085",
+        "section_id": "SEC-000002",
+        "passage_id": "PASSAGE-000052",
+        "original_text": "morfología compatible con Eukaryota",
+        "normalized_form": "morfología compatible con Eukaryota",
+        "mention_type": "unresolved",
+        "character_offsets": {
+          "start": 1933,
+          "end": 2083
+        },
+        "resolution": {
+          "status": "pending",
+          "target_ids": [],
+          "reason": null
+        },
+        "disposition": null,
+        "issue_ids": [],
+        "notes": [
+          "capa de registro: objeto en C-702",
+          "la etiqueta no aparece literal en el pasaje; los offsets cubren el pasaje entero"
+        ],
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "mentions.jsonl",
+      "record_id": "MENTION-000086",
+      "before": null,
+      "after": {
+        "id": "MENTION-000086",
+        "section_id": "SEC-000002",
+        "passage_id": "PASSAGE-000053",
+        "original_text": "Dictyosphaera y Shuiyousphaeridium",
+        "normalized_form": "Dictyosphaera y Shuiyousphaeridium",
+        "mention_type": "unresolved",
+        "character_offsets": {
+          "start": 2085,
+          "end": 2119
+        },
+        "resolution": {
+          "status": "pending",
+          "target_ids": [],
+          "reason": null
+        },
+        "disposition": null,
+        "issue_ids": [],
+        "notes": [
+          "capa de registro: sujeto en C-703"
+        ],
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "mentions.jsonl",
+      "record_id": "MENTION-000087",
+      "before": null,
+      "after": {
+        "id": "MENTION-000087",
+        "section_id": "SEC-000002",
+        "passage_id": "PASSAGE-000053",
+        "original_text": "ornamentación compleja de pared",
+        "normalized_form": "ornamentación compleja de pared",
+        "mention_type": "unresolved",
+        "character_offsets": {
+          "start": 2085,
+          "end": 2259
+        },
+        "resolution": {
+          "status": "pending",
+          "target_ids": [],
+          "reason": null
+        },
+        "disposition": null,
+        "issue_ids": [],
+        "notes": [
+          "capa de registro: objeto en C-703",
+          "la etiqueta no aparece literal en el pasaje; los offsets cubren el pasaje entero"
+        ],
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "mentions.jsonl",
+      "record_id": "MENTION-000088",
+      "before": null,
+      "after": {
+        "id": "MENTION-000088",
+        "section_id": "SEC-000002",
+        "passage_id": "PASSAGE-000054",
+        "original_text": "biota del Grupo Ruyang",
+        "normalized_form": "biota del Grupo Ruyang",
+        "mention_type": "unresolved",
+        "character_offsets": {
+          "start": 2261,
+          "end": 2400
+        },
+        "resolution": {
+          "status": "pending",
+          "target_ids": [],
+          "reason": null
+        },
+        "disposition": null,
+        "issue_ids": [],
+        "notes": [
+          "capa de registro: sujeto en C-704",
+          "la etiqueta no aparece literal en el pasaje; los offsets cubren el pasaje entero"
+        ],
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "mentions.jsonl",
+      "record_id": "MENTION-000089",
+      "before": null,
+      "after": {
+        "id": "MENTION-000089",
+        "section_id": "SEC-000002",
+        "passage_id": "PASSAGE-000054",
+        "original_text": "límites amplios y menos directos que los del Grupo Roper",
+        "normalized_form": "límites amplios y menos directos que los del Grupo Roper",
+        "mention_type": "unresolved",
+        "character_offsets": {
+          "start": 2261,
+          "end": 2400
+        },
+        "resolution": {
+          "status": "pending",
+          "target_ids": [],
+          "reason": null
+        },
+        "disposition": null,
+        "issue_ids": [],
+        "notes": [
+          "capa de registro: objeto en C-704",
+          "la etiqueta no aparece literal en el pasaje; los offsets cubren el pasaje entero"
+        ],
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "mentions.jsonl",
+      "record_id": "MENTION-000090",
+      "before": null,
+      "after": {
+        "id": "MENTION-000090",
+        "section_id": "SEC-000002",
+        "passage_id": "PASSAGE-000055",
+        "original_text": "Qingshania magnifica",
+        "normalized_form": "Qingshania magnifica",
+        "mention_type": "unresolved",
+        "character_offsets": {
+          "start": 2402,
+          "end": 2422
+        },
+        "resolution": {
+          "status": "pending",
+          "target_ids": [],
+          "reason": null
+        },
+        "disposition": null,
+        "issue_ids": [],
+        "notes": [
+          "capa de registro: sujeto en C-705; sujeto en C-707"
+        ],
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "mentions.jsonl",
+      "record_id": "MENTION-000091",
+      "before": null,
+      "after": {
+        "id": "MENTION-000091",
+        "section_id": "SEC-000002",
+        "passage_id": "PASSAGE-000055",
+        "original_text": "aproximadamente 1.63 Ga",
+        "normalized_form": "aproximadamente 1.63 Ga",
+        "mention_type": "unresolved",
+        "character_offsets": {
+          "start": 2471,
+          "end": 2494
+        },
+        "resolution": {
+          "status": "pending",
+          "target_ids": [],
+          "reason": null
+        },
+        "disposition": null,
+        "issue_ids": [],
+        "notes": [
+          "capa de registro: objeto en C-705"
+        ],
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "mentions.jsonl",
+      "record_id": "MENTION-000092",
+      "before": null,
+      "after": {
+        "id": "MENTION-000092",
+        "section_id": "SEC-000002",
+        "passage_id": "PASSAGE-000056",
+        "original_text": "distribución de diámetros de Qingshania magnifica",
+        "normalized_form": "distribución de diámetros de Qingshania magnifica",
+        "mention_type": "unresolved",
+        "character_offsets": {
+          "start": 2541,
+          "end": 2889
+        },
+        "resolution": {
+          "status": "pending",
+          "target_ids": [],
+          "reason": null
+        },
+        "disposition": null,
+        "issue_ids": [],
+        "notes": [
+          "capa de registro: sujeto en C-706",
+          "la etiqueta no aparece literal en el pasaje; los offsets cubren el pasaje entero"
+        ],
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "mentions.jsonl",
+      "record_id": "MENTION-000093",
+      "before": null,
+      "after": {
+        "id": "MENTION-000093",
+        "section_id": "SEC-000002",
+        "passage_id": "PASSAGE-000056",
+        "original_text": "{rango=20–194 µm; media=73 µm; desviación estándar=29 µm; n=262}",
+        "normalized_form": "{rango=20–194 µm; media=73 µm; desviación estándar=29 µm; n=262}",
+        "mention_type": "unresolved",
+        "character_offsets": {
+          "start": 2541,
+          "end": 2889
+        },
+        "resolution": {
+          "status": "pending",
+          "target_ids": [],
+          "reason": null
+        },
+        "disposition": null,
+        "issue_ids": [],
+        "notes": [
+          "capa de registro: objeto en C-706",
+          "la etiqueta no aparece literal en el pasaje; los offsets cubren el pasaje entero"
+        ],
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "mentions.jsonl",
+      "record_id": "MENTION-000094",
+      "before": null,
+      "after": {
+        "id": "MENTION-000094",
+        "section_id": "SEC-000002",
+        "passage_id": "PASSAGE-000057",
+        "original_text": "eucariota multicelular de posición interna incierta",
+        "normalized_form": "eucariota multicelular de posición interna incierta",
+        "mention_type": "unresolved",
+        "character_offsets": {
+          "start": 2891,
+          "end": 3058
+        },
+        "resolution": {
+          "status": "pending",
+          "target_ids": [],
+          "reason": null
+        },
+        "disposition": null,
+        "issue_ids": [],
+        "notes": [
+          "capa de registro: objeto en C-707",
+          "la etiqueta no aparece literal en el pasaje; los offsets cubren el pasaje entero"
+        ],
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "mentions.jsonl",
+      "record_id": "MENTION-000095",
+      "before": null,
+      "after": {
+        "id": "MENTION-000095",
+        "section_id": "SEC-000002",
+        "passage_id": "PASSAGE-000059",
+        "original_text": "Grypania spiralis",
+        "normalized_form": "Grypania spiralis",
+        "mention_type": "unresolved",
+        "character_offsets": {
+          "start": 3102,
+          "end": 3119
+        },
+        "resolution": {
+          "status": "pending",
+          "target_ids": [],
+          "reason": null
+        },
+        "disposition": null,
+        "issue_ids": [],
+        "notes": [
+          "capa de registro: sujeto en C-708; sujeto en C-709"
+        ],
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "mentions.jsonl",
+      "record_id": "MENTION-000096",
+      "before": null,
+      "after": {
+        "id": "MENTION-000096",
+        "section_id": "SEC-000002",
+        "passage_id": "PASSAGE-000059",
+        "original_text": "posible alga eucariota",
+        "normalized_form": "posible alga eucariota",
+        "mention_type": "unresolved",
+        "character_offsets": {
+          "start": 3102,
+          "end": 3256
+        },
+        "resolution": {
+          "status": "pending",
+          "target_ids": [],
+          "reason": null
+        },
+        "disposition": null,
+        "issue_ids": [],
+        "notes": [
+          "capa de registro: objeto en C-708",
+          "la etiqueta no aparece literal en el pasaje; los offsets cubren el pasaje entero"
+        ],
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "mentions.jsonl",
+      "record_id": "MENTION-000097",
+      "before": null,
+      "after": {
+        "id": "MENTION-000097",
+        "section_id": "SEC-000002",
+        "passage_id": "PASSAGE-000060",
+        "original_text": "origen eucariota muy probable y relaciones filogenéticas no bien restringidas",
+        "normalized_form": "origen eucariota muy probable y relaciones filogenéticas no bien restringidas",
+        "mention_type": "unresolved",
+        "character_offsets": {
+          "start": 3258,
+          "end": 3460
+        },
+        "resolution": {
+          "status": "pending",
+          "target_ids": [],
+          "reason": null
+        },
+        "disposition": null,
+        "issue_ids": [],
+        "notes": [
+          "capa de registro: objeto en C-709",
+          "la etiqueta no aparece literal en el pasaje; los offsets cubren el pasaje entero"
+        ],
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "mentions.jsonl",
+      "record_id": "MENTION-000098",
+      "before": null,
+      "after": {
+        "id": "MENTION-000098",
+        "section_id": "SEC-000002",
+        "passage_id": "PASSAGE-000061",
+        "original_text": "Rafatazmia chitrakootensis",
+        "normalized_form": "Rafatazmia chitrakootensis",
+        "mention_type": "unresolved",
+        "character_offsets": {
+          "start": 3462,
+          "end": 3488
+        },
+        "resolution": {
+          "status": "pending",
+          "target_ids": [],
+          "reason": null
+        },
+        "disposition": null,
+        "issue_ids": [],
+        "notes": [
+          "capa de registro: sujeto en C-710; sujeto en C-711"
+        ],
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "mentions.jsonl",
+      "record_id": "MENTION-000099",
+      "before": null,
+      "after": {
+        "id": "MENTION-000099",
+        "section_id": "SEC-000002",
+        "passage_id": "PASSAGE-000061",
+        "original_text": "aproximadamente 1.6 Ga",
+        "normalized_form": "aproximadamente 1.6 Ga",
+        "mention_type": "unresolved",
+        "character_offsets": {
+          "start": 3462,
+          "end": 3637
+        },
+        "resolution": {
+          "status": "pending",
+          "target_ids": [],
+          "reason": null
+        },
+        "disposition": null,
+        "issue_ids": [],
+        "notes": [
+          "capa de registro: objeto en C-710",
+          "la etiqueta no aparece literal en el pasaje; los offsets cubren el pasaje entero"
+        ],
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "mentions.jsonl",
+      "record_id": "MENTION-000100",
+      "before": null,
+      "after": {
+        "id": "MENTION-000100",
+        "section_id": "SEC-000002",
+        "passage_id": "PASSAGE-000062",
+        "original_text": "Rhodophyta grupo corona",
+        "normalized_form": "Rhodophyta grupo corona",
+        "mention_type": "unresolved",
+        "character_offsets": {
+          "start": 3639,
+          "end": 3772
+        },
+        "resolution": {
+          "status": "pending",
+          "target_ids": [],
+          "reason": null
+        },
+        "disposition": null,
+        "issue_ids": [],
+        "notes": [
+          "capa de registro: objeto en C-711",
+          "la etiqueta no aparece literal en el pasaje; los offsets cubren el pasaje entero"
+        ],
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "mentions.jsonl",
+      "record_id": "MENTION-000101",
+      "before": null,
+      "after": {
+        "id": "MENTION-000101",
+        "section_id": "SEC-000002",
+        "passage_id": "PASSAGE-000063",
+        "original_text": "afirmación C-711",
+        "normalized_form": "afirmación C-711",
+        "mention_type": "unresolved",
+        "character_offsets": {
+          "start": 3774,
+          "end": 3991
+        },
+        "resolution": {
+          "status": "pending",
+          "target_ids": [],
+          "reason": null
+        },
+        "disposition": null,
+        "issue_ids": [],
+        "notes": [
+          "capa de registro: sujeto en C-712",
+          "la etiqueta no aparece literal en el pasaje; los offsets cubren el pasaje entero"
+        ],
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "mentions.jsonl",
+      "record_id": "MENTION-000102",
+      "before": null,
+      "after": {
+        "id": "MENTION-000102",
+        "section_id": "SEC-000002",
+        "passage_id": "PASSAGE-000063",
+        "original_text": "ambigüedad morfológica y estratigráfica",
+        "normalized_form": "ambigüedad morfológica y estratigráfica",
+        "mention_type": "unresolved",
+        "character_offsets": {
+          "start": 3774,
+          "end": 3991
+        },
+        "resolution": {
+          "status": "pending",
+          "target_ids": [],
+          "reason": null
+        },
+        "disposition": null,
+        "issue_ids": [],
+        "notes": [
+          "capa de registro: objeto en C-712",
+          "la etiqueta no aparece literal en el pasaje; los offsets cubren el pasaje entero"
+        ],
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "mentions.jsonl",
+      "record_id": "MENTION-000103",
+      "before": null,
+      "after": {
+        "id": "MENTION-000103",
+        "section_id": "SEC-000002",
+        "passage_id": "PASSAGE-000065",
+        "original_text": "microfósiles con forma de vasija del Grupo Chuar",
+        "normalized_form": "microfósiles con forma de vasija del Grupo Chuar",
+        "mention_type": "unresolved",
+        "character_offsets": {
+          "start": 4096,
+          "end": 4144
+        },
+        "resolution": {
+          "status": "pending",
+          "target_ids": [],
+          "reason": null
+        },
+        "disposition": null,
+        "issue_ids": [],
+        "notes": [
+          "capa de registro: sujeto en C-713"
+        ],
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "mentions.jsonl",
+      "record_id": "MENTION-000104",
+      "before": null,
+      "after": {
+        "id": "MENTION-000104",
+        "section_id": "SEC-000002",
+        "passage_id": "PASSAGE-000065",
+        "original_text": "amebas testadas próximas a Amoebozoa",
+        "normalized_form": "amebas testadas próximas a Amoebozoa",
+        "mention_type": "unresolved",
+        "character_offsets": {
+          "start": 4092,
+          "end": 4294
+        },
+        "resolution": {
+          "status": "pending",
+          "target_ids": [],
+          "reason": null
+        },
+        "disposition": null,
+        "issue_ids": [],
+        "notes": [
+          "capa de registro: objeto en C-713",
+          "la etiqueta no aparece literal en el pasaje; los offsets cubren el pasaje entero"
+        ],
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "mentions.jsonl",
+      "record_id": "MENTION-000105",
+      "before": null,
+      "after": {
+        "id": "MENTION-000105",
+        "section_id": "SEC-000002",
+        "passage_id": "PASSAGE-000066",
+        "original_text": "perforaciones del Grupo Chuar",
+        "normalized_form": "perforaciones del Grupo Chuar",
+        "mention_type": "unresolved",
+        "character_offsets": {
+          "start": 4296,
+          "end": 4448
+        },
+        "resolution": {
+          "status": "pending",
+          "target_ids": [],
+          "reason": null
+        },
+        "disposition": null,
+        "issue_ids": [],
+        "notes": [
+          "capa de registro: sujeto en C-714",
+          "la etiqueta no aparece literal en el pasaje; los offsets cubren el pasaje entero"
+        ],
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "mentions.jsonl",
+      "record_id": "MENTION-000106",
+      "before": null,
+      "after": {
+        "id": "MENTION-000106",
+        "section_id": "SEC-000002",
+        "passage_id": "PASSAGE-000066",
+        "original_text": "780–740 Ma",
+        "normalized_form": "780–740 Ma",
+        "mention_type": "unresolved",
+        "character_offsets": {
+          "start": 4296,
+          "end": 4448
+        },
+        "resolution": {
+          "status": "pending",
+          "target_ids": [],
+          "reason": null
+        },
+        "disposition": null,
+        "issue_ids": [],
+        "notes": [
+          "capa de registro: objeto en C-714",
+          "la etiqueta no aparece literal en el pasaje; los offsets cubren el pasaje entero"
+        ],
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "mentions.jsonl",
+      "record_id": "MENTION-000107",
+      "before": null,
+      "after": {
+        "id": "MENTION-000107",
+        "section_id": "SEC-000002",
+        "passage_id": "PASSAGE-000067",
+        "original_text": "perforaciones en acritarcos del Grupo Chuar",
+        "normalized_form": "perforaciones en acritarcos del Grupo Chuar",
+        "mention_type": "unresolved",
+        "character_offsets": {
+          "start": 4450,
+          "end": 4596
+        },
+        "resolution": {
+          "status": "pending",
+          "target_ids": [],
+          "reason": null
+        },
+        "disposition": null,
+        "issue_ids": [],
+        "notes": [
+          "capa de registro: sujeto en C-715; sujeto en C-716",
+          "la etiqueta no aparece literal en el pasaje; los offsets cubren el pasaje entero"
+        ],
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "mentions.jsonl",
+      "record_id": "MENTION-000108",
+      "before": null,
+      "after": {
+        "id": "MENTION-000108",
+        "section_id": "SEC-000002",
+        "passage_id": "PASSAGE-000067",
+        "original_text": "0.1–3.4 µm",
+        "normalized_form": "0.1–3.4 µm",
+        "mention_type": "unresolved",
+        "character_offsets": {
+          "start": 4491,
+          "end": 4501
+        },
+        "resolution": {
+          "status": "pending",
+          "target_ids": [],
+          "reason": null
+        },
+        "disposition": null,
+        "issue_ids": [],
+        "notes": [
+          "capa de registro: objeto en C-715"
+        ],
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "mentions.jsonl",
+      "record_id": "MENTION-000109",
+      "before": null,
+      "after": {
+        "id": "MENTION-000109",
+        "section_id": "SEC-000002",
+        "passage_id": "PASSAGE-000068",
+        "original_text": "depredación por perforación",
+        "normalized_form": "depredación por perforación",
+        "mention_type": "unresolved",
+        "character_offsets": {
+          "start": 4723,
+          "end": 4750
+        },
+        "resolution": {
+          "status": "pending",
+          "target_ids": [],
+          "reason": null
+        },
+        "disposition": null,
+        "issue_ids": [],
+        "notes": [
+          "capa de registro: objeto en C-716"
+        ],
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "mentions.jsonl",
+      "record_id": "MENTION-000110",
+      "before": null,
+      "after": {
+        "id": "MENTION-000110",
+        "section_id": "SEC-000002",
+        "passage_id": "PASSAGE-000069",
+        "original_text": "alternativas tafonómicas y de preparación",
+        "normalized_form": "alternativas tafonómicas y de preparación",
+        "mention_type": "unresolved",
+        "character_offsets": {
+          "start": 4777,
+          "end": 4941
+        },
+        "resolution": {
+          "status": "pending",
+          "target_ids": [],
+          "reason": null
+        },
+        "disposition": null,
+        "issue_ids": [],
+        "notes": [
+          "capa de registro: objeto en C-717",
+          "la etiqueta no aparece literal en el pasaje; los offsets cubren el pasaje entero"
+        ],
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "mentions.jsonl",
+      "record_id": "MENTION-000111",
+      "before": null,
+      "after": {
+        "id": "MENTION-000111",
+        "section_id": "SEC-000002",
+        "passage_id": "PASSAGE-000070",
+        "original_text": "microfósiles con forma de vasija perforados",
+        "normalized_form": "microfósiles con forma de vasija perforados",
+        "mention_type": "unresolved",
+        "character_offsets": {
+          "start": 4943,
+          "end": 5110
+        },
+        "resolution": {
+          "status": "pending",
+          "target_ids": [],
+          "reason": null
+        },
+        "disposition": null,
+        "issue_ids": [],
+        "notes": [
+          "capa de registro: sujeto en C-718",
+          "la etiqueta no aparece literal en el pasaje; los offsets cubren el pasaje entero"
+        ],
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "mentions.jsonl",
+      "record_id": "MENTION-000112",
+      "before": null,
+      "after": {
+        "id": "MENTION-000112",
+        "section_id": "SEC-000002",
+        "passage_id": "PASSAGE-000070",
+        "original_text": "aproximadamente 15–35 µm",
+        "normalized_form": "aproximadamente 15–35 µm",
+        "mention_type": "unresolved",
+        "character_offsets": {
+          "start": 4943,
+          "end": 5110
+        },
+        "resolution": {
+          "status": "pending",
+          "target_ids": [],
+          "reason": null
+        },
+        "disposition": null,
+        "issue_ids": [],
+        "notes": [
+          "capa de registro: objeto en C-718",
+          "la etiqueta no aparece literal en el pasaje; los offsets cubren el pasaje entero"
+        ],
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "mentions.jsonl",
+      "record_id": "MENTION-000113",
+      "before": null,
+      "after": {
+        "id": "MENTION-000113",
+        "section_id": "SEC-000002",
+        "passage_id": "PASSAGE-000071",
+        "original_text": "organismo perforador del Grupo Chuar",
+        "normalized_form": "organismo perforador del Grupo Chuar",
+        "mention_type": "unresolved",
+        "character_offsets": {
+          "start": 5112,
+          "end": 5233
+        },
+        "resolution": {
+          "status": "pending",
+          "target_ids": [],
+          "reason": null
+        },
+        "disposition": null,
+        "issue_ids": [],
+        "notes": [
+          "capa de registro: sujeto en C-719",
+          "la etiqueta no aparece literal en el pasaje; los offsets cubren el pasaje entero"
+        ],
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "mentions.jsonl",
+      "record_id": "MENTION-000114",
+      "before": null,
+      "after": {
+        "id": "MENTION-000114",
+        "section_id": "SEC-000002",
+        "passage_id": "PASSAGE-000071",
+        "original_text": "no determinada",
+        "normalized_form": "no determinada",
+        "mention_type": "unresolved",
+        "character_offsets": {
+          "start": 5112,
+          "end": 5233
+        },
+        "resolution": {
+          "status": "pending",
+          "target_ids": [],
+          "reason": null
+        },
+        "disposition": null,
+        "issue_ids": [],
+        "notes": [
+          "capa de registro: objeto en C-719",
+          "la etiqueta no aparece literal en el pasaje; los offsets cubren el pasaje entero"
+        ],
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "mentions.jsonl",
+      "record_id": "MENTION-000115",
+      "before": null,
+      "after": {
+        "id": "MENTION-000115",
+        "section_id": "SEC-000002",
+        "passage_id": "PASSAGE-000075",
+        "original_text": "Bangiomorpha pubescens",
+        "normalized_form": "Bangiomorpha pubescens",
+        "mention_type": "unresolved",
+        "character_offsets": {
+          "start": 5622,
+          "end": 5644
+        },
+        "resolution": {
+          "status": "pending",
+          "target_ids": [],
+          "reason": null
+        },
+        "disposition": null,
+        "issue_ids": [],
+        "notes": [
+          "capa de registro: sujeto en C-720; sujeto en C-721; sujeto en C-722; sujeto en C-723"
+        ],
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "mentions.jsonl",
+      "record_id": "MENTION-000116",
+      "before": null,
+      "after": {
+        "id": "MENTION-000116",
+        "section_id": "SEC-000002",
+        "passage_id": "PASSAGE-000075",
+        "original_text": "filamentos diferenciados y patrones de división bangiales",
+        "normalized_form": "filamentos diferenciados y patrones de división bangiales",
+        "mention_type": "unresolved",
+        "character_offsets": {
+          "start": 5622,
+          "end": 5800
+        },
+        "resolution": {
+          "status": "pending",
+          "target_ids": [],
+          "reason": null
+        },
+        "disposition": null,
+        "issue_ids": [],
+        "notes": [
+          "capa de registro: objeto en C-720",
+          "la etiqueta no aparece literal en el pasaje; los offsets cubren el pasaje entero"
+        ],
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "mentions.jsonl",
+      "record_id": "MENTION-000117",
+      "before": null,
+      "after": {
+        "id": "MENTION-000117",
+        "section_id": "SEC-000002",
+        "passage_id": "PASSAGE-000076",
+        "original_text": "reproducción sexual inferida",
+        "normalized_form": "reproducción sexual inferida",
+        "mention_type": "unresolved",
+        "character_offsets": {
+          "start": 5802,
+          "end": 5948
+        },
+        "resolution": {
+          "status": "pending",
+          "target_ids": [],
+          "reason": null
+        },
+        "disposition": null,
+        "issue_ids": [],
+        "notes": [
+          "capa de registro: objeto en C-721",
+          "la etiqueta no aparece literal en el pasaje; los offsets cubren el pasaje entero"
+        ],
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "mentions.jsonl",
+      "record_id": "MENTION-000118",
+      "before": null,
+      "after": {
+        "id": "MENTION-000118",
+        "section_id": "SEC-000002",
+        "passage_id": "PASSAGE-000077",
+        "original_text": "aproximadamente 1.047 Ga",
+        "normalized_form": "aproximadamente 1.047 Ga",
+        "mention_type": "unresolved",
+        "character_offsets": {
+          "start": 6012,
+          "end": 6036
+        },
+        "resolution": {
+          "status": "pending",
+          "target_ids": [],
+          "reason": null
+        },
+        "disposition": null,
+        "issue_ids": [],
+        "notes": [
+          "capa de registro: objeto en C-722"
+        ],
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "mentions.jsonl",
+      "record_id": "MENTION-000119",
+      "before": null,
+      "after": {
+        "id": "MENTION-000119",
+        "section_id": "SEC-000002",
+        "passage_id": "PASSAGE-000078",
+        "original_text": "Rhodophyta corona condicionado por afinidad",
+        "normalized_form": "Rhodophyta corona condicionado por afinidad",
+        "mention_type": "unresolved",
+        "character_offsets": {
+          "start": 6061,
+          "end": 6242
+        },
+        "resolution": {
+          "status": "pending",
+          "target_ids": [],
+          "reason": null
+        },
+        "disposition": null,
+        "issue_ids": [],
+        "notes": [
+          "capa de registro: objeto en C-723",
+          "la etiqueta no aparece literal en el pasaje; los offsets cubren el pasaje entero"
+        ],
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "mentions.jsonl",
+      "record_id": "MENTION-000120",
+      "before": null,
+      "after": {
+        "id": "MENTION-000120",
+        "section_id": "SEC-000002",
+        "passage_id": "PASSAGE-000079",
+        "original_text": "Ourasphaira giraldae",
+        "normalized_form": "Ourasphaira giraldae",
+        "mention_type": "unresolved",
+        "character_offsets": {
+          "start": 6244,
+          "end": 6264
+        },
+        "resolution": {
+          "status": "pending",
+          "target_ids": [],
+          "reason": null
+        },
+        "disposition": null,
+        "issue_ids": [],
+        "notes": [
+          "capa de registro: sujeto en C-724; sujeto en C-725; sujeto en C-726"
+        ],
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "mentions.jsonl",
+      "record_id": "MENTION-000121",
+      "before": null,
+      "after": {
+        "id": "MENTION-000121",
+        "section_id": "SEC-000002",
+        "passage_id": "PASSAGE-000079",
+        "original_text": "1010–890 Ma",
+        "normalized_form": "1010–890 Ma",
+        "mention_type": "unresolved",
+        "character_offsets": {
+          "start": 6244,
+          "end": 6345
+        },
+        "resolution": {
+          "status": "pending",
+          "target_ids": [],
+          "reason": null
+        },
+        "disposition": null,
+        "issue_ids": [],
+        "notes": [
+          "capa de registro: objeto en C-724",
+          "la etiqueta no aparece literal en el pasaje; los offsets cubren el pasaje entero"
+        ],
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "mentions.jsonl",
+      "record_id": "MENTION-000122",
+      "before": null,
+      "after": {
+        "id": "MENTION-000122",
+        "section_id": "SEC-000002",
+        "passage_id": "PASSAGE-000080",
+        "original_text": "candidato a Fungi",
+        "normalized_form": "candidato a Fungi",
+        "mention_type": "unresolved",
+        "character_offsets": {
+          "start": 6347,
+          "end": 6513
+        },
+        "resolution": {
+          "status": "pending",
+          "target_ids": [],
+          "reason": null
+        },
+        "disposition": null,
+        "issue_ids": [],
+        "notes": [
+          "capa de registro: objeto en C-725",
+          "la etiqueta no aparece literal en el pasaje; los offsets cubren el pasaje entero"
+        ],
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "mentions.jsonl",
+      "record_id": "MENTION-000123",
+      "before": null,
+      "after": {
+        "id": "MENTION-000123",
+        "section_id": "SEC-000002",
+        "passage_id": "PASSAGE-000081",
+        "original_text": "posición exacta dentro de Holomycota u Opisthokonta",
+        "normalized_form": "posición exacta dentro de Holomycota u Opisthokonta",
+        "mention_type": "unresolved",
+        "character_offsets": {
+          "start": 6515,
+          "end": 6696
+        },
+        "resolution": {
+          "status": "pending",
+          "target_ids": [],
+          "reason": null
+        },
+        "disposition": null,
+        "issue_ids": [],
+        "notes": [
+          "capa de registro: objeto en C-726",
+          "la etiqueta no aparece literal en el pasaje; los offsets cubren el pasaje entero"
+        ],
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "mentions.jsonl",
+      "record_id": "MENTION-000124",
+      "before": null,
+      "after": {
+        "id": "MENTION-000124",
+        "section_id": "SEC-000002",
+        "passage_id": "PASSAGE-000082",
+        "original_text": "Bicellum brasieri",
+        "normalized_form": "Bicellum brasieri",
+        "mention_type": "unresolved",
+        "character_offsets": {
+          "start": 6698,
+          "end": 6715
+        },
+        "resolution": {
+          "status": "pending",
+          "target_ids": [],
+          "reason": null
+        },
+        "disposition": null,
+        "issue_ids": [],
+        "notes": [
+          "capa de registro: sujeto en C-727; sujeto en C-728; sujeto en C-729"
+        ],
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "mentions.jsonl",
+      "record_id": "MENTION-000125",
+      "before": null,
+      "after": {
+        "id": "MENTION-000125",
+        "section_id": "SEC-000002",
+        "passage_id": "PASSAGE-000082",
+        "original_text": "aproximadamente 1.0 Ga",
+        "normalized_form": "aproximadamente 1.0 Ga",
+        "mention_type": "unresolved",
+        "character_offsets": {
+          "start": 6774,
+          "end": 6796
+        },
+        "resolution": {
+          "status": "pending",
+          "target_ids": [],
+          "reason": null
+        },
+        "disposition": null,
+        "issue_ids": [],
+        "notes": [
+          "capa de registro: objeto en C-727"
+        ],
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "mentions.jsonl",
+      "record_id": "MENTION-000126",
+      "before": null,
+      "after": {
+        "id": "MENTION-000126",
+        "section_id": "SEC-000002",
+        "passage_id": "PASSAGE-000083",
+        "original_text": "dos morfotipos celulares espacialmente diferenciados",
+        "normalized_form": "dos morfotipos celulares espacialmente diferenciados",
+        "mention_type": "unresolved",
+        "character_offsets": {
+          "start": 6842,
+          "end": 6990
+        },
+        "resolution": {
+          "status": "pending",
+          "target_ids": [],
+          "reason": null
+        },
+        "disposition": null,
+        "issue_ids": [],
+        "notes": [
+          "capa de registro: objeto en C-728",
+          "la etiqueta no aparece literal en el pasaje; los offsets cubren el pasaje entero"
+        ],
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "mentions.jsonl",
+      "record_id": "MENTION-000127",
+      "before": null,
+      "after": {
+        "id": "MENTION-000127",
+        "section_id": "SEC-000002",
+        "passage_id": "PASSAGE-000084",
+        "original_text": "posible Holozoa",
+        "normalized_form": "posible Holozoa",
+        "mention_type": "unresolved",
+        "character_offsets": {
+          "start": 6992,
+          "end": 7152
+        },
+        "resolution": {
+          "status": "pending",
+          "target_ids": [],
+          "reason": null
+        },
+        "disposition": null,
+        "issue_ids": [],
+        "notes": [
+          "capa de registro: objeto en C-729",
+          "la etiqueta no aparece literal en el pasaje; los offsets cubren el pasaje entero"
+        ],
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "mentions.jsonl",
+      "record_id": "MENTION-000128",
+      "before": null,
+      "after": {
+        "id": "MENTION-000128",
+        "section_id": "SEC-000002",
+        "passage_id": "PASSAGE-000085",
+        "original_text": "afirmación C-729",
+        "normalized_form": "afirmación C-729",
+        "mention_type": "unresolved",
+        "character_offsets": {
+          "start": 7154,
+          "end": 7349
+        },
+        "resolution": {
+          "status": "pending",
+          "target_ids": [],
+          "reason": null
+        },
+        "disposition": null,
+        "issue_ids": [],
+        "notes": [
+          "capa de registro: sujeto en C-730",
+          "la etiqueta no aparece literal en el pasaje; los offsets cubren el pasaje entero"
+        ],
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "mentions.jsonl",
+      "record_id": "MENTION-000129",
+      "before": null,
+      "after": {
+        "id": "MENTION-000129",
+        "section_id": "SEC-000002",
+        "passage_id": "PASSAGE-000085",
+        "original_text": "posibilidad de pared flexible",
+        "normalized_form": "posibilidad de pared flexible",
+        "mention_type": "unresolved",
+        "character_offsets": {
+          "start": 7154,
+          "end": 7349
+        },
+        "resolution": {
+          "status": "pending",
+          "target_ids": [],
+          "reason": null
+        },
+        "disposition": null,
+        "issue_ids": [],
+        "notes": [
+          "capa de registro: objeto en C-730",
+          "la etiqueta no aparece literal en el pasaje; los offsets cubren el pasaje entero"
+        ],
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "mentions.jsonl",
+      "record_id": "MENTION-000130",
+      "before": null,
+      "after": {
+        "id": "MENTION-000130",
+        "section_id": "SEC-000002",
+        "passage_id": "PASSAGE-000088",
+        "original_text": "Formación Doushantuo",
+        "normalized_form": "Formación Doushantuo",
+        "mention_type": "unresolved",
+        "character_offsets": {
+          "start": 7640,
+          "end": 7660
+        },
+        "resolution": {
+          "status": "pending",
+          "target_ids": [],
+          "reason": null
+        },
+        "disposition": null,
+        "issue_ids": [],
+        "notes": [
+          "capa de registro: sujeto en C-731; apéndice B en C-731",
+          "apéndice B: tipo declarado «unidad estratigráfica»"
+        ],
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "mentions.jsonl",
+      "record_id": "MENTION-000131",
+      "before": null,
+      "after": {
+        "id": "MENTION-000131",
+        "section_id": "SEC-000002",
+        "passage_id": "PASSAGE-000088",
+        "original_text": "635–551 Ma",
+        "normalized_form": "635–551 Ma",
+        "mention_type": "unresolved",
+        "character_offsets": {
+          "start": 7637,
+          "end": 7789
+        },
+        "resolution": {
+          "status": "pending",
+          "target_ids": [],
+          "reason": null
+        },
+        "disposition": null,
+        "issue_ids": [],
+        "notes": [
+          "capa de registro: objeto en C-731",
+          "la etiqueta no aparece literal en el pasaje; los offsets cubren el pasaje entero"
+        ],
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "mentions.jsonl",
+      "record_id": "MENTION-000132",
+      "before": null,
+      "after": {
+        "id": "MENTION-000132",
+        "section_id": "SEC-000002",
+        "passage_id": "PASSAGE-000089",
+        "original_text": "biota de Weng’an",
+        "normalized_form": "biota de Weng’an",
+        "mention_type": "unresolved",
+        "character_offsets": {
+          "start": 7824,
+          "end": 7840
+        },
+        "resolution": {
+          "status": "pending",
+          "target_ids": [],
+          "reason": null
+        },
+        "disposition": null,
+        "issue_ids": [],
+        "notes": [
+          "capa de registro: sujeto en C-732; apéndice B en C-732",
+          "apéndice B: tipo declarado «conjunto fósil»"
+        ],
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "mentions.jsonl",
+      "record_id": "MENTION-000133",
+      "before": null,
+      "after": {
+        "id": "MENTION-000133",
+        "section_id": "SEC-000002",
+        "passage_id": "PASSAGE-000089",
+        "original_text": "más antigua que 609 ± 5 Ma o próxima según posición estratigráfica",
+        "normalized_form": "más antigua que 609 ± 5 Ma o próxima según posición estratigráfica",
+        "mention_type": "unresolved",
+        "character_offsets": {
+          "start": 7791,
+          "end": 7925
+        },
+        "resolution": {
+          "status": "pending",
+          "target_ids": [],
+          "reason": null
+        },
+        "disposition": null,
+        "issue_ids": [],
+        "notes": [
+          "capa de registro: objeto en C-732",
+          "la etiqueta no aparece literal en el pasaje; los offsets cubren el pasaje entero"
+        ],
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "mentions.jsonl",
+      "record_id": "MENTION-000134",
+      "before": null,
+      "after": {
+        "id": "MENTION-000134",
+        "section_id": "SEC-000002",
+        "passage_id": "PASSAGE-000090",
+        "original_text": "Tianzhushania/Megasphaera",
+        "normalized_form": "Tianzhushania/Megasphaera",
+        "mention_type": "unresolved",
+        "character_offsets": {
+          "start": 7927,
+          "end": 8106
+        },
+        "resolution": {
+          "status": "pending",
+          "target_ids": [],
+          "reason": null
+        },
+        "disposition": null,
+        "issue_ids": [],
+        "notes": [
+          "capa de registro: sujeto en C-733; sujeto en C-734",
+          "la etiqueta no aparece literal en el pasaje; los offsets cubren el pasaje entero"
+        ],
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "mentions.jsonl",
+      "record_id": "MENTION-000135",
+      "before": null,
+      "after": {
+        "id": "MENTION-000135",
+        "section_id": "SEC-000002",
+        "passage_id": "PASSAGE-000090",
+        "original_text": "embriones animales",
+        "normalized_form": "embriones animales",
+        "mention_type": "unresolved",
+        "character_offsets": {
+          "start": 8013,
+          "end": 8031
+        },
+        "resolution": {
+          "status": "pending",
+          "target_ids": [],
+          "reason": null
+        },
+        "disposition": null,
+        "issue_ids": [],
+        "notes": [
+          "capa de registro: objeto en C-733"
+        ],
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "mentions.jsonl",
+      "record_id": "MENTION-000136",
+      "before": null,
+      "after": {
+        "id": "MENTION-000136",
+        "section_id": "SEC-000002",
+        "passage_id": "PASSAGE-000091",
+        "original_text": "protistas holozoos enquistantes",
+        "normalized_form": "protistas holozoos enquistantes",
+        "mention_type": "unresolved",
+        "character_offsets": {
+          "start": 8180,
+          "end": 8211
+        },
+        "resolution": {
+          "status": "pending",
+          "target_ids": [],
+          "reason": null
+        },
+        "disposition": null,
+        "issue_ids": [],
+        "notes": [
+          "capa de registro: objeto en C-734"
+        ],
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "mentions.jsonl",
+      "record_id": "MENTION-000137",
+      "before": null,
+      "after": {
+        "id": "MENTION-000137",
+        "section_id": "SEC-000002",
+        "passage_id": "PASSAGE-000092",
+        "original_text": "fósiles tipo Megasphaera",
+        "normalized_form": "fósiles tipo Megasphaera",
+        "mention_type": "unresolved",
+        "character_offsets": {
+          "start": 8359,
+          "end": 8383
+        },
+        "resolution": {
+          "status": "pending",
+          "target_ids": [],
+          "reason": null
+        },
+        "disposition": null,
+        "issue_ids": [],
+        "notes": [
+          "capa de registro: sujeto en C-735"
+        ],
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "mentions.jsonl",
+      "record_id": "MENTION-000138",
+      "before": null,
+      "after": {
+        "id": "MENTION-000138",
+        "section_id": "SEC-000002",
+        "passage_id": "PASSAGE-000092",
+        "original_text": "diferenciación celular y separación germen–soma inferidas",
+        "normalized_form": "diferenciación celular y separación germen–soma inferidas",
+        "mention_type": "unresolved",
+        "character_offsets": {
+          "start": 8300,
+          "end": 8470
+        },
+        "resolution": {
+          "status": "pending",
+          "target_ids": [],
+          "reason": null
+        },
+        "disposition": null,
+        "issue_ids": [],
+        "notes": [
+          "capa de registro: objeto en C-735",
+          "la etiqueta no aparece literal en el pasaje; los offsets cubren el pasaje entero"
+        ],
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "mentions.jsonl",
+      "record_id": "MENTION-000139",
+      "before": null,
+      "after": {
+        "id": "MENTION-000139",
+        "section_id": "SEC-000002",
+        "passage_id": "PASSAGE-000093",
+        "original_text": "afirmación C-734",
+        "normalized_form": "afirmación C-734",
+        "mention_type": "unresolved",
+        "character_offsets": {
+          "start": 8472,
+          "end": 8648
+        },
+        "resolution": {
+          "status": "pending",
+          "target_ids": [],
+          "reason": null
+        },
+        "disposition": null,
+        "issue_ids": [],
+        "notes": [
+          "capa de registro: sujeto en C-736",
+          "la etiqueta no aparece literal en el pasaje; los offsets cubren el pasaje entero"
+        ],
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "mentions.jsonl",
+      "record_id": "MENTION-000140",
+      "before": null,
+      "after": {
+        "id": "MENTION-000140",
+        "section_id": "SEC-000002",
+        "passage_id": "PASSAGE-000093",
+        "original_text": "estructuras internas interpretadas como diferenciación",
+        "normalized_form": "estructuras internas interpretadas como diferenciación",
+        "mention_type": "unresolved",
+        "character_offsets": {
+          "start": 8472,
+          "end": 8648
+        },
+        "resolution": {
+          "status": "pending",
+          "target_ids": [],
+          "reason": null
+        },
+        "disposition": null,
+        "issue_ids": [],
+        "notes": [
+          "capa de registro: objeto en C-736",
+          "la etiqueta no aparece literal en el pasaje; los offsets cubren el pasaje entero"
+        ],
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "mentions.jsonl",
+      "record_id": "MENTION-000141",
+      "before": null,
+      "after": {
+        "id": "MENTION-000141",
+        "section_id": "SEC-000002",
+        "passage_id": "PASSAGE-000094",
+        "original_text": "acritarcos de Doushantuo",
+        "normalized_form": "acritarcos de Doushantuo",
+        "mention_type": "unresolved",
+        "character_offsets": {
+          "start": 8722,
+          "end": 8746
+        },
+        "resolution": {
+          "status": "pending",
+          "target_ids": [],
+          "reason": null
+        },
+        "disposition": null,
+        "issue_ids": [],
+        "notes": [
+          "capa de registro: sujeto en C-737"
+        ],
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "mentions.jsonl",
+      "record_id": "MENTION-000142",
+      "before": null,
+      "after": {
+        "id": "MENTION-000142",
+        "section_id": "SEC-000002",
+        "passage_id": "PASSAGE-000094",
+        "original_text": "quistes algales",
+        "normalized_form": "quistes algales",
+        "mention_type": "unresolved",
+        "character_offsets": {
+          "start": 8650,
+          "end": 8830
+        },
+        "resolution": {
+          "status": "pending",
+          "target_ids": [],
+          "reason": null
+        },
+        "disposition": null,
+        "issue_ids": [],
+        "notes": [
+          "capa de registro: objeto en C-737",
+          "la etiqueta no aparece literal en el pasaje; los offsets cubren el pasaje entero"
+        ],
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "mentions.jsonl",
+      "record_id": "MENTION-000143",
+      "before": null,
+      "after": {
+        "id": "MENTION-000143",
+        "section_id": "SEC-000002",
+        "passage_id": "PASSAGE-000095",
+        "original_text": "Caveasphaera",
+        "normalized_form": "Caveasphaera",
+        "mention_type": "unresolved",
+        "character_offsets": {
+          "start": 8832,
+          "end": 8844
+        },
+        "resolution": {
+          "status": "pending",
+          "target_ids": [],
+          "reason": null
+        },
+        "disposition": null,
+        "issue_ids": [],
+        "notes": [
+          "capa de registro: sujeto en C-738; sujeto en C-739"
+        ],
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "mentions.jsonl",
+      "record_id": "MENTION-000144",
+      "before": null,
+      "after": {
+        "id": "MENTION-000144",
+        "section_id": "SEC-000002",
+        "passage_id": "PASSAGE-000095",
+        "original_text": "desarrollo parecido al embrionario animal",
+        "normalized_form": "desarrollo parecido al embrionario animal",
+        "mention_type": "unresolved",
+        "character_offsets": {
+          "start": 8832,
+          "end": 8982
+        },
+        "resolution": {
+          "status": "pending",
+          "target_ids": [],
+          "reason": null
+        },
+        "disposition": null,
+        "issue_ids": [],
+        "notes": [
+          "capa de registro: objeto en C-738",
+          "la etiqueta no aparece literal en el pasaje; los offsets cubren el pasaje entero"
+        ],
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "mentions.jsonl",
+      "record_id": "MENTION-000145",
+      "before": null,
+      "after": {
+        "id": "MENTION-000145",
+        "section_id": "SEC-000002",
+        "passage_id": "PASSAGE-000096",
+        "original_text": "Holozoa indeterminado",
+        "normalized_form": "Holozoa indeterminado",
+        "mention_type": "unresolved",
+        "character_offsets": {
+          "start": 8984,
+          "end": 9130
+        },
+        "resolution": {
+          "status": "pending",
+          "target_ids": [],
+          "reason": null
+        },
+        "disposition": null,
+        "issue_ids": [],
+        "notes": [
+          "capa de registro: objeto en C-739",
+          "la etiqueta no aparece literal en el pasaje; los offsets cubren el pasaje entero"
+        ],
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "mentions.jsonl",
+      "record_id": "MENTION-000146",
+      "before": null,
+      "after": {
+        "id": "MENTION-000146",
+        "section_id": "SEC-000002",
+        "passage_id": "PASSAGE-000097",
+        "original_text": "Helicoforamina",
+        "normalized_form": "Helicoforamina",
+        "mention_type": "unresolved",
+        "character_offsets": {
+          "start": 9132,
+          "end": 9146
+        },
+        "resolution": {
+          "status": "pending",
+          "target_ids": [],
+          "reason": null
+        },
+        "disposition": null,
+        "issue_ids": [],
+        "notes": [
+          "capa de registro: sujeto en C-740"
+        ],
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "mentions.jsonl",
+      "record_id": "MENTION-000147",
+      "before": null,
+      "after": {
+        "id": "MENTION-000147",
+        "section_id": "SEC-000002",
+        "passage_id": "PASSAGE-000097",
+        "original_text": "Holozoa de posición interna indeterminada",
+        "normalized_form": "Holozoa de posición interna indeterminada",
+        "mention_type": "unresolved",
+        "character_offsets": {
+          "start": 9132,
+          "end": 9317
+        },
+        "resolution": {
+          "status": "pending",
+          "target_ids": [],
+          "reason": null
+        },
+        "disposition": null,
+        "issue_ids": [],
+        "notes": [
+          "capa de registro: objeto en C-740",
+          "la etiqueta no aparece literal en el pasaje; los offsets cubren el pasaje entero"
+        ],
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "mentions.jsonl",
+      "record_id": "MENTION-000148",
+      "before": null,
+      "after": {
+        "id": "MENTION-000148",
+        "section_id": "SEC-000002",
+        "passage_id": "PASSAGE-000099",
+        "original_text": "reportes de esteranos y hopanos arcaicos anteriores a S170",
+        "normalized_form": "reportes de esteranos y hopanos arcaicos anteriores a S170",
+        "mention_type": "unresolved",
+        "character_offsets": {
+          "start": 9342,
+          "end": 9671
+        },
+        "resolution": {
+          "status": "pending",
+          "target_ids": [],
+          "reason": null
+        },
+        "disposition": null,
+        "issue_ids": [],
+        "notes": [
+          "capa de registro: sujeto en C-741",
+          "la etiqueta no aparece literal en el pasaje; los offsets cubren el pasaje entero"
+        ],
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "mentions.jsonl",
+      "record_id": "MENTION-000149",
+      "before": null,
+      "after": {
+        "id": "MENTION-000149",
+        "section_id": "SEC-000002",
+        "passage_id": "PASSAGE-000099",
+        "original_text": "biomarcadores singenéticos",
+        "normalized_form": "biomarcadores singenéticos",
+        "mention_type": "unresolved",
+        "character_offsets": {
+          "start": 9425,
+          "end": 9451
+        },
+        "resolution": {
+          "status": "pending",
+          "target_ids": [],
+          "reason": null
+        },
+        "disposition": null,
+        "issue_ids": [],
+        "notes": [
+          "capa de registro: objeto en C-741"
+        ],
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "mentions.jsonl",
+      "record_id": "MENTION-000150",
+      "before": null,
+      "after": {
+        "id": "MENTION-000150",
+        "section_id": "SEC-000002",
+        "passage_id": "PASSAGE-000099",
+        "original_text": "contaminación introducida después de la litificación",
+        "normalized_form": "contaminación introducida después de la litificación",
+        "mention_type": "unresolved",
+        "character_offsets": {
+          "start": 9342,
+          "end": 9671
+        },
+        "resolution": {
+          "status": "pending",
+          "target_ids": [],
+          "reason": null
+        },
+        "disposition": null,
+        "issue_ids": [],
+        "notes": [
+          "capa de registro: objeto en C-742",
+          "la etiqueta no aparece literal en el pasaje; los offsets cubren el pasaje entero"
+        ],
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "mentions.jsonl",
+      "record_id": "MENTION-000151",
+      "before": null,
+      "after": {
+        "id": "MENTION-000151",
+        "section_id": "SEC-000002",
+        "passage_id": "PASSAGE-000100",
+        "original_text": "biomarcadores arcaicos contaminados",
+        "normalized_form": "biomarcadores arcaicos contaminados",
+        "mention_type": "unresolved",
+        "character_offsets": {
+          "start": 9673,
+          "end": 9812
+        },
+        "resolution": {
+          "status": "pending",
+          "target_ids": [],
+          "reason": null
+        },
+        "disposition": null,
+        "issue_ids": [],
+        "notes": [
+          "capa de registro: sujeto en C-743",
+          "la etiqueta no aparece literal en el pasaje; los offsets cubren el pasaje entero"
+        ],
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "mentions.jsonl",
+      "record_id": "MENTION-000152",
+      "before": null,
+      "after": {
+        "id": "MENTION-000152",
+        "section_id": "SEC-000002",
+        "passage_id": "PASSAGE-000100",
+        "original_text": "presencia de Eukaryota en el Arcaico",
+        "normalized_form": "presencia de Eukaryota en el Arcaico",
+        "mention_type": "unresolved",
+        "character_offsets": {
+          "start": 9673,
+          "end": 9812
+        },
+        "resolution": {
+          "status": "pending",
+          "target_ids": [],
+          "reason": null
+        },
+        "disposition": null,
+        "issue_ids": [],
+        "notes": [
+          "capa de registro: objeto en C-743",
+          "la etiqueta no aparece literal en el pasaje; los offsets cubren el pasaje entero"
+        ],
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "mentions.jsonl",
+      "record_id": "MENTION-000153",
+      "before": null,
+      "after": {
+        "id": "MENTION-000153",
+        "section_id": "SEC-000002",
+        "passage_id": "PASSAGE-000101",
+        "original_text": "biota de protosteroides",
+        "normalized_form": "biota de protosteroides",
+        "mention_type": "unresolved",
+        "character_offsets": {
+          "start": 9817,
+          "end": 9840
+        },
+        "resolution": {
+          "status": "pending",
+          "target_ids": [],
+          "reason": null
+        },
+        "disposition": null,
+        "issue_ids": [],
+        "notes": [
+          "capa de registro: sujeto en C-744; sujeto en C-745"
+        ],
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "mentions.jsonl",
+      "record_id": "MENTION-000154",
+      "before": null,
+      "after": {
+        "id": "MENTION-000154",
+        "section_id": "SEC-000002",
+        "passage_id": "PASSAGE-000101",
+        "original_text": "biomarcadores de protosteroles",
+        "normalized_form": "biomarcadores de protosteroles",
+        "mention_type": "unresolved",
+        "character_offsets": {
+          "start": 9814,
+          "end": 9985
+        },
+        "resolution": {
+          "status": "pending",
+          "target_ids": [],
+          "reason": null
+        },
+        "disposition": null,
+        "issue_ids": [],
+        "notes": [
+          "capa de registro: objeto en C-744",
+          "la etiqueta no aparece literal en el pasaje; los offsets cubren el pasaje entero"
+        ],
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "mentions.jsonl",
+      "record_id": "MENTION-000155",
+      "before": null,
+      "after": {
+        "id": "MENTION-000155",
+        "section_id": "SEC-000002",
+        "passage_id": "PASSAGE-000103",
+        "original_text": "24-isopropilcolestano",
+        "normalized_form": "24-isopropilcolestano",
+        "mention_type": "unresolved",
+        "character_offsets": {
+          "start": 10196,
+          "end": 10217
+        },
+        "resolution": {
+          "status": "pending",
+          "target_ids": [],
+          "reason": null
+        },
+        "disposition": null,
+        "issue_ids": [],
+        "notes": [
+          "capa de registro: sujeto en C-746; apéndice B en C-746",
+          "apéndice B: tipo declarado «biomarcador»"
+        ],
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "mentions.jsonl",
+      "record_id": "MENTION-000156",
+      "before": null,
+      "after": {
+        "id": "MENTION-000156",
+        "section_id": "SEC-000002",
+        "passage_id": "PASSAGE-000103",
+        "original_text": "biomarcador de Demospongiae",
+        "normalized_form": "biomarcador de Demospongiae",
+        "mention_type": "unresolved",
+        "character_offsets": {
+          "start": 10193,
+          "end": 10301
+        },
+        "resolution": {
+          "status": "pending",
+          "target_ids": [],
+          "reason": null
+        },
+        "disposition": null,
+        "issue_ids": [],
+        "notes": [
+          "capa de registro: objeto en C-746",
+          "la etiqueta no aparece literal en el pasaje; los offsets cubren el pasaje entero"
+        ],
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "mentions.jsonl",
+      "record_id": "MENTION-000157",
+      "before": null,
+      "after": {
+        "id": "MENTION-000157",
+        "section_id": "SEC-000002",
+        "passage_id": "PASSAGE-000104",
+        "original_text": "afirmación C-746",
+        "normalized_form": "afirmación C-746",
+        "mention_type": "unresolved",
+        "character_offsets": {
+          "start": 10303,
+          "end": 10463
+        },
+        "resolution": {
+          "status": "pending",
+          "target_ids": [],
+          "reason": null
+        },
+        "disposition": null,
+        "issue_ids": [],
+        "notes": [
+          "capa de registro: sujeto en C-747",
+          "la etiqueta no aparece literal en el pasaje; los offsets cubren el pasaje entero"
+        ],
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "mentions.jsonl",
+      "record_id": "MENTION-000158",
+      "before": null,
+      "after": {
+        "id": "MENTION-000158",
+        "section_id": "SEC-000002",
+        "passage_id": "PASSAGE-000104",
+        "original_text": "biosíntesis en Rhizaria unicelulares",
+        "normalized_form": "biosíntesis en Rhizaria unicelulares",
+        "mention_type": "unresolved",
+        "character_offsets": {
+          "start": 10303,
+          "end": 10463
+        },
+        "resolution": {
+          "status": "pending",
+          "target_ids": [],
+          "reason": null
+        },
+        "disposition": null,
+        "issue_ids": [],
+        "notes": [
+          "capa de registro: objeto en C-747",
+          "la etiqueta no aparece literal en el pasaje; los offsets cubren el pasaje entero"
+        ],
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "mentions.jsonl",
+      "record_id": "MENTION-000159",
+      "before": null,
+      "after": {
+        "id": "MENTION-000159",
+        "section_id": "SEC-000002",
+        "passage_id": "PASSAGE-000105",
+        "original_text": "esponjas",
+        "normalized_form": "esponjas",
+        "mention_type": "unresolved",
+        "character_offsets": {
+          "start": 10490,
+          "end": 10498
+        },
+        "resolution": {
+          "status": "pending",
+          "target_ids": [],
+          "reason": null
+        },
+        "disposition": null,
+        "issue_ids": [],
+        "notes": [
+          "capa de registro: sujeto en C-748"
+        ],
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "mentions.jsonl",
+      "record_id": "MENTION-000160",
+      "before": null,
+      "after": {
+        "id": "MENTION-000160",
+        "section_id": "SEC-000002",
+        "passage_id": "PASSAGE-000105",
+        "original_text": "genes asociados con esteroles C30",
+        "normalized_form": "genes asociados con esteroles C30",
+        "mention_type": "unresolved",
+        "character_offsets": {
+          "start": 10465,
+          "end": 10660
+        },
+        "resolution": {
+          "status": "pending",
+          "target_ids": [],
+          "reason": null
+        },
+        "disposition": null,
+        "issue_ids": [],
+        "notes": [
+          "capa de registro: objeto en C-748",
+          "la etiqueta no aparece literal en el pasaje; los offsets cubren el pasaje entero"
+        ],
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "mentions.jsonl",
+      "record_id": "MENTION-000161",
+      "before": null,
+      "after": {
+        "id": "MENTION-000161",
+        "section_id": "SEC-000002",
+        "passage_id": "PASSAGE-000106",
+        "original_text": "biosíntesis de esteroles en Saccharomyces cerevisiae",
+        "normalized_form": "biosíntesis de esteroles en Saccharomyces cerevisiae",
+        "mention_type": "unresolved",
+        "character_offsets": {
+          "start": 10662,
+          "end": 10779
+        },
+        "resolution": {
+          "status": "pending",
+          "target_ids": [],
+          "reason": null
+        },
+        "disposition": null,
+        "issue_ids": [],
+        "notes": [
+          "capa de registro: sujeto en C-749",
+          "la etiqueta no aparece literal en el pasaje; los offsets cubren el pasaje entero"
+        ],
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "mentions.jsonl",
+      "record_id": "MENTION-000162",
+      "before": null,
+      "after": {
+        "id": "MENTION-000162",
+        "section_id": "SEC-000002",
+        "passage_id": "PASSAGE-000106",
+        "original_text": "7 nM O₂",
+        "normalized_form": "7 nM O₂",
+        "mention_type": "unresolved",
+        "character_offsets": {
+          "start": 10662,
+          "end": 10779
+        },
+        "resolution": {
+          "status": "pending",
+          "target_ids": [],
+          "reason": null
+        },
+        "disposition": null,
+        "issue_ids": [],
+        "notes": [
+          "capa de registro: objeto en C-749",
+          "la etiqueta no aparece literal en el pasaje; los offsets cubren el pasaje entero"
+        ],
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "mentions.jsonl",
+      "record_id": "MENTION-000163",
+      "before": null,
+      "after": {
+        "id": "MENTION-000163",
+        "section_id": "SEC-000002",
+        "passage_id": "PASSAGE-000107",
+        "original_text": "umbral experimental de esteroles",
+        "normalized_form": "umbral experimental de esteroles",
+        "mention_type": "unresolved",
+        "character_offsets": {
+          "start": 10781,
+          "end": 10935
+        },
+        "resolution": {
+          "status": "pending",
+          "target_ids": [],
+          "reason": null
+        },
+        "disposition": null,
+        "issue_ids": [],
+        "notes": [
+          "capa de registro: sujeto en C-750",
+          "la etiqueta no aparece literal en el pasaje; los offsets cubren el pasaje entero"
+        ],
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "mentions.jsonl",
+      "record_id": "MENTION-000164",
+      "before": null,
+      "after": {
+        "id": "MENTION-000164",
+        "section_id": "SEC-000002",
+        "passage_id": "PASSAGE-000107",
+        "original_text": "pO₂ atmosférica global",
+        "normalized_form": "pO₂ atmosférica global",
+        "mention_type": "unresolved",
+        "character_offsets": {
+          "start": 10781,
+          "end": 10935
+        },
+        "resolution": {
+          "status": "pending",
+          "target_ids": [],
+          "reason": null
+        },
+        "disposition": null,
+        "issue_ids": [],
+        "notes": [
+          "capa de registro: objeto en C-750",
+          "la etiqueta no aparece literal en el pasaje; los offsets cubren el pasaje entero"
+        ],
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "mentions.jsonl",
+      "record_id": "MENTION-000165",
+      "before": null,
+      "after": {
+        "id": "MENTION-000165",
+        "section_id": "SEC-000002",
+        "passage_id": "PASSAGE-000048",
+        "original_text": "fósiles eucariotas más antiguos del conjunto de S547",
+        "normalized_form": "fósiles eucariotas más antiguos del conjunto de S547",
+        "mention_type": "unresolved",
+        "character_offsets": {
+          "start": 1009,
+          "end": 1445
+        },
+        "resolution": {
+          "status": "pending",
+          "target_ids": [],
+          "reason": null
+        },
+        "disposition": null,
+        "issue_ids": [],
+        "notes": [
+          "capa de registro: sujeto en C-751; sujeto en C-752",
+          "la etiqueta no aparece literal en el pasaje; los offsets cubren el pasaje entero"
+        ],
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "mentions.jsonl",
+      "record_id": "MENTION-000166",
+      "before": null,
+      "after": {
+        "id": "MENTION-000166",
+        "section_id": "SEC-000002",
+        "passage_id": "PASSAGE-000048",
+        "original_text": "~1,75–1,4 Ga",
+        "normalized_form": "~1,75–1,4 Ga",
+        "mention_type": "unresolved",
+        "character_offsets": {
+          "start": 1009,
+          "end": 1445
+        },
+        "resolution": {
+          "status": "pending",
+          "target_ids": [],
+          "reason": null
+        },
+        "disposition": null,
+        "issue_ids": [],
+        "notes": [
+          "capa de registro: objeto en C-751",
+          "la etiqueta no aparece literal en el pasaje; los offsets cubren el pasaje entero"
+        ],
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "mentions.jsonl",
+      "record_id": "MENTION-000167",
+      "before": null,
+      "after": {
+        "id": "MENTION-000167",
+        "section_id": "SEC-000002",
+        "passage_id": "PASSAGE-000048",
+        "original_text": "fondos marinos oxigenados, casi exclusivamente en el conjunto estudiado",
+        "normalized_form": "fondos marinos oxigenados, casi exclusivamente en el conjunto estudiado",
+        "mention_type": "unresolved",
+        "character_offsets": {
+          "start": 1009,
+          "end": 1445
+        },
+        "resolution": {
+          "status": "pending",
+          "target_ids": [],
+          "reason": null
+        },
+        "disposition": null,
+        "issue_ids": [],
+        "notes": [
+          "capa de registro: objeto en C-752",
+          "la etiqueta no aparece literal en el pasaje; los offsets cubren el pasaje entero"
+        ],
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "mentions.jsonl",
+      "record_id": "MENTION-000168",
+      "before": null,
+      "after": {
+        "id": "MENTION-000168",
+        "section_id": "SEC-000002",
+        "passage_id": "PASSAGE-000048",
+        "original_text": "Lechte et al.",
+        "normalized_form": "Lechte et al.",
+        "mention_type": "unresolved",
+        "character_offsets": {
+          "start": 1009,
+          "end": 1022
+        },
+        "resolution": {
+          "status": "pending",
+          "target_ids": [],
+          "reason": null
+        },
+        "disposition": null,
+        "issue_ids": [],
+        "notes": [
+          "capa de registro: sujeto en C-753; sujeto en C-754"
+        ],
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "mentions.jsonl",
+      "record_id": "MENTION-000169",
+      "before": null,
+      "after": {
+        "id": "MENTION-000169",
+        "section_id": "SEC-000002",
+        "passage_id": "PASSAGE-000048",
+        "original_text": "aerobiosis y presencia de mitocondrias en los organismos fósiles estudiados",
+        "normalized_form": "aerobiosis y presencia de mitocondrias en los organismos fósiles estudiados",
+        "mention_type": "unresolved",
+        "character_offsets": {
+          "start": 1009,
+          "end": 1445
+        },
+        "resolution": {
+          "status": "pending",
+          "target_ids": [],
+          "reason": null
+        },
+        "disposition": null,
+        "issue_ids": [],
+        "notes": [
+          "capa de registro: objeto en C-753",
+          "la etiqueta no aparece literal en el pasaje; los offsets cubren el pasaje entero"
+        ],
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "mentions.jsonl",
+      "record_id": "MENTION-000170",
+      "before": null,
+      "after": {
+        "id": "MENTION-000170",
+        "section_id": "SEC-000002",
+        "passage_id": "PASSAGE-000048",
+        "original_text": "hábito bentónico de los organismos fósiles analizados",
+        "normalized_form": "hábito bentónico de los organismos fósiles analizados",
+        "mention_type": "unresolved",
+        "character_offsets": {
+          "start": 1009,
+          "end": 1445
+        },
+        "resolution": {
+          "status": "pending",
+          "target_ids": [],
+          "reason": null
+        },
+        "disposition": null,
+        "issue_ids": [],
+        "notes": [
+          "capa de registro: objeto en C-754",
+          "la etiqueta no aparece literal en el pasaje; los offsets cubren el pasaje entero"
+        ],
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "mentions.jsonl",
+      "record_id": "MENTION-000171",
+      "before": null,
+      "after": {
+        "id": "MENTION-000171",
+        "section_id": "SEC-000002",
+        "passage_id": "PASSAGE-000110",
+        "original_text": "búsqueda Q-0171 de fósiles diagnósticos de Amorphea",
+        "normalized_form": "búsqueda Q-0171 de fósiles diagnósticos de Amorphea",
+        "mention_type": "unresolved",
+        "character_offsets": {
+          "start": 11282,
+          "end": 11948
+        },
+        "resolution": {
+          "status": "pending",
+          "target_ids": [],
+          "reason": null
+        },
+        "disposition": null,
+        "issue_ids": [],
+        "notes": [
+          "capa de registro: sujeto en C-755",
+          "la etiqueta no aparece literal en el pasaje; los offsets cubren el pasaje entero"
+        ],
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "mentions.jsonl",
+      "record_id": "MENTION-000172",
+      "before": null,
+      "after": {
+        "id": "MENTION-000172",
+        "section_id": "SEC-000002",
+        "passage_id": "PASSAGE-000110",
+        "original_text": "fósil con sinapomorfía diagnóstica del nodo",
+        "normalized_form": "fósil con sinapomorfía diagnóstica del nodo",
+        "mention_type": "unresolved",
+        "character_offsets": {
+          "start": 11282,
+          "end": 11948
+        },
+        "resolution": {
+          "status": "pending",
+          "target_ids": [],
+          "reason": null
+        },
+        "disposition": null,
+        "issue_ids": [],
+        "notes": [
+          "capa de registro: objeto en C-755; objeto en C-756",
+          "la etiqueta no aparece literal en el pasaje; los offsets cubren el pasaje entero"
+        ],
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "mentions.jsonl",
+      "record_id": "MENTION-000173",
+      "before": null,
+      "after": {
+        "id": "MENTION-000173",
+        "section_id": "SEC-000002",
+        "passage_id": "PASSAGE-000110",
+        "original_text": "búsqueda Q-0172 de fósiles diagnósticos de Obazoa",
+        "normalized_form": "búsqueda Q-0172 de fósiles diagnósticos de Obazoa",
+        "mention_type": "unresolved",
+        "character_offsets": {
+          "start": 11282,
+          "end": 11948
+        },
+        "resolution": {
+          "status": "pending",
+          "target_ids": [],
+          "reason": null
+        },
+        "disposition": null,
+        "issue_ids": [],
+        "notes": [
+          "capa de registro: sujeto en C-756",
+          "la etiqueta no aparece literal en el pasaje; los offsets cubren el pasaje entero"
+        ],
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "mentions.jsonl",
+      "record_id": "MENTION-000174",
+      "before": null,
+      "after": {
+        "id": "MENTION-000174",
+        "section_id": "SEC-000002",
+        "passage_id": "PASSAGE-000049",
+        "original_text": "Re–Os",
+        "normalized_form": "Re–Os",
+        "mention_type": "unresolved",
+        "character_offsets": {
+          "start": 1510,
+          "end": 1515
+        },
+        "resolution": {
+          "status": "pending",
+          "target_ids": [],
+          "reason": null
+        },
+        "disposition": null,
+        "issue_ids": [],
+        "notes": [
+          "capa de registro: apéndice B en C-699",
+          "apéndice B: tipo declarado «método geocronológico»"
+        ],
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "mentions.jsonl",
+      "record_id": "MENTION-000175",
+      "before": null,
+      "after": {
+        "id": "MENTION-000175",
+        "section_id": "SEC-000002",
+        "passage_id": "PASSAGE-000051",
+        "original_text": "*Valeria lophostriata*",
+        "normalized_form": "*Valeria lophostriata*",
+        "mention_type": "unresolved",
+        "character_offsets": {
+          "start": 1790,
+          "end": 1931
+        },
+        "resolution": {
+          "status": "pending",
+          "target_ids": [],
+          "reason": null
+        },
+        "disposition": null,
+        "issue_ids": [],
+        "notes": [
+          "capa de registro: apéndice B en C-701",
+          "la etiqueta no aparece literal en el pasaje; los offsets cubren el pasaje entero",
+          "apéndice B: tipo declarado «taxón o morfotipo fósil»"
+        ],
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "mentions.jsonl",
+      "record_id": "MENTION-000176",
+      "before": null,
+      "after": {
+        "id": "MENTION-000176",
+        "section_id": "SEC-000002",
+        "passage_id": "PASSAGE-000052",
+        "original_text": "*Tappania plana*",
+        "normalized_form": "*Tappania plana*",
+        "mention_type": "unresolved",
+        "character_offsets": {
+          "start": 1933,
+          "end": 2083
+        },
+        "resolution": {
+          "status": "pending",
+          "target_ids": [],
+          "reason": null
+        },
+        "disposition": null,
+        "issue_ids": [],
+        "notes": [
+          "capa de registro: apéndice B en C-702",
+          "la etiqueta no aparece literal en el pasaje; los offsets cubren el pasaje entero",
+          "apéndice B: tipo declarado «taxón o morfotipo fósil»"
+        ],
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "mentions.jsonl",
+      "record_id": "MENTION-000177",
+      "before": null,
+      "after": {
+        "id": "MENTION-000177",
+        "section_id": "SEC-000002",
+        "passage_id": "PASSAGE-000053",
+        "original_text": "*Dictyosphaera*",
+        "normalized_form": "*Dictyosphaera*",
+        "mention_type": "unresolved",
+        "character_offsets": {
+          "start": 2085,
+          "end": 2259
+        },
+        "resolution": {
+          "status": "pending",
+          "target_ids": [],
+          "reason": null
+        },
+        "disposition": null,
+        "issue_ids": [],
+        "notes": [
+          "capa de registro: apéndice B en C-703",
+          "la etiqueta no aparece literal en el pasaje; los offsets cubren el pasaje entero",
+          "apéndice B: tipo declarado «taxón o morfotipo fósil»"
+        ],
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "mentions.jsonl",
+      "record_id": "MENTION-000178",
+      "before": null,
+      "after": {
+        "id": "MENTION-000178",
+        "section_id": "SEC-000002",
+        "passage_id": "PASSAGE-000053",
+        "original_text": "Grupo Ruyang",
+        "normalized_form": "Grupo Ruyang",
+        "mention_type": "unresolved",
+        "character_offsets": {
+          "start": 2124,
+          "end": 2136
+        },
+        "resolution": {
+          "status": "pending",
+          "target_ids": [],
+          "reason": null
+        },
+        "disposition": null,
+        "issue_ids": [],
+        "notes": [
+          "capa de registro: apéndice B en C-703",
+          "apéndice B: tipo declarado «unidad estratigráfica»"
+        ],
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "mentions.jsonl",
+      "record_id": "MENTION-000179",
+      "before": null,
+      "after": {
+        "id": "MENTION-000179",
+        "section_id": "SEC-000002",
+        "passage_id": "PASSAGE-000053",
+        "original_text": "*Shuiyousphaeridium*",
+        "normalized_form": "*Shuiyousphaeridium*",
+        "mention_type": "unresolved",
+        "character_offsets": {
+          "start": 2085,
+          "end": 2259
+        },
+        "resolution": {
+          "status": "pending",
+          "target_ids": [],
+          "reason": null
+        },
+        "disposition": null,
+        "issue_ids": [],
+        "notes": [
+          "capa de registro: apéndice B en C-703",
+          "la etiqueta no aparece literal en el pasaje; los offsets cubren el pasaje entero",
+          "apéndice B: tipo declarado «taxón o morfotipo fósil»"
+        ],
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "mentions.jsonl",
+      "record_id": "MENTION-000180",
+      "before": null,
+      "after": {
+        "id": "MENTION-000180",
+        "section_id": "SEC-000002",
+        "passage_id": "PASSAGE-000055",
+        "original_text": "Formación Chuanlinggou",
+        "normalized_form": "Formación Chuanlinggou",
+        "mention_type": "unresolved",
+        "character_offsets": {
+          "start": 2437,
+          "end": 2459
+        },
+        "resolution": {
+          "status": "pending",
+          "target_ids": [],
+          "reason": null
+        },
+        "disposition": null,
+        "issue_ids": [],
+        "notes": [
+          "capa de registro: apéndice B en C-705",
+          "apéndice B: tipo declarado «unidad estratigráfica»"
+        ],
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "mentions.jsonl",
+      "record_id": "MENTION-000181",
+      "before": null,
+      "after": {
+        "id": "MENTION-000181",
+        "section_id": "SEC-000002",
+        "passage_id": "PASSAGE-000055",
+        "original_text": "*Qingshania magnifica*",
+        "normalized_form": "*Qingshania magnifica*",
+        "mention_type": "unresolved",
+        "character_offsets": {
+          "start": 2402,
+          "end": 2539
+        },
+        "resolution": {
+          "status": "pending",
+          "target_ids": [],
+          "reason": null
+        },
+        "disposition": null,
+        "issue_ids": [],
+        "notes": [
+          "capa de registro: apéndice B en C-705",
+          "la etiqueta no aparece literal en el pasaje; los offsets cubren el pasaje entero",
+          "apéndice B: tipo declarado «taxón o morfotipo fósil»"
+        ],
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "mentions.jsonl",
+      "record_id": "MENTION-000182",
+      "before": null,
+      "after": {
+        "id": "MENTION-000182",
+        "section_id": "SEC-000002",
+        "passage_id": "PASSAGE-000059",
+        "original_text": "Formación de Hierro Negaunee",
+        "normalized_form": "Formación de Hierro Negaunee",
+        "mention_type": "unresolved",
+        "character_offsets": {
+          "start": 3179,
+          "end": 3207
+        },
+        "resolution": {
+          "status": "pending",
+          "target_ids": [],
+          "reason": null
+        },
+        "disposition": null,
+        "issue_ids": [],
+        "notes": [
+          "capa de registro: apéndice B en C-708",
+          "apéndice B: tipo declarado «unidad estratigráfica»"
+        ],
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "mentions.jsonl",
+      "record_id": "MENTION-000183",
+      "before": null,
+      "after": {
+        "id": "MENTION-000183",
+        "section_id": "SEC-000002",
+        "passage_id": "PASSAGE-000059",
+        "original_text": "*Grypania spiralis*",
+        "normalized_form": "*Grypania spiralis*",
+        "mention_type": "unresolved",
+        "character_offsets": {
+          "start": 3102,
+          "end": 3256
+        },
+        "resolution": {
+          "status": "pending",
+          "target_ids": [],
+          "reason": null
+        },
+        "disposition": null,
+        "issue_ids": [],
+        "notes": [
+          "capa de registro: apéndice B en C-708",
+          "la etiqueta no aparece literal en el pasaje; los offsets cubren el pasaje entero",
+          "apéndice B: tipo declarado «taxón o morfotipo fósil»"
+        ],
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "mentions.jsonl",
+      "record_id": "MENTION-000184",
+      "before": null,
+      "after": {
+        "id": "MENTION-000184",
+        "section_id": "SEC-000002",
+        "passage_id": "PASSAGE-000061",
+        "original_text": "Dolomía Tirohan",
+        "normalized_form": "Dolomía Tirohan",
+        "mention_type": "unresolved",
+        "character_offsets": {
+          "start": 3508,
+          "end": 3523
+        },
+        "resolution": {
+          "status": "pending",
+          "target_ids": [],
+          "reason": null
+        },
+        "disposition": null,
+        "issue_ids": [],
+        "notes": [
+          "capa de registro: apéndice B en C-710",
+          "apéndice B: tipo declarado «unidad estratigráfica»"
+        ],
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "mentions.jsonl",
+      "record_id": "MENTION-000185",
+      "before": null,
+      "after": {
+        "id": "MENTION-000185",
+        "section_id": "SEC-000002",
+        "passage_id": "PASSAGE-000061",
+        "original_text": "*Rafatazmia chitrakootensis*",
+        "normalized_form": "*Rafatazmia chitrakootensis*",
+        "mention_type": "unresolved",
+        "character_offsets": {
+          "start": 3462,
+          "end": 3637
+        },
+        "resolution": {
+          "status": "pending",
+          "target_ids": [],
+          "reason": null
+        },
+        "disposition": null,
+        "issue_ids": [],
+        "notes": [
+          "capa de registro: apéndice B en C-710",
+          "la etiqueta no aparece literal en el pasaje; los offsets cubren el pasaje entero",
+          "apéndice B: tipo declarado «taxón o morfotipo fósil»"
+        ],
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "mentions.jsonl",
+      "record_id": "MENTION-000186",
+      "before": null,
+      "after": {
+        "id": "MENTION-000186",
+        "section_id": "SEC-000002",
+        "passage_id": "PASSAGE-000065",
+        "original_text": "Grupo Chuar",
+        "normalized_form": "Grupo Chuar",
+        "mention_type": "unresolved",
+        "character_offsets": {
+          "start": 4133,
+          "end": 4144
+        },
+        "resolution": {
+          "status": "pending",
+          "target_ids": [],
+          "reason": null
+        },
+        "disposition": null,
+        "issue_ids": [],
+        "notes": [
+          "capa de registro: apéndice B en C-713",
+          "apéndice B: tipo declarado «unidad estratigráfica»"
+        ],
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "mentions.jsonl",
+      "record_id": "MENTION-000187",
+      "before": null,
+      "after": {
+        "id": "MENTION-000187",
+        "section_id": "SEC-000002",
+        "passage_id": "PASSAGE-000065",
+        "original_text": "microfósiles con forma de vasija",
+        "normalized_form": "microfósiles con forma de vasija",
+        "mention_type": "unresolved",
+        "character_offsets": {
+          "start": 4096,
+          "end": 4128
+        },
+        "resolution": {
+          "status": "pending",
+          "target_ids": [],
+          "reason": null
+        },
+        "disposition": null,
+        "issue_ids": [],
+        "notes": [
+          "capa de registro: apéndice B en C-713",
+          "apéndice B: tipo declarado «taxón o morfotipo fósil»"
+        ],
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "mentions.jsonl",
+      "record_id": "MENTION-000188",
+      "before": null,
+      "after": {
+        "id": "MENTION-000188",
+        "section_id": "SEC-000002",
+        "passage_id": "PASSAGE-000068",
+        "original_text": "organismo perforador del Grupo Chuar no identificado",
+        "normalized_form": "organismo perforador del Grupo Chuar no identificado",
+        "mention_type": "unresolved",
+        "character_offsets": {
+          "start": 4598,
+          "end": 4775
+        },
+        "resolution": {
+          "status": "pending",
+          "target_ids": [],
+          "reason": null
+        },
+        "disposition": null,
+        "issue_ids": [],
+        "notes": [
+          "capa de registro: apéndice B en C-716",
+          "la etiqueta no aparece literal en el pasaje; los offsets cubren el pasaje entero",
+          "apéndice B: tipo declarado «linaje no identificado»"
+        ],
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "mentions.jsonl",
+      "record_id": "MENTION-000189",
+      "before": null,
+      "after": {
+        "id": "MENTION-000189",
+        "section_id": "SEC-000002",
+        "passage_id": "PASSAGE-000075",
+        "original_text": "*Bangiomorpha pubescens*",
+        "normalized_form": "*Bangiomorpha pubescens*",
+        "mention_type": "unresolved",
+        "character_offsets": {
+          "start": 5622,
+          "end": 5800
+        },
+        "resolution": {
+          "status": "pending",
+          "target_ids": [],
+          "reason": null
+        },
+        "disposition": null,
+        "issue_ids": [],
+        "notes": [
+          "capa de registro: apéndice B en C-720",
+          "la etiqueta no aparece literal en el pasaje; los offsets cubren el pasaje entero",
+          "apéndice B: tipo declarado «taxón o morfotipo fósil»"
+        ],
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "mentions.jsonl",
+      "record_id": "MENTION-000190",
+      "before": null,
+      "after": {
+        "id": "MENTION-000190",
+        "section_id": "SEC-000002",
+        "passage_id": "PASSAGE-000076",
+        "original_text": "U–Pb CA-ID-TIMS",
+        "normalized_form": "U–Pb CA-ID-TIMS",
+        "mention_type": "unresolved",
+        "character_offsets": {
+          "start": 5802,
+          "end": 5948
+        },
+        "resolution": {
+          "status": "pending",
+          "target_ids": [],
+          "reason": null
+        },
+        "disposition": null,
+        "issue_ids": [],
+        "notes": [
+          "capa de registro: apéndice B en C-721",
+          "la etiqueta no aparece literal en el pasaje; los offsets cubren el pasaje entero",
+          "apéndice B: tipo declarado «método geocronológico»"
+        ],
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "mentions.jsonl",
+      "record_id": "MENTION-000191",
+      "before": null,
+      "after": {
+        "id": "MENTION-000191",
+        "section_id": "SEC-000002",
+        "passage_id": "PASSAGE-000079",
+        "original_text": "Formación Grassy Bay",
+        "normalized_form": "Formación Grassy Bay",
+        "mention_type": "unresolved",
+        "character_offsets": {
+          "start": 6244,
+          "end": 6345
+        },
+        "resolution": {
+          "status": "pending",
+          "target_ids": [],
+          "reason": null
+        },
+        "disposition": null,
+        "issue_ids": [],
+        "notes": [
+          "capa de registro: apéndice B en C-724",
+          "la etiqueta no aparece literal en el pasaje; los offsets cubren el pasaje entero",
+          "apéndice B: tipo declarado «unidad estratigráfica»"
+        ],
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "mentions.jsonl",
+      "record_id": "MENTION-000192",
+      "before": null,
+      "after": {
+        "id": "MENTION-000192",
+        "section_id": "SEC-000002",
+        "passage_id": "PASSAGE-000079",
+        "original_text": "Fungi",
+        "normalized_form": "Fungi",
+        "mention_type": "unresolved",
+        "character_offsets": {
+          "start": 6244,
+          "end": 6345
+        },
+        "resolution": {
+          "status": "pending",
+          "target_ids": [],
+          "reason": null
+        },
+        "disposition": null,
+        "issue_ids": [],
+        "notes": [
+          "capa de registro: apéndice B en C-724",
+          "la etiqueta no aparece literal en el pasaje; los offsets cubren el pasaje entero",
+          "apéndice B: tipo declarado «clado»"
+        ],
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "mentions.jsonl",
+      "record_id": "MENTION-000193",
+      "before": null,
+      "after": {
+        "id": "MENTION-000193",
+        "section_id": "SEC-000002",
+        "passage_id": "PASSAGE-000079",
+        "original_text": "*Ourasphaira giraldae*",
+        "normalized_form": "*Ourasphaira giraldae*",
+        "mention_type": "unresolved",
+        "character_offsets": {
+          "start": 6244,
+          "end": 6345
+        },
+        "resolution": {
+          "status": "pending",
+          "target_ids": [],
+          "reason": null
+        },
+        "disposition": null,
+        "issue_ids": [],
+        "notes": [
+          "capa de registro: apéndice B en C-724",
+          "la etiqueta no aparece literal en el pasaje; los offsets cubren el pasaje entero",
+          "apéndice B: tipo declarado «taxón o morfotipo fósil»"
+        ],
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "mentions.jsonl",
+      "record_id": "MENTION-000194",
+      "before": null,
+      "after": {
+        "id": "MENTION-000194",
+        "section_id": "SEC-000002",
+        "passage_id": "PASSAGE-000082",
+        "original_text": "*Bicellum brasieri*",
+        "normalized_form": "*Bicellum brasieri*",
+        "mention_type": "unresolved",
+        "character_offsets": {
+          "start": 6698,
+          "end": 6840
+        },
+        "resolution": {
+          "status": "pending",
+          "target_ids": [],
+          "reason": null
+        },
+        "disposition": null,
+        "issue_ids": [],
+        "notes": [
+          "capa de registro: apéndice B en C-727",
+          "la etiqueta no aparece literal en el pasaje; los offsets cubren el pasaje entero",
+          "apéndice B: tipo declarado «taxón o morfotipo fósil»"
+        ],
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "mentions.jsonl",
+      "record_id": "MENTION-000195",
+      "before": null,
+      "after": {
+        "id": "MENTION-000195",
+        "section_id": "SEC-000002",
+        "passage_id": "PASSAGE-000082",
+        "original_text": "Formación Diabaig",
+        "normalized_form": "Formación Diabaig",
+        "mention_type": "unresolved",
+        "character_offsets": {
+          "start": 6753,
+          "end": 6770
+        },
+        "resolution": {
+          "status": "pending",
+          "target_ids": [],
+          "reason": null
+        },
+        "disposition": null,
+        "issue_ids": [],
+        "notes": [
+          "capa de registro: apéndice B en C-727",
+          "apéndice B: tipo declarado «unidad estratigráfica»"
+        ],
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "mentions.jsonl",
+      "record_id": "MENTION-000196",
+      "before": null,
+      "after": {
+        "id": "MENTION-000196",
+        "section_id": "SEC-000002",
+        "passage_id": "PASSAGE-000085",
+        "original_text": "Apoikozoa",
+        "normalized_form": "Apoikozoa",
+        "mention_type": "unresolved",
+        "character_offsets": {
+          "start": 7154,
+          "end": 7349
+        },
+        "resolution": {
+          "status": "pending",
+          "target_ids": [],
+          "reason": null
+        },
+        "disposition": null,
+        "issue_ids": [],
+        "notes": [
+          "capa de registro: apéndice B en C-730",
+          "la etiqueta no aparece literal en el pasaje; los offsets cubren el pasaje entero",
+          "apéndice B: tipo declarado «concepto taxonómico»"
+        ],
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "mentions.jsonl",
+      "record_id": "MENTION-000197",
+      "before": null,
+      "after": {
+        "id": "MENTION-000197",
+        "section_id": "SEC-000002",
+        "passage_id": "PASSAGE-000085",
+        "original_text": "Choanozoa *sensu stricto*",
+        "normalized_form": "Choanozoa *sensu stricto*",
+        "mention_type": "unresolved",
+        "character_offsets": {
+          "start": 7154,
+          "end": 7349
+        },
+        "resolution": {
+          "status": "pending",
+          "target_ids": [],
+          "reason": null
+        },
+        "disposition": null,
+        "issue_ids": [],
+        "notes": [
+          "capa de registro: apéndice B en C-730",
+          "la etiqueta no aparece literal en el pasaje; los offsets cubren el pasaje entero",
+          "apéndice B: tipo declarado «concepto taxonómico»"
+        ],
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "mentions.jsonl",
+      "record_id": "MENTION-000198",
+      "before": null,
+      "after": {
+        "id": "MENTION-000198",
+        "section_id": "SEC-000002",
+        "passage_id": "PASSAGE-000085",
+        "original_text": "holozoo fósil de posición interna indeterminada",
+        "normalized_form": "holozoo fósil de posición interna indeterminada",
+        "mention_type": "unresolved",
+        "character_offsets": {
+          "start": 7154,
+          "end": 7349
+        },
+        "resolution": {
+          "status": "pending",
+          "target_ids": [],
+          "reason": null
+        },
+        "disposition": null,
+        "issue_ids": [],
+        "notes": [
+          "capa de registro: apéndice B en C-730",
+          "la etiqueta no aparece literal en el pasaje; los offsets cubren el pasaje entero",
+          "apéndice B: tipo declarado «linaje descriptivo»"
+        ],
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "mentions.jsonl",
+      "record_id": "MENTION-000199",
+      "before": null,
+      "after": {
+        "id": "MENTION-000199",
+        "section_id": "SEC-000002",
+        "passage_id": "PASSAGE-000089",
+        "original_text": "U–Pb SIMS",
+        "normalized_form": "U–Pb SIMS",
+        "mention_type": "unresolved",
+        "character_offsets": {
+          "start": 7791,
+          "end": 7925
+        },
+        "resolution": {
+          "status": "pending",
+          "target_ids": [],
+          "reason": null
+        },
+        "disposition": null,
+        "issue_ids": [],
+        "notes": [
+          "capa de registro: apéndice B en C-732",
+          "la etiqueta no aparece literal en el pasaje; los offsets cubren el pasaje entero",
+          "apéndice B: tipo declarado «método geocronológico»"
+        ],
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "mentions.jsonl",
+      "record_id": "MENTION-000200",
+      "before": null,
+      "after": {
+        "id": "MENTION-000200",
+        "section_id": "SEC-000002",
+        "passage_id": "PASSAGE-000090",
+        "original_text": "*Megasphaera*",
+        "normalized_form": "*Megasphaera*",
+        "mention_type": "unresolved",
+        "character_offsets": {
+          "start": 7927,
+          "end": 8106
+        },
+        "resolution": {
+          "status": "pending",
+          "target_ids": [],
+          "reason": null
+        },
+        "disposition": null,
+        "issue_ids": [],
+        "notes": [
+          "capa de registro: apéndice B en C-733",
+          "la etiqueta no aparece literal en el pasaje; los offsets cubren el pasaje entero",
+          "apéndice B: tipo declarado «taxón o morfotipo fósil»"
+        ],
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "mentions.jsonl",
+      "record_id": "MENTION-000201",
+      "before": null,
+      "after": {
+        "id": "MENTION-000201",
+        "section_id": "SEC-000002",
+        "passage_id": "PASSAGE-000090",
+        "original_text": "*Tianzhushania*",
+        "normalized_form": "*Tianzhushania*",
+        "mention_type": "unresolved",
+        "character_offsets": {
+          "start": 7927,
+          "end": 8106
+        },
+        "resolution": {
+          "status": "pending",
+          "target_ids": [],
+          "reason": null
+        },
+        "disposition": null,
+        "issue_ids": [],
+        "notes": [
+          "capa de registro: apéndice B en C-733",
+          "la etiqueta no aparece literal en el pasaje; los offsets cubren el pasaje entero",
+          "apéndice B: tipo declarado «taxón o morfotipo fósil»"
+        ],
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "mentions.jsonl",
+      "record_id": "MENTION-000202",
+      "before": null,
+      "after": {
+        "id": "MENTION-000202",
+        "section_id": "SEC-000002",
+        "passage_id": "PASSAGE-000093",
+        "original_text": "*Caveasphaera*",
+        "normalized_form": "*Caveasphaera*",
+        "mention_type": "unresolved",
+        "character_offsets": {
+          "start": 8472,
+          "end": 8648
+        },
+        "resolution": {
+          "status": "pending",
+          "target_ids": [],
+          "reason": null
+        },
+        "disposition": null,
+        "issue_ids": [],
+        "notes": [
+          "capa de registro: apéndice B en C-736",
+          "la etiqueta no aparece literal en el pasaje; los offsets cubren el pasaje entero",
+          "apéndice B: tipo declarado «taxón o morfotipo fósil»"
+        ],
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "mentions.jsonl",
+      "record_id": "MENTION-000203",
+      "before": null,
+      "after": {
+        "id": "MENTION-000203",
+        "section_id": "SEC-000002",
+        "passage_id": "PASSAGE-000095",
+        "original_text": "*Helicoforamina*",
+        "normalized_form": "*Helicoforamina*",
+        "mention_type": "unresolved",
+        "character_offsets": {
+          "start": 8832,
+          "end": 8982
+        },
+        "resolution": {
+          "status": "pending",
+          "target_ids": [],
+          "reason": null
+        },
+        "disposition": null,
+        "issue_ids": [],
+        "notes": [
+          "capa de registro: apéndice B en C-738",
+          "la etiqueta no aparece literal en el pasaje; los offsets cubren el pasaje entero",
+          "apéndice B: tipo declarado «taxón o morfotipo fósil»"
+        ],
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "mentions.jsonl",
+      "record_id": "MENTION-000204",
+      "before": null,
+      "after": {
+        "id": "MENTION-000204",
+        "section_id": "SEC-000002",
+        "passage_id": "PASSAGE-000099",
+        "original_text": "esterano",
+        "normalized_form": "esterano",
+        "mention_type": "unresolved",
+        "character_offsets": {
+          "start": 9342,
+          "end": 9671
+        },
+        "resolution": {
+          "status": "pending",
+          "target_ids": [],
+          "reason": null
+        },
+        "disposition": null,
+        "issue_ids": [],
+        "notes": [
+          "capa de registro: apéndice B en C-742",
+          "la etiqueta no aparece literal en el pasaje; los offsets cubren el pasaje entero",
+          "apéndice B: tipo declarado «biomarcador»"
+        ],
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "mentions.jsonl",
+      "record_id": "MENTION-000205",
+      "before": null,
+      "after": {
+        "id": "MENTION-000205",
+        "section_id": "SEC-000002",
+        "passage_id": "PASSAGE-000101",
+        "original_text": "protosteroide",
+        "normalized_form": "protosteroide",
+        "mention_type": "unresolved",
+        "character_offsets": {
+          "start": 9814,
+          "end": 9985
+        },
+        "resolution": {
+          "status": "pending",
+          "target_ids": [],
+          "reason": null
+        },
+        "disposition": null,
+        "issue_ids": [],
+        "notes": [
+          "capa de registro: apéndice B en C-744",
+          "la etiqueta no aparece literal en el pasaje; los offsets cubren el pasaje entero",
+          "apéndice B: tipo declarado «biomarcador»"
+        ],
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "mentions.jsonl",
+      "record_id": "MENTION-000206",
+      "before": null,
+      "after": {
+        "id": "MENTION-000206",
+        "section_id": "SEC-000002",
+        "passage_id": "PASSAGE-000104",
+        "original_text": "Rhizaria",
+        "normalized_form": "Rhizaria",
+        "mention_type": "unresolved",
+        "character_offsets": {
+          "start": 10359,
+          "end": 10367
+        },
+        "resolution": {
+          "status": "pending",
+          "target_ids": [],
+          "reason": null
+        },
+        "disposition": null,
+        "issue_ids": [],
+        "notes": [
+          "capa de registro: apéndice B en C-747",
+          "apéndice B: tipo declarado «clado»"
+        ],
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "mentions.jsonl",
+      "record_id": "MENTION-000207",
+      "before": null,
+      "after": {
+        "id": "MENTION-000207",
+        "section_id": "SEC-000002",
+        "passage_id": "PASSAGE-000105",
+        "original_text": "esterol C30",
+        "normalized_form": "esterol C30",
+        "mention_type": "unresolved",
+        "character_offsets": {
+          "start": 10465,
+          "end": 10660
+        },
+        "resolution": {
+          "status": "pending",
+          "target_ids": [],
+          "reason": null
+        },
+        "disposition": null,
+        "issue_ids": [],
+        "notes": [
+          "capa de registro: apéndice B en C-748",
+          "la etiqueta no aparece literal en el pasaje; los offsets cubren el pasaje entero",
+          "apéndice B: tipo declarado «clase molecular»"
+        ],
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "mentions.jsonl",
+      "record_id": "MENTION-000208",
+      "before": null,
+      "after": {
+        "id": "MENTION-000208",
+        "section_id": "SEC-000002",
+        "passage_id": "PASSAGE-000106",
+        "original_text": "*Saccharomyces cerevisiae*",
+        "normalized_form": "*Saccharomyces cerevisiae*",
+        "mention_type": "unresolved",
+        "character_offsets": {
+          "start": 10662,
+          "end": 10779
+        },
+        "resolution": {
+          "status": "pending",
+          "target_ids": [],
+          "reason": null
+        },
+        "disposition": null,
+        "issue_ids": [],
+        "notes": [
+          "capa de registro: apéndice B en C-749",
+          "la etiqueta no aparece literal en el pasaje; los offsets cubren el pasaje entero",
+          "apéndice B: tipo declarado «organismo»"
+        ],
+        "record_status": "active"
+      }
+    }
+  ],
+  "records_added": [
+    "MENTION-000069",
+    "MENTION-000070",
+    "MENTION-000071",
+    "MENTION-000072",
+    "MENTION-000073",
+    "MENTION-000074",
+    "MENTION-000075",
+    "MENTION-000076",
+    "MENTION-000077",
+    "MENTION-000078",
+    "MENTION-000079",
+    "MENTION-000080",
+    "MENTION-000081",
+    "MENTION-000082",
+    "MENTION-000083",
+    "MENTION-000084",
+    "MENTION-000085",
+    "MENTION-000086",
+    "MENTION-000087",
+    "MENTION-000088",
+    "MENTION-000089",
+    "MENTION-000090",
+    "MENTION-000091",
+    "MENTION-000092",
+    "MENTION-000093",
+    "MENTION-000094",
+    "MENTION-000095",
+    "MENTION-000096",
+    "MENTION-000097",
+    "MENTION-000098",
+    "MENTION-000099",
+    "MENTION-000100",
+    "MENTION-000101",
+    "MENTION-000102",
+    "MENTION-000103",
+    "MENTION-000104",
+    "MENTION-000105",
+    "MENTION-000106",
+    "MENTION-000107",
+    "MENTION-000108",
+    "MENTION-000109",
+    "MENTION-000110",
+    "MENTION-000111",
+    "MENTION-000112",
+    "MENTION-000113",
+    "MENTION-000114",
+    "MENTION-000115",
+    "MENTION-000116",
+    "MENTION-000117",
+    "MENTION-000118",
+    "MENTION-000119",
+    "MENTION-000120",
+    "MENTION-000121",
+    "MENTION-000122",
+    "MENTION-000123",
+    "MENTION-000124",
+    "MENTION-000125",
+    "MENTION-000126",
+    "MENTION-000127",
+    "MENTION-000128",
+    "MENTION-000129",
+    "MENTION-000130",
+    "MENTION-000131",
+    "MENTION-000132",
+    "MENTION-000133",
+    "MENTION-000134",
+    "MENTION-000135",
+    "MENTION-000136",
+    "MENTION-000137",
+    "MENTION-000138",
+    "MENTION-000139",
+    "MENTION-000140",
+    "MENTION-000141",
+    "MENTION-000142",
+    "MENTION-000143",
+    "MENTION-000144",
+    "MENTION-000145",
+    "MENTION-000146",
+    "MENTION-000147",
+    "MENTION-000148",
+    "MENTION-000149",
+    "MENTION-000150",
+    "MENTION-000151",
+    "MENTION-000152",
+    "MENTION-000153",
+    "MENTION-000154",
+    "MENTION-000155",
+    "MENTION-000156",
+    "MENTION-000157",
+    "MENTION-000158",
+    "MENTION-000159",
+    "MENTION-000160",
+    "MENTION-000161",
+    "MENTION-000162",
+    "MENTION-000163",
+    "MENTION-000164",
+    "MENTION-000165",
+    "MENTION-000166",
+    "MENTION-000167",
+    "MENTION-000168",
+    "MENTION-000169",
+    "MENTION-000170",
+    "MENTION-000171",
+    "MENTION-000172",
+    "MENTION-000173",
+    "MENTION-000174",
+    "MENTION-000175",
+    "MENTION-000176",
+    "MENTION-000177",
+    "MENTION-000178",
+    "MENTION-000179",
+    "MENTION-000180",
+    "MENTION-000181",
+    "MENTION-000182",
+    "MENTION-000183",
+    "MENTION-000184",
+    "MENTION-000185",
+    "MENTION-000186",
+    "MENTION-000187",
+    "MENTION-000188",
+    "MENTION-000189",
+    "MENTION-000190",
+    "MENTION-000191",
+    "MENTION-000192",
+    "MENTION-000193",
+    "MENTION-000194",
+    "MENTION-000195",
+    "MENTION-000196",
+    "MENTION-000197",
+    "MENTION-000198",
+    "MENTION-000199",
+    "MENTION-000200",
+    "MENTION-000201",
+    "MENTION-000202",
+    "MENTION-000203",
+    "MENTION-000204",
+    "MENTION-000205",
+    "MENTION-000206",
+    "MENTION-000207",
+    "MENTION-000208"
+  ],
+  "records_updated": [],
+  "claims_added": [],
+  "events_added": [],
+  "hypotheses_added": [],
+  "issues_added": [],
+  "issues_resolved": [],
+  "records_deprecated": [],
+  "views_invalidated": [],
+  "views_built": [],
+  "validation_results": {},
+  "corpus_origin": {
+    "corpus": "Corredor Eukaryota → Holozoa",
+    "version": "0.6.0-research-audit",
+    "freeze": {
+      "path": "knowledge/corpus/manifests/corredor-v0.6.0-research-audit-af7e799.json",
+      "fingerprint": "sha256:b53f15ad613451387591f519d7ec8d4144a774aed83fbaaabd5e5207a18aa415",
+      "commit": "af7e799e2d096a48f24afd31d7745e19cebf374d"
+    },
+    "section": "05",
+    "files": {
+      "prose": {
+        "path": "docs/secciones/006-05-5-el-registro-material-fosiles-y-biomarcadores.md",
+        "sha256": "sha256:95cc030fcf06813b0377d45fcec8193365e6c6df2de8b9a6cac01370c212bf9e",
+        "copy": "knowledge/corpus/sections/SEC-000002.md"
+      },
+      "registry": {
+        "path": "data/afirmaciones/05.csv",
+        "sha256": "sha256:9e729fabdb7357cf6af1089b70f0887563d32c44ff3df933aba9fdd5ad91b29d",
+        "copy": "knowledge/corpus/sections/SEC-000002.registro.csv"
+      }
+    },
+    "rows": {
+      "C-694": {
+        "passage_ids": [
+          "PASSAGE-000042"
+        ],
+        "via": "prosa",
+        "mention_ids": [
+          "MENTION-000069",
+          "MENTION-000070"
+        ]
+      },
+      "C-695": {
+        "passage_ids": [
+          "PASSAGE-000043"
+        ],
+        "via": "prosa",
+        "mention_ids": [
+          "MENTION-000071",
+          "MENTION-000072",
+          "MENTION-000075"
+        ]
+      },
+      "C-696": {
+        "passage_ids": [
+          "PASSAGE-000044"
+        ],
+        "via": "prosa",
+        "mention_ids": [
+          "MENTION-000073",
+          "MENTION-000074"
+        ]
+      },
+      "C-697": {
+        "passage_ids": [
+          "PASSAGE-000045"
+        ],
+        "via": "prosa",
+        "mention_ids": [
+          "MENTION-000075",
+          "MENTION-000076"
+        ]
+      },
+      "C-698": {
+        "passage_ids": [
+          "PASSAGE-000046"
+        ],
+        "via": "prosa",
+        "mention_ids": [
+          "MENTION-000077",
+          "MENTION-000078"
+        ]
+      },
+      "C-699": {
+        "passage_ids": [
+          "PASSAGE-000049"
+        ],
+        "via": "prosa",
+        "mention_ids": [
+          "MENTION-000079",
+          "MENTION-000080",
+          "MENTION-000174"
+        ]
+      },
+      "C-700": {
+        "passage_ids": [
+          "PASSAGE-000050"
+        ],
+        "via": "prosa",
+        "mention_ids": [
+          "MENTION-000081",
+          "MENTION-000082"
+        ]
+      },
+      "C-701": {
+        "passage_ids": [
+          "PASSAGE-000051"
+        ],
+        "via": "prosa",
+        "mention_ids": [
+          "MENTION-000083",
+          "MENTION-000084",
+          "MENTION-000175"
+        ]
+      },
+      "C-702": {
+        "passage_ids": [
+          "PASSAGE-000052"
+        ],
+        "via": "prosa",
+        "mention_ids": [
+          "MENTION-000083",
+          "MENTION-000085",
+          "MENTION-000176"
+        ]
+      },
+      "C-703": {
+        "passage_ids": [
+          "PASSAGE-000053"
+        ],
+        "via": "prosa",
+        "mention_ids": [
+          "MENTION-000086",
+          "MENTION-000087",
+          "MENTION-000177",
+          "MENTION-000178",
+          "MENTION-000179"
+        ]
+      },
+      "C-704": {
+        "passage_ids": [
+          "PASSAGE-000054"
+        ],
+        "via": "prosa",
+        "mention_ids": [
+          "MENTION-000088",
+          "MENTION-000089"
+        ]
+      },
+      "C-705": {
+        "passage_ids": [
+          "PASSAGE-000055"
+        ],
+        "via": "prosa",
+        "mention_ids": [
+          "MENTION-000090",
+          "MENTION-000091",
+          "MENTION-000180",
+          "MENTION-000181"
+        ]
+      },
+      "C-706": {
+        "passage_ids": [
+          "PASSAGE-000056"
+        ],
+        "via": "prosa",
+        "mention_ids": [
+          "MENTION-000092",
+          "MENTION-000093"
+        ]
+      },
+      "C-707": {
+        "passage_ids": [
+          "PASSAGE-000057"
+        ],
+        "via": "prosa",
+        "mention_ids": [
+          "MENTION-000090",
+          "MENTION-000094"
+        ]
+      },
+      "C-708": {
+        "passage_ids": [
+          "PASSAGE-000059"
+        ],
+        "via": "prosa",
+        "mention_ids": [
+          "MENTION-000095",
+          "MENTION-000096",
+          "MENTION-000182",
+          "MENTION-000183"
+        ]
+      },
+      "C-709": {
+        "passage_ids": [
+          "PASSAGE-000060"
+        ],
+        "via": "prosa",
+        "mention_ids": [
+          "MENTION-000095",
+          "MENTION-000097"
+        ]
+      },
+      "C-710": {
+        "passage_ids": [
+          "PASSAGE-000061"
+        ],
+        "via": "prosa",
+        "mention_ids": [
+          "MENTION-000098",
+          "MENTION-000099",
+          "MENTION-000184",
+          "MENTION-000185"
+        ]
+      },
+      "C-711": {
+        "passage_ids": [
+          "PASSAGE-000062"
+        ],
+        "via": "prosa",
+        "mention_ids": [
+          "MENTION-000098",
+          "MENTION-000100"
+        ]
+      },
+      "C-712": {
+        "passage_ids": [
+          "PASSAGE-000063"
+        ],
+        "via": "prosa",
+        "mention_ids": [
+          "MENTION-000101",
+          "MENTION-000102"
+        ]
+      },
+      "C-713": {
+        "passage_ids": [
+          "PASSAGE-000065",
+          "PASSAGE-000109"
+        ],
+        "via": "prosa",
+        "mention_ids": [
+          "MENTION-000103",
+          "MENTION-000104",
+          "MENTION-000186",
+          "MENTION-000187"
+        ]
+      },
+      "C-714": {
+        "passage_ids": [
+          "PASSAGE-000066"
+        ],
+        "via": "prosa",
+        "mention_ids": [
+          "MENTION-000105",
+          "MENTION-000106"
+        ]
+      },
+      "C-715": {
+        "passage_ids": [
+          "PASSAGE-000067",
+          "PASSAGE-000072"
+        ],
+        "via": "prosa",
+        "mention_ids": [
+          "MENTION-000107",
+          "MENTION-000108"
+        ]
+      },
+      "C-716": {
+        "passage_ids": [
+          "PASSAGE-000068",
+          "PASSAGE-000072"
+        ],
+        "via": "prosa",
+        "mention_ids": [
+          "MENTION-000107",
+          "MENTION-000109",
+          "MENTION-000188"
+        ]
+      },
+      "C-717": {
+        "passage_ids": [
+          "PASSAGE-000069",
+          "PASSAGE-000072"
+        ],
+        "via": "prosa",
+        "mention_ids": [
+          "MENTION-000110"
+        ]
+      },
+      "C-718": {
+        "passage_ids": [
+          "PASSAGE-000070",
+          "PASSAGE-000072"
+        ],
+        "via": "prosa",
+        "mention_ids": [
+          "MENTION-000111",
+          "MENTION-000112"
+        ]
+      },
+      "C-719": {
+        "passage_ids": [
+          "PASSAGE-000071",
+          "PASSAGE-000072"
+        ],
+        "via": "prosa",
+        "mention_ids": [
+          "MENTION-000113",
+          "MENTION-000114"
+        ]
+      },
+      "C-720": {
+        "passage_ids": [
+          "PASSAGE-000075"
+        ],
+        "via": "prosa",
+        "mention_ids": [
+          "MENTION-000115",
+          "MENTION-000116",
+          "MENTION-000189"
+        ]
+      },
+      "C-721": {
+        "passage_ids": [
+          "PASSAGE-000076"
+        ],
+        "via": "prosa",
+        "mention_ids": [
+          "MENTION-000115",
+          "MENTION-000117",
+          "MENTION-000190"
+        ]
+      },
+      "C-722": {
+        "passage_ids": [
+          "PASSAGE-000077"
+        ],
+        "via": "prosa",
+        "mention_ids": [
+          "MENTION-000115",
+          "MENTION-000118"
+        ]
+      },
+      "C-723": {
+        "passage_ids": [
+          "PASSAGE-000078",
+          "PASSAGE-000109"
+        ],
+        "via": "prosa",
+        "mention_ids": [
+          "MENTION-000115",
+          "MENTION-000119"
+        ]
+      },
+      "C-724": {
+        "passage_ids": [
+          "PASSAGE-000079"
+        ],
+        "via": "prosa",
+        "mention_ids": [
+          "MENTION-000120",
+          "MENTION-000121",
+          "MENTION-000191",
+          "MENTION-000192",
+          "MENTION-000193"
+        ]
+      },
+      "C-725": {
+        "passage_ids": [
+          "PASSAGE-000080"
+        ],
+        "via": "prosa",
+        "mention_ids": [
+          "MENTION-000120",
+          "MENTION-000122"
+        ]
+      },
+      "C-726": {
+        "passage_ids": [
+          "PASSAGE-000081",
+          "PASSAGE-000109"
+        ],
+        "via": "prosa",
+        "mention_ids": [
+          "MENTION-000120",
+          "MENTION-000123"
+        ]
+      },
+      "C-727": {
+        "passage_ids": [
+          "PASSAGE-000082"
+        ],
+        "via": "prosa",
+        "mention_ids": [
+          "MENTION-000124",
+          "MENTION-000125",
+          "MENTION-000194",
+          "MENTION-000195"
+        ]
+      },
+      "C-728": {
+        "passage_ids": [
+          "PASSAGE-000083"
+        ],
+        "via": "prosa",
+        "mention_ids": [
+          "MENTION-000124",
+          "MENTION-000126"
+        ]
+      },
+      "C-729": {
+        "passage_ids": [
+          "PASSAGE-000084",
+          "PASSAGE-000109"
+        ],
+        "via": "prosa",
+        "mention_ids": [
+          "MENTION-000124",
+          "MENTION-000127"
+        ]
+      },
+      "C-730": {
+        "passage_ids": [
+          "PASSAGE-000085"
+        ],
+        "via": "prosa",
+        "mention_ids": [
+          "MENTION-000128",
+          "MENTION-000129",
+          "MENTION-000196",
+          "MENTION-000197",
+          "MENTION-000198"
+        ]
+      },
+      "C-731": {
+        "passage_ids": [
+          "PASSAGE-000088"
+        ],
+        "via": "prosa",
+        "mention_ids": [
+          "MENTION-000130",
+          "MENTION-000131"
+        ]
+      },
+      "C-732": {
+        "passage_ids": [
+          "PASSAGE-000089",
+          "PASSAGE-000110"
+        ],
+        "via": "prosa",
+        "mention_ids": [
+          "MENTION-000132",
+          "MENTION-000133",
+          "MENTION-000199"
+        ]
+      },
+      "C-733": {
+        "passage_ids": [
+          "PASSAGE-000090",
+          "PASSAGE-000110"
+        ],
+        "via": "prosa",
+        "mention_ids": [
+          "MENTION-000134",
+          "MENTION-000135",
+          "MENTION-000200",
+          "MENTION-000201"
+        ]
+      },
+      "C-734": {
+        "passage_ids": [
+          "PASSAGE-000091",
+          "PASSAGE-000110"
+        ],
+        "via": "prosa",
+        "mention_ids": [
+          "MENTION-000134",
+          "MENTION-000136"
+        ]
+      },
+      "C-735": {
+        "passage_ids": [
+          "PASSAGE-000092",
+          "PASSAGE-000110"
+        ],
+        "via": "prosa",
+        "mention_ids": [
+          "MENTION-000137",
+          "MENTION-000138"
+        ]
+      },
+      "C-736": {
+        "passage_ids": [
+          "PASSAGE-000093",
+          "PASSAGE-000110"
+        ],
+        "via": "prosa",
+        "mention_ids": [
+          "MENTION-000139",
+          "MENTION-000140",
+          "MENTION-000202"
+        ]
+      },
+      "C-737": {
+        "passage_ids": [
+          "PASSAGE-000094",
+          "PASSAGE-000110"
+        ],
+        "via": "prosa",
+        "mention_ids": [
+          "MENTION-000141",
+          "MENTION-000142"
+        ]
+      },
+      "C-738": {
+        "passage_ids": [
+          "PASSAGE-000095",
+          "PASSAGE-000110"
+        ],
+        "via": "prosa",
+        "mention_ids": [
+          "MENTION-000143",
+          "MENTION-000144",
+          "MENTION-000203"
+        ]
+      },
+      "C-739": {
+        "passage_ids": [
+          "PASSAGE-000096",
+          "PASSAGE-000110"
+        ],
+        "via": "prosa",
+        "mention_ids": [
+          "MENTION-000143",
+          "MENTION-000145"
+        ]
+      },
+      "C-740": {
+        "passage_ids": [
+          "PASSAGE-000097"
+        ],
+        "via": "prosa",
+        "mention_ids": [
+          "MENTION-000146",
+          "MENTION-000147"
+        ]
+      },
+      "C-741": {
+        "passage_ids": [
+          "PASSAGE-000099"
+        ],
+        "via": "prosa",
+        "mention_ids": [
+          "MENTION-000148",
+          "MENTION-000149"
+        ]
+      },
+      "C-742": {
+        "passage_ids": [
+          "PASSAGE-000099"
+        ],
+        "via": "prosa",
+        "mention_ids": [
+          "MENTION-000150",
+          "MENTION-000204"
+        ]
+      },
+      "C-743": {
+        "passage_ids": [
+          "PASSAGE-000100"
+        ],
+        "via": "prosa",
+        "mention_ids": [
+          "MENTION-000151",
+          "MENTION-000152"
+        ]
+      },
+      "C-744": {
+        "passage_ids": [
+          "PASSAGE-000101"
+        ],
+        "via": "prosa",
+        "mention_ids": [
+          "MENTION-000153",
+          "MENTION-000154",
+          "MENTION-000205"
+        ]
+      },
+      "C-745": {
+        "passage_ids": [
+          "PASSAGE-000102"
+        ],
+        "via": "prosa",
+        "mention_ids": [
+          "MENTION-000153",
+          "MENTION-000074"
+        ]
+      },
+      "C-746": {
+        "passage_ids": [
+          "PASSAGE-000103"
+        ],
+        "via": "prosa",
+        "mention_ids": [
+          "MENTION-000155",
+          "MENTION-000156"
+        ]
+      },
+      "C-747": {
+        "passage_ids": [
+          "PASSAGE-000104"
+        ],
+        "via": "prosa",
+        "mention_ids": [
+          "MENTION-000157",
+          "MENTION-000158",
+          "MENTION-000206"
+        ]
+      },
+      "C-748": {
+        "passage_ids": [
+          "PASSAGE-000105"
+        ],
+        "via": "prosa",
+        "mention_ids": [
+          "MENTION-000159",
+          "MENTION-000160",
+          "MENTION-000207"
+        ]
+      },
+      "C-749": {
+        "passage_ids": [
+          "PASSAGE-000106"
+        ],
+        "via": "prosa",
+        "mention_ids": [
+          "MENTION-000161",
+          "MENTION-000162",
+          "MENTION-000208"
+        ]
+      },
+      "C-750": {
+        "passage_ids": [
+          "PASSAGE-000107"
+        ],
+        "via": "prosa",
+        "mention_ids": [
+          "MENTION-000163",
+          "MENTION-000164"
+        ]
+      },
+      "C-751": {
+        "passage_ids": [
+          "PASSAGE-000048"
+        ],
+        "via": "prosa",
+        "mention_ids": [
+          "MENTION-000165",
+          "MENTION-000166"
+        ]
+      },
+      "C-752": {
+        "passage_ids": [
+          "PASSAGE-000048"
+        ],
+        "via": "prosa",
+        "mention_ids": [
+          "MENTION-000165",
+          "MENTION-000167"
+        ]
+      },
+      "C-753": {
+        "passage_ids": [
+          "PASSAGE-000048"
+        ],
+        "via": "prosa",
+        "mention_ids": [
+          "MENTION-000168",
+          "MENTION-000169"
+        ]
+      },
+      "C-754": {
+        "passage_ids": [
+          "PASSAGE-000048"
+        ],
+        "via": "prosa",
+        "mention_ids": [
+          "MENTION-000168",
+          "MENTION-000170"
+        ]
+      },
+      "C-755": {
+        "passage_ids": [
+          "PASSAGE-000110"
+        ],
+        "via": "prosa",
+        "mention_ids": [
+          "MENTION-000171",
+          "MENTION-000172"
+        ]
+      },
+      "C-756": {
+        "passage_ids": [
+          "PASSAGE-000110"
+        ],
+        "via": "prosa",
+        "mention_ids": [
+          "MENTION-000173",
+          "MENTION-000172"
+        ]
+      }
+    }
+  }
+}

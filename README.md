@@ -2,7 +2,7 @@
 
 Una **base de conocimiento científico versionada y centrada en afirmaciones**, capaz de generar múltiples redes evolutivas coherentes y de proyectarlas hacia un juego poblacional desarrollado cronológicamente por campañas.
 
-**Estado:** Fase 0 completada y pipeline de las Fases 2–6 verificado contra fixtures. El corpus de la Campaña 1 está **congelado** (`DEC-056`) y su primera sección, la 6, ingerida y convertida en registros (`DEC-057`, `SEC-000001`): siguen la Fase 1 y la ingestión del resto, sección por sección.
+**Estado:** Fase 0 completada y pipeline de las Fases 2–6 verificado contra fixtures. El corpus de la Campaña 1 está **congelado** (`DEC-056`) y dos secciones están ingeridas y convertidas en registros: la 6 (`DEC-057`, `SEC-000001`) y la 5, fósiles y biomarcadores (`DEC-058`, `SEC-000002`, esquema `1.3.0`). Siguen la Fase 1 y la ingestión del resto, sección por sección.
 
 ---
 
