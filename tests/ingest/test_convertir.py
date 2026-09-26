@@ -223,6 +223,18 @@ class Convertir(unittest.TestCase):
         self.assertIn("@Alfa", str(e.exception))
         self.assertIn("id", str(e.exception))
 
+    def test_una_procedencia_en_el_fichero_de_conversion_se_rechaza(self):
+        # La procedencia se deduce de las filas del registro; una copiada a mano
+        # podría señalar otra sección u otros pasajes que los de sus filas.
+        spec = self.entorno.spec()
+        spec["records"][2]["record"]["provenance"] = {
+            "section_ids": ["SEC-000001"], "passage_ids": [], "source_ids": [], "operation_id": None,
+            "dataset_revision": "REV-000002", "origin": "ingestion"}
+        with self.assertRaises(SystemExit) as e:
+            self.entorno.construir(spec)
+        self.assertIn("@CL1", str(e.exception))
+        self.assertIn("provenance", str(e.exception))
+
     def test_un_identificador_literal_que_no_existe_se_rechaza(self):
         spec = self.entorno.spec()
         spec["records"][2]["record"]["object"]["entity_id"] = "CLADE-999999"
