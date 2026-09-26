@@ -95,34 +95,43 @@ def gather() -> dict:
 
 
 def conversiones_alteradas() -> list[str]:
-    """Ficheros de conversión que ya no son los que guardó su delta aplicado.
+    """Ficheros de conversión que ya no son los que guardó su delta.
 
     El delta de una conversión guarda la ruta y el hash del fichero del que
     salió. Si el fichero cambió, un snapshot nuevo registraría el contenido
-    nuevo y lo daría por bueno, y la entrada real se habría perdido.
+    nuevo y lo daría por bueno, y la entrada real se habría perdido. Vale
+    también para una conversión revertida, que sigue siendo constancia, con una
+    excepción: que una conversión posterior, el reintento tras revertir, use la
+    misma ruta. Revertir sirve para corregir el fichero y reintentar, y entonces
+    manda el hash del reintento.
     """
     deltas = ROOT / "knowledge" / "deltas"
-    revertidos = set()
     historial = deltas / "historial.jsonl"
+    orden: dict[str, int] = {}
     if historial.exists():
-        ultima = {}
-        for linea in historial.read_text(encoding="utf-8").splitlines():
+        for n, linea in enumerate(historial.read_text(encoding="utf-8").splitlines()):
             if linea.strip():
                 h = json.loads(linea)
-                ultima[h.get("delta")] = h.get("accion")
-        revertidos = {d for d, a in ultima.items() if a == "revertir"}
-    problemas = []
+                if h.get("accion") == "aplicar":
+                    orden.setdefault(h.get("delta"), n)
+    fichas = []
     for p in sorted(deltas.glob("*.json")) if deltas.exists() else []:
-        if p.name in revertidos:
-            continue
         ficha = (json.loads(p.read_text(encoding="utf-8")).get("conversion") or {}).get("spec") or {}
-        if not ficha.get("path"):
+        if ficha.get("path"):
+            fichas.append((p.name, ficha))
+    # Sin aplicar, un delta va detrás de todos los aplicados.
+    posicion = lambda nombre: orden.get(nombre, len(orden) + 1)
+    problemas = []
+    for nombre, ficha in fichas:
+        sustituida = any(otra["path"] == ficha["path"] and posicion(otro) > posicion(nombre)
+                         for otro, otra in fichas if otro != nombre)
+        if sustituida:
             continue
         ruta = ROOT / ficha["path"]
         if not ruta.exists():
-            problemas.append(f"{ficha['path']}: falta, y {p.name} salió de él")
+            problemas.append(f"{ficha['path']}: falta, y {nombre} salió de él")
         elif digest(ruta) != ficha.get("sha256"):
-            problemas.append(f"{ficha['path']}: no es el que guardó {p.name} ({ficha.get('sha256')})")
+            problemas.append(f"{ficha['path']}: no es el que guardó {nombre} ({ficha.get('sha256')})")
     return problemas
 
 
