@@ -511,6 +511,7 @@ class Convertir(unittest.TestCase):
             (0, "record_status", "deprecated"),
             (2, "evidence_ids", ["@EV1"]),
             (2, "counterevidence_ids", []),
+            (2, "epistemic_dimensions", {}),
         ]
         for i, campo, valor in casos:
             with self.subTest(campo=campo):
@@ -617,6 +618,67 @@ class Convertir(unittest.TestCase):
         [act] = [o for o in r["delta"]["operations"] if o["record_id"] == op["record_id"]]
         self.assertIn("nota intermedia", act["before"]["notes"])
         self.assertIn("nota intermedia", act["after"]["notes"])
+
+    def estudio(self, spec: dict, result_ids: list[str] | None) -> dict:
+        """Añade al spec la cadena datos → análisis → resultado de la fila C-001."""
+        analisis = {"analysis_type": "molecular_clock_dating", "method": "reloj", "dataset_ids": ["@D1"]}
+        if result_ids is not None:
+            analisis["result_ids"] = result_ids
+        spec["records"] += [
+            {"key": "@D1", "file": "datasets.jsonl", "rows": ["C-001"],
+             "record": {"dataset_type": "other", "title": "Datos", "description": "De prueba."}},
+            {"key": "@A1", "file": "analyses.jsonl", "rows": ["C-001"], "record": analisis},
+            {"key": "@R1", "file": "results.jsonl", "rows": ["C-001"],
+             "record": {"analysis_id": "@A1", "result_type": "other", "description": "De prueba."}},
+        ]
+        spec["rows"]["C-001"]["keys"] += ["@D1", "@A1", "@R1"]
+        return spec
+
+    def test_los_resultados_de_un_analisis_se_deducen(self):
+        r = self.entorno.construir(self.estudio(self.entorno.spec(), None))
+        recs = self.registros(r)
+        [an] = [x for x in recs.values() if x["id"].startswith("ANALYSIS-")]
+        [res] = [x for x in recs.values() if x["id"].startswith("RESULT-")]
+        self.assertEqual(an["result_ids"], [res["id"]])
+
+    def test_un_analisis_que_no_lista_sus_resultados_se_rechaza(self):
+        with self.assertRaises(SystemExit) as e:
+            self.entorno.construir(self.estudio(self.entorno.spec(), []))
+        self.assertIn("@A1", str(e.exception))
+        self.assertIn("result_ids", str(e.exception))
+
+    def test_un_resultado_de_un_analisis_existente_lo_enlaza(self):
+        existente = {"id": "ANALYSIS-000050", "analysis_type": "other", "method": "x", "dataset_ids": [],
+                     "result_ids": [], "record_status": "active"}
+        (self.entorno.records / "analyses.jsonl").write_text(json.dumps(existente) + "\n", encoding="utf-8")
+        spec = self.entorno.spec()
+        spec["records"].append({"key": "@R1", "file": "results.jsonl", "rows": ["C-001"],
+                                "record": {"analysis_id": "ANALYSIS-000050", "result_type": "other",
+                                           "description": "De prueba."}})
+        spec["rows"]["C-001"]["keys"].append("@R1")
+        r = self.entorno.construir(spec)
+        [res] = [rec["id"] for _, rec in r["salida"] if rec["id"].startswith("RESULT-")]
+        [op] = [o for o in r["delta"]["operations"] if o["record_id"] == "ANALYSIS-000050"]
+        self.assertEqual(op["after"]["result_ids"], [res])
+
+    def test_una_afirmacion_derivada_tiene_procedencia_derivada(self):
+        spec = self.entorno.spec()
+        spec["records"][2]["record"]["derivation"] = {"rule": "de prueba", "depends_on_ids": [],
+                                                      "derived_in_view_id": None}
+        r = self.entorno.construir(spec)
+        [claim] = [rec for _, rec in r["salida"] if rec["id"].startswith("CLAIM-")]
+        self.assertEqual(claim["provenance"]["origin"], "derived")
+
+    def test_una_incidencia_nueva_nace_abierta(self):
+        spec = self.entorno.spec()
+        spec["records"].append({"key": "@I1", "file": "issues.jsonl", "rows": ["C-001"], "record": {
+            "issue_type": "pending_question", "title": "Prueba", "severity": "INFO",
+            "resolution": {"status": "resolved"}}})
+        spec["rows"]["C-001"]["keys"].append("@I1")
+        with self.assertRaises(SystemExit) as e:
+            self.entorno.construir(spec)
+        self.assertIn("@I1", str(e.exception))
+        self.assertIn("resolution", str(e.exception))
 
     def test_el_fichero_de_conversion_tiene_que_estar_en_conversions(self):
         # El snapshot sólo registra knowledge/corpus/conversions/*.json: una

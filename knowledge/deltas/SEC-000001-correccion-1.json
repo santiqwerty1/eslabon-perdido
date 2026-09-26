@@ -1,0 +1,143 @@
+{
+  "schema_version": "1.2.0",
+  "dataset_revision_before": "REV-000002",
+  "dataset_revision_after": "REV-000003",
+  "operations": [
+    {
+      "operation": "UPDATE_RECORD",
+      "file": "claims.jsonl",
+      "record_id": "CLAIM-000009",
+      "before": {
+        "id": "CLAIM-000009",
+        "claim_type": "temporal",
+        "subject_id": "EVENT-000003",
+        "predicate": "dated_to",
+        "object": {
+          "temporal_expression_id": "TIME-000009"
+        },
+        "notes": [],
+        "issue_ids": [
+          "ISSUE-000040"
+        ],
+        "derivation": {
+          "rule": "envolvente: el límite más reciente y el más antiguo de las estimaciones que sintetiza",
+          "depends_on_ids": [
+            "CLAIM-000004",
+            "CLAIM-000006"
+          ],
+          "derived_in_view_id": null
+        },
+        "provenance": {
+          "section_ids": [
+            "SEC-000001"
+          ],
+          "passage_ids": [
+            "PASSAGE-000019"
+          ],
+          "source_ids": [
+            "SRC-000002",
+            "SRC-000003"
+          ],
+          "operation_id": null,
+          "dataset_revision": "REV-000002",
+          "origin": "ingestion"
+        },
+        "epistemic_dimensions": {
+          "acceptance": "not_assessed",
+          "evidence_strength": "high",
+          "evidence_strength_reason": "Es el envolvente de estimaciones publicadas, no un intervalo de confianza combinado ni un promedio.",
+          "resolution": "unresolved",
+          "historical_status": "current"
+        },
+        "scope": {
+          "hypothesis_ids": [],
+          "classification_view_ids": [],
+          "temporal_expression_ids": [],
+          "region_ids": []
+        },
+        "quantitative_support": [],
+        "evidence_ids": [
+          "EVID-000004",
+          "EVID-000006"
+        ],
+        "counterevidence_ids": [],
+        "record_status": "active"
+      },
+      "after": {
+        "id": "CLAIM-000009",
+        "claim_type": "temporal",
+        "subject_id": "EVENT-000003",
+        "predicate": "dated_to",
+        "object": {
+          "temporal_expression_id": "TIME-000009"
+        },
+        "notes": [
+          "Procedencia corregida de «ingestion» a «derived» en REV-000003: lleva regla de derivación (§9.4) y convertir.py la marcaba como expresa (SEC-000001-correccion-1)."
+        ],
+        "issue_ids": [
+          "ISSUE-000040"
+        ],
+        "derivation": {
+          "rule": "envolvente: el límite más reciente y el más antiguo de las estimaciones que sintetiza",
+          "depends_on_ids": [
+            "CLAIM-000004",
+            "CLAIM-000006"
+          ],
+          "derived_in_view_id": null
+        },
+        "provenance": {
+          "section_ids": [
+            "SEC-000001"
+          ],
+          "passage_ids": [
+            "PASSAGE-000019"
+          ],
+          "source_ids": [
+            "SRC-000002",
+            "SRC-000003"
+          ],
+          "operation_id": null,
+          "dataset_revision": "REV-000002",
+          "origin": "derived"
+        },
+        "epistemic_dimensions": {
+          "acceptance": "not_assessed",
+          "evidence_strength": "high",
+          "evidence_strength_reason": "Es el envolvente de estimaciones publicadas, no un intervalo de confianza combinado ni un promedio.",
+          "resolution": "unresolved",
+          "historical_status": "current"
+        },
+        "scope": {
+          "hypothesis_ids": [],
+          "classification_view_ids": [],
+          "temporal_expression_ids": [],
+          "region_ids": []
+        },
+        "quantitative_support": [],
+        "evidence_ids": [
+          "EVID-000004",
+          "EVID-000006"
+        ],
+        "counterevidence_ids": [],
+        "record_status": "active"
+      }
+    }
+  ],
+  "records_added": [],
+  "records_updated": [
+    "CLAIM-000009"
+  ],
+  "claims_added": [],
+  "events_added": [],
+  "hypotheses_added": [],
+  "issues_added": [],
+  "issues_resolved": [],
+  "records_deprecated": [],
+  "views_invalidated": [],
+  "views_built": [],
+  "validation_results": {},
+  "correction": {
+    "of": "SEC-000001-conversion.json",
+    "reason": "CLAIM-000009 (C-773) es la envolvente de CLAIM-000004 y CLAIM-000006: lleva `derivation`, y §9.4 pide que una afirmación derivada no se confunda con una expresa. convertir.py le puso origin «ingestion»; desde este cambio pone «derived» a toda afirmación con derivación."
+  }
+}

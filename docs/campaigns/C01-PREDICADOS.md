@@ -159,3 +159,8 @@ Las 68 menciones tienen destino: 17 crean entidad, 34 son atributo de un
 registro, 9 señalan su evidencia, 5 son parte de un evento, una es una cuestión
 pendiente y 2 se descartan con razón. Las 36 filas son trazables: el delta de la
 conversión dice, por fila, su destino y los registros que produjo.
+
+La envolvente de C-773 (`CLAIM-000009`) entró con origen `ingestion` aunque
+lleva regla de derivación. `SEC-000001-correccion-1.json` (REV-000002 →
+REV-000003) la marca como `derived`, como pide §9.4, y `SNAP-000013` registra el
+estado corregido. `convertir.py` ya marca así toda afirmación con derivación.
