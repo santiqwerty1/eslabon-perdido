@@ -313,6 +313,12 @@ def claves_usadas(valor) -> set[str]:
 
 
 def construir(spec_path: Path, corpus: str) -> dict:
+    # La entrada revisada tiene que quedar donde el snapshot la registra: fuera
+    # de ahí, cambiarla o perderla no lo detectaría nadie y un clon limpio no
+    # podría reconstruir de dónde salieron los registros.
+    if spec_path.resolve().parent != CONVERSIONS.resolve() or spec_path.suffix != ".json":
+        raise SystemExit(f"ERROR el fichero de conversión tiene que estar en knowledge/corpus/conversions/ "
+                         f"({spec_path})")
     spec_bytes = spec_path.read_bytes()
     spec = json.loads(spec_bytes)
     sec = spec["section"]

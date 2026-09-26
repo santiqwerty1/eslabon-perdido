@@ -203,12 +203,28 @@ def _check_conservation(data, rep, snapshots_dir: Path, deltas_dir: Path) -> Non
             "estado: no hay deltas registrados; la conservación de lo que cada "
             "sección incorporó se comprobará cuando existan (§17 paso 13)"
         )
+    # Un delta revertido se queda en deltas/ como constancia y sigue reservando
+    # sus identificadores, pero ya no es estado: lo que incorporó se retiró al
+    # revertirlo, y el que lo sustituye recorre las mismas revisiones. Lo dice
+    # la última acción del historial sobre él.
+    ultima: dict[str, str] = {}
+    historial = deltas_dir / "historial.jsonl"
+    if historial.exists():
+        for line in historial.read_text(encoding="utf-8").splitlines():
+            try:
+                h = json.loads(line) if line.strip() else None
+            except json.JSONDecodeError:
+                h = None
+            if isinstance(h, dict) and isinstance(h.get("delta"), str):
+                ultima[h["delta"]] = h.get("accion")
     parsed = []
     for path in deltas:
         delta = _read_json(path, rep)
         if delta is None:
             continue
-        parsed.append((path, delta))
+        revertido = ultima.get(path.name) == "revertir"
+        if not revertido:
+            parsed.append((path, delta))
         for key, value in delta.items():
             if REMOVAL_RE.search(key.lower()) and value:
                 rep.error(
@@ -216,7 +232,7 @@ def _check_conservation(data, rep, snapshots_dir: Path, deltas_dir: Path) -> Non
                     "contempla ninguna operación de borrado, sólo DEPRECATE_RECORD, "
                     "SUPERSEDE_RECORD y MERGE_CONFIRMED_IDENTITIES"
                 )
-        for key in DELTA_RECORD_KEYS:
+        for key in DELTA_RECORD_KEYS if not revertido else ():
             for item in delta.get(key) or []:
                 rid = item.get("id") if isinstance(item, dict) else item
                 if not isinstance(rid, str) or not ID_RE.fullmatch(rid):

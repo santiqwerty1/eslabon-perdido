@@ -23,6 +23,7 @@ from __future__ import annotations
 import importlib.util
 import json
 import sys
+import tempfile
 import unittest
 from pathlib import Path
 
@@ -147,6 +148,27 @@ class TestState(Base):
         rep = run_state(CASES / "state-bad" / "undocumented-migration")
         self.assertMessage(rep.errors, "1.0.0", "2.0.0", "sin documento")
         self.assertMessage(rep.errors, "REV-000001", "REV-000007", "sin migración documentada")
+
+    def test_un_delta_revertido_no_cuenta_como_estado(self):
+        """Revertir y reintentar: el revertido queda como constancia, no como estado."""
+        with tempfile.TemporaryDirectory() as tmp:
+            case = Path(tmp)
+            (case / "deltas").mkdir()
+            (case / "claims.jsonl").write_text(
+                json.dumps({"id": "CLAIM-000002", "record_status": "active"}) + "\n", encoding="utf-8")
+            for nombre, rid in (("SEC-000001-conversion", "CLAIM-000001"), ("SEC-000001-conversion-2", "CLAIM-000002")):
+                (case / "deltas" / f"{nombre}.json").write_text(json.dumps({
+                    "dataset_revision_before": "REV-000001", "dataset_revision_after": "REV-000002",
+                    "records_added": [rid]}), encoding="utf-8")
+            (case / "deltas" / "historial.jsonl").write_text("".join(json.dumps(h) + "\n" for h in (
+                {"delta": "SEC-000001-conversion.json", "accion": "aplicar", "revision": "REV-000002"},
+                {"delta": "SEC-000001-conversion.json", "accion": "revertir", "revision": "REV-000001"},
+                {"delta": "SEC-000001-conversion-2.json", "accion": "aplicar", "revision": "REV-000002"},
+            )), encoding="utf-8")
+            rep = run_state(case)
+        self.assertNoMessage(rep.errors, "CLAIM-000001")
+        self.assertNoMessage(rep.errors, "la cadena de revisiones salta")
+        self.assertEqual(rep.errors, [])
 
     def test_migracion_documentada_no_se_denuncia(self):
         """El caso íntegro tiene dos schema_version y un documento que las une."""
