@@ -193,6 +193,23 @@ def cmd(path: Path, reverse: bool, dry: bool, full: bool = False) -> int:
         print("\n(en seco: no se ha escrito nada)")
         return 0
 
+    # La cadena de revisiones es el orden: un delta se aplica sobre la revisión
+    # de la que parte y sólo se revierte el último aplicado. Revertir la sección
+    # antes que su conversión, por ejemplo, borraría las menciones que la
+    # conversión actualizó y dejaría sus registros sin procedencia.
+    actual = (json.loads(MANIFEST.read_text(encoding="utf-8")).get("dataset_revision")
+              if MANIFEST.exists() else None)
+    if actual is not None and actual != origen:
+        if reverse:
+            ultimo = next((h["delta"] for h in reversed(read_jsonl(HISTORIAL))
+                           if h.get("accion") == "aplicar" and h.get("revision") == actual), None)
+            print(f"ERROR el dataset está en {actual}, no en {origen}: antes hay que revertir "
+                  f"{ultimo or 'el delta que lo llevó ahí'}")
+        else:
+            print(f"ERROR el dataset está en {actual} y este delta parte de {origen}: "
+                  "hay que aplicar los deltas en el orden de la cadena")
+        return 1
+
     try:
         diario = apply_ops(ops, reverse)
     except ValueError as exc:

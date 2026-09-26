@@ -121,6 +121,13 @@ LITERAL = re.compile(json.loads((base.ROOT / "schemas" / "json-schema" / "common
                                 .read_text(encoding="utf-8"))["$defs"]["id"]["pattern"])
 FUENTE = re.compile(r"^@(S\d+)$")
 CITA = re.compile(r"\bS\d+\b")
+# Los destinos de fila de docs/campaigns/C01-PREDICADOS.md, A–I.
+DESTINOS = set("ABCDEFGHI")
+# Sólo una mención descartada puede quedarse sin registro al que apunte.
+SIN_OBJETIVO = {"discarded_with_reason"}
+# Lo que identifica la obra. Si el apéndice activo lo corrigió, la fuente que ya
+# existe no es la que cita el corpus congelado.
+BIBLIOGRAFIA = ("authors", "year", "title", "container", "doi", "url", "source_type")
 
 
 def propiedades(fichero: str) -> set[str]:
@@ -354,6 +361,10 @@ def construir(spec_path: Path, corpus: str) -> dict:
     sobran = sorted(set(spec.get("mentions", {})) - etiquetas)
     if sobran:
         errores.append(f"menciones que la sección no tiene: {'; '.join(sobran)}")
+    for etiqueta, destino in spec.get("mentions", {}).items():
+        if destino.get("disposition") not in SIN_OBJETIVO and not destino.get("targets"):
+            errores.append(f"mención {etiqueta}: {destino.get('disposition')} sin `targets`; "
+                           "sólo una descartada puede quedarse sin registro")
 
     definidas: dict[str, dict] = {}
     for r in spec.get("records", []):
@@ -366,11 +377,15 @@ def construir(spec_path: Path, corpus: str) -> dict:
                            "los asigna convertir.py")
         if r["file"] not in PREFIJO or r["file"] == "sources.jsonl":
             errores.append(f"{r['key']}: fichero {r['file']} fuera de lo que convierte este paso")
+        if not r.get("rows"):
+            errores.append(f"{r['key']}: sin fila de origen (`rows`); la procedencia sale de ahí")
         for fila in r.get("rows", []):
             if fila not in filas:
                 errores.append(f"{r['key']}: la fila {fila} no es de la sección {sec}")
         definidas[r["key"]] = r
     for fila, destino in spec.get("rows", {}).items():
+        if destino.get("destination") not in DESTINOS:
+            errores.append(f"{fila}: destino {destino.get('destination')!r} fuera de A–I")
         for k in destino.get("keys", []):
             if k not in definidas:
                 errores.append(f"{fila}: la clave {k} no está definida")
@@ -418,13 +433,22 @@ def construir(spec_path: Path, corpus: str) -> dict:
         return f"{prefijo}-{n:06d}"
 
     fuentes_nuevas: list[dict] = []
+    distintas = []
     for clave in sorted(citadas, key=lambda s: int(s[1:])):
         if clave in existentes:
+            previa = proy[existentes[clave]][1]
+            activa = fuente_de_apendice(por_clave[clave], col_doi)
+            cambios = [k for k in BIBLIOGRAFIA if previa.get(k) != activa[k]]
+            if cambios:
+                distintas.append(f"{existentes[clave]} ({clave}): {', '.join(cambios)}")
             ids[f"@{clave}"] = existentes[clave]
         else:
             rid = nuevo("SRC")
             ids[f"@{clave}"] = rid
             fuentes_nuevas.append({"id": rid, **fuente_de_apendice(por_clave[clave], col_doi)})
+    if distintas:
+        raise SystemExit("ERROR fuentes que ya existen y el apéndice A activo describe de otra manera; "
+                         "hay que actualizarlas antes de convertir:\n  " + "\n  ".join(distintas))
     for r in spec.get("records", []):
         ids[r["key"]] = nuevo(PREFIJO[r["file"]])
 

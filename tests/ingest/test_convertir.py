@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import argparse
 import contextlib
+import csv
 import io
 import json
 import shutil
@@ -188,11 +189,15 @@ class Convertir(unittest.TestCase):
             self.entorno.construir(self.entorno.spec(section="01"))
         self.assertIn("no se ha ingerido", str(e.exception))
 
+    def fuente_del_apendice(self, clave: str) -> dict:
+        with (MINI / "data" / "apendices" / "A_fuentes.csv").open(encoding="utf-8", newline="") as fh:
+            filas = list(csv.DictReader(fh))
+        col_doi = next(c for c in filas[0] if c.strip().lower().startswith("doi"))
+        return convertir.fuente_de_apendice(next(f for f in filas if f["clave"].strip() == clave), col_doi)
+
     def test_una_fuente_que_ya_existe_se_reutiliza(self):
         (self.entorno.records / "sources.jsonl").write_text(json.dumps({
-            "id": "SRC-000007", "citation_key": "S01", "title": "Trabajo ficticio uno",
-            "source_type": "primary_research", "verification_status": "pending_verification",
-            "record_status": "active"}) + "\n", encoding="utf-8")
+            "id": "SRC-000007", **self.fuente_del_apendice("S01")}) + "\n", encoding="utf-8")
         r = self.entorno.construir(self.entorno.spec())
         recs = self.registros(r)
         self.assertFalse([s for s in recs if s.startswith("SRC-")])
@@ -312,6 +317,67 @@ class Convertir(unittest.TestCase):
         r = self.entorno.construir(spec)
         [claim] = [rec for _, rec in r["salida"] if rec["id"].startswith("CLAIM-")]
         self.assertEqual(claim["scope"]["classification_view_ids"], ["TAXVIEW-000001"])
+
+    def test_un_registro_sin_fila_de_origen_se_rechaza(self):
+        spec = self.entorno.spec()
+        spec["records"][0]["rows"] = []
+        with self.assertRaises(SystemExit) as e:
+            self.entorno.construir(spec)
+        self.assertIn("@Alfa", str(e.exception))
+        self.assertIn("fila", str(e.exception))
+
+    def test_un_destino_fuera_del_vocabulario_se_rechaza(self):
+        spec = self.entorno.spec()
+        spec["rows"]["C-001"]["destination"] = "J"
+        with self.assertRaises(SystemExit) as e:
+            self.entorno.construir(spec)
+        self.assertIn("C-001", str(e.exception))
+        self.assertIn("J", str(e.exception))
+
+    def test_una_mencion_resuelta_sin_destino_se_rechaza(self):
+        spec = self.entorno.spec()
+        spec["mentions"]["FIX-Alfa"]["targets"] = []
+        with self.assertRaises(SystemExit) as e:
+            self.entorno.construir(spec)
+        self.assertIn("FIX-Alfa", str(e.exception))
+
+    def test_una_fuente_que_difiere_del_apendice_se_rechaza(self):
+        # La versión activa del apéndice corrigió la referencia: reutilizar la
+        # fuente vieja haría citar datos que el corpus congelado ya no dice.
+        (self.entorno.records / "sources.jsonl").write_text(json.dumps({
+            "id": "SRC-000007", **self.fuente_del_apendice("S01"),
+            "title": "Un título que el apéndice no tiene"}) + "\n", encoding="utf-8")
+        with self.assertRaises(SystemExit) as e:
+            self.entorno.construir(self.entorno.spec())
+        self.assertIn("SRC-000007", str(e.exception))
+        self.assertIn("title", str(e.exception))
+
+    def test_delta_no_se_revierte_fuera_del_orden_de_la_cadena(self):
+        ruta = self.entorno.tmp / "spec.json"
+        ruta.write_text(json.dumps(self.entorno.spec(), ensure_ascii=False), encoding="utf-8")
+        with contextlib.redirect_stdout(io.StringIO()):
+            convertir.convertir(ruta, str(MINI), False)
+        deltas = self.entorno.tmp / "deltas"
+        originales = (delta_mod.MANIFEST, delta_mod.HISTORIAL)
+        delta_mod.MANIFEST, delta_mod.HISTORIAL = self.entorno.tmp / "dataset.json", deltas / "historial.jsonl"
+        try:
+            with contextlib.redirect_stdout(io.StringIO()):
+                # Aplicar la conversión antes que la sección tampoco vale.
+                self.assertEqual(delta_mod.cmd(deltas / "SEC-000001-conversion.json", False, False), 1)
+                self.assertEqual(delta_mod.cmd(deltas / "SEC-000001.json", False, False), 0)
+                self.assertEqual(delta_mod.cmd(deltas / "SEC-000001-conversion.json", False, False), 0)
+                antes = {f.name: f.read_bytes() for f in self.entorno.records.glob("*.jsonl")}
+                salida = io.StringIO()
+                with contextlib.redirect_stdout(salida):
+                    self.assertEqual(delta_mod.cmd(deltas / "SEC-000001.json", True, False), 1)
+                self.assertIn("SEC-000001-conversion.json", salida.getvalue())
+                self.assertEqual({f.name: f.read_bytes() for f in self.entorno.records.glob("*.jsonl")}, antes)
+                self.assertEqual(delta_mod.cmd(deltas / "SEC-000001-conversion.json", True, False), 0)
+                self.assertEqual(delta_mod.cmd(deltas / "SEC-000001.json", True, False), 0)
+        finally:
+            delta_mod.MANIFEST, delta_mod.HISTORIAL = originales
+        self.assertEqual(json.loads((self.entorno.tmp / "dataset.json").read_text(encoding="utf-8"))
+                         ["dataset_revision"], "REV-000000")
 
     def test_la_conversion_va_detras_del_delta_de_la_seccion(self):
         r = self.entorno.construir(self.entorno.spec())
