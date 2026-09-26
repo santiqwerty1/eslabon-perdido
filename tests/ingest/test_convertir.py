@@ -808,6 +808,50 @@ class Convertir(unittest.TestCase):
             self.assertEqual(delta_mod.cmd(deltas / "SEC-000009-conversion.json", False, True), 1)
         self.assertIn("historial", salida.getvalue())
 
+    def test_delta_exige_revisiones_de_seis_digitos(self):
+        ruta = self.entorno.tmp / "deltas" / "SEC-000001.json"
+        d = json.loads(ruta.read_text(encoding="utf-8"))
+        d["dataset_revision_after"] = "REV-1"
+        ruta.write_text(json.dumps(d), encoding="utf-8")
+        with contextlib.redirect_stdout(io.StringIO()):
+            self.assertEqual(delta_mod.cmd(ruta, False, True), 1)
+
+    def test_delta_comprueba_el_estado_previo_de_cada_registro(self):
+        # Si el registro ya no está como el delta espera, aplicar o revertir
+        # pisaría un cambio que el delta no conoce. No se escribe nada.
+        ruta = self.entorno.tmp / "spec.json"
+        ruta.write_text(json.dumps(self.entorno.spec(), ensure_ascii=False), encoding="utf-8")
+        deltas = self.entorno.tmp / "deltas"
+        menciones = self.entorno.records / "mentions.jsonl"
+        with contextlib.redirect_stdout(io.StringIO()):
+            convertir.convertir(ruta, str(MINI), False)
+            self.assertEqual(delta_mod.cmd(deltas / "SEC-000001.json", False, False), 0)
+        original = menciones.read_bytes()
+        lineas = [json.loads(l) for l in original.decode("utf-8").splitlines()]
+        lineas[0]["notes"] = list(lineas[0].get("notes", [])) + ["cambio que el delta no conoce"]
+        menciones.write_text("".join(json.dumps(l, ensure_ascii=False) + "\n" for l in lineas), encoding="utf-8")
+        tocado = menciones.read_bytes()
+        for seco in (True, False):
+            salida = io.StringIO()
+            with contextlib.redirect_stdout(salida):
+                self.assertEqual(delta_mod.cmd(deltas / "SEC-000001-conversion.json", False, seco), 1)
+            self.assertIn(lineas[0]["id"], salida.getvalue())
+        self.assertEqual(menciones.read_bytes(), tocado)
+        # Y al revertir: el registro tiene que estar como lo dejó el delta.
+        menciones.write_bytes(original)
+        with contextlib.redirect_stdout(io.StringIO()):
+            self.assertEqual(delta_mod.cmd(deltas / "SEC-000001-conversion.json", False, False), 0)
+        convertida = menciones.read_bytes()
+        lineas = [json.loads(l) for l in convertida.decode("utf-8").splitlines()]
+        lineas[0]["notes"] = list(lineas[0].get("notes", [])) + ["otro cambio que el delta no conoce"]
+        menciones.write_text("".join(json.dumps(l, ensure_ascii=False) + "\n" for l in lineas), encoding="utf-8")
+        with contextlib.redirect_stdout(io.StringIO()):
+            self.assertEqual(delta_mod.cmd(deltas / "SEC-000001-conversion.json", True, False), 1)
+        menciones.write_bytes(convertida)
+        with contextlib.redirect_stdout(io.StringIO()):
+            self.assertEqual(delta_mod.cmd(deltas / "SEC-000001-conversion.json", True, False), 0)
+            self.assertEqual(delta_mod.cmd(deltas / "SEC-000001.json", True, False), 0)
+
     def test_el_fichero_de_conversion_tiene_que_estar_en_conversions(self):
         # El snapshot sólo registra knowledge/corpus/conversions/*.json: una
         # entrada revisada fuera de ahí no se podría recuperar ni verificar.
