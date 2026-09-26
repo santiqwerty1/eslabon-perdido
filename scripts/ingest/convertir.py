@@ -66,6 +66,7 @@ import ingest as base  # noqa: E402
 from parse_research import ACEPTACION, FUERZA, RESOLUCION, TIPO_FUENTE, VIGENCIA  # noqa: E402
 
 SCHEMAS = base.ROOT / "schemas" / "json-schema"
+VIEWS = base.ROOT / "knowledge" / "views"
 CONVERSIONS = base.CORPUS / "conversions"
 
 # Fichero -> prefijo de §16.3. Sólo los ficheros que una conversión puede escribir.
@@ -172,29 +173,42 @@ def registros(fichero: str) -> list[dict]:
     return [json.loads(l) for l in ruta.read_text(encoding="utf-8").splitlines() if l.strip()]
 
 
-def pendientes(fichero: str) -> list[dict]:
-    """Registros que añade a `fichero` algún delta sin aplicar todavía."""
-    manifiesto = json.loads(base.MANIFEST.read_text(encoding="utf-8")) if base.MANIFEST.exists() else {}
-    _, _, sin_aplicar = base.revision_siguiente(manifiesto)
-    out = []
-    for nombre in sin_aplicar:
-        d = json.loads((base.DELTAS / nombre).read_text(encoding="utf-8"))
-        out += [op["after"] for op in d.get("operations", [])
-                if op.get("file") == fichero and op.get("operation", "").startswith("ADD") and op.get("after")]
-    return out
+def proyeccion() -> dict[str, tuple[str, dict]]:
+    """Cada registro como quedará tras aplicar los deltas pendientes, por identificador.
 
-
-def existentes_por_id() -> dict[str, tuple[str, dict]]:
-    """Todo registro que ya existe o que añade un delta sin aplicar, por identificador."""
+    Los pendientes se reproducen en el orden de la cadena, altas y
+    actualizaciones: si dos conversiones sin aplicar enlazan el mismo registro,
+    la segunda tiene que partir del estado que deja la primera, o al aplicarlas
+    pisaría su enlace.
+    """
     out: dict[str, tuple[str, dict]] = {}
     for ruta in sorted(base.RECORDS.glob("*.jsonl")):
         for r in registros(ruta.name):
             if isinstance(r.get("id"), str):
                 out[r["id"]] = (ruta.name, r)
-    for fichero in PREFIJO:
-        for r in pendientes(fichero):
-            if isinstance(r.get("id"), str):
-                out[r["id"]] = (fichero, r)
+    manifiesto = json.loads(base.MANIFEST.read_text(encoding="utf-8")) if base.MANIFEST.exists() else {}
+    _, _, sin_aplicar = base.revision_siguiente(manifiesto)
+    for nombre in sin_aplicar:
+        d = json.loads((base.DELTAS / nombre).read_text(encoding="utf-8"))
+        for op in d.get("operations", []):
+            if isinstance(op.get("record_id"), str) and isinstance(op.get("after"), dict):
+                out[op["record_id"]] = (op.get("file"), op["after"])
+    return out
+
+
+def ids_de_vistas() -> set[str]:
+    """Las vistas viven en knowledge/views/, no en records/, y también se citan."""
+    out: set[str] = set()
+    if not VIEWS.exists():
+        return out
+    for ruta in sorted(VIEWS.rglob("*.json*")):
+        texto = ruta.read_text(encoding="utf-8")
+        docs = ([json.loads(l) for l in texto.splitlines() if l.strip()] if ruta.suffix == ".jsonl"
+                else [json.loads(texto)] if texto.strip() else [])
+        for doc in docs:
+            for r in (doc if isinstance(doc, list) else [doc]):
+                if isinstance(r, dict) and isinstance(r.get("id"), str):
+                    out.add(r["id"])
     return out
 
 
@@ -386,8 +400,9 @@ def construir(spec_path: Path, corpus: str) -> dict:
     if no_estan:
         raise SystemExit(f"ERROR fuentes citadas que el apéndice A no tiene: {', '.join(no_estan)}")
 
-    existentes = {r.get("citation_key"): r["id"] for r in registros("sources.jsonl") + pendientes("sources.jsonl")
-                  if r.get("citation_key")}
+    proy = proyeccion()
+    existentes = {r.get("citation_key"): rid for rid, (f, r) in proy.items()
+                  if f == "sources.jsonl" and r.get("citation_key")}
 
     # --- identificadores -----------------------------------------------------------
     rev_antes, rev_despues, sin_aplicar = base.revision_siguiente(
@@ -507,9 +522,9 @@ def construir(spec_path: Path, corpus: str) -> dict:
     # Un registro de otra sección se cita por su identificador. Si no existe, el
     # validador sólo lo detectaría en los `*_ids` de primer nivel: un sujeto, un
     # objeto o un participante colgando pasarían.
-    existentes_id = existentes_por_id()
+    existentes_id = proy
     conocidos = (set(por_id) | set(existentes_id) | base.ids_de_pasajes() | base.ids_de_secciones()
-                 | set(menciones))
+                 | set(menciones) | ids_de_vistas())
     colgando = []
     for fichero, rec in salida:
         colgando += [f"{rec['id']} → {x}" for x in sorted(literales(rec) - conocidos)]

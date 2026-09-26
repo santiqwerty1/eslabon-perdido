@@ -308,7 +308,10 @@ class Congelacion(unittest.TestCase):
         (self.tmp / "knowledge" / "deltas").mkdir(parents=True)
         (self.tmp / "knowledge" / "deltas" / "historial.jsonl").write_text("{}\n", encoding="utf-8")
         (self.tmp / "knowledge" / "deltas" / "SEC-000001.json").write_text("{}\n", encoding="utf-8")
+        (self.tmp / "knowledge" / "corpus" / "conversions").mkdir(parents=True)
+        (self.tmp / "knowledge" / "corpus" / "conversions" / "corredor-06.json").write_text("{}\n", encoding="utf-8")
         ficheros = snapshot.gather()["files"]
+        self.assertIn("knowledge/corpus/conversions/corredor-06.json", ficheros)
         self.assertIn("knowledge/deltas/SEC-000001.json", ficheros)
         self.assertIn("knowledge/corpus/sections/SEC-000001.registro.csv", ficheros)
         self.assertIn("knowledge/deltas/historial.jsonl", ficheros)

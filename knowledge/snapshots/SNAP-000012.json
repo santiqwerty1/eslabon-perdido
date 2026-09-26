@@ -44,6 +44,7 @@
     "knowledge/records/traits.jsonl": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
     "knowledge/corpus/manifests/dataset.json": "sha256:0c2b6f83e0f1001e2c7a570cf26db51858ddfc66e51977399e2771b412a823af",
     "knowledge/corpus/sections/SEC-000001.registro.csv": "sha256:dc54b334db8573ea2bb085ec8e9f5b5b89ca3b41c2566a771bec7506a1a8897c",
+    "knowledge/corpus/conversions/corredor-06.json": "sha256:e8100ba889ecfcc8d3f000a074bccdf6617bb4ceeb45763ed392b260257574e0",
     "knowledge/deltas/SEC-000001-conversion.json": "sha256:7ed425e9368bd5ccd5c851342a77300c560ff1f57aa23a1c822d3b96b4cf0bec",
     "knowledge/deltas/SEC-000001.json": "sha256:e1bd6fda2e74f873149ccbfb783199841562fc0e6b1f730f3aefbc6b602198db",
     "knowledge/deltas/historial.jsonl": "sha256:e174a47cd7fb7f0885977f70eb4dd65c5112bbc7952b13ddae6c49a5fe41c88c",
