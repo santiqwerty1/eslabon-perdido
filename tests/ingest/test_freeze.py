@@ -491,6 +491,46 @@ class Congelacion(unittest.TestCase):
         delta.write_text('{"ops": [], "editado": true}\n', encoding="utf-8")
         self.assertEqual(self.ejecutar(lambda a: snapshot.verify(None)), 1)
 
+    def conversion_revertida(self):
+        snapshot, deltas = self.snapshot_con_deltas()
+        conversions = self.tmp / "knowledge" / "corpus" / "conversions"
+        conversions.mkdir(parents=True)
+        fichero = conversions / "corredor-06.json"
+        fichero.write_text('{"section": "06"}\n', encoding="utf-8")
+        primera = deltas / "SEC-000001-conversion.json"
+        primera.write_text(json.dumps({"conversion": {"spec": {
+            "path": "knowledge/corpus/conversions/corredor-06.json", "sha256": snapshot.digest(fichero)}}}),
+            encoding="utf-8")
+        lineas = [{"delta": primera.name, "accion": "aplicar", "revision": "REV-000001",
+                   "sha256": snapshot.digest(primera)},
+                  {"delta": primera.name, "accion": "revertir", "revision": "REV-000000"}]
+        (deltas / "historial.jsonl").write_text("".join(json.dumps(l) + "\n" for l in lineas), encoding="utf-8")
+        return snapshot, deltas, fichero, lineas
+
+    def test_una_conversion_revertida_sigue_atada_a_su_fichero(self):
+        snapshot, deltas, fichero, _ = self.conversion_revertida()
+        self.assertEqual(snapshot.conversiones_alteradas(), [])
+        fichero.write_text('{"section": "06", "editado": true}\n', encoding="utf-8")
+        self.assertEqual(len(snapshot.conversiones_alteradas()), 1)
+
+    def test_el_reintento_tras_revertir_manda_sobre_el_fichero(self):
+        # Revertir sirve para corregir el fichero y reintentar: el reintento
+        # guarda el hash nuevo y es el que se comprueba.
+        snapshot, deltas, fichero, lineas = self.conversion_revertida()
+        fichero.write_text('{"section": "06", "corregido": true}\n', encoding="utf-8")
+        reintento = deltas / "SEC-000001-conversion-2.json"
+        reintento.write_text(json.dumps({"conversion": {"spec": {
+            "path": "knowledge/corpus/conversions/corredor-06.json", "sha256": snapshot.digest(fichero)}}}),
+            encoding="utf-8")
+        self.assertEqual(snapshot.conversiones_alteradas(), [])  # reintento sin aplicar todavía
+        lineas.append({"delta": reintento.name, "accion": "aplicar", "revision": "REV-000001",
+                       "sha256": snapshot.digest(reintento)})
+        (deltas / "historial.jsonl").write_text("".join(json.dumps(l) + "\n" for l in lineas), encoding="utf-8")
+        self.assertEqual(snapshot.conversiones_alteradas(), [])
+        fichero.write_text('{"section": "06", "otra vez": true}\n', encoding="utf-8")
+        [problema] = snapshot.conversiones_alteradas()
+        self.assertIn("SEC-000001-conversion-2.json", problema)
+
     def test_el_snapshot_cubre_la_congelacion_activa(self):
         spec = importlib.util.spec_from_file_location("snapshot", ROOT / "scripts" / "snapshot" / "snapshot.py")
         snapshot = importlib.util.module_from_spec(spec)
