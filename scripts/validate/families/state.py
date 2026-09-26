@@ -167,12 +167,33 @@ def _texts(rec: dict, keys) -> list[str]:
 
 # --- 1. registros superados conservados --------------------------------------
 
+# Las operaciones que dan de alta un registro: las de modo «add» de
+# scripts/ingest/delta.py (OPERATIONS). Revertirlas lo retira.
+ADD_OPERATIONS = {"ADD_RECORD", "ADD_CLAIM", "ADD_EVIDENCE", "ADD_EVENT", "ADD_HYPOTHESIS", "ADD_SOURCE",
+                  "ADD_ISSUE", "BUILD_VIEW"}
+
+
+def _aplicados_en(lineas: list[bytes]) -> set[str]:
+    """Los deltas aplicados según esas líneas del historial: su última acción es «aplicar»."""
+    ultima: dict[str, str] = {}
+    for linea in lineas:
+        try:
+            h = json.loads(linea) if linea.strip() else None
+        except json.JSONDecodeError:
+            continue
+        if isinstance(h, dict) and isinstance(h.get("delta"), str):
+            ultima[h["delta"]] = h.get("accion")
+    return {d for d, a in ultima.items() if a == "aplicar"}
+
+
 def _retirados_despues(snap: dict, deltas_dir: Path) -> dict[str, int]:
     """Lo que retiraron, por recuento, las reversiones posteriores al snapshot.
 
     El historial sólo crece y el snapshot guarda su hash: lo que el snapshot ya
-    conocía es el prefijo con ese hash, y lo que viene detrás pasó después. Sin
-    ese hash no se sabe qué es posterior, y no se descuenta nada.
+    conocía es el prefijo con ese hash. Sólo cuenta lo que el snapshot incluía
+    y ya no está: los deltas aplicados en ese corte que hoy no lo están. Uno
+    aplicado y revertido después no estaba en el snapshot y no descuenta nada.
+    Sin ese hash no se sabe qué es posterior, y no se descuenta nada.
     """
     historial = deltas_dir / "historial.jsonl"
     registrado = (snap.get("files") or {}).get("knowledge/deltas/historial.jsonl")
@@ -184,19 +205,13 @@ def _retirados_despues(snap: dict, deltas_dir: Path) -> dict[str, int]:
     if corte is None:
         return {}
     retirados: dict[str, int] = {}
-    for linea in lineas[corte:]:
+    for nombre in sorted(_aplicados_en(lineas[:corte]) - _aplicados_en(lineas)):
         try:
-            h = json.loads(linea) if linea.strip() else None
-        except json.JSONDecodeError:
-            continue
-        if not isinstance(h, dict) or h.get("accion") != "revertir" or not isinstance(h.get("delta"), str):
-            continue
-        try:
-            delta = json.loads((deltas_dir / h["delta"]).read_text(encoding="utf-8"))
+            delta = json.loads((deltas_dir / nombre).read_text(encoding="utf-8"))
         except (OSError, json.JSONDecodeError):
             continue
         for op in delta.get("operations") or []:
-            if not isinstance(op, dict) or op.get("operation") != "ADD_RECORD":
+            if not isinstance(op, dict) or op.get("operation") not in ADD_OPERATIONS:
                 continue
             for key, files in COUNT_FILES.items():
                 if op.get("file") in files:
