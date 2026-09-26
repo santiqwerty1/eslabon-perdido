@@ -85,6 +85,17 @@ class Identidad(unittest.TestCase):
                                              "preferred_label": "esterano", "alias_ids": ["CLADE-000901"]}]}, rep)
         self.assertTrue(any("alias" in e and "MOL-000901" in e for e in rep.errors), rep.errors)
 
+    def test_una_molecula_no_es_ancestro_ni_miembro_de_nada(self):
+        # Los predicados que la lista de especímenes deja pasar tampoco valen.
+        for pred in ("possible_ancestor_of", "possible_sampled_ancestor_of", "member_of",
+                     "chronological_continuation_of", "acquires_trait"):
+            [e] = self.errores([afirmacion("CLAIM-000901", "MOL-000901", pred, {"entity_id": "CLADE-000901"})])
+            self.assertIn(pred, e)
+
+    def test_una_molecula_en_un_ambiente_pasa(self):
+        self.assertEqual(self.errores([afirmacion("CLAIM-000901", "MOL-000901", "occurs_in",
+                                                  {"category": "rocas arcaicas"})]), [])
+
     def test_una_molecula_clasificada_en_una_categoria_pasa(self):
         # «interpretados como biomarcadores singenéticos» (C-741): una
         # categoría, no un taxón.
