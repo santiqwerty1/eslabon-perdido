@@ -183,16 +183,20 @@ def main() -> int:
     # Los bordes del diff —filas que un diff equivocado haría desaparecer sin
     # aviso— y la ingestión de una sección del corredor sobre corredor-mini.
     pruebas = sorted((ROOT / "tests" / "ingest").glob("test_*.py"))
+    # De tests/validation/ sólo las que pasan en la base: las de estado,
+    # separación, geografía, hipótesis y evidencia arrastran fallos anteriores
+    # y se incorporarán cuando se corrijan.
+    pruebas += [ROOT / "tests" / "validation" / "test_reversiones.py"]
     if pruebas:
         import subprocess
-        print(f"\n{DIM}ingestión — congelación, diff y secciones del corredor{RESET}")
+        print(f"\n{DIM}ingestión y validación — congelación, diff, secciones del corredor y reversiones{RESET}")
         for prueba in pruebas:
             r = subprocess.run([sys.executable, str(prueba)], capture_output=True, text=True)
             resumen = (r.stderr.strip().splitlines() or ["?"])[-1]
             marca = f"{GREEN}PASA{RESET}" if r.returncode == 0 else f"{RED}FALLA{RESET}"
             print(f"  {marca}  {prueba.name}  {DIM}({resumen}){RESET}")
             if r.returncode != 0:
-                fallos.append(f"ingest/{prueba.name}")
+                fallos.append(f"{prueba.parent.name}/{prueba.name}")
                 print(r.stderr[-3000:])
         total_ver += len(pruebas)
 
