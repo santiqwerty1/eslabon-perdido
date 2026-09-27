@@ -109,7 +109,8 @@ class Informe(unittest.TestCase):
 
     def test_una_entidad_retirada_lleva_sus_menciones(self):
         [e] = self.r["entities"]
-        self.assertEqual((e["label"], e["state"], e["section"], e["row"]), ("FIX-Omega", "retirada", "00", "C-003"))
+        self.assertEqual((e["label"], e["state"], e["section"], e["row_before"], e["row_after"]),
+                         ("FIX-Omega", "retirada", "00", "C-003", None))
         self.assertEqual(len(e["mention_ids"]), 1)
 
     def test_los_pasajes_que_cambian_y_donde_se_cita_ahora_cada_fila(self):
@@ -164,7 +165,11 @@ class Informe(unittest.TestCase):
         v = self.version({"data/afirmaciones/01.csv": self.texto("data/afirmaciones/01.csv") + fila,
                           "data/apendices/D_fechas.csv": '"evento","filas"\n"edad de FIX-Zeta","C-006"\n'})
         r = absorber.informe(str(MINI), str(v))
-        self.assertEqual([x for x in r["appendices"] if x["path"].endswith("D_fechas.csv")], [])
+        # El cambio del apéndice no desaparece: va con la fila nueva, sin
+        # registros de la vieja.
+        [d] = [x for x in r["appendices"] if x["path"].endswith("D_fechas.csv")]
+        self.assertEqual((d["rows"], d["new_rows"], d["record_ids"], d["sections"]), ([], ["C-006"], [], ["01"]))
+        self.assertEqual(absorber.esqueleto(r)["appendices"][d["path"]][0]["new_rows"], ["C-006"])
         self.assertIn("C-006", [n["row"] for n in r["sections"]["01"]["new_rows"]])
 
     def test_una_entidad_que_cambia_de_primera_fila_afecta_a_las_dos_secciones(self):
@@ -175,6 +180,29 @@ class Informe(unittest.TestCase):
         self.assertEqual(set(delta), {"00", "01"})
         self.assertTrue(delta["00"]["mention_ids"])
         self.assertEqual(delta["01"]["mention_ids"], [])
+
+    def test_una_entidad_que_cambia_de_primera_fila_en_su_seccion_conserva_las_dos(self):
+        b = self.texto("data/apendices/B_entidades.csv").replace('"FIX-Gamma","clado","n/a","n/a","C-002"',
+                                                                  '"FIX-Gamma","clado","n/a","n/a","C-009"')
+        r = absorber.informe(str(MINI), str(self.version({"data/apendices/B_entidades.csv": b})))
+        [gamma] = [e for e in r["entities"] if e["label"] == "FIX-Gamma"]
+        self.assertEqual((gamma["section"], gamma["side"], gamma["row_before"], gamma["row_after"]),
+                         ("00", "ambos", "C-002", "C-009"))
+        [x] = [x for x in absorber.esqueleto(r)["entities"] if x["label"] == "FIX-Gamma"]
+        self.assertEqual((x["row_before"], x["row_after"]), ("C-002", "C-009"))
+
+    def test_un_delta_aplicado_y_editado_no_da_correspondencia(self):
+        # Los registros salieron del delta que se aplicó; si el fichero cambió,
+        # su mapa de filas ya no los describe.
+        ruta = self.tmp / "deltas" / "SEC-000002.json"
+        original = ruta.read_bytes()
+        ruta.write_bytes(original + b"\n")
+        try:
+            with self.assertRaises(SystemExit) as e:
+                absorber.informe(str(MINI), str(MINI_V2))
+        finally:
+            ruta.write_bytes(original)
+        self.assertIn("SEC-000002.json", str(e.exception))
 
     def test_una_fila_que_cambia_de_seccion_desfasa_los_dos_borradores(self):
         seccion0 = self.texto("data/afirmaciones/00.csv").splitlines(keepends=True)
