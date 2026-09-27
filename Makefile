@@ -10,7 +10,7 @@
 VENV   := .venv
 PYTHON := $(shell [ -x $(VENV)/bin/python ] && echo $(VENV)/bin/python || echo python3)
 
-.PHONY: help setup validate verify snapshot test check clean-generated ingest corpus-freeze corpus-verify corpus-diff corpus-impact convert
+.PHONY: help setup validate verify snapshot test check clean-generated ingest corpus-freeze corpus-verify corpus-diff corpus-impact corpus-absorb convert
 
 help: ## Muestra estos objetivos
 	@grep -hE '^[a-z-]+:.*?## ' $(MAKEFILE_LIST) \
@@ -67,6 +67,10 @@ corpus-diff: ## Qué cambió entre dos versiones: make corpus-diff ANTES=../corr
 corpus-impact: ## Qué registros toca una versión nueva: make corpus-impact ANTES=../corredor@af7e799 DESPUES=../corredor@ref
 	@test -n "$(ANTES)" -a -n "$(DESPUES)" || { echo "uso: make corpus-impact ANTES=ruta@congelación-activa DESPUES=ruta[@ref]"; exit 1; }
 	@$(PYTHON) scripts/ingest/absorber.py informe "$(ANTES)" "$(DESPUES)" $(if $(SOBRESCRIBIR),--sobrescribir,)
+
+corpus-absorb: ## Construye el delta de absorción: make corpus-absorb FICHERO=knowledge/corpus/absorptions/… ANTES=… DESPUES=… [DRY=1]
+	@test -n "$(FICHERO)" -a -n "$(ANTES)" -a -n "$(DESPUES)" || { echo "uso: make corpus-absorb FICHERO=fichero-de-absorción ANTES=ruta@congelación-activa DESPUES=ruta@ref [DRY=1]"; exit 1; }
+	@$(PYTHON) scripts/ingest/absorber.py construir "$(FICHERO)" "$(ANTES)" "$(DESPUES)" $(if $(DRY),--dry-run,)
 
 snapshot: ## Crea un snapshot nuevo del estado actual
 	@$(PYTHON) scripts/snapshot/snapshot.py create --label "$(LABEL)"
