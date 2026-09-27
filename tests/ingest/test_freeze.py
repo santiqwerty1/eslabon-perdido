@@ -169,6 +169,20 @@ class Informe(unittest.TestCase):
         self.assertEqual([x["estado"] for x in inf["prosa"]], ["citas desactualizadas"])
         self.assertIn("prosa", inf["afirmaciones"]["secciones_afectadas"]["00"])
 
+    def test_el_informe_trae_la_correspondencia_de_todas_las_filas(self):
+        # Para absorber una versión hay que seguir cada fila, también las que no
+        # cambiaron: sin ellas no se sabe qué registros siguen valiendo.
+        a = corpus(self.tmp / "a", {"00": [fila("C-001", "Uno."), fila("C-002", "Dos."), fila("C-003", "Tres.")]})
+        b = corpus(self.tmp / "b", {"00": [fila("C-001", "Uno."), fila("C-003", "Dos."),
+                                           fila("C-004", "Tres, corregida.")]})
+        inf = self.informe(a, b)
+        self.assertEqual(inf["afirmaciones"]["correspondencia"], [
+            {"de": "C-001", "a": "C-001", "via": "número y contenido"},
+            {"de": "C-002", "a": "C-003", "via": "contenido"},
+            {"de": "C-003", "a": "C-004", "via": "posición"},
+        ])
+        self.assertNotIn("mapa", inf["afirmaciones"])
+
     def test_un_cambio_solo_de_prosa_manda_reingerir_la_seccion(self):
         filas = {"00": [fila("C-001", "Uno.")]}
         a = corpus(self.tmp / "a", filas, prosa="Uno. [C-001]\n")

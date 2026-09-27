@@ -481,11 +481,32 @@ def comparar_afirmaciones(a: Path, b: Path) -> dict:
         "nuevas": nuevas_l,
         "retiradas": retiradas_l,
         "secciones_afectadas": {s: dict(c) for s, c in sorted(afectadas.items())},
+        # Todas las filas emparejadas, también las que no cambiaron: con ella se
+        # sigue cada fila de una versión a la otra (DEC-059).
+        "correspondencia": [{"de": i, "a": j, "via": via} for i, j, via in pares],
         "mapa": mapa,
     }
 
 
 def comparar_registro(pa: Path | None, pb: Path | None, mapa: dict[str, str]) -> dict:
+    res, filas = cambios_de_registro(pa, pb, mapa)
+    # Las filas que cambiaron de verdad, en su versión: sus citas C-… dicen qué
+    # secciones del corredor las usan, y por tanto cuáles hay que reingerir.
+    res["citas_viejas"] = sorted({c for f in filas if f["antes"] for v in f["antes"].values()
+                                  for c in C_REF.findall(v)})
+    res["citas_nuevas"] = sorted({c for f in filas if f["despues"] for v in f["despues"].values()
+                                  for c in C_REF.findall(v)})
+    return res
+
+
+def cambios_de_registro(pa: Path | None, pb: Path | None,
+                        mapa: dict[str, str]) -> tuple[dict, list[dict]]:
+    """El recuento de `comparar_registro` y las filas que cambiaron, una a una.
+
+    Cada fila cambiada es `{estado, clave, antes, despues}`: modificada (las
+    dos), retirada (sólo `antes`) o nueva (sólo `despues`), con los rangos ya
+    expandidos. Sin clave única, una corrección es una retirada y una nueva.
+    """
     cab_a, filas_a = leer_csv(pa) if pa and pa.exists() else ([], [])
     cab_b, filas_b = leer_csv(pb) if pb and pb.exists() else ([], [])
     clave = (cab_b or cab_a or [None])[0]
@@ -505,11 +526,7 @@ def comparar_registro(pa: Path | None, pb: Path | None, mapa: dict[str, str]) ->
              and len({f[clave] for f in filas_b}) == len(filas_b))
     res = {"filas": [len(filas_a), len(filas_b)], "cabecera_cambiada": bool(cab_a and cab_b and cab_a != cab_b)}
 
-    # Las filas que cambiaron de verdad, en su versión: sus citas C-… dicen qué
-    # secciones del corredor las usan, y por tanto cuáles hay que reingerir.
-    viejas_cambiadas: list[dict] = []
-    nuevas_cambiadas: list[dict] = []
-
+    filas: list[dict] = []
     if unica:
         va = {t[clave]: (f, t) for f, t in zip(filas_a, traducidas)}
         vb = {f[clave]: f for f in filas_b}
@@ -522,8 +539,9 @@ def comparar_registro(pa: Path | None, pb: Path | None, mapa: dict[str, str]) ->
             "modificadas": modificadas,
             "solo_renumeracion": sorted(k for k in comunes if va[k][0] != vb[k] and va[k][1] == vb[k]),
         })
-        viejas_cambiadas = [va[k][0] for k in (*res["retiradas"], *modificadas)]
-        nuevas_cambiadas = [vb[k] for k in (*res["nuevas"], *modificadas)]
+        filas = ([{"estado": "retirada", "clave": k, "antes": va[k][0], "despues": None} for k in res["retiradas"]]
+                 + [{"estado": "modificada", "clave": k, "antes": va[k][0], "despues": vb[k]} for k in modificadas]
+                 + [{"estado": "nueva", "clave": k, "antes": None, "despues": vb[k]} for k in res["nuevas"]])
     else:
         # Sin clave única (F_magnitudes repite magnitud): una fila corregida
         # aparece como una retirada más una nueva, y así se declara.
@@ -545,15 +563,15 @@ def comparar_registro(pa: Path | None, pb: Path | None, mapa: dict[str, str]) ->
             "solo_renumeracion": renumeradas,
         })
         solo_a, solo_b = fa - fb, fb - fa
-        viejas_cambiadas = [f for f, t in zip(filas_a, traducidas) if solo_a[forma(t)] > 0]
-        nuevas_cambiadas = [f for f in filas_b if solo_b[forma(f)] > 0]
-    res["citas_viejas"] = sorted({c for f in viejas_cambiadas for v in f.values() for c in C_REF.findall(v)})
-    res["citas_nuevas"] = sorted({c for f in nuevas_cambiadas for v in f.values() for c in C_REF.findall(v)})
-    return res
+        filas = ([{"estado": "retirada", "clave": None, "antes": f, "despues": None}
+                  for f, t in zip(filas_a, traducidas) if solo_a[forma(t)] > 0]
+                 + [{"estado": "nueva", "clave": None, "antes": None, "despues": f}
+                    for f in filas_b if solo_b[forma(f)] > 0])
+    return res, filas
 
 
-def cmd_diff(args) -> int:
-    a, b = abrir(args.anterior), abrir(args.nueva)
+def diferencia(a: Fuente, b: Fuente) -> dict:
+    """Qué cambió de `a` a `b`: el informe que `diff` imprime y escribe."""
     fa = {f["path"]: f["sha256"] for f in ficheros(a.base)}
     fb = {f["path"]: f["sha256"] for f in ficheros(b.base)}
     cambiados = sorted(p for p in fa.keys() & fb.keys() if fa[p] != fb[p])
@@ -661,7 +679,11 @@ def cmd_diff(args) -> int:
         "otros": [{"path": p, "estado": estado(p)} for p in sorted(tocados)
                   if not any(p.startswith(c + "/") for c in conocidas)],
     }
+    return informe
 
+
+def cmd_diff(args) -> int:
+    informe = diferencia(abrir(args.anterior), abrir(args.nueva))
     imprimir(informe, args.detalle)
     if args.json:
         Path(args.json).write_text(json.dumps(informe, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
