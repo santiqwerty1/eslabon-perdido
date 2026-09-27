@@ -205,6 +205,34 @@ def correspondencia() -> dict[str, dict]:
     return secciones
 
 
+def anclar(ids: list[str], citadas: dict, por_marcador: dict[str, object], indice: dict[str, dict],
+           leer_tabla) -> dict[str, tuple[list, str]]:
+    """De qué pasajes cuelga cada fila, y por qué vía.
+
+    Del párrafo que la cita; si sólo la cita una tabla de síntesis, del párrafo
+    donde se inserta esa tabla; si no la cita nada, del que inserta el registro
+    de la sección o, sin él, del primero. `citadas` va de pasaje a las filas que
+    cita, en el orden de la prosa; `por_marcador`, de tabla al pasaje que la
+    inserta. La absorción usa la misma regla sobre la versión nueva (DEC-059).
+    """
+    por_tabla = {tid: citas(leer_tabla(indice[tid]["csv_path"]))
+                 for tid in por_marcador if tid in indice and indice[tid].get("category") != "claims"}
+    del_registro = next((tid for tid in por_marcador if indice.get(tid, {}).get("category") == "claims"), None)
+    salida = {}
+    for i in ids:
+        pids, via = [pid for pid, cs in citadas.items() if i in cs], "prosa"
+        if not pids:
+            tablas = [tid for tid, cs in por_tabla.items() if i in cs]
+            pids, via = [por_marcador[t] for t in tablas], "tabla " + ", ".join(tablas)
+        if not pids:
+            if del_registro:
+                pids, via = [por_marcador[del_registro]], "sólo el registro"
+            else:
+                pids, via = [next(iter(citadas))], "sólo el registro, sin marcador en la prosa"
+        salida[i] = (pids, via)
+    return salida
+
+
 def localizar(etiqueta: str, pasaje: dict) -> tuple[int, int, str | None]:
     """Offsets de la etiqueta dentro del pasaje, y una nota si no es literal.
 
@@ -331,22 +359,10 @@ def construir(spec: str, seccion: str, ruta_congelacion: Path | None = None) -> 
     if sin_indice:
         raise SystemExit(f"ERROR la prosa de la sección {sec} inserta tablas que no están en "
                          f"data/table_index.json: {', '.join(sin_indice)}")
-    por_tabla = {tid: citas(dentro(indice[tid]["csv_path"]).read_text(encoding="utf-8"))
-                 for tid in por_marcador if tid in indice and indice[tid].get("category") != "claims"}
     del_registro = next((tid for tid in por_marcador if indice.get(tid, {}).get("category") == "claims"), None)
-
-    origen_filas: dict[str, dict] = {}
-    for i in ids:
-        pids, via = [pid for pid, cs in citadas.items() if i in cs], "prosa"
-        if not pids:
-            tablas = [tid for tid, cs in por_tabla.items() if i in cs]
-            pids, via = [por_marcador[t] for t in tablas], "tabla " + ", ".join(tablas)
-        if not pids:
-            if del_registro:
-                pids, via = [por_marcador[del_registro]], "sólo el registro"
-            else:
-                pids, via = [pasajes[0]["id"]], "sólo el registro, sin marcador en la prosa"
-        origen_filas[i] = {"passage_ids": pids, "via": via, "mention_ids": []}
+    origen_filas = {i: {"passage_ids": pids, "via": via, "mention_ids": []}
+                    for i, (pids, via) in anclar(ids, citadas, por_marcador, indice,
+                                                 lambda r: dentro(r).read_text(encoding="utf-8")).items()}
 
     # --- pasos 3 y 4: una mención por etiqueta distinta de la sección ------
     menciones: list[dict] = []
