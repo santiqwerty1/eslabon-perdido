@@ -162,7 +162,7 @@ Una sección está terminada cuando la cobertura es completa, la procedencia est
 
 ## Cuando llega una versión nueva del corpus
 
-La auditoría del corredor sigue abierta y va a producir versiones nuevas. Ninguna se aplica encima de la congelada: cada una **se congela aparte, se compara con la anterior y sólo reingiere lo que cambió**.
+La auditoría del corredor sigue abierta y va a producir versiones nuevas. Ninguna se aplica encima de la congelada: cada una **se congela aparte, se compara con la anterior y sólo se trabaja lo que cambió**.
 
 ```bash
 # 1 · qué cambió, fila a fila
@@ -186,6 +186,30 @@ make corpus-freeze CORPUS=../corredor-eukaryota-holozoa@<commit> DEC=DEC-056 \
 Probado sobre el corpus real: una afirmación insertada en la sección 3 más una fuente corregida en la 9, renumeradas con el propio `renumber.py` del corredor, dan 1 nueva, 1 modificada y 1.774 «sólo renumeración», no 1.953 cambios.
 
 **Qué no resuelve.** Si en un mismo hueco se reescribe una afirmación **y** se inserta otra, el diff no adivina cuál es cuál: las declara retirada y nuevas, y quien ingiere decide. Tampoco juzga si el cambio es correcto: eso sigue siendo §27.12.
+
+**Absorber lo ya ingerido (`DEC-059`).** Las secciones que no se habían ingerido se ingieren desde la versión nueva, como cualquier otra. Las ya ingeridas no se reingieren: sus registros tienen identidad, enlaces y correcciones propias. Lo que cambió en ellas se decide en un **fichero de absorción**, igual que una sección se convierte con su fichero de conversión. El primer paso no escribe nada en `knowledge/`:
+
+```bash
+make corpus-impact ANTES=../corredor-eukaryota-holozoa@af7e799 DESPUES=../corredor-eukaryota-holozoa@<commit>
+```
+
+`ANTES` tiene que ser la congelación activa, porque el informe cruza el diff con lo que se ingirió de ella. En `generated/absorcion/<commit>/` deja tres ficheros:
+
+- `diff.json`: el diff completo, con la correspondencia de todas las filas, también de las que no cambiaron;
+- `informe.md`: qué registros toca cada cambio;
+- `corredor-<commit>.json`: el esqueleto del fichero de absorción, con una decisión en blanco por cambio.
+
+Por cada sección ingerida, el informe da:
+
+- **Las filas que cambian,** con su clase, sus columnas y los registros que salieron de ellas. De cada registro dice si esa fila es la primera, porque de la primera salen sus ejes.
+- **Las filas nuevas,** que piden destino como en una conversión.
+- **Las divisiones,** que se leen de `data/auditoria/sucesiones_afirmaciones.csv`. El corredor inscribe ahí cada fila que retira por no ser atómica, y el número retirado se queda como fila de registro, como C-681. Una fila retirada sin sucesoras se avisa.
+- **Los pasajes cuya prosa cambia o desaparece,** y las menciones y la procedencia que cuelgan de ellos. Para cada una dice en qué párrafo nuevo se cita ahora su fila. Un pasaje que sólo se desplaza cambia de offsets y no pide ninguna decisión.
+- **Los apéndices:** las filas que citan filas ingeridas, las entidades del apéndice B cuya primera fila es de la sección, y las fuentes del apéndice A que ya son registros y el apéndice nuevo describe de otra manera.
+
+**Dónde vive la correspondencia.** La relación de cada fila con sus pasajes, sus menciones y sus registros no está en un fichero aparte que pudiera desincronizarse. `corredor.correspondencia()` la reconstruye recorriendo los deltas aplicados: el de la ingestión, `corpus_origin.rows`, y el de la conversión, `conversion.rows`. Un delta revertido no cuenta.
+
+**Lo que falta.** Construir el delta de absorción desde el fichero de absorción, cambiar la congelación activa al aplicarlo y versionar las copias y los pasajes de las secciones. Viene en un paso aparte.
 
 **Por qué los identificadores opacos importan aquí.** El `C-0412` del corredor no es una identidad estable; el `CLAIM-000412` de este proyecto sí (`DEC-052`). Una afirmación renumerada conserva su identificador opaco y sólo cambia su localizador en el corpus. Si se hubieran usado las claves del corredor como identidad, cada pasada de auditoría las habría roto todas.
 
