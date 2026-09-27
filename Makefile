@@ -10,7 +10,7 @@
 VENV   := .venv
 PYTHON := $(shell [ -x $(VENV)/bin/python ] && echo $(VENV)/bin/python || echo python3)
 
-.PHONY: help setup validate verify snapshot test check clean-generated ingest corpus-freeze corpus-verify corpus-diff convert
+.PHONY: help setup validate verify snapshot test check clean-generated ingest corpus-freeze corpus-verify corpus-diff corpus-impact convert
 
 help: ## Muestra estos objetivos
 	@grep -hE '^[a-z-]+:.*?## ' $(MAKEFILE_LIST) \
@@ -63,6 +63,10 @@ corpus-verify: ## Comprueba que una copia es la versión congelada: make corpus-
 corpus-diff: ## Qué cambió entre dos versiones: make corpus-diff ANTES=../corredor@af7e799 DESPUES=../corredor
 	@test -n "$(ANTES)" -a -n "$(DESPUES)" || { echo "uso: make corpus-diff ANTES=ruta[@ref] DESPUES=ruta[@ref] [DETALLE=1]"; exit 1; }
 	@$(PYTHON) scripts/ingest/freeze.py diff "$(ANTES)" "$(DESPUES)" $(if $(DETALLE),--detalle,)
+
+corpus-impact: ## Qué registros toca una versión nueva: make corpus-impact ANTES=../corredor@af7e799 DESPUES=../corredor@ref
+	@test -n "$(ANTES)" -a -n "$(DESPUES)" || { echo "uso: make corpus-impact ANTES=ruta@congelación-activa DESPUES=ruta[@ref]"; exit 1; }
+	@$(PYTHON) scripts/ingest/absorber.py informe "$(ANTES)" "$(DESPUES)"
 
 snapshot: ## Crea un snapshot nuevo del estado actual
 	@$(PYTHON) scripts/snapshot/snapshot.py create --label "$(LABEL)"

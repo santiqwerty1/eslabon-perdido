@@ -40,6 +40,7 @@ from pathlib import Path
 AQUI = Path(__file__).resolve().parent
 sys.path.insert(0, str(AQUI))
 
+import delta as delta_mod  # noqa: E402
 import freeze  # noqa: E402
 import ingest as base  # noqa: E402
 from parse_research import parse  # noqa: E402
@@ -164,6 +165,44 @@ def ya_ingerida(sec: str) -> str | None:
                 continue
             return p.name
     return None
+
+
+def correspondencia() -> dict[str, dict]:
+    """Qué salió de cada fila de cada sección ingerida, según los deltas aplicados.
+
+    Por sección: su SEC, su delta de ingestión y el de conversión, la congelación
+    de la que salieron y, por fila, sus pasajes, sus menciones, su destino y sus
+    registros. Es la correspondencia `#` → registros que necesita absorber una
+    versión nueva (DEC-059). No vive en un fichero aparte que pudiera
+    desincronizarse: se reconstruye recorriendo los deltas en el orden en que se
+    aplicaron, y un delta revertido no cuenta.
+    """
+    secciones: dict[str, dict] = {}
+    de_sec_id: dict[str, str] = {}
+    for nombre in delta_mod.aplicados():
+        ruta = base.DELTAS / nombre
+        if not ruta.exists():
+            raise SystemExit(f"ERROR el historial da por aplicado {nombre}, que no está en knowledge/deltas/")
+        d = json.loads(ruta.read_text(encoding="utf-8"))
+        origen = d.get("corpus_origin")
+        if origen:
+            sec = origen["section"]
+            secciones[sec] = {
+                "section_id": d["section_id"], "delta": nombre, "freeze": origen["freeze"],
+                "files": origen["files"], "conversion": None,
+                "rows": {c: {"passage_ids": list(o["passage_ids"]), "via": o["via"],
+                             "mention_ids": list(o["mention_ids"]), "destination": None, "record_ids": []}
+                         for c, o in origen["rows"].items()},
+            }
+            de_sec_id[d["section_id"]] = sec
+        conversion = d.get("conversion")
+        if conversion and conversion.get("of") in de_sec_id:
+            s = secciones[de_sec_id[conversion["of"]]]
+            s["conversion"] = {"delta": nombre, "spec": conversion["spec"], "freeze": conversion["freeze"]}
+            for c, o in conversion["rows"].items():
+                if c in s["rows"]:
+                    s["rows"][c].update(destination=o["destination"], record_ids=list(o["record_ids"]))
+    return secciones
 
 
 def localizar(etiqueta: str, pasaje: dict) -> tuple[int, int, str | None]:

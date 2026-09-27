@@ -1,0 +1,8 @@
+"#","Afirmación","Sujeto","Predicado","Objeto","Atribución","Fuente","Aceptación","Fuerza","Motivo","Resolución","Vigencia"
+"C-001","FIX-Alfa es el grupo hermano de FIX-Beta.","FIX-Alfa","grupo_hermano_de","FIX-Beta","expresa","S01 resumen","no evaluado","alta","Lo confirman el resumen y la figura 2.","resuelta","vigente"
+"C-002","FIX-Gamma procede de FIX-Delta.","FIX-Gamma","desciende_de","FIX-Delta","expresa","S02 resultados","no evaluado","media","Lo dicen los resultados.","resuelta","vigente"
+"C-003","La afirmación que ocupaba esta fila se retiró por no ser atómica; sus proposiciones permanecen en C-007 y C-008.","registro C-003","tiene_estado*","retirado por no atomicidad y sustituido por dos premisas","glosa","n/a","no evaluado","desconocida","Registro auditable de la sucesión.","resuelta","superada"
+"C-004","El linaje de FIX-Epsilon tiene una edad estimada.","linaje de FIX-Epsilon","tiene_edad_estimada","n/a","expresa","S01 tabla 2","no evaluado","baja","Sólo en una tabla.","sin resolver","vigente"
+"C-007","FIX-Gamma conserva un rasgo.","FIX-Gamma","posee_rasgo","rasgo conservado","expresa","S02 discusión","no evaluado","baja","Una sola fuente.","sin resolver","vigente"
+"C-008","Ese rasgo de FIX-Gamma procede de FIX-Delta.","rasgo conservado","hereda_de","FIX-Delta","expresa","S02 discusión","no evaluado","baja","Una sola fuente.","sin resolver","vigente"
+"C-009","FIX-Beta vive en aguas someras.","FIX-Beta","habita","aguas someras","expresa","S01 discusión","no evaluado","media","Lo dice la discusión.","resuelta","vigente"
