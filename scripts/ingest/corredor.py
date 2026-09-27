@@ -180,6 +180,11 @@ def correspondencia() -> dict[str, dict]:
     versión nueva (DEC-059). No vive en un fichero aparte que pudiera
     desincronizarse: se reconstruye recorriendo los deltas en el orden en que se
     aplicaron, y un delta revertido no cuenta.
+
+    Una absorción aplicada sustituye lo de sus secciones: la congelación, las
+    copias y los pasajes vigentes, y el mapa de filas con los números nuevos.
+    Desde ahí, `record_rows` dice de qué filas sale cada registro, en su orden;
+    antes lo dice el fichero de conversión.
     """
     secciones: dict[str, dict] = {}
     de_sec_id: dict[str, str] = {}
@@ -203,7 +208,10 @@ def correspondencia() -> dict[str, dict]:
             sec = origen["section"]
             secciones[sec] = {
                 "section_id": d["section_id"], "delta": nombre, "freeze": origen["freeze"],
-                "files": origen["files"], "conversion": None,
+                "files": {**origen["files"],
+                          "passages": origen["files"].get("passages",
+                                                          f"knowledge/corpus/passages/{d['section_id']}.json")},
+                "conversion": None, "absorption": None, "record_rows": None,
                 "rows": {c: {"passage_ids": list(o["passage_ids"]), "via": o["via"],
                              "mention_ids": list(o["mention_ids"]), "destination": None, "record_ids": []}
                          for c, o in origen["rows"].items()},
@@ -216,6 +224,19 @@ def correspondencia() -> dict[str, dict]:
             for c, o in conversion["rows"].items():
                 if c in s["rows"]:
                     s["rows"][c].update(destination=o["destination"], record_ids=list(o["record_ids"]))
+        absorcion = d.get("absorption")
+        if absorcion:
+            destino = absorcion["freeze"]["to"]
+            for sec, a in absorcion["sections"].items():
+                if sec not in secciones:
+                    raise SystemExit(f"ERROR {nombre} absorbe la sección {sec}, que ningún delta aplicado ingirió")
+                s = secciones[sec]
+                s.update(freeze={k: destino.get(k) for k in ("path", "fingerprint", "commit")},
+                         files=a["files"], absorption=nombre, record_rows=a["record_rows"],
+                         rows={c: {"passage_ids": list(o["passage_ids"]), "via": o["via"],
+                                   "mention_ids": list(o["mention_ids"]), "destination": o["destination"],
+                                   "record_ids": list(o["record_ids"])}
+                               for c, o in a["rows"].items()})
     return secciones
 
 

@@ -137,6 +137,14 @@ def apply_ops(ops: list[dict], reverse: bool = False, escribir: bool = True) -> 
     return diario
 
 
+def congelaciones(delta: dict) -> tuple[dict, dict] | None:
+    """La congelación de la que parte y la que deja una absorción (DEC-059), o None."""
+    bloque = (delta.get("absorption") or {}).get("freeze")
+    if not bloque:
+        return None
+    return bloque["from"], bloque["to"]
+
+
 def bump_revision(delta: dict, reverse: bool) -> None:
     if not MANIFEST.exists():
         return
@@ -144,6 +152,12 @@ def bump_revision(delta: dict, reverse: bool) -> None:
     m["dataset_revision"] = (
         delta["dataset_revision_before"] if reverse else delta["dataset_revision_after"]
     )
+    # Una absorción cambia la versión del corpus de la que sale el libro mayor:
+    # al aplicarla la activa pasa a ser la nueva, y al revertirla vuelve la de
+    # antes, tal como estaba declarada.
+    par = congelaciones(delta)
+    if par:
+        m["corpus_freeze"] = dict(par[0] if reverse else par[1])
     # El siguiente identificador que declara el manifiesto avanza por encima de
     # lo que el delta da de alta. Al revertir no retrocede: los identificadores
     # de un delta revertido siguen reservados.
@@ -236,9 +250,21 @@ def fuera_de_orden(path: Path, delta: dict, reverse: bool) -> str | None:
     # revertir dejaría el libro mayor sin revisión autorizada.
     if not MANIFEST.exists():
         return f"falta el manifiesto ({MANIFEST}): sin él no hay revisión con la que encadenar"
-    actual = json.loads(MANIFEST.read_text(encoding="utf-8")).get("dataset_revision")
+    declarado = json.loads(MANIFEST.read_text(encoding="utf-8"))
+    actual = declarado.get("dataset_revision")
     if not actual:
         return f"el manifiesto ({MANIFEST}) no declara `dataset_revision`"
+    # Una absorción lleva el libro mayor de una congelación a otra: sólo se
+    # aplica sobre la de partida y sólo se revierte desde la que deja. Otra
+    # activa querría decir que el corpus ya no es el que absorbió.
+    par = congelaciones(delta)
+    if par:
+        activa = (declarado.get("corpus_freeze") or {}).get("fingerprint")
+        esperada = (par[1] if reverse else par[0]).get("fingerprint")
+        if activa != esperada:
+            return (f"{path.name} {'deja' if reverse else 'parte de'} la congelación {esperada}, y la activa "
+                    f"es {activa}: " + ("se revierte desde la versión que dejó" if reverse
+                                         else "una absorción se aplica sobre la versión de la que parte"))
     pila = aplicados()
     # Lo que se aplicó con este nombre. Sin historial no hay prueba de nada:
     # ni de que se aplicara ni de con qué contenido.

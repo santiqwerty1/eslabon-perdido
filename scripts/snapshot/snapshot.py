@@ -51,7 +51,9 @@ def digest(path: Path) -> str:
 def gather() -> dict:
     corpus = ROOT / "knowledge" / "corpus"
     counts = {
-        "sections": len(list((corpus / "sections").glob("*.md"))),
+        # Por SEC distinto: una absorción deja otra copia de la misma sección
+        # (SEC-000001.<commit>.md), no una sección más (DEC-059).
+        "sections": len({p.name.split(".")[0] for p in (corpus / "sections").glob("*.md")}),
         # Cada fichero agrupa los pasajes de una sección: se cuentan los pasajes.
         "passages": sum(len(json.loads(p.read_text(encoding="utf-8")))
                         for p in (corpus / "passages").glob("*.json")),
@@ -77,9 +79,12 @@ def gather() -> dict:
     for p in sorted([*(corpus / "sections").glob("*.md"), *(corpus / "sections").glob("*.json"),
                      *(corpus / "sections").glob("*.registro.csv"), *(corpus / "passages").glob("*.json")]):
         files[str(p.relative_to(ROOT))] = digest(p)
-    # Y los ficheros de conversión: son la entrada revisada de la que salieron
-    # los registros (DEC-057), y su delta sólo guarda su ruta y su hash.
-    for p in sorted((corpus / "conversions").glob("*.json")):
+    # Y los ficheros de conversión y de absorción: son la entrada revisada de la
+    # que salieron los registros (DEC-057, DEC-059), y su delta sólo guarda su
+    # ruta y su hash. Las congelaciones del corredor también: una absorción
+    # aplicada o revertida pasa de una a otra, y las dos tienen que seguir ahí.
+    for p in sorted([*(corpus / "conversions").glob("*.json"), *(corpus / "absorptions").glob("*.json"),
+                     *(corpus / "manifests").glob("corredor-*.json")]):
         files[str(p.relative_to(ROOT))] = digest(p)
     # Los deltas también: los pendientes reservan revisión e identificadores,
     # y cualquiera de ellos dice qué secciones se ingirieron ya.
@@ -95,7 +100,7 @@ def gather() -> dict:
 
 
 def conversiones_alteradas() -> list[str]:
-    """Ficheros de conversión que ya no son los que guardó su delta.
+    """Ficheros de conversión o de absorción que ya no son los que guardó su delta.
 
     El delta de una conversión guarda la ruta y el hash del fichero del que
     salió. Si el fichero cambió, un snapshot nuevo registraría el contenido
@@ -116,9 +121,11 @@ def conversiones_alteradas() -> list[str]:
                     orden.setdefault(h.get("delta"), n)
     fichas = []
     for p in sorted(deltas.glob("*.json")) if deltas.exists() else []:
-        ficha = (json.loads(p.read_text(encoding="utf-8")).get("conversion") or {}).get("spec") or {}
-        if ficha.get("path"):
-            fichas.append((p.name, ficha))
+        d = json.loads(p.read_text(encoding="utf-8"))
+        for bloque in ("conversion", "absorption"):
+            ficha = (d.get(bloque) or {}).get("spec") or {}
+            if ficha.get("path"):
+                fichas.append((p.name, ficha))
     # Sin aplicar, un delta va detrás de todos los aplicados.
     posicion = lambda nombre: orden.get(nombre, len(orden) + 1)
     problemas = []
@@ -202,6 +209,51 @@ def deltas_alterados() -> list[str]:
     return problemas
 
 
+def congelacion_incoherente() -> list[str]:
+    """Si la congelación activa no es la que dejan los deltas aplicados.
+
+    Cada ingestión y cada conversión declaran de qué congelación salen, y una
+    absorción la cambia de `from` a `to` (DEC-059). Recorriendo los aplicados en
+    su orden, la activa tiene que ser la última: si no, dataset.json se editó a
+    mano y el libro mayor dice salir de una versión del corpus que no absorbió.
+    """
+    deltas = ROOT / "knowledge" / "deltas"
+    historial = deltas / "historial.jsonl"
+    if not historial.exists() or not MANIFEST.exists():
+        return []
+    pila: list[str] = []
+    for linea in historial.read_text(encoding="utf-8").splitlines():
+        if linea.strip():
+            h = json.loads(linea)
+            if h.get("accion") == "aplicar":
+                pila.append(h.get("delta"))
+            elif h.get("accion") == "revertir" and h.get("delta") in pila:
+                del pila[len(pila) - 1 - pila[::-1].index(h["delta"])]
+    problemas, vigente = [], None
+    for nombre in pila:
+        ruta = deltas / str(nombre)
+        if not ruta.exists():
+            continue  # deltas_alterados() ya lo dice
+        d = json.loads(ruta.read_text(encoding="utf-8"))
+        absorcion = (d.get("absorption") or {}).get("freeze")
+        if absorcion:
+            if vigente is not None and absorcion["from"].get("fingerprint") != vigente:
+                problemas.append(f"{nombre} absorbe desde {absorcion['from'].get('fingerprint')}, y los deltas "
+                                 f"anteriores dejan {vigente}")
+            vigente = absorcion["to"].get("fingerprint")
+            continue
+        declarada = (((d.get("corpus_origin") or {}).get("freeze") or {}).get("fingerprint")
+                     or ((d.get("conversion") or {}).get("freeze") or {}).get("fingerprint"))
+        if declarada:
+            if vigente is not None and declarada != vigente:
+                problemas.append(f"{nombre} sale de {declarada}, y la congelación vigente era {vigente}")
+            vigente = vigente or declarada
+    activa = (json.loads(MANIFEST.read_text(encoding="utf-8")).get("corpus_freeze") or {}).get("fingerprint")
+    if vigente is not None and activa != vigente:
+        problemas.append(f"dataset.json declara activa {activa}, y los deltas aplicados dejan {vigente}")
+    return problemas
+
+
 def next_id() -> str:
     existing = sorted(SNAPSHOTS.glob("SNAP-*.json"))
     n = int(existing[-1].stem.split("-")[1]) + 1 if existing else 0
@@ -218,6 +270,11 @@ def create(label: str | None) -> int:
     if alterados:
         print("ERROR deltas que no son los que se aplicaron; "
               "no se crea un snapshot que los dé por buenos:\n  " + "\n  ".join(alterados))
+        return 1
+    incoherente = congelacion_incoherente()
+    if incoherente:
+        print("ERROR la congelación activa no es la que dejan los deltas aplicados; "
+              "no se crea un snapshot que la dé por buena:\n  " + "\n  ".join(incoherente))
         return 1
     manifest = json.loads(MANIFEST.read_text(encoding="utf-8"))
     state = gather()
@@ -279,6 +336,7 @@ def verify(snap_id: str | None) -> int:
         problems.append(f"fichero nuevo no registrado: {f}")
     problems += [f"conversión alterada: {a}" for a in conversiones_alteradas()]
     problems += [f"delta alterado: {a}" for a in deltas_alterados()]
+    problems += [f"congelación: {a}" for a in congelacion_incoherente()]
 
     print(f"verificando {snapshot['snapshot_id']}")
     for p in problems:
