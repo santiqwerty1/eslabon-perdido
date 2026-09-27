@@ -280,9 +280,11 @@ def informe(anterior: str, nueva: str) -> dict:
                 prosa_b = None
         if prosa_b is None:
             avisos.append(f"la sección {sec} no tiene prosa en la versión nueva")
-        elif viejos_p.exists():
+        if viejos_p.exists():
+            # Sin prosa nueva, todos sus pasajes quedan retirados: sus menciones
+            # y la procedencia de sus filas piden decisión igual.
             viejos = json.loads(viejos_p.read_text(encoding="utf-8"))
-            texto_b = prosa_b.read_text(encoding="utf-8")
+            texto_b = prosa_b.read_text(encoding="utf-8") if prosa_b is not None else ""
             parrafos = base.segmentar(texto_b)
             todos = pasajes_cambiados(viejos, texto_b)
             pasajes = [p for p in todos if p["estado"] != "igual"]
@@ -367,7 +369,10 @@ def informe(anterior: str, nueva: str) -> dict:
                                                 traduccion)
         for ch in cambios:
             viejas = {x for v in (ch["antes"] or {}).values() for x in freeze.C_REF.findall(v)}
-            nuevas_c = {inverso.get(x, x) for v in (ch["despues"] or {}).values() for x in freeze.C_REF.findall(v)}
+            # Una cita nueva sólo es de una fila ingerida si tiene antecesora: una
+            # fila nueva puede reutilizar un número que otra dejó al renumerarse.
+            nuevas_c = {inverso[x] for v in (ch["despues"] or {}).values() for x in freeze.C_REF.findall(v)
+                        if x in inverso}
             ingeridas = sorted((viejas | nuevas_c) & fila_de.keys(), key=freeze._num)
             clave = ch["clave"] if ch["clave"] is not None else next(iter((ch["antes"] or ch["despues"]).values()))
             if ruta_r == FUENTES and ch["clave"] in existentes_src:
@@ -384,18 +389,31 @@ def informe(anterior: str, nueva: str) -> dict:
                               and previa.get(k) != nueva_f[k]]
                 fuentes.append({"key": ch["clave"], "record_id": rid, "state": ch["estado"], "fields": cambia})
             if ruta_r == ENTIDADES:
-                fila_e = ch["antes"] or ch["despues"]
-                primera_fila = (fila_e.get(corredor.COL_PRIMERA) or "").strip()
-                if primera_fila in fila_de:
-                    sec_e = fila_de[primera_fila][0]
-                    etiqueta = (fila_e.get("etiqueta preferida") or "").strip()
+                # Una entidad se ingiere con la sección de su primera fila. Si esa
+                # fila cambia, cuentan las dos: la de antes pierde la entidad y la
+                # de ahora la gana, aunque todavía no tenga mención.
+                etiqueta = ((ch["antes"] or ch["despues"]).get("etiqueta preferida") or "").strip()
+                cols = sorted(k for k in (ch["antes"] or {}) if ch["despues"] and ch["antes"][k] != ch["despues"].get(k))
+                lados: dict[str, tuple[str, str]] = {}
+                if ch["antes"]:
+                    fila_v = (ch["antes"].get(corredor.COL_PRIMERA) or "").strip()
+                    if fila_v in fila_de:
+                        lados[fila_de[fila_v][0]] = ("antes", fila_v)
+                if ch["despues"]:
+                    fila_n = (ch["despues"].get(corredor.COL_PRIMERA) or "").strip()
+                    if inverso.get(fila_n) in fila_de:
+                        sec_n, fila_n = fila_de[inverso[fila_n]][0], inverso[fila_n]
+                    else:
+                        sec_n = filas_b.get(fila_n, (None,))[0]
+                    if sec_n in secciones:
+                        lados[sec_n] = ("ambos", lados[sec_n][1]) if sec_n in lados else ("despues", fila_n)
+                for sec_e, (lado, fila_e) in sorted(lados.items()):
                     mids = sorted(mid for mid, m in menciones.items()
                                   if m.get("section_id") == secciones[sec_e]["section_id"]
                                   and m.get("original_text") == etiqueta)
-                    cols = sorted(k for k in (ch["antes"] or {}) if ch["despues"] and ch["antes"][k] != ch["despues"].get(k))
-                    entidades.append({"label": etiqueta, "state": ch["estado"], "section": sec_e,
-                                      "mention_ids": mids, "columns": cols, "row": primera_fila,
-                                      "record_ids": fila_de[primera_fila][1]["record_ids"]})
+                    entidades.append({"label": etiqueta, "state": ch["estado"], "section": sec_e, "side": lado,
+                                      "mention_ids": mids, "columns": cols, "row": fila_e,
+                                      "record_ids": fila_de[fila_e][1]["record_ids"] if fila_e in fila_de else []})
                 continue
             if ingeridas:
                 apendices.append({
@@ -418,7 +436,12 @@ def informe(anterior: str, nueva: str) -> dict:
         sec_b = spec.get("section")
         # Una renumeración también deja el borrador desfasado: sus claves de
         # fila y los `rows` de sus registros siguen con el número viejo.
-        cambiadas = sorted({*(m["de"] for m in af["modificadas"] if m["seccion"] == sec_b),
+        # Una fila que cambia de sección desfasa los dos borradores: el de su
+        # sección vieja la tiene con su número viejo, el de la nueva la necesita
+        # con el nuevo.
+        cambiadas = sorted({*(m["de"] for m in af["modificadas"] if filas_a.get(m["de"], (None,))[0] == sec_b),
+                            *(m["a"] for m in af["modificadas"]
+                              if m["seccion"] == sec_b and filas_a.get(m["de"], (None,))[0] != sec_b),
                             *(x["id"] for x in (*af["nuevas"], *af["retiradas"]) if x["seccion"] == sec_b),
                             *(x["de"] for x in af["solo_renumeracion"] if filas_a.get(x["de"], (None,))[0] == sec_b)},
                            key=freeze._num)
@@ -480,9 +503,10 @@ def esqueleto(r: dict) -> dict:
         "sections": secciones,
         "sources": {f["key"]: {"record_id": f["record_id"], "fields": f["fields"], "decision": None}
                     for f in r["sources"] if f["fields"]},
-        "entities": {e["label"]: {"section": e["section"], "row": e["row"], "state": e["state"],
-                                  "columns": e["columns"], "mention_ids": e["mention_ids"],
-                                  "decision": None, "reason": None} for e in r["entities"]},
+        # Una entidad puede tocar dos secciones si cambia su primera fila.
+        "entities": [{"label": e["label"], "section": e["section"], "side": e["side"], "row": e["row"],
+                      "state": e["state"], "columns": e["columns"], "mention_ids": e["mention_ids"],
+                      "decision": None, "reason": None} for e in r["entities"]],
         # Una lista por apéndice: sin clave única (F_magnitudes), dos filas
         # cambiadas pueden empezar igual.
         "appendices": {ruta: [{"key": x["key"], "state": x["state"], "rows": x["rows"], "decision": None,
@@ -591,8 +615,10 @@ def markdown(r: dict) -> list[str]:
         lineas += ["## Entidades del apéndice B de secciones ingeridas", ""]
         for e in r["entities"]:
             cols = f" ({', '.join(e['columns'])})" if e["columns"] else ""
-            lineas.append(f"- «{e['label']}», sección {e['section']}, {e['state']}{cols}: "
-                          f"menciones {', '.join(e['mention_ids']) or 'ninguna'}")
+            lado = {"antes": "la pierde", "despues": "la gana", "ambos": ""}[e["side"]]
+            lineas.append(f"- «{e['label']}», sección {e['section']}{', ' + lado if lado else ''}, {e['state']}{cols}: "
+                          + (f"menciones {', '.join(e['mention_ids'])}" if e["mention_ids"]
+                             else "sin mención en esta sección: pide una nueva"))
         lineas.append("")
     if r["appendices"]:
         lineas += ["## Filas de los apéndices que citan filas ingeridas", "",

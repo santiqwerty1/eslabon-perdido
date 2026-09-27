@@ -53,6 +53,20 @@ class Informe(unittest.TestCase):
         cls.r = absorber.informe(str(MINI), str(MINI_V2))
         cls.filas = {f["row"]: f for f in cls.r["sections"]["00"]["rows"]}
 
+    def version(self, cambios: dict[str, str | None]) -> Path:
+        """Una copia de corredor-mini-v2 con ficheros reescritos (None: se borra)."""
+        copia = Path(tempfile.mkdtemp(dir=self.tmp)) / "corpus"
+        shutil.copytree(MINI_V2, copia)
+        for ruta, texto in cambios.items():
+            if texto is None:
+                (copia / ruta).unlink()
+            else:
+                (copia / ruta).write_text(texto, encoding="utf-8")
+        return copia
+
+    def texto(self, ruta: str) -> str:
+        return (MINI_V2 / ruta).read_text(encoding="utf-8")
+
     @classmethod
     def tearDownClass(cls):
         cls.entorno.__exit__(None, None, None)
@@ -127,8 +141,60 @@ class Informe(unittest.TestCase):
 
     def test_las_entidades_del_apendice_b_piden_decision(self):
         e = absorber.esqueleto(self.r)
-        self.assertEqual(e["entities"]["FIX-Omega"]["state"], "retirada")
-        self.assertIsNone(e["entities"]["FIX-Omega"]["decision"])
+        [omega] = [x for x in e["entities"] if x["label"] == "FIX-Omega"]
+        self.assertEqual((omega["state"], omega["section"]), ("retirada", "00"))
+        self.assertIsNone(omega["decision"])
+
+    def test_una_seccion_cuya_prosa_desaparece_pide_decisiones(self):
+        v = self.version({"docs/secciones/002-01-1-historia.md": None})
+        r = absorber.informe(str(MINI), str(v))
+        s = r["sections"]["01"]
+        self.assertEqual({p["estado"] for p in s["passages"]}, {"retirado"})
+        [zeta] = [m for m in s["mentions"] if m["label"] == "FIX-Zeta"]
+        self.assertEqual(zeta["state"], "retirado")
+        self.assertFalse(s["provenance"]["C-006"]["mechanical"])
+        e = absorber.esqueleto(r)
+        self.assertIsNone(e["sections"]["01"]["provenance"]["C-006"]["decision"])
+
+    def test_una_fila_nueva_que_reutiliza_un_numero_no_se_atribuye_a_la_vieja(self):
+        # C-006 se renumeró a C-010; una fila nueva ocupa el número C-006 y un
+        # apéndice la cita. Esa cita no es de la C-006 que se ingirió.
+        fila = ('"C-006","FIX-Zeta tiene una edad.","FIX-Zeta","tiene_edad_estimada","n/a","expresa",'
+                '"S01 x","no evaluado","baja","m","resuelta","vigente"\n')
+        v = self.version({"data/afirmaciones/01.csv": self.texto("data/afirmaciones/01.csv") + fila,
+                          "data/apendices/D_fechas.csv": '"evento","filas"\n"edad de FIX-Zeta","C-006"\n'})
+        r = absorber.informe(str(MINI), str(v))
+        self.assertEqual([x for x in r["appendices"] if x["path"].endswith("D_fechas.csv")], [])
+        self.assertIn("C-006", [n["row"] for n in r["sections"]["01"]["new_rows"]])
+
+    def test_una_entidad_que_cambia_de_primera_fila_afecta_a_las_dos_secciones(self):
+        b = self.texto("data/apendices/B_entidades.csv").replace('"FIX-Delta","clado","n/a","n/a","C-002"',
+                                                                  '"FIX-Delta","clado","n/a","n/a","C-010"')
+        r = absorber.informe(str(MINI), str(self.version({"data/apendices/B_entidades.csv": b})))
+        delta = {e["section"]: e for e in r["entities"] if e["label"] == "FIX-Delta"}
+        self.assertEqual(set(delta), {"00", "01"})
+        self.assertTrue(delta["00"]["mention_ids"])
+        self.assertEqual(delta["01"]["mention_ids"], [])
+
+    def test_una_fila_que_cambia_de_seccion_desfasa_los_dos_borradores(self):
+        seccion0 = self.texto("data/afirmaciones/00.csv").splitlines(keepends=True)
+        [c004] = [l for l in seccion0 if l.startswith('"C-004"')]
+        v = self.version({"data/afirmaciones/00.csv": "".join(l for l in seccion0 if l != c004),
+                          "data/afirmaciones/01.csv": self.texto("data/afirmaciones/01.csv")
+                          + c004.replace('"C-004"', '"C-011"')})
+        borradores = {"00": self.tmp / "corredor-00-borrador.json", "01": self.tmp / "corredor-01.json"}
+        for sec, ruta in borradores.items():
+            ruta.write_text(json.dumps({"freeze": {"fingerprint": self.entorno.huella}, "section": sec}),
+                            encoding="utf-8")
+        try:
+            r = absorber.informe(str(MINI), str(v))
+        finally:
+            for ruta in borradores.values():
+                ruta.unlink()
+        cambiadas = {d["section"]: d["changed_rows"] for d in r["drafts"]}
+        self.assertIn("C-004", cambiadas["00"])
+        self.assertIn("C-011", cambiadas["01"])
+        self.assertNotIn("C-004", cambiadas["01"])
 
     def test_un_borrador_de_una_seccion_solo_renumerada_se_senala(self):
         borrador = self.tmp / "corredor-01.json"
