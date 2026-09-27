@@ -172,8 +172,17 @@ def anclaje_nuevo(raiz: Path, parrafos: list[tuple[int, int, str]], filas: list[
         for tid in corredor.MARCADOR.findall(c):
             marcadores[tid] = n
     ruta_indice = raiz / "data" / "table_index.json"
-    indice = ({t["id"]: t for t in json.loads(ruta_indice.read_text(encoding="utf-8")).get("tables", [])}
-              if ruta_indice.exists() else {})
+    entradas = json.loads(ruta_indice.read_text(encoding="utf-8")).get("tables", []) if ruta_indice.exists() else []
+    # Las mismas negativas que corredor.construir: con un id repetido o un
+    # marcador sin entrada, la procedencia saldría de una elección que nadie hizo.
+    repetidos = sorted({e["id"] for e in entradas if sum(1 for x in entradas if x["id"] == e["id"]) > 1})
+    if repetidos:
+        raise SystemExit(f"ERROR data/table_index.json repite identificadores: {', '.join(repetidos)}")
+    indice = {t["id"]: t for t in entradas}
+    sin_indice = sorted(tid for tid in marcadores if tid not in indice)
+    if sin_indice:
+        raise SystemExit("ERROR la prosa nueva inserta tablas que no están en data/table_index.json: "
+                         + ", ".join(sin_indice))
 
     canonicos = {f["path"] for f in freeze.ficheros(raiz)}
 
@@ -403,8 +412,19 @@ def informe(anterior: str, nueva: str) -> dict:
             if ruta_r == FUENTES and ch["clave"] in existentes_src:
                 rid, previa = existentes_src[ch["clave"]]
                 col_doi = next((c for c in cab if c.strip().lower().startswith("doi")), "")
+                candidatas = []
                 if ch["despues"] is None:
                     cambia = ["retirada del apéndice A"]
+                    # Si sólo cambió de clave, sale como una retirada y una nueva:
+                    # se proponen las filas nuevas con el mismo DOI o el mismo título.
+                    vieja = convertir.fuente_de_apendice(ch["antes"], col_doi)
+
+                    def misma(n: dict) -> bool:
+                        return bool((n["doi"] and n["doi"] == vieja["doi"])
+                                    or (n["title"] and n["title"].casefold() == vieja["title"].casefold()))
+                    candidatas = sorted(x["clave"] for x in cambios
+                                        if x["estado"] == "nueva" and x["clave"] not in existentes_src
+                                        and misma(convertir.fuente_de_apendice(x["despues"], col_doi)))
                 else:
                     # Todo lo que el registro guarda del apéndice, no sólo la
                     # bibliografía: también las notas de calidad y la fecha de
@@ -412,7 +432,8 @@ def informe(anterior: str, nueva: str) -> dict:
                     nueva_f = convertir.fuente_de_apendice(ch["despues"], col_doi)
                     cambia = [k for k in nueva_f if k not in ("verification_status", "record_status")
                               and previa.get(k) != nueva_f[k]]
-                fuentes.append({"key": ch["clave"], "record_id": rid, "state": ch["estado"], "fields": cambia})
+                fuentes.append({"key": ch["clave"], "record_id": rid, "state": ch["estado"], "fields": cambia,
+                                "candidates": candidatas})
             if ruta_r == ENTIDADES:
                 # Una entidad se ingiere con la sección de su primera fila. Si esa
                 # fila cambia, cuentan las dos: la de antes pierde la entidad y la
@@ -525,9 +546,11 @@ def esqueleto(r: dict) -> dict:
             if "successors" in f:
                 e["successors"] = {suc: [] for suc in f["successors"]}
             filas[f["row"]] = e
-        for n in s["new_rows"]:
-            filas[n["row"]] = {"class": "nueva", "destination": None, "keys": [], "note": None,
-                               **({"successor_of": n["successor_of"]} if n["successor_of"] else {})}
+        # Aparte de las filas ingeridas: una fila nueva puede ocupar el número
+        # que otra dejó al renumerarse o retirarse, y las dos piden decisión.
+        nuevas = {n["row"]: {"destination": None, "keys": [], "note": None,
+                             **({"successor_of": n["successor_of"]} if n["successor_of"] else {})}
+                  for n in s["new_rows"]}
         menciones = {m["mention"]: {"label": m["label"], "state": m["state"], "decision": None, "reason": None}
                      for m in s["mentions"] if m["state"] != "desplazado"}
         procedencia = {c: {"record_ids": x["record_ids"], "mention_ids": x["mention_ids"],
@@ -535,9 +558,9 @@ def esqueleto(r: dict) -> dict:
                            "paragraphs_after": x["paragraphs_after"], "decision": None, "reason": None}
                        for c, x in s["provenance"].items() if not x["mechanical"]}
         sucesiones = {c: {**x, "decision": None, "reason": None} for c, x in s["successions"].items()}
-        if filas or menciones or procedencia or sucesiones:
-            secciones[sec] = {"section_id": s["section_id"], "rows": filas, "records": [], "mentions": menciones,
-                              "provenance": procedencia, "successions": sucesiones}
+        if filas or nuevas or menciones or procedencia or sucesiones:
+            secciones[sec] = {"section_id": s["section_id"], "rows": filas, "new_rows": nuevas, "records": [],
+                              "mentions": menciones, "provenance": procedencia, "successions": sucesiones}
     return {
         "from": {k: r["from"][k] for k in ("path", "fingerprint")},
         "to": {k: r["to"][k] for k in ("path", "fingerprint")},
@@ -545,7 +568,8 @@ def esqueleto(r: dict) -> dict:
         "received_at": None,
         "pairing": {},
         "sections": secciones,
-        "sources": {f["key"]: {"record_id": f["record_id"], "fields": f["fields"], "decision": None}
+        "sources": {f["key"]: {"record_id": f["record_id"], "fields": f["fields"], "decision": None,
+                               **({"candidates": f["candidates"], "pair_with": None} if f["state"] == "retirada" else {})}
                     for f in r["sources"] if f["fields"]},
         # Una entidad puede tocar dos secciones si cambia su primera fila.
         "entities": [{"label": e["label"], "section": e["section"], "side": e["side"],
@@ -659,7 +683,9 @@ def markdown(r: dict) -> list[str]:
         lineas += ["## Fuentes del apéndice A que ya son registros", ""]
         for f in r["sources"]:
             que = ", ".join(f["fields"]) if f["fields"] else "nada del registro (sólo columnas que no se ingieren)"
-            lineas.append(f"- {f['key']} ({f['record_id']}), {f['state']}: cambia {que}")
+            pareja = (f"; posible clave nueva: {', '.join(f['candidates'])}" if f["candidates"]
+                      else "; ninguna fila nueva con su DOI o su título" if f["state"] == "retirada" else "")
+            lineas.append(f"- {f['key']} ({f['record_id']}), {f['state']}: cambia {que}{pareja}")
         lineas.append("")
     if r["entities"]:
         lineas += ["## Entidades del apéndice B de secciones ingeridas", ""]
@@ -698,14 +724,20 @@ def markdown(r: dict) -> list[str]:
 def cmd_informe(args) -> int:
     r = informe(args.anterior, args.nueva)
     salida = Path(args.salida) if args.salida else GENERATED / r["suffix"]
+    nombre = f"corredor-{r['suffix']}.json"
+    texto_esqueleto = json.dumps(esqueleto(r), indent=2, ensure_ascii=False) + "\n"
+    # El esqueleto se rellena a mano: volver a generar el informe no puede
+    # borrar decisiones ya tomadas sin que se pida.
+    previo = salida / nombre
+    if previo.exists() and previo.read_text(encoding="utf-8") != texto_esqueleto and not args.sobrescribir:
+        raise SystemExit(f"ERROR {corredor._rel(previo)} ya existe y no es el esqueleto en blanco: puede tener "
+                         "decisiones. Muévelo, o vuelve a ejecutar con --sobrescribir si quieres perderlas")
     salida.mkdir(parents=True, exist_ok=True)
     (salida / "diff.json").write_text(json.dumps({**r["diff"], "afirmaciones": {
         k: v for k, v in r["diff"]["afirmaciones"].items() if k != "mapa"}}, indent=2, ensure_ascii=False) + "\n",
         encoding="utf-8")
     (salida / "informe.md").write_text("\n".join(markdown(r)) + "\n", encoding="utf-8")
-    nombre = f"corredor-{r['suffix']}.json"
-    (salida / nombre).write_text(
-        json.dumps(esqueleto(r), indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    (salida / nombre).write_text(texto_esqueleto, encoding="utf-8")
     for sec, s in r["sections"].items():
         print(f"sección {sec} ({s['section_id']}): {len(s['rows'])} filas cambiadas, {len(s['new_rows'])} nuevas, "
               f"{len(s['passages'])} pasajes y {len(s['mentions'])} menciones afectados")
@@ -726,6 +758,8 @@ def main() -> int:
     i.add_argument("anterior", help="la congelación activa: directorio del corpus, o directorio@ref")
     i.add_argument("nueva", help="la versión nueva: directorio, o directorio@ref")
     i.add_argument("--salida", default=None, help="carpeta de salida (por defecto, generated/absorcion/<commit>/)")
+    i.add_argument("--sobrescribir", action="store_true",
+                   help="reescribir un fichero de absorción que ya existe, aunque tenga decisiones")
     i.set_defaults(func=cmd_informe)
     args = ap.parse_args()
     return args.func(args)

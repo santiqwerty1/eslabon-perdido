@@ -199,6 +199,8 @@ make corpus-impact ANTES=../corredor-eukaryota-holozoa@af7e799 DESPUES=../corred
 - `informe.md`: qué registros toca cada cambio;
 - `corredor-<commit>.json`: el esqueleto del fichero de absorción, con una decisión en blanco por cambio: filas, menciones, procedencia, fuentes, entidades y filas de apéndices.
 
+El esqueleto se rellena a mano. Si ya existe con otro contenido, el informe se niega a reescribirlo, porque puede tener decisiones; para reescribirlo igualmente, `SOBRESCRIBIR=1`. Las filas nuevas van en `new_rows`, aparte de las ingeridas (`rows`): una fila nueva puede reutilizar el número de otra que se renumeró o se retiró, y las dos piden decisión.
+
 La carpeta se nombra por el commit de la versión nueva. Si es una copia de trabajo con cambios sin confirmar, se nombra por su huella, porque su commit no la describe. El informe compara con el libro mayor tal como está: un delta pendiente no cuenta, y se avisa.
 
 Por cada sección ingerida, el informe da:
@@ -208,7 +210,7 @@ Por cada sección ingerida, el informe da:
 - **Las divisiones,** que se leen de `data/auditoria/sucesiones_afirmaciones.csv`. El corredor inscribe ahí cada fila que retira por no ser atómica, y el número retirado se queda como fila de registro, como C-681. Una fila retirada sin sucesoras se avisa.
 - **Los pasajes cuya prosa cambia o desaparece,** y las menciones y la procedencia que cuelgan de ellos. Para cada una dice en qué párrafo nuevo se cita ahora su fila. Un pasaje que sólo se desplaza cambia de offsets y no pide ninguna decisión.
 - **Las filas cuya procedencia cambia.** De qué párrafos colgaría cada fila si se ingiriera ahora sale de la misma regla que la ingestión, `corredor.anclar()`: la prosa que la cita, una tabla de síntesis o el registro. Una tabla o el índice de tablas pueden cambiarlo sin tocar la fila ni la prosa. Pide decisión si la fila deja de colgar de un párrafo del que colgaba o cambia de vía. Si sólo gana párrafos que también la citan, es mecánico.
-- **Los apéndices:** las filas que citan filas ingeridas, las entidades del apéndice B cuya primera fila es de la sección, y las fuentes del apéndice A que ya son registros y el apéndice nuevo describe de otra manera.
+- **Los apéndices:** las filas que citan filas ingeridas, las entidades del apéndice B cuya primera fila es de la sección, y las fuentes del apéndice A que ya son registros y el apéndice nuevo describe de otra manera. Una fuente que cambia de clave sale como retirada; el informe propone como pareja las filas nuevas con su DOI o su título.
 
 **Dónde vive la correspondencia.** La relación de cada fila con sus pasajes, sus menciones y sus registros no está en un fichero aparte que pudiera desincronizarse. `corredor.correspondencia()` la reconstruye recorriendo los deltas aplicados: el de la ingestión, `corpus_origin.rows`, y el de la conversión, `conversion.rows`. Un delta revertido no cuenta.
 
