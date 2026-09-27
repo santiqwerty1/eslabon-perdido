@@ -175,14 +175,21 @@ def anclaje_nuevo(raiz: Path, parrafos: list[tuple[int, int, str]], filas: list[
     indice = ({t["id"]: t for t in json.loads(ruta_indice.read_text(encoding="utf-8")).get("tables", [])}
               if ruta_indice.exists() else {})
 
+    canonicos = {f["path"] for f in freeze.ficheros(raiz)}
+
     def leer(relativa: str) -> str:
-        # Sólo ficheros de la versión comparada, como exige la ingestión.
+        # Sólo ficheros de la capa canónica de la versión comparada: la ingestión
+        # rechaza cualquier otro (corredor.construir), y un fichero de fuera
+        # cambiaría el informe sin cambiar la huella.
         ruta = (raiz / relativa).resolve()
         try:
-            ruta.relative_to(raiz.resolve())
+            rel = ruta.relative_to(raiz.resolve()).as_posix()
         except ValueError:
-            return ""
-        return ruta.read_text(encoding="utf-8") if ruta.is_file() else ""
+            rel = None
+        if rel not in canonicos:
+            raise SystemExit(f"ERROR data/table_index.json apunta a {relativa!r}, que no es un fichero de la "
+                             "capa canónica de la versión nueva")
+        return ruta.read_text(encoding="utf-8")
 
     return corredor.anclar(filas, citadas, marcadores, indice, leer) if citadas else {}
 
@@ -210,6 +217,11 @@ def informe(anterior: str, nueva: str) -> dict:
     modificadas = {m["de"]: m for m in af["modificadas"]}
     filas_a, filas_b = freeze.leer_afirmaciones(a.base), freeze.leer_afirmaciones(b.base)
     sucesiones = leer_sucesiones(b.base)
+    # El registro de sucesiones de antes, con los números de ahora: lo que
+    # cambia en él pide decisión aunque la fila no cambie.
+    sucesiones_antes = {mapa.get(k, k): [mapa.get(x, x) for x in v] for k, v in leer_sucesiones(a.base).items()}
+    sucesion_cambia = {k for k in set(sucesiones_antes) | set(sucesiones)
+                       if sucesiones_antes.get(k) != sucesiones.get(k)}
     proy = registros_actuales()
     secciones = corredor.correspondencia()
     avisos: list[str] = []
@@ -249,13 +261,21 @@ def informe(anterior: str, nueva: str) -> dict:
                 "columns": columnas,
                 "touches": sorted({QUE_TOCA.get(col, col) for col in columnas}),
             }
-            if c in sucesiones:
-                fila["successors"] = sucesiones[c]
+            # El registro de la versión nueva usa los números nuevos.
+            if mapa.get(c, c) in sucesiones:
+                fila["successors"] = sucesiones[mapa.get(c, c)]
             elif clase == "retirada":
                 fila["aviso"] = "retirada sin sucesoras en sucesiones_afirmaciones.csv"
             elif (columnas.get("Vigencia") or ["", ""])[1].strip().lower() == "superada":
                 fila["aviso"] = "pasa a vigencia superada sin sucesoras declaradas"
             filas.append(fila)
+
+        # Sucesiones que cambian en el registro sin que cambie la fila.
+        reportadas = {f["row"] for f in filas}
+        sucesiones_s = {c: {"to": mapa.get(c, c), "before": sucesiones_antes.get(mapa.get(c, c), []),
+                            "after": sucesiones.get(mapa.get(c, c), [])}
+                        for c in sorted(s["rows"], key=freeze._num)
+                        if mapa.get(c, c) in sucesion_cambia and c not in reportadas}
 
         # Filas que entran en la sección: nuevas, o que vienen de otra.
         nuevas = [n["id"] for n in af["nuevas"] if n["seccion"] == sec]
@@ -354,6 +374,7 @@ def informe(anterior: str, nueva: str) -> dict:
             "section_id": s["section_id"], "converted": s["conversion"] is not None,
             "unchanged": sin_cambios, "rows": filas, "new_rows": nuevas_l,
             "passages": pasajes, "mentions": afectadas_m, "provenance": procedencia,
+            "successions": sucesiones_s,
         }
         if s["conversion"] is None:
             avisos.append(f"la sección {sec} está ingerida pero sin convertir: se absorbe sólo su ingestión")
@@ -397,7 +418,16 @@ def informe(anterior: str, nueva: str) -> dict:
                 # fila cambia, cuentan las dos: la de antes pierde la entidad y la
                 # de ahora la gana, aunque todavía no tenga mención.
                 etiqueta = ((ch["antes"] or ch["despues"]).get("etiqueta preferida") or "").strip()
-                cols = sorted(k for k in (ch["antes"] or {}) if ch["despues"] and ch["antes"][k] != ch["despues"].get(k))
+                # Las columnas de las dos versiones, con las citas de antes ya
+                # renumeradas: una columna nueva cuenta donde tiene valor, y una
+                # cita sólo renumerada no es un cambio.
+                cols = []
+                if ch["antes"] and ch["despues"]:
+                    antes_t = {k: freeze.traducir(v, traduccion) for k, v in ch["antes"].items()}
+                    cols = sorted(k for k in set(antes_t) | set(ch["despues"])
+                                  if (antes_t.get(k) or "") != (ch["despues"].get(k) or ""))
+                    if not cols:
+                        continue
                 # Por sección: la primera fila de antes (número viejo) y la de
                 # ahora (número nuevo). Si las dos son de la misma sección, van
                 # juntas y no se pierde ninguna.
@@ -504,9 +534,10 @@ def esqueleto(r: dict) -> dict:
                            "via_before": x["via_before"], "via_after": x["via_after"],
                            "paragraphs_after": x["paragraphs_after"], "decision": None, "reason": None}
                        for c, x in s["provenance"].items() if not x["mechanical"]}
-        if filas or menciones or procedencia:
+        sucesiones = {c: {**x, "decision": None, "reason": None} for c, x in s["successions"].items()}
+        if filas or menciones or procedencia or sucesiones:
             secciones[sec] = {"section_id": s["section_id"], "rows": filas, "records": [], "mentions": menciones,
-                              "provenance": procedencia}
+                              "provenance": procedencia, "successions": sucesiones}
     return {
         "from": {k: r["from"][k] for k in ("path", "fingerprint")},
         "to": {k: r["to"][k] for k in ("path", "fingerprint")},
@@ -551,7 +582,7 @@ def markdown(r: dict) -> list[str]:
         estado = "convertida" if s["converted"] else "ingerida, sin convertir"
         lineas += [f"## Sección {sec} · {s['section_id']} ({estado})", ""]
         marcas = d["secciones_afectadas"].get(sec)
-        if not (s["rows"] or s["new_rows"] or s["passages"] or s["provenance"] or marcas):
+        if not (s["rows"] or s["new_rows"] or s["passages"] or s["provenance"] or s["successions"] or marcas):
             lineas += [f"Sin cambios: sus {s['unchanged']} filas y su prosa son las mismas.", ""]
             continue
         lineas.append(f"{s['unchanged']} filas sin cambios.")
@@ -579,6 +610,11 @@ def markdown(r: dict) -> list[str]:
                     lineas.append(f"- **{f['row']}**: " + ". ".join(detalle) + ".")
                 for col, (antes, despues) in f["columns"].items():
                     lineas += [f"  - {col}", f"    - antes: {antes}", f"    - ahora: {despues}"]
+            lineas.append("")
+        if s["successions"]:
+            lineas += ["Sucesiones que cambian en el registro sin que cambie su fila:", ""]
+            for c, x in s["successions"].items():
+                lineas.append(f"- {c}: {', '.join(x['before']) or '—'} → {', '.join(x['after']) or '—'}")
             lineas.append("")
         if s["new_rows"]:
             lineas += ["Filas nuevas, que piden destino:", ""]

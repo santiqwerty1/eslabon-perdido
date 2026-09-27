@@ -204,6 +204,44 @@ class Informe(unittest.TestCase):
             ruta.write_bytes(original)
         self.assertIn("SEC-000002.json", str(e.exception))
 
+    def test_una_columna_nueva_del_apendice_b_cuenta_solo_donde_tiene_valor(self):
+        lineas = self.texto("data/apendices/B_entidades.csv").splitlines()
+        b = [lineas[0] + ',"notas"'] + [l + (',"revisada"' if l.startswith('"FIX-Gamma"') else ',""')
+                                          for l in lineas[1:]]
+        r = absorber.informe(str(MINI), str(self.version({"data/apendices/B_entidades.csv": "\n".join(b) + "\n"})))
+        self.assertEqual({e["label"] for e in r["entities"]}, {"FIX-Omega", "FIX-Gamma"})
+        [gamma] = [e for e in r["entities"] if e["label"] == "FIX-Gamma"]
+        self.assertEqual(gamma["columns"], ["notas"])
+
+    def test_las_sucesiones_se_buscan_por_el_numero_nuevo(self):
+        # C-005 vuelve como C-013, superada y con su sucesora declarada por el
+        # número nuevo.
+        c013 = ('"C-013","FIX-Alfa y FIX-Gamma son el arranque del corredor.","FIX-Alfa","forma_con*","FIX-Gamma",'
+                '"sintesis(C-001; C-002)","n/a","no evaluado","media","Se sigue de C-001 y C-002.","resuelta",'
+                '"superada"\n')
+        suc = self.texto("data/auditoria/sucesiones_afirmaciones.csv") + '"C-013","C-009","Superada.","2026-09-27T00:00:00Z"\n'
+        v = self.version({"data/afirmaciones/00.csv": self.texto("data/afirmaciones/00.csv") + c013,
+                          "data/auditoria/sucesiones_afirmaciones.csv": suc})
+        r = absorber.informe(str(MINI), str(v))
+        [f] = [f for f in r["sections"]["00"]["rows"] if f["row"] == "C-005"]
+        self.assertEqual((f["to"], f["successors"]), ("C-013", ["C-009"]))
+        self.assertNotIn("aviso", f)
+
+    def test_una_sucesion_nueva_sin_cambio_de_fila_pide_decision(self):
+        suc = self.texto("data/auditoria/sucesiones_afirmaciones.csv") + '"C-002","C-009","Otra.","2026-09-27T00:00:00Z"\n'
+        r = absorber.informe(str(MINI), str(self.version({"data/auditoria/sucesiones_afirmaciones.csv": suc})))
+        s = r["sections"]["00"]["successions"]
+        self.assertEqual(s["C-002"], {"to": "C-002", "before": [], "after": ["C-009"]})
+        self.assertNotIn("C-003", s)  # ya sale en sus filas, con sus sucesoras
+        self.assertIsNone(absorber.esqueleto(r)["sections"]["00"]["successions"]["C-002"]["decision"])
+
+    def test_una_tabla_fuera_de_la_capa_canonica_se_rechaza(self):
+        indice = self.texto("data/table_index.json").replace("data/tablas/00/table-01-00-edades.csv",
+                                                             "data/tablas/00/no-existe.csv")
+        with self.assertRaises(SystemExit) as e:
+            absorber.informe(str(MINI), str(self.version({"data/table_index.json": indice})))
+        self.assertIn("no-existe.csv", str(e.exception))
+
     def test_una_fila_que_cambia_de_seccion_desfasa_los_dos_borradores(self):
         seccion0 = self.texto("data/afirmaciones/00.csv").splitlines(keepends=True)
         [c004] = [l for l in seccion0 if l.startswith('"C-004"')]
