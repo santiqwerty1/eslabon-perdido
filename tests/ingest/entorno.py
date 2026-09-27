@@ -18,6 +18,7 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "scripts" / "ingest"))
 sys.path.insert(0, str(ROOT / "scripts" / "validate"))
 
+import absorber  # noqa: E402
 import convertir  # noqa: E402
 import corredor  # noqa: E402
 import delta as delta_mod  # noqa: E402
@@ -56,6 +57,7 @@ class Entorno:
             (delta_mod, "DELTAS"): tmp / "deltas",
             (delta_mod, "HISTORIAL"): tmp / "deltas" / "historial.jsonl",
             (convertir, "CONVERSIONS"): tmp,
+            (absorber, "ABSORCIONES"): tmp / "absorptions",
         }
 
     def __enter__(self):

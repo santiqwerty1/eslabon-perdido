@@ -10,6 +10,9 @@ fichero (DEC-057). Este script hace lo mecánico.
 
     informe ANTES DESPUES   qué registros toca cada cambio, y el esqueleto del
                             fichero de absorción con las decisiones en blanco
+    construir FICHERO ANTES DESPUES
+                            el delta ABS-<commit> desde el fichero revisado: al
+                            aplicarlo, la congelación activa pasa a DESPUES
 
 ANTES tiene que ser la congelación activa: el informe cruza el diff con lo que
 se ingirió de ella. `informe` no escribe nada en `knowledge/`; deja en
@@ -30,6 +33,13 @@ Por sección ingerida, el informe dice:
 
 La correspondencia de cada fila con sus registros no vive en un fichero aparte:
 `corredor.correspondencia()` la reconstruye de los deltas aplicados.
+
+`construir` rehace el informe, exige que el fichero cubra justo sus puntos de
+decisión y ejecuta las decisiones sobre lo que ya existe: conservar, corregir
+con parches, retirar, reanclar, dar mención a las etiquetas nuevas y actualizar
+fuentes. Las que crearían registros nuevos se niegan con su motivo. La prosa,
+el registro y los pasajes nuevos van a ficheros con sufijo de versión; los de
+antes no se tocan. El estado resultante se valida entero antes de escribir.
 """
 
 from __future__ import annotations
@@ -39,7 +49,7 @@ import difflib
 import json
 import re
 import sys
-from collections import defaultdict
+from collections import Counter, defaultdict
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
@@ -52,11 +62,13 @@ import freeze  # noqa: E402
 import ingest as base  # noqa: E402
 
 GENERATED = base.ROOT / "generated" / "absorcion"
+ABSORCIONES = base.CORPUS / "absorptions"
 SUCESIONES = "data/auditoria/sucesiones_afirmaciones.csv"
 FUENTES = "data/apendices/A_fuentes.csv"
 ENTIDADES = "data/apendices/B_entidades.csv"
 
 EJES = ("Aceptación", "Fuerza", "Motivo", "Resolución", "Vigencia")
+MENCION_EN_BLANCO = {"mention_type": None, "disposition": None, "targets": [], "reason": None}
 QUE_TOCA = {
     "Afirmación": "el enunciado: revisar lo que afirma cada registro",
     "Sujeto": "el sujeto y su mención",
@@ -97,6 +109,25 @@ def entradas_de_conversion(conversion: dict) -> tuple[dict[str, dict], list[str]
         return {}, [f"{conversion['delta']} no sigue el orden de su fichero de conversión: "
                     "no se sabe la primera fila de cada registro"]
     return {op["record_id"]: e for op, e in zip(altas, entradas)}, []
+
+
+def filas_de_registros(s: dict) -> tuple[dict[str, list[str]], list[str]]:
+    """De qué filas sale cada registro de una sección, en su orden, y los avisos.
+
+    La primera fila fija sus ejes. Tras una absorción lo dice su delta, con los
+    números de la versión absorbida; antes, el fichero de conversión.
+    """
+    if s.get("record_rows") is not None:
+        return {rid: list(filas) for rid, filas in s["record_rows"].items()}, []
+    if not s["conversion"]:
+        return {}, []
+    entradas, avisos = entradas_de_conversion(s["conversion"])
+    return {rid: list(e.get("rows") or []) for rid, e in entradas.items()}, avisos
+
+
+def pasajes_vigentes(s: dict) -> Path:
+    """El fichero de los pasajes vigentes de una sección: el de su ingestión o su última absorción."""
+    return base.PASSAGES / Path(s["files"]["passages"]).name
 
 
 def leer_sucesiones(raiz: Path) -> dict[str, list[str]]:
@@ -212,10 +243,12 @@ def aparece(etiqueta: str, texto: str) -> bool:
 # ---------------------------------------------------------------------------
 
 def informe(anterior: str, nueva: str) -> dict:
+    return informe_de(freeze.abrir(anterior), freeze.abrir(nueva))
+
+
+def informe_de(a: freeze.Fuente, b: freeze.Fuente) -> dict:
     ruta, activa = corredor.congelacion(None)
-    a = freeze.abrir(anterior)
     corredor.verificar(a, ruta, activa)
-    b = freeze.abrir(nueva)
     dif = freeze.diferencia(a, b)
     af = dif["afirmaciones"]
 
@@ -246,13 +279,14 @@ def informe(anterior: str, nueva: str) -> dict:
     # Toda fila ingerida, de cualquier sección: las citas de los apéndices se
     # cruzan con ellas.
     fila_de: dict[str, tuple[str, dict]] = {c: (sec, o) for sec, s in secciones.items() for c, o in s["rows"].items()}
-    menciones = {rid: r for rid, (f, r) in proy.items() if f == "mentions.jsonl"}
+    menciones = {rid: r for rid, (f, r) in proy.items()
+                 if f == "mentions.jsonl" and r.get("record_status", "active") == "active"}
 
     salida_secciones = {}
     for sec, s in sorted(secciones.items()):
-        entradas, av = entradas_de_conversion(s["conversion"]) if s["conversion"] else ({}, [])
+        de_registro, av = filas_de_registros(s)
         avisos += av
-        primera = {rid: e["rows"][0] for rid, e in entradas.items() if e.get("rows")}
+        primera = {rid: filas_r[0] for rid, filas_r in de_registro.items() if filas_r}
         filas, sin_cambios = [], 0
         for c in sorted(s["rows"], key=freeze._num):
             o = s["rows"][c]
@@ -310,7 +344,7 @@ def informe(anterior: str, nueva: str) -> dict:
         for c, o in s["rows"].items():
             for mid in o["mention_ids"]:
                 filas_de_mencion[mid].append(c)
-        viejos_p = base.PASSAGES / f"{s['section_id']}.json"
+        viejos_p = pasajes_vigentes(s)
         # La misma búsqueda que la ingestión: con dos prosas para la sección, la
         # ingestión se negaría, y el informe no puede elegir una.
         prosas = corredor.prosas_de_seccion(b.base, sec)
@@ -558,6 +592,10 @@ def esqueleto(r: dict) -> dict:
                 e["successors"] = {suc: [] for suc in f["successors"]}
             if "successors_before" in f:
                 e["successors_before"] = f["successors_before"]
+            # Una etiqueta nueva del sujeto o del objeto pide su mención, con el
+            # mismo vocabulario que una conversión.
+            if f.get("new_labels"):
+                e["new_mentions"] = {et: dict(MENCION_EN_BLANCO) for et in f["new_labels"]}
             filas[f["row"]] = e
         # Aparte de las filas ingeridas: una fila nueva puede ocupar el número
         # que otra dejó al renumerarse o retirarse, y las dos piden decisión.
@@ -736,6 +774,795 @@ def markdown(r: dict) -> list[str]:
     return lineas
 
 
+# ---------------------------------------------------------------------------
+# Construir el delta de absorción
+# ---------------------------------------------------------------------------
+
+# Qué decisión vale en cada punto de decisión. Las que crean registros nuevos o
+# parten una fila —reemplazar, dividir, ampliar, una fila nueva con registros,
+# emparejar— llegan con el constructor de registros nuevos: se nombran para
+# negarlas con su motivo, no para ignorarlas.
+DECISIONES = {
+    "rows": {"conservar", "corregir", "retirar"},
+    "mentions": {"reanclar", "retirar"},
+    "provenance": {"aceptar", "fijar"},
+    "successions": {"conservar", "corregir"},
+    "sources": {"actualizar", "conservar"},
+    "entities": {"conservar", "corregir", "retirar"},
+    "appendices": {"conservar", "corregir"},
+}
+DE_REGISTROS_NUEVOS = {"reemplazar", "dividir", "ampliar"}
+CON_MOTIVO = {"conservar", "corregir", "retirar"}
+# Lo que se rellena a mano. Lo demás lo escribió el informe y tiene que seguir
+# igual: un fichero rellenado para otro diff no describe éste.
+RELLENABLES = {
+    "rows": {"decision", "reason", "patches", "new_mentions"},
+    "new_rows": {"destination", "keys", "note"},
+    "mentions": {"decision", "reason", "passage"},
+    "provenance": {"decision", "reason", "paragraphs"},
+    "successions": {"decision", "reason", "patches"},
+    "sources": {"decision", "reason", "pair_with"},
+    "entities": {"decision", "reason", "patches"},
+    "appendices": {"decision", "reason", "patches"},
+}
+# Un parche no fija lo que se deduce (convertir.DERIVADOS) ni un enlace cuyo
+# otro lado habría que rehacer: eso es trabajo del constructor de registros.
+ENLACES = {"subject_id", "object", "supports_claim_ids", "challenges_claim_ids", "analysis_id", "result_ids",
+           "temporal_expression_ids", "temporal_expression_id", "issue_ids", "affects", "superseded_by",
+           "merged_into"}
+FECHA = re.compile(r"^\d{4}-\d{2}-\d{2}$")
+
+
+def revisar(spec: dict, esq: dict) -> list[str]:
+    """Lo que falla en un fichero de absorción frente al esqueleto del informe rehecho.
+
+    Tiene que cubrir exactamente sus puntos de decisión, con lo que escribió el
+    informe intacto y una decisión válida en cada uno.
+    """
+    errores: list[str] = []
+
+    def entrada(donde: str, tipo: str, hecho: dict, pedido: dict) -> None:
+        if not isinstance(hecho, dict):
+            errores.append(f"{donde}: no es un objeto")
+            return
+        fijos = {k: v for k, v in pedido.items() if k not in RELLENABLES[tipo]}
+        puestos = {k: v for k, v in hecho.items() if k not in RELLENABLES[tipo]}
+        if fijos != puestos:
+            distintos = sorted(k for k in set(fijos) | set(puestos) if fijos.get(k) != puestos.get(k))
+            errores.append(f"{donde}: {', '.join(distintos)} no es lo que dice el informe de esta versión")
+        if tipo == "new_rows":
+            destino = hecho.get("destination")
+            if destino is None:
+                errores.append(f"{donde}: sin destino")
+            elif destino != "H" or hecho.get("keys"):
+                errores.append(f"{donde}: una fila nueva con registros (destino {destino}) llega con el "
+                               "constructor de registros nuevos; hoy sólo se absorbe como glosa (H) sin `keys`")
+            return
+        decision = hecho.get("decision")
+        if decision is None:
+            # Una fila sólo renumerada se arrastra sin decidir nada.
+            if not (tipo == "rows" and pedido.get("class") == "renumerada"):
+                errores.append(f"{donde}: sin decisión")
+        elif decision in DE_REGISTROS_NUEVOS:
+            errores.append(f"{donde}: «{decision}» crea registros nuevos, y eso llega con el constructor de "
+                           "registros nuevos; hoy se puede conservar, corregir o retirar")
+        elif decision not in DECISIONES[tipo]:
+            errores.append(f"{donde}: decisión «{decision}» desconocida; aquí vale "
+                           + ", ".join(sorted(DECISIONES[tipo])))
+        motivo = (hecho.get("reason") or "").strip()
+        if decision in CON_MOTIVO and not motivo:
+            errores.append(f"{donde}: «{decision}» sin `reason`")
+        if decision == "corregir" and not hecho.get("patches"):
+            errores.append(f"{donde}: «corregir» sin `patches`")
+        if decision != "corregir" and hecho.get("patches"):
+            errores.append(f"{donde}: `patches` sólo acompaña a «corregir»")
+        if tipo == "rows":
+            if pedido.get("class") == "retirada" and decision not in (None, "retirar", "conservar"):
+                errores.append(f"{donde}: la fila ya no está en la versión nueva; se retira o se conserva")
+            if decision == "retirar" and pedido.get("class") != "retirada":
+                errores.append(f"{donde}: sólo se retira una fila que la versión nueva retira; los registros de "
+                               "una fila que sigue se corrigen, o se reemplazan con el constructor de registros nuevos")
+            nuevas = hecho.get("new_mentions") or {}
+            if set(nuevas) != set(pedido.get("new_mentions") or {}):
+                errores.append(f"{donde}: `new_mentions` no son las etiquetas nuevas que da el informe")
+            elif decision in ("conservar", "corregir"):
+                for etiqueta, m in sorted(nuevas.items()):
+                    errores.extend(f"{donde}, mención nueva «{etiqueta}»: {e}" for e in mencion_mal(m))
+        if tipo == "mentions" and hecho.get("passage") is not None and (
+                not isinstance(hecho["passage"], int) or decision != "reanclar"):
+            errores.append(f"{donde}: `passage` es el número de párrafo al que se reancla")
+        if tipo == "provenance":
+            parrafos = hecho.get("paragraphs")
+            if decision == "fijar" and not (isinstance(parrafos, list) and parrafos
+                                             and all(isinstance(n, int) for n in parrafos)):
+                errores.append(f"{donde}: «fijar» necesita `paragraphs`, los números de párrafo de la prosa nueva")
+            if decision != "fijar" and parrafos:
+                errores.append(f"{donde}: `paragraphs` sólo acompaña a «fijar»")
+        if tipo == "sources" and hecho.get("pair_with") is not None:
+            errores.append(f"{donde}: emparejar una fuente que cambió de clave llega con el constructor de "
+                           "registros nuevos")
+
+    def diccionario(donde: str, tipo: str, hechos, pedidos: dict) -> None:
+        hechos = hechos if isinstance(hechos, dict) else {}
+        for k in sorted(set(pedidos) - set(hechos)):
+            errores.append(f"{donde}: falta {k}")
+        for k in sorted(set(hechos) - set(pedidos)):
+            errores.append(f"{donde}: {k} no es un cambio de esta versión")
+        for k in sorted(set(pedidos) & set(hechos)):
+            entrada(f"{donde} {k}", tipo, hechos[k], pedidos[k])
+
+    def lista(donde: str, tipo: str, hechas, pedidas: list) -> None:
+        hechas = hechas if isinstance(hechas, list) else []
+        if len(hechas) != len(pedidas):
+            errores.append(f"{donde}: {len(hechas)} entradas, y el informe da {len(pedidas)}")
+            return
+        for n, (h, p) in enumerate(zip(hechas, pedidas), 1):
+            entrada(f"{donde} #{n}", tipo, h, p)
+
+    secciones = spec.get("sections") if isinstance(spec.get("sections"), dict) else {}
+    for sec in sorted(set(esq["sections"]) - set(secciones)):
+        errores.append(f"faltan las decisiones de la sección {sec}")
+    for sec in sorted(set(secciones) - set(esq["sections"])):
+        errores.append(f"la sección {sec} no pide decisiones en esta versión")
+    for sec in sorted(set(secciones) & set(esq["sections"])):
+        h, e = secciones[sec], esq["sections"][sec]
+        if h.get("section_id") != e["section_id"]:
+            errores.append(f"sección {sec}: `section_id` no es {e['section_id']}")
+        if h.get("records"):
+            errores.append(f"sección {sec}: `records` declara registros nuevos, y eso llega con el constructor "
+                           "de registros nuevos")
+        for tipo in ("rows", "new_rows", "mentions", "provenance", "successions"):
+            diccionario(f"sección {sec}, {tipo}", tipo, h.get(tipo), e[tipo])
+    diccionario("sources", "sources", spec.get("sources"), esq["sources"])
+    lista("entities", "entities", spec.get("entities"), esq["entities"])
+    apendices = spec.get("appendices") if isinstance(spec.get("appendices"), dict) else {}
+    for ruta in sorted(set(esq["appendices"]) - set(apendices)):
+        errores.append(f"appendices: falta {ruta}")
+    for ruta in sorted(set(apendices) - set(esq["appendices"])):
+        errores.append(f"appendices: {ruta} no cambia en esta versión")
+    for ruta in sorted(set(apendices) & set(esq["appendices"])):
+        lista(f"appendices {ruta}", "appendices", apendices[ruta], esq["appendices"][ruta])
+    return errores
+
+
+def mencion_mal(m) -> list[str]:
+    """Lo que falla en la decisión sobre una mención nueva: el vocabulario de una conversión."""
+    if not isinstance(m, dict):
+        return ["no es un objeto"]
+    errores = []
+    if not m.get("mention_type"):
+        errores.append("sin `mention_type`")
+    if not m.get("disposition"):
+        errores.append("sin `disposition`")
+    elif m["disposition"] in convertir.SIN_OBJETIVO:
+        if not (m.get("reason") or "").strip():
+            errores.append("descartada sin `reason`")
+    elif not m.get("targets"):
+        errores.append(f"{m['disposition']} sin `targets`")
+    claves = [t for t in m.get("targets") or [] if not (isinstance(t, str) and convertir.LITERAL.match(t))]
+    if claves:
+        errores.append(f"`targets` {', '.join(map(str, claves))} no son identificadores: una mención nueva apunta a "
+                       "registros que ya existen; a uno nuevo, con el constructor de registros nuevos")
+    return errores
+
+
+def es_de_localizacion(nota: str) -> bool:
+    """Si una nota de mención es de las que escribe corredor.localizar sobre su pasaje."""
+    return (nota.startswith("en el pasaje aparece como «")
+            or nota == "la etiqueta no aparece literal en el pasaje; los offsets cubren el pasaje entero")
+
+
+def nota_j(fila: str, datos: dict) -> str:
+    """La nota de evaluación de una evidencia de una fila J, como la escribe convertir.py."""
+    e = convertir.ejes(datos)
+    return (f"Evaluación de la fila {fila} (destino J): acceptance={e['acceptance']}; "
+            f"evidence_strength={e['evidence_strength']}"
+            + (f" ({e['evidence_strength_reason']})" if e["evidence_strength_reason"] else "")
+            + f"; resolution={e['resolution']}; historical_status={e['historical_status']}")
+
+
+def claves_de_fuente(filas: list[str], datos: dict[str, tuple[str, dict]]) -> list[str]:
+    return sorted({k for c in filas for k in convertir.CITA.findall(datos[c][1].get("Fuente", ""))},
+                  key=lambda k: int(k[1:]))
+
+
+def validar_estado(cambios: dict, altas: list[tuple[str, dict]]) -> list[str]:
+    """Los errores de validación que el delta añadiría al libro mayor.
+
+    Se valida el estado entero tal como quedaría, con todas las familias, y se
+    compara con el de partida: sólo cuenta lo nuevo, no lo que ya estaba.
+    """
+    import tempfile
+    import validate
+
+    def normal(errores: list[str]) -> set[str]:
+        return {re.sub(r":\d+:", ":", e) for e in errores}
+
+    antes = normal(validate.run(list(validate.FAMILY_ORDER), base.RECORDS).errors)
+    with tempfile.TemporaryDirectory(prefix="absorcion-") as tmp:
+        por_fichero = {p.name: convertir.registros(p.name) for p in sorted(base.RECORDS.glob("*.jsonl"))}
+        for rid, (fichero, _, despues) in cambios.items():
+            por_fichero[fichero] = [despues if r.get("id") == rid else r for r in por_fichero[fichero]]
+        for fichero, rec in altas:
+            por_fichero.setdefault(fichero, []).append(rec)
+        for fichero, recs in por_fichero.items():
+            (Path(tmp) / fichero).write_text("".join(json.dumps(r, ensure_ascii=False) + "\n" for r in recs),
+                                             encoding="utf-8")
+        despues = normal(validate.run(list(validate.FAMILY_ORDER), Path(tmp)).errors)
+    return sorted(despues - antes)
+
+
+def construir(ruta_spec: Path, anterior: str, nueva: str) -> dict:
+    """El delta de absorción de un fichero revisado, sin escribir nada.
+
+    Devuelve el delta, las copias y los pasajes que hay que escribir junto a él,
+    y lo que dice el informe de la construcción.
+    """
+    # La entrada revisada queda donde el snapshot la registra, como un fichero
+    # de conversión: fuera de ahí, cambiarla o perderla no lo notaría nadie.
+    if ruta_spec.resolve().parent != ABSORCIONES.resolve() or ruta_spec.suffix != ".json":
+        raise SystemExit(f"ERROR el fichero de absorción tiene que estar en knowledge/corpus/absorptions/ "
+                         f"({ruta_spec})")
+    spec_bytes = ruta_spec.read_bytes()
+    spec = json.loads(spec_bytes)
+    try:
+        import jsonschema  # noqa: F401
+    except ImportError:
+        raise SystemExit("ERROR jsonschema no está instalado: absorber.py no escribe un delta sin validarlo "
+                         "contra los esquemas (make setup)")
+
+    # --- de dónde parte ---------------------------------------------------------
+    manifiesto = json.loads(base.MANIFEST.read_text(encoding="utf-8"))
+    rev_antes, rev_despues, pendientes = base.revision_siguiente(manifiesto)
+    if pendientes:
+        raise SystemExit(f"ERROR hay deltas sin aplicar ({', '.join(pendientes)}): una absorción parte del libro "
+                         "mayor aplicado, y se aplica o se retira lo pendiente antes")
+    secciones = corredor.correspondencia()
+    sin_convertir = sorted(sec for sec, s in secciones.items() if not s["conversion"])
+    if sin_convertir:
+        raise SystemExit(f"ERROR secciones ingeridas sin convertir: {', '.join(sin_convertir)}. Se convierten "
+                         "antes de absorber: su conversión parte de la versión de la que se ingirieron")
+    a, b = freeze.abrir(anterior), freeze.abrir(nueva)
+    r = informe_de(a, b)
+
+    destino = spec.get("to") if isinstance(spec.get("to"), dict) else {}
+    ruta_to = base.ROOT / destino["path"] if destino.get("path") else None
+    if ruta_to is None or not ruta_to.exists():
+        raise SystemExit(f"ERROR falta la congelación de la versión nueva ({destino.get('path')}): se congela "
+                         "antes de absorberla (make corpus-freeze) y su ruta va en `to`")
+    congelada = json.loads(ruta_to.read_text(encoding="utf-8"))
+    if freeze.huella(congelada["files"]) != congelada.get("fingerprint"):
+        raise SystemExit(f"ERROR {destino['path']} es incoherente: su huella no corresponde a sus ficheros")
+    if congelada["fingerprint"] != r["to"]["fingerprint"]:
+        raise SystemExit(f"ERROR {b.etiqueta} no es la versión congelada en {destino['path']}")
+    if destino.get("fingerprint") != congelada["fingerprint"]:
+        raise SystemExit(f"ERROR `to` declara la huella {destino.get('fingerprint')}, y {destino['path']} "
+                         f"congela {congelada['fingerprint']}")
+    if spec.get("from") != {"path": r["from"]["path"], "fingerprint": r["from"]["fingerprint"]}:
+        raise SystemExit("ERROR el fichero de absorción parte de otra congelación que la activa "
+                         f"({r['from']['path']})")
+    if not FECHA.match(str(spec.get("received_at") or "")):
+        raise SystemExit("ERROR `received_at` tiene que ser la fecha de la absorción (AAAA-MM-DD): el delta sale "
+                         "de ella, no del día en que se construye")
+    if spec.get("pairing"):
+        raise SystemExit("ERROR `pairing` corrige emparejamientos del diff, y eso llega con el constructor de "
+                         "registros nuevos; hoy tiene que estar vacío")
+    errores = revisar(spec, esqueleto(r))
+    if errores:
+        raise SystemExit("ERROR el fichero de absorción no cubre esta versión:\n  " + "\n  ".join(errores))
+    por_seccion = spec.get("sections") or {}
+
+    af = r["diff"]["afirmaciones"]
+    mapa = {x["de"]: x["a"] for x in af["correspondencia"]}
+    inverso = {j: i for i, j in mapa.items()}
+    modificadas = {m["de"]: m for m in af["modificadas"]}
+    filas_a, filas_b = freeze.leer_afirmaciones(a.base), freeze.leer_afirmaciones(b.base)
+    proy = registros_actuales()
+    suf = r["suffix"]
+    avisos = list(r["warnings"])
+    cambios: dict[str, list] = {}
+    retirados: dict[str, str] = {}
+    altas: list[tuple[str, dict]] = []
+    ficheros: dict[Path, bytes] = {}
+
+    def tocar(rid: str) -> dict:
+        if rid not in cambios:
+            fichero, antes = proy[rid]
+            cambios[rid] = [fichero, antes, json.loads(json.dumps(antes))]
+        return cambios[rid][2]
+
+    def retirar(rid: str, motivo: str) -> None:
+        rec = tocar(rid)
+        rec["record_status"] = "deprecated"
+        if "notes" in rec or cambios[rid][0] == "mentions.jsonl":
+            rec["notes"] = [*(rec.get("notes") or []), f"absorción {suf}: retirado; {motivo}"]
+        retirados[rid] = motivo
+
+    # --- parches: sólo registros que salieron del corpus, uno por sitio ------------
+    derivados = {rid for s in secciones.values() for o in s["rows"].values() for rid in o["record_ids"]}
+    parches: dict[str, tuple[str, dict]] = {}
+
+    def recoger(donde: str, d: dict) -> None:
+        if d.get("decision") != "corregir":
+            return
+        if not isinstance(d.get("patches"), dict):
+            errores.append(f"{donde}: `patches` va de registro a {{campo: valor}}")
+            return
+        for rid, parche in sorted(d["patches"].items()):
+            if not isinstance(parche, dict) or not parche:
+                errores.append(f"{donde}: el parche de {rid} tiene que ser un objeto {{campo: valor}} con algo dentro")
+                continue
+            if rid in parches:
+                errores.append(f"{donde}: {rid} ya se corrige en {parches[rid][0]}; un registro se corrige en un sitio")
+                continue
+            if rid not in proy:
+                errores.append(f"{donde}: {rid} no existe")
+                continue
+            if rid not in derivados:
+                errores.append(f"{donde}: {rid} no salió de ninguna fila ingerida; una absorción sólo corrige eso")
+                continue
+            fichero = proy[rid][0]
+            prohibidos = sorted(set(parche) & {*convertir.DERIVADOS, *convertir.DERIVADOS_POR_FICHERO.get(fichero, ())})
+            enlaces = sorted(set(parche) & ENLACES)
+            ajenos = sorted(set(parche) - convertir.propiedades(fichero)) if fichero in convertir.ESQUEMA else []
+            if prohibidos:
+                errores.append(f"{donde}: {rid}: {', '.join(prohibidos)} se deduce, no se corrige a mano")
+            if enlaces:
+                errores.append(f"{donde}: {rid}: cambiar {', '.join(enlaces)} obliga a rehacer el otro lado del "
+                               "enlace, y eso llega con el constructor de registros nuevos")
+            if ajenos:
+                errores.append(f"{donde}: {rid}: {', '.join(ajenos)} no es un campo de {fichero}")
+            parches[rid] = (donde, parche)
+
+    for sec, h in sorted(por_seccion.items()):
+        for tipo in ("rows", "successions"):
+            for k, d in sorted(h.get(tipo, {}).items()):
+                recoger(f"sección {sec}, {tipo} {k}", d)
+    for n, d in enumerate(spec.get("entities") or [], 1):
+        recoger(f"entities #{n}", d)
+    for ruta, entradas in sorted((spec.get("appendices") or {}).items()):
+        for n, d in enumerate(entradas, 1):
+            recoger(f"appendices {ruta} #{n}", d)
+
+    # --- menciones que se retiran por su entidad --------------------------------------
+    menciones_fuera: dict[str, str] = {}
+    for n, e in enumerate(spec.get("entities") or [], 1):
+        if e.get("decision") == "retirar":
+            for mid in e["mention_ids"]:
+                menciones_fuera[mid] = f"la entidad «{e['label']}» sale del apéndice B: {e['reason']}"
+
+    # --- fuentes ----------------------------------------------------------------------------
+    fuente_de_clave = {rec.get("citation_key"): rid for rid, (f, rec) in proy.items()
+                       if f == "sources.jsonl" and rec.get("citation_key")}
+    cab, filas_ap = freeze.leer_csv(b.base / FUENTES) if (b.base / FUENTES).exists() else ([], [])
+    col_doi = next((c for c in cab if c.strip().lower().startswith("doi")), "")
+    apendice_a = {f["clave"].strip(): f for f in filas_ap if (f.get("clave") or "").strip()}
+    siguiente_src = [None]
+
+    def fuente(clave: str, donde: str) -> str | None:
+        if clave in fuente_de_clave:
+            return fuente_de_clave[clave]
+        if clave not in apendice_a:
+            errores.append(f"{donde}: cita {clave}, que el apéndice A de la versión nueva no tiene")
+            return None
+        if siguiente_src[0] is None:
+            siguiente_src[0] = base.siguiente_libre("SRC", convertir.usados("SRC"))
+        rid = f"SRC-{siguiente_src[0]:06d}"
+        siguiente_src[0] += 1
+        altas.append(("sources.jsonl", {"id": rid, **convertir.fuente_de_apendice(apendice_a[clave], col_doi)}))
+        fuente_de_clave[clave] = rid
+        return rid
+
+    for clave, d in sorted((spec.get("sources") or {}).items()):
+        if d.get("decision") == "actualizar":
+            if clave not in apendice_a:
+                errores.append(f"sources {clave}: el apéndice A de la versión nueva ya no la tiene; no hay "
+                               "con qué actualizarla")
+                continue
+            rec = tocar(d["record_id"])
+            for k, v in convertir.fuente_de_apendice(apendice_a[clave], col_doi).items():
+                if k not in ("verification_status", "record_status"):
+                    rec[k] = v
+
+    # --- secciones ----------------------------------------------------------------------------
+    siguiente_pasaje = base.siguiente_libre("PASSAGE", base.ids_de_pasajes())
+    siguiente_mencion = base.siguiente_libre("MENTION", base.ids_en_uso("mentions.jsonl", "MENTION")
+                                             | base.reservados_por_deltas("MENTION"))
+    bloque: dict[str, dict] = {}
+    resumen: dict[str, dict] = {}
+    for sec, s in sorted(secciones.items()):
+        sid = s["section_id"]
+        h = por_seccion.get(sec, {})
+        propias = sorted((c for c, (sv, _) in filas_b.items() if sv == sec), key=freeze._num)
+        # Una fila que cambia de sección se lleva sus registros a otra: eso es
+        # rehacer dos secciones, trabajo del constructor de registros nuevos.
+        for c in propias:
+            if c in inverso and inverso[c] not in s["rows"]:
+                errores.append(f"{c} llega a la sección {sec} desde otra ({inverso[c]}); mover filas entre "
+                               "secciones llega con el constructor de registros nuevos")
+        for c in s["rows"]:
+            if c in mapa and filas_b[mapa[c]][0] != sec:
+                errores.append(f"{c} deja la sección {sec} ({mapa[c]}); mover filas entre secciones llega con el "
+                               "constructor de registros nuevos")
+        prosas = corredor.prosas_de_seccion(b.base, sec)
+        registro_b = b.base / "data" / "afirmaciones" / f"{sec}.csv"
+        if not prosas or not registro_b.exists():
+            errores.append(f"la sección {sec} desaparece de la versión nueva; retirarla entera llega con el "
+                           "constructor de registros nuevos")
+            continue
+        prosa_b = prosas[0]
+        texto_bytes, registro_bytes = prosa_b.read_bytes(), registro_b.read_bytes()
+        texto = texto_bytes.decode("utf-8")
+        prosa_cambia = base.sha256(texto_bytes) != s["files"]["prose"]["sha256"]
+        registro_cambia = base.sha256(registro_bytes) != s["files"]["registry"]["sha256"]
+        viejos = json.loads(pasajes_vigentes(s).read_text(encoding="utf-8"))
+        parrafos = base.segmentar(texto)
+
+        # Copias y pasajes de la versión nueva. Los de antes no se tocan: son el
+        # texto del que salieron los registros hasta hoy.
+        files = {k: dict(v) if isinstance(v, dict) else v for k, v in s["files"].items()}
+        if prosa_cambia:
+            ruta_p = base.PASSAGES / f"{sid}.{suf}.json"
+            forma = [(c, i, f) for i, f, c in parrafos]
+            if ruta_p.exists():
+                # Un intento anterior, revertido: sus pasajes ya se emitieron y
+                # se reutilizan, o el mismo texto tendría dos juegos de ids.
+                nuevos = json.loads(ruta_p.read_text(encoding="utf-8"))
+                if [(p["text"], p["character_offsets"]["start"], p["character_offsets"]["end"])
+                        for p in nuevos] != forma:
+                    raise SystemExit(f"ERROR {corredor._rel(ruta_p)} ya existe y no son los párrafos de esta versión")
+            else:
+                nuevos = [{"id": f"PASSAGE-{siguiente_pasaje + n:06d}", "section_id": sid, "ordinal": n + 1,
+                           "text": c, "character_offsets": {"start": i, "end": f}, "record_status": "active"}
+                          for n, (c, i, f) in enumerate(forma)]
+                siguiente_pasaje += len(nuevos)
+            ficheros[ruta_p] = (json.dumps(nuevos, indent=2, ensure_ascii=False) + "\n").encode("utf-8")
+            ficheros[base.SECTIONS / f"{sid}.{suf}.md"] = texto_bytes
+            files["prose"] = {"path": prosa_b.relative_to(b.base).as_posix(), "sha256": base.sha256(texto_bytes),
+                              "copy": f"knowledge/corpus/sections/{sid}.{suf}.md"}
+            files["passages"] = f"knowledge/corpus/passages/{sid}.{suf}.json"
+            alineacion = pasajes_cambiados(viejos, texto)
+            por_ordinal = {p["ordinal"]: p["id"] for p in nuevos}
+            mapa_p = {x["antes"]: (por_ordinal[x["ordinal"]] if x["ordinal"] else None)
+                      for x in alineacion if x["antes"]}
+            estado_p = {x["antes"]: x["estado"] for x in alineacion if x["antes"]}
+        else:
+            nuevos = viejos
+            por_ordinal = {n: p["id"] for n, p in enumerate(nuevos, 1)}
+            mapa_p = {p["id"]: p["id"] for p in viejos}
+            estado_p = {p["id"]: "igual" for p in viejos}
+        if registro_cambia:
+            ficheros[base.SECTIONS / f"{sid}.{suf}.registro.csv"] = registro_bytes
+            files["registry"] = {"path": registro_b.relative_to(b.base).as_posix(),
+                                 "sha256": base.sha256(registro_bytes),
+                                 "copy": f"knowledge/corpus/sections/{sid}.{suf}.registro.csv"}
+        pasaje = {p["id"]: p for p in nuevos}
+        viejo_p = {p["id"]: p for p in viejos}
+
+        # De qué párrafos cuelga cada fila en la versión nueva: la regla de la
+        # ingestión, salvo donde el fichero fija otros.
+        anclaje = anclaje_nuevo(b.base, parrafos, propias)
+        fijadas = {c: d for c, d in h.get("provenance", {}).items() if d.get("decision") == "fijar"}
+        for c, d in sorted(fijadas.items()):
+            fuera = [n for n in d["paragraphs"] if n not in por_ordinal]
+            if fuera:
+                errores.append(f"sección {sec}, provenance {c}: la prosa nueva no tiene el párrafo "
+                               f"{', '.join(map(str, fuera))}")
+
+        def colgar(c_nuevo: str) -> tuple[list[str], str | None]:
+            viejo = inverso.get(c_nuevo)
+            if viejo in fijadas:
+                ords = [n for n in fijadas[viejo]["paragraphs"] if n in por_ordinal]
+                return [por_ordinal[n] for n in ords], "fijada en la absorción"
+            ords, via = anclaje.get(c_nuevo, ([], None))
+            return [por_ordinal[n] for n in ords], via
+
+        # --- menciones ------------------------------------------------------------------
+        de_la_seccion = {mid: m for mid, (f, m) in proy.items()
+                         if f == "mentions.jsonl" and m.get("section_id") == sid
+                         and m.get("record_status", "active") == "active"}
+        informadas = {m["mention"]: m for m in r["sections"][sec]["mentions"]}
+        retiradas_m: set[str] = set()
+        reancladas = 0
+        for mid, m in sorted(de_la_seccion.items()):
+            d = h.get("mentions", {}).get(mid)
+            if mid in menciones_fuera:
+                if d is not None and d.get("decision") == "reanclar":
+                    errores.append(f"sección {sec}, mentions {mid}: se reancla, y su entidad la retira")
+                retirar(mid, menciones_fuera[mid])
+                retiradas_m.add(mid)
+                continue
+            if not prosa_cambia:
+                continue
+            estado = estado_p.get(m.get("passage_id"))
+            if estado is None:
+                continue  # cuelga de un pasaje de otra versión: ya no es de la prosa vigente
+            if estado in ("igual", "desplazado"):
+                nuevo = pasaje[mapa_p[m["passage_id"]]]
+                salto = nuevo["character_offsets"]["start"] - viejo_p[m["passage_id"]]["character_offsets"]["start"]
+                rec = tocar(mid)
+                rec["passage_id"] = nuevo["id"]
+                rec["character_offsets"] = {k: v + salto for k, v in m["character_offsets"].items()}
+                reancladas += 1
+                continue
+            if d is None:
+                errores.append(f"sección {sec}: la mención {mid} cuelga de un pasaje {estado} y no tiene decisión")
+                continue
+            if d["decision"] == "retirar":
+                retirar(mid, d["reason"])
+                retiradas_m.add(mid)
+                continue
+            ordinal = d.get("passage")
+            if ordinal is None:
+                citada = (informadas.get(mid) or {}).get("cited_in") or []
+                if not citada:
+                    errores.append(f"sección {sec}, mentions {mid}: su fila no se cita en la prosa nueva; di a "
+                                   "qué párrafo se reancla (`passage`) o retírala")
+                    continue
+                ordinal = citada[0]
+            if ordinal not in por_ordinal:
+                errores.append(f"sección {sec}, mentions {mid}: la prosa nueva no tiene el párrafo {ordinal}")
+                continue
+            ini, fin, nota = corredor.localizar(m["original_text"], pasaje[por_ordinal[ordinal]])
+            rec = tocar(mid)
+            rec["passage_id"] = por_ordinal[ordinal]
+            rec["character_offsets"] = {"start": ini, "end": fin}
+            # La nota de cómo aparece la etiqueta era del pasaje de antes: la
+            # sustituye la del nuevo, y otra deja constancia del cambio.
+            rec["notes"] = [n for n in rec.get("notes") or [] if not es_de_localizacion(n)]
+            rec["notes"] += [f"absorción {suf}: reanclada al párrafo {ordinal}", *([nota] if nota else [])]
+            reancladas += 1
+
+        # Menciones nuevas: las etiquetas que la versión nueva introduce.
+        nuevas_de_fila: dict[str, list[str]] = defaultdict(list)
+        for viejo, d in sorted(h.get("rows", {}).items(), key=lambda x: freeze._num(x[0])):
+            if d.get("decision") not in ("conservar", "corregir"):
+                continue
+            c = mapa[viejo]
+            pids, _ = colgar(c)
+            for etiqueta, dm in sorted((d.get("new_mentions") or {}).items()):
+                if not pids:
+                    errores.append(f"sección {sec}, rows {viejo}: la fila no cuelga de ningún párrafo nuevo; "
+                                   f"no hay dónde anclar «{etiqueta}»")
+                    continue
+                ajenos = [t for t in dm["targets"] if t not in proy]
+                if ajenos:
+                    errores.append(f"sección {sec}, rows {viejo}, mención nueva «{etiqueta}»: "
+                                   f"{', '.join(ajenos)} no existe")
+                    continue
+                ini, fin, nota = corredor.localizar(etiqueta, pasaje[pids[0]])
+                mid = f"MENTION-{siguiente_mencion:06d}"
+                siguiente_mencion += 1
+                cuestiones = [t for t in dm["targets"] if t.startswith("ISSUE-")]
+                altas.append(("mentions.jsonl", {
+                    "id": mid, "section_id": sid, "passage_id": pids[0], "original_text": etiqueta,
+                    "normalized_form": base.normalizar(etiqueta), "mention_type": dm["mention_type"],
+                    "character_offsets": {"start": ini, "end": fin},
+                    "resolution": {"status": "resolved", "target_ids": list(dm["targets"]), "reason": dm.get("reason")},
+                    "disposition": dm["disposition"], "issue_ids": cuestiones,
+                    "notes": [f"absorción {suf}: etiqueta nueva de {c}", *([nota] if nota else []),
+                              *([f"destino: {dm['reason']}"] if dm.get("reason") else [])],
+                    "record_status": "active"}))
+                for iid in cuestiones:
+                    afecta = tocar(iid).setdefault("affects", {})
+                    afecta["mention_ids"] = [*afecta.get("mention_ids", []), mid]
+                nuevas_de_fila[c].append(mid)
+
+        # --- registros ------------------------------------------------------------------
+        de_registro, av = filas_de_registros(s)
+        if av:
+            errores.extend(f"sección {sec}: {x}" for x in av)
+        decision_fila = {c: d.get("decision") for c, d in h.get("rows", {}).items()}
+        filas_nuevas_de: dict[str, list[str]] = {}
+        for rid in sorted({rid for o in s["rows"].values() for rid in o["record_ids"]}):
+            if rid not in proy:
+                errores.append(f"sección {sec}: {rid} está en la correspondencia y no en el libro mayor")
+                continue
+            viejas = de_registro.get(rid) or [c for c, o in s["rows"].items() if rid in o["record_ids"]]
+            vivas = [mapa[c] for c in viejas if c in mapa]
+            filas_nuevas_de[rid] = vivas
+            fichero, antes = proy[rid]
+            if antes.get("record_status", "active") != "active":
+                continue
+            if not vivas:
+                # Todas sus filas se van. Si alguna se conserva, el registro sigue
+                # tal cual; si todas se retiran, se retira con ellas.
+                if all(decision_fila.get(c) == "retirar" for c in viejas):
+                    motivos = "; ".join(dict.fromkeys(h["rows"][c]["reason"] for c in viejas))
+                    retirar(rid, f"sus filas ({', '.join(viejas)}) salen del corpus: {motivos}")
+                continue
+            # Procedencia: los párrafos nuevos de sus filas y, si cambió la
+            # columna Fuente y sus fuentes salían de ella, las fuentes nuevas.
+            prov = antes.get("provenance")
+            if isinstance(prov, dict):
+                nueva_prov = dict(prov)
+                esperados = list(dict.fromkeys(p for c in viejas if c in s["rows"] for p in s["rows"][c]["passage_ids"]))
+                colgados = list(dict.fromkeys(p for c in vivas for p in colgar(c)[0]))
+                if prov.get("passage_ids") == esperados:
+                    nueva_prov["passage_ids"] = colgados
+                elif prosa_cambia:
+                    nueva_prov["passage_ids"] = [mapa_p[p] for p in prov.get("passage_ids", []) if mapa_p.get(p)]
+                    avisos.append(f"{rid}: sus pasajes no eran los de sus filas; se traducen a la prosa nueva "
+                                  "sin recalcularlos")
+                if any("Fuente" in modificadas.get(c, {}).get("columnas", {}) for c in viejas):
+                    automaticas = [fuente_de_clave.get(k) for k in claves_de_fuente(viejas, filas_a)]
+                    if prov.get("source_ids") == automaticas:
+                        fuentes_r = [fuente(k, f"{rid} ({', '.join(vivas)})") for k in claves_de_fuente(vivas, filas_b)]
+                        nueva_prov["source_ids"] = [x for x in fuentes_r if x]
+                    else:
+                        avisos.append(f"{rid}: la columna Fuente cambió, pero sus fuentes no salían de ella; "
+                                      "se dejan como están")
+                if nueva_prov != prov:
+                    nueva_prov["dataset_revision"] = rev_despues
+                    rec = tocar(rid)
+                    rec["provenance"] = nueva_prov
+                    if "source_ids" in antes:
+                        rec["source_ids"] = list(nueva_prov.get("source_ids", []))
+            # Ejes: salen de la primera fila. Se rehacen si esa fila cambió sus
+            # columnas de evaluación o si la primera es ahora otra.
+            if fichero in ("claims.jsonl", "hypotheses.jsonl") and "epistemic_dimensions" in antes:
+                primera_v = inverso.get(vivas[0])
+                cols = modificadas.get(primera_v, {}).get("columnas", {})
+                if primera_v != viejas[0] or any(e in cols for e in EJES):
+                    ejes_n = convertir.ejes(filas_b[vivas[0]][1])
+                    if ejes_n != antes["epistemic_dimensions"]:
+                        tocar(rid)["epistemic_dimensions"] = ejes_n
+            if fichero == "evidence.jsonl" and antes.get("quality_notes"):
+                notas = list(antes["quality_notes"])
+                for c in vivas:
+                    v = inverso[c]
+                    if s["rows"].get(v, {}).get("destination") != "J":
+                        continue
+                    previa = f"Evaluación de la fila {v} (destino J)"
+                    notas = [nota_j(c, filas_b[c][1]) if n.startswith(previa) else n for n in notas]
+                if notas != antes["quality_notes"]:
+                    tocar(rid)["quality_notes"] = notas
+
+        # --- el mapa de filas de la versión nueva ----------------------------------------------
+        filas_mapa = {}
+        for c in propias:
+            viejo = inverso.get(c)
+            pids, via = colgar(c)
+            if viejo is None:
+                clase, o = "nueva", {"destination": "H", "record_ids": [], "mention_ids": []}
+            else:
+                o = s["rows"][viejo]
+                clase = ("modificada" if viejo in modificadas else "renumerada" if viejo != c else "sin cambios")
+            filas_mapa[c] = {"from": viejo, "class": clase, "passage_ids": pids, "via": via,
+                             "mention_ids": [m for m in o["mention_ids"] if m not in retiradas_m] + nuevas_de_fila[c],
+                             "destination": o["destination"], "record_ids": list(o["record_ids"])}
+        bloque[sec] = {"section_id": sid, "files": files,
+                       **({"passages": mapa_p} if prosa_cambia else {}),
+                       "rows": filas_mapa,
+                       "record_rows": {rid: filas_nuevas_de.get(rid, []) for rid in sorted(filas_nuevas_de)}}
+        resumen[sec] = {"section_id": sid, "prose": prosa_cambia, "registry": registro_cambia,
+                        "passages": len(nuevos) if prosa_cambia else 0, "reanchored": reancladas}
+
+    # --- parches ------------------------------------------------------------------------------
+    for rid, (donde, parche) in sorted(parches.items()):
+        if rid in retirados:
+            errores.append(f"{donde}: {rid} se corrige y se retira a la vez")
+            continue
+        rec = tocar(rid)
+        rec.update(json.loads(json.dumps(parche)))
+    # Una evidencia dice de qué obra sale: tiene que ser una de su procedencia.
+    for rid, (fichero, _, rec) in sorted(cambios.items()):
+        prov = rec.get("provenance")
+        if isinstance(prov, dict):
+            ajenas = convertir.valores_de(rec, "source_id") - set(prov.get("source_ids") or [])
+            if ajenas:
+                errores.append(f"{rid}: `source_id` {', '.join(sorted(ajenas))} no está entre las fuentes de su "
+                               "procedencia; corrígelo con un parche")
+    if errores:
+        raise SystemExit("ERROR la absorción no se puede construir:\n  " + "\n  ".join(errores))
+
+    # Lo que no cambia no es una operación.
+    for rid in [rid for rid, (_, antes, despues) in cambios.items() if antes == despues]:
+        del cambios[rid]
+    invalidos = validar_estado(cambios, altas)
+    if invalidos:
+        raise SystemExit("ERROR el libro mayor dejaría de validar:\n  " + "\n  ".join(invalidos))
+
+    # --- delta ---------------------------------------------------------------------------------
+    operaciones = [{"operation": "ADD_RECORD", "file": f, "record_id": rec["id"], "before": None, "after": rec}
+                   for f, rec in altas]
+    operaciones += [{"operation": "DEPRECATE_RECORD" if rid in retirados else "UPDATE_RECORD", "file": f,
+                     "record_id": rid, "before": antes, "after": despues}
+                    for rid, (f, antes, despues) in sorted(cambios.items())]
+    de_partida = dict(manifiesto["corpus_freeze"])
+    llegada = {"path": destino["path"], "version": congelada.get("version"), "commit": congelada.get("commit"),
+               "fingerprint": congelada["fingerprint"], "decision": spec.get("decision") or "DEC-059"}
+    delta = {
+        "schema_version": base.SCHEMA_VERSION,
+        "dataset_revision_before": rev_antes,
+        "dataset_revision_after": rev_despues,
+        "operations": operaciones,
+        "records_added": [rec["id"] for _, rec in altas],
+        "records_updated": sorted(rid for rid in cambios if rid not in retirados),
+        "claims_added": [], "events_added": [], "hypotheses_added": [], "issues_added": [], "issues_resolved": [],
+        "records_deprecated": sorted(retirados),
+        "views_invalidated": [], "views_built": [], "validation_results": {},
+        "absorption": {
+            "spec": {"path": corredor._rel(ruta_spec), "sha256": convertir.sha256(spec_bytes)},
+            "decision": spec.get("decision"),
+            "received_at": spec["received_at"],
+            "freeze": {"from": de_partida, "to": llegada},
+            "sections": bloque,
+        },
+    }
+    return {"suffix": suf, "delta": delta, "files": ficheros, "summary": resumen, "warnings": avisos,
+            "rev": (rev_antes, rev_despues), "added": altas, "changed": cambios, "deprecated": retirados,
+            "from": de_partida, "to": llegada}
+
+
+def informe_construccion(c: dict) -> list[str]:
+    d = c["delta"]
+    lineas = [
+        f"# Absorción {c['suffix']}",
+        "",
+        f"- Revisión: {c['rev'][0]} → {c['rev'][1]}",
+        f"- Congelación: `{c['from']['path']}` → `{c['to']['path']}`",
+        f"- Fichero de absorción: `{d['absorption']['spec']['path']}` ({d['absorption']['spec']['sha256'][:19]}…)",
+        f"- Fecha: {d['absorption']['received_at']}",
+        "",
+        "## Secciones",
+        "",
+        "| Sección | SEC | Prosa | Registro | Pasajes nuevos | Menciones reancladas |",
+        "|---|---|---|---|---:|---:|",
+    ]
+    for sec, x in c["summary"].items():
+        lineas.append(f"| {sec} | {x['section_id']} | {'cambia' if x['prose'] else 'igual'} | "
+                      f"{'cambia' if x['registry'] else 'igual'} | {x['passages']} | {x['reanchored']} |")
+    por_fichero: dict[str, int] = defaultdict(int)
+    for rid, (f, _, _) in c["changed"].items():
+        if rid not in c["deprecated"]:
+            por_fichero[f] += 1
+    lineas += ["", "## Operaciones", "", "| Operación | Fichero | Registros |", "|---|---|---:|"]
+    for f, n in sorted(Counter(f for f, _ in c["added"]).items()):
+        lineas.append(f"| alta | `{f}` | {n} |")
+    for f, n in sorted(por_fichero.items()):
+        lineas.append(f"| actualización | `{f}` | {n} |")
+    if c["deprecated"]:
+        lineas += ["", "## Retirados", ""] + [f"- {rid}: {m}" for rid, m in sorted(c["deprecated"].items())]
+    if c["warnings"]:
+        lineas += ["", "## Avisos", ""] + [f"- {a}" for a in c["warnings"]]
+    lineas += ["", f"Se aplica con `python scripts/ingest/delta.py ABS-{c['suffix']}.json` y se revierte con `--revert`: "
+               "al aplicarlo la congelación activa pasa a la versión nueva, y al revertirlo vuelve la de antes."]
+    return lineas
+
+
+def cmd_construir(args) -> int:
+    c = construir(Path(args.fichero).resolve(), args.anterior, args.nueva)
+    lineas = informe_construccion(c)
+    print("\n".join(lineas))
+    if args.dry_run:
+        print("\n(en seco: no se ha escrito nada)")
+        return 0
+    # Las copias de la versión nueva no se reescriben: si ya están, tienen que
+    # ser las mismas (un intento anterior, revertido).
+    for ruta, contenido in c["files"].items():
+        if ruta.exists() and ruta.read_bytes() != contenido:
+            raise SystemExit(f"ERROR {corredor._rel(ruta)} ya existe con otro contenido; no se sobrescribe")
+    nombre, n = f"ABS-{c['suffix']}", 2
+    # Una absorción revertida se queda como constancia; la nueva lleva otro nombre.
+    while (base.DELTAS / f"{nombre}.json").exists():
+        nombre, n = f"ABS-{c['suffix']}-{n}", n + 1
+    for ruta, contenido in c["files"].items():
+        ruta.parent.mkdir(parents=True, exist_ok=True)
+        ruta.write_bytes(contenido)
+    base.DELTAS.mkdir(parents=True, exist_ok=True)
+    base.REPORTS.mkdir(parents=True, exist_ok=True)
+    (base.DELTAS / f"{nombre}.json").write_text(json.dumps(c["delta"], indent=2, ensure_ascii=False) + "\n",
+                                                encoding="utf-8")
+    (base.REPORTS / f"{nombre}.md").write_text("\n".join(lineas) + "\n", encoding="utf-8")
+    for ruta in c["files"]:
+        print(f"  copia     {corredor._rel(ruta)}")
+    print(f"  delta     knowledge/deltas/{nombre}.json")
+    print(f"  informe   generated/reports/{nombre}.md")
+    print(f"\n  el delta NO se ha aplicado:\n    python scripts/ingest/delta.py {nombre}.json")
+    return 0
+
+
 def cmd_informe(args) -> int:
     r = informe(args.anterior, args.nueva)
     salida = Path(args.salida) if args.salida else GENERATED / r["suffix"]
@@ -776,6 +1603,12 @@ def main() -> int:
     i.add_argument("--sobrescribir", action="store_true",
                    help="reescribir un fichero de absorción que ya existe, aunque tenga decisiones")
     i.set_defaults(func=cmd_informe)
+    c = sub.add_parser("construir", help="el delta de absorción desde el fichero de absorción revisado")
+    c.add_argument("fichero", help="knowledge/corpus/absorptions/corredor-<commit>.json")
+    c.add_argument("anterior", help="la congelación activa: directorio del corpus, o directorio@ref")
+    c.add_argument("nueva", help="la versión congelada en `to`: directorio, o directorio@ref")
+    c.add_argument("--dry-run", action="store_true", help="comprobar y mostrar sin escribir nada")
+    c.set_defaults(func=cmd_construir)
     args = ap.parse_args()
     return args.func(args)
 

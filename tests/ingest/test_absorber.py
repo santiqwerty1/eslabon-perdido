@@ -29,6 +29,11 @@ import absorber  # noqa: E402
 import convertir  # noqa: E402
 import corredor  # noqa: E402
 import delta as delta_mod  # noqa: E402
+import freeze  # noqa: E402
+import ingest  # noqa: E402
+
+sys.path.insert(0, str(ROOT / "scripts" / "snapshot"))
+import snapshot  # noqa: E402
 
 MINI_V2 = ROOT / "tests" / "fixtures" / "corredor-mini-v2"
 
@@ -438,6 +443,297 @@ class Informe(unittest.TestCase):
         texto = (salida / "informe.md").read_text(encoding="utf-8")
         self.assertIn("C-003", texto)
         self.assertIn("C-004", texto)
+
+
+def rellenar(r: dict, esq: dict, to: str) -> dict:
+    """El esqueleto con una decisión de la primera fase en cada punto, como lo rellenaría un revisor."""
+    esq["to"]["path"] = to
+    esq["received_at"] = "2026-09-28"
+    for sec, s in esq["sections"].items():
+        citadas = {m["mention"]: m["cited_in"] for m in r["sections"][sec]["mentions"]}
+        for f in s["rows"].values():
+            if f["class"] != "renumerada":
+                f.update(decision="retirar" if f["class"] == "retirada" else "conservar", reason="prueba")
+            for m in (f.get("new_mentions") or {}).values():
+                m.update(mention_type="unresolved", disposition="discarded_with_reason", reason="prueba")
+        for f in s["new_rows"].values():
+            f["destination"] = "H"
+        for mid, m in s["mentions"].items():
+            m.update(decision="reanclar" if citadas.get(mid) else "retirar", reason="prueba")
+        for x in s["provenance"].values():
+            x["decision"] = "aceptar"
+        for x in s["successions"].values():
+            x.update(decision="conservar", reason="prueba")
+    for f in esq["sources"].values():
+        f["decision"] = "actualizar"
+    for x in esq["entities"]:
+        x.update(decision="conservar", reason="prueba")
+    for xs in esq["appendices"].values():
+        for x in xs:
+            x.update(decision="conservar", reason="prueba")
+    return esq
+
+
+@unittest.skipUnless(importlib.util.find_spec("jsonschema"), "convertir.py exige jsonschema")
+class Construir(unittest.TestCase):
+    """El delta de absorción: un libro mayor con la sección 0 convertida, frente a corredor-mini-v2.
+
+    Cada prueba parte de un libro mayor nuevo: aplican y revierten.
+    """
+
+    def setUp(self):
+        self._tmp = tempfile.TemporaryDirectory()
+        self.tmp = Path(self._tmp.name)
+        self.entorno = Entorno(self.tmp).__enter__()
+        self.addCleanup(self._tmp.cleanup)
+        self.addCleanup(self.entorno.__exit__, None, None, None)
+        deltas = self.tmp / "deltas"
+        with contextlib.redirect_stdout(io.StringIO()):
+            assert delta_mod.cmd(deltas / "SEC-000001.json", False, False) == 0
+            spec = self.tmp / "corredor-00.json"
+            spec.write_text(json.dumps(self.entorno.spec(), ensure_ascii=False), encoding="utf-8")
+            assert convertir.convertir(spec, str(MINI), False) == 0
+            assert delta_mod.cmd(deltas / "SEC-000001-conversion.json", False, False) == 0
+        (self.tmp / "absorptions").mkdir()
+
+    def congelar(self, corpus: Path) -> Path:
+        ruta = self.tmp / f"{corpus.parent.name}-{corpus.name}.json"
+        with contextlib.redirect_stdout(io.StringIO()):
+            freeze.cmd_create(argparse.Namespace(fuente=str(corpus), salida=str(ruta), repositorio="x",
+                                                 decision="DEC-059", sustituye=None, fecha="2026-09-28"))
+        return ruta
+
+    def version(self, cambios: dict[str, str | None]) -> Path:
+        copia = Path(tempfile.mkdtemp(dir=self.tmp)) / "corpus"
+        shutil.copytree(MINI_V2, copia)
+        for ruta, texto in cambios.items():
+            if texto is None:
+                (copia / ruta).unlink()
+            else:
+                (copia / ruta).write_text(texto, encoding="utf-8")
+        return copia
+
+    def absorcion(self, corpus: Path = MINI_V2, ajustar=None) -> Path:
+        r = absorber.informe(str(MINI), str(corpus))
+        self.nueva = self.congelar(corpus)
+        esq = rellenar(r, absorber.esqueleto(r), str(self.nueva))
+        if ajustar:
+            ajustar(esq)
+        ruta = self.tmp / "absorptions" / "corredor-v2.json"
+        ruta.write_text(json.dumps(esq, ensure_ascii=False, indent=1), encoding="utf-8")
+        return ruta
+
+    def construir(self, ruta: Path, corpus: Path = MINI_V2) -> str:
+        with contextlib.redirect_stdout(io.StringIO()):
+            assert absorber.cmd_construir(argparse.Namespace(fichero=str(ruta), anterior=str(MINI),
+                                                             nueva=str(corpus), dry_run=False)) == 0
+        return next(p.name for p in (self.tmp / "deltas").glob("ABS-*.json"))
+
+    def aplicar(self, nombre: str, revertir: bool = False) -> int:
+        with contextlib.redirect_stdout(io.StringIO()):
+            return delta_mod.cmd(self.tmp / "deltas" / nombre, revertir, False)
+
+    def registro(self, rid: str) -> dict:
+        return absorber.registros_actuales()[rid][1]
+
+    def texto(self, ruta: str) -> str:
+        return (MINI_V2 / ruta).read_text(encoding="utf-8")
+
+    def activa(self) -> str:
+        return json.loads((self.tmp / "dataset.json").read_text(encoding="utf-8"))["corpus_freeze"]["fingerprint"]
+
+    def test_aplicar_cambia_la_congelacion_y_revertir_deja_todo_como_estaba(self):
+        antes = {p.name: p.read_bytes() for p in self.entorno.records.glob("*.jsonl")}
+        nombre = self.construir(self.absorcion())
+        nueva = json.loads(self.nueva.read_text(encoding="utf-8"))
+        self.assertEqual(self.aplicar(nombre), 0)
+        self.assertEqual(self.activa(), nueva["fingerprint"])
+        s = corredor.correspondencia()["00"]
+        self.assertEqual((s["freeze"]["fingerprint"], s["absorption"]), (nueva["fingerprint"], nombre))
+        self.assertEqual(sorted(s["rows"]), ["C-001", "C-002", "C-003", "C-004", "C-007", "C-008", "C-009"])
+        # El informe siguiente parte de la versión absorbida: con ella no hay nada que absorber.
+        r = absorber.informe(str(MINI_V2), str(MINI_V2))
+        self.assertEqual((r["sections"]["00"]["rows"], r["sections"]["00"]["passages"]), ([], []))
+        self.assertEqual(self.aplicar(nombre, revertir=True), 0)
+        self.assertEqual(self.activa(), self.entorno.huella)
+        self.assertEqual({p.name: p.read_bytes() for p in self.entorno.records.glob("*.jsonl")}, antes)
+
+    def test_una_absorcion_no_se_aplica_sobre_otra_congelacion(self):
+        nombre = self.construir(self.absorcion())
+        manifiesto = json.loads((self.tmp / "dataset.json").read_text(encoding="utf-8"))
+        manifiesto["corpus_freeze"]["fingerprint"] = "sha256:" + "0" * 64
+        (self.tmp / "dataset.json").write_text(json.dumps(manifiesto), encoding="utf-8")
+        self.assertEqual(self.aplicar(nombre), 1)
+
+    def test_los_pasajes_viejos_siguen_y_los_nuevos_cuadran_con_su_copia(self):
+        viejos = (self.tmp / "passages" / "SEC-000001.json").read_bytes()
+        nombre = self.construir(self.absorcion())
+        suf = nombre[len("ABS-"):-len(".json")]
+        self.assertEqual((self.tmp / "passages" / "SEC-000001.json").read_bytes(), viejos)
+        copia = (self.tmp / "sections" / f"SEC-000001.{suf}.md").read_text(encoding="utf-8")
+        self.assertEqual(copia, (MINI_V2 / "docs" / "secciones" / "001-00-0-arranque.md").read_text(encoding="utf-8"))
+        nuevos = json.loads((self.tmp / "passages" / f"SEC-000001.{suf}.json").read_text(encoding="utf-8"))
+        for p in nuevos:
+            self.assertEqual(copia[p["character_offsets"]["start"]:p["character_offsets"]["end"]], p["text"])
+        self.assertFalse({p["id"] for p in nuevos} & {p["id"] for p in json.loads(viejos)})
+
+    def test_cada_mencion_reanclada_senala_su_etiqueta_en_la_prosa_nueva(self):
+        nombre = self.construir(self.absorcion())
+        self.aplicar(nombre)
+        s = corredor.correspondencia()["00"]
+        pasajes = {p["id"]: p for p in json.loads(absorber.pasajes_vigentes(s).read_text(encoding="utf-8"))}
+        copia = (self.tmp / "sections" / Path(s["files"]["prose"]["copy"]).name).read_text(encoding="utf-8")
+        activas = [m for f, m in absorber.registros_actuales().values()
+                   if f == "mentions.jsonl" and m.get("record_status") == "active"]
+        self.assertTrue(activas)
+        for m in activas:
+            self.assertIn(m["passage_id"], pasajes)
+            o, p = m["character_offsets"], pasajes[m["passage_id"]]["character_offsets"]
+            # Dentro de su pasaje nuevo: la que no aparece literal lo cubre entero,
+            # la que sí señala su etiqueta.
+            self.assertTrue(p["start"] <= o["start"] <= o["end"] <= p["end"], m["id"])
+            if any("no aparece literal" in n for n in m["notes"]):
+                self.assertEqual((o["start"], o["end"]), (p["start"], p["end"]), m["id"])
+            else:
+                self.assertEqual(copia[o["start"]:o["end"]].casefold(), m["original_text"].casefold(), m["id"])
+        # Las que se retiraron conservan su pasaje de antes.
+        retiradas = [m for f, m in absorber.registros_actuales().values()
+                     if f == "mentions.jsonl" and m.get("record_status") == "deprecated"]
+        self.assertTrue(retiradas and all(m["passage_id"] not in pasajes for m in retiradas))
+
+    def test_los_ejes_y_la_fuente_salen_de_la_version_nueva(self):
+        self.aplicar(self.construir(self.absorcion()))
+        claim = "CLAIM-000001"  # la afirmación de C-001, cuya fuerza y motivo cambian
+        dims = self.registro(claim)["epistemic_dimensions"]
+        self.assertEqual((dims["evidence_strength"], dims["evidence_strength_reason"]),
+                         ("high", "Lo confirman el resumen y la figura 2."))
+        fuente = next(r for f, r in absorber.registros_actuales().values() if f == "sources.jsonl")
+        filas = {f["clave"]: f for f in freeze.leer_csv(MINI_V2 / "data" / "apendices" / "A_fuentes.csv")[1]}
+        self.assertEqual((fuente["title"], fuente["consulted_at"]),
+                         (filas["S01"]["título"], filas["S01"]["fecha de consulta"]))
+        self.assertEqual(self.registro(claim)["provenance"]["dataset_revision"], "REV-000003")
+
+    def test_las_etiquetas_nuevas_dan_menciones_con_su_decision(self):
+        self.aplicar(self.construir(self.absorcion()))
+        nuevas = [m for f, m in absorber.registros_actuales().values()
+                  if f == "mentions.jsonl" and any("etiqueta nueva de C-003" in n for n in m["notes"])]
+        self.assertEqual(sorted(m["original_text"] for m in nuevas),
+                         ["registro C-003", "retirado por no atomicidad y sustituido por dos premisas"])
+        self.assertTrue(all(m["disposition"] == "discarded_with_reason" for m in nuevas))
+        filas = corredor.correspondencia()["00"]["rows"]
+        self.assertTrue({m["id"] for m in nuevas} <= set(filas["C-003"]["mention_ids"]))
+
+    def test_dos_construcciones_dan_el_mismo_delta(self):
+        ruta = self.absorcion()
+        uno = absorber.construir(ruta, str(MINI), str(MINI_V2))["delta"]
+        dos = absorber.construir(ruta, str(MINI), str(MINI_V2))["delta"]
+        self.assertEqual(json.dumps(uno, sort_keys=True), json.dumps(dos, sort_keys=True))
+
+    def test_una_fila_retirada_con_decision_retirar_depreca_sus_registros(self):
+        filas = self.texto("data/afirmaciones/00.csv")
+        sin_c001 = "".join(l for l in filas.splitlines(keepends=True) if not l.startswith('"C-001"'))
+        v = self.version({"data/afirmaciones/00.csv": sin_c001})
+        self.aplicar(self.construir(self.absorcion(v), v))
+        for rid in ("CLAIM-000001", "EVID-000001"):
+            self.assertEqual(self.registro(rid)["record_status"], "deprecated", rid)
+            self.assertTrue(any("C-001" in n for n in self.registro(rid)["notes"]))
+
+    def test_un_parche_corrige_un_registro_y_pasa_por_la_validacion(self):
+        def corregir(esq, parche):
+            esq["sections"]["00"]["rows"]["C-001"].update(decision="corregir", patches={"CLAIM-000001": parche})
+
+        self.aplicar(self.construir(self.absorcion(ajustar=lambda e: corregir(e, {"notes": ["revisada"]}))))
+        self.assertEqual(self.registro("CLAIM-000001")["notes"], ["revisada"])
+
+    def test_un_parche_no_toca_lo_que_se_deduce_ni_los_enlaces_ni_rompe_el_esquema(self):
+        for parche, dice in (({"epistemic_dimensions": {}}, "se deduce"),
+                             ({"subject_id": "CLADE-000002"}, "otro lado del enlace"),
+                             ({"claim_type": "no-existe"}, "dejaría de validar"),
+                             ({"inventado": 1}, "no es un campo")):
+            ruta = self.absorcion(ajustar=lambda e, p=parche: e["sections"]["00"]["rows"]["C-001"].update(
+                decision="corregir", patches={"CLAIM-000001": p}))
+            with self.assertRaises(SystemExit) as e:
+                absorber.construir(ruta, str(MINI), str(MINI_V2))
+            self.assertIn(dice, str(e.exception), parche)
+
+    def test_lo_que_crea_registros_nuevos_se_niega_con_su_motivo(self):
+        ajustes = (lambda e: e["sections"]["00"]["new_rows"]["C-009"].update(destination="A", keys=["@X"]),
+                   lambda e: e["sections"]["00"]["rows"]["C-003"].update(decision="dividir"),
+                   lambda e: e.update(pairing={"C-001": "C-009"}),
+                   lambda e: e["sections"]["00"]["rows"]["C-003"]["new_mentions"]["registro C-003"].update(
+                       disposition="new_entity", targets=["@Nuevo"]))
+        for ajustar in ajustes:
+            with self.assertRaises(SystemExit) as e:
+                absorber.construir(self.absorcion(ajustar=ajustar), str(MINI), str(MINI_V2))
+            self.assertIn("constructor de registros nuevos", str(e.exception))
+
+    def test_el_fichero_tiene_que_cubrir_justo_lo_que_pide_el_informe(self):
+        for ajustar, dice in (
+                (lambda e: e["sections"]["00"]["rows"]["C-001"].update(decision=None), "sin decisión"),
+                (lambda e: e["sections"]["00"]["rows"]["C-001"].update(reason=None), "sin `reason`"),
+                (lambda e: e["sections"]["00"]["rows"]["C-001"].update(**{"class": "renumerada"}), "no es lo que dice"),
+                (lambda e: e["sections"]["00"]["mentions"].pop("MENTION-000003"), "falta MENTION-000003"),
+                (lambda e: e["sections"]["00"]["rows"].update({"C-002": {"decision": "conservar"}}),
+                 "no es un cambio de esta versión"),
+                (lambda e: e.update(received_at=None), "received_at")):
+            with self.assertRaises(SystemExit) as e:
+                absorber.construir(self.absorcion(ajustar=ajustar), str(MINI), str(MINI_V2))
+            self.assertIn(dice, str(e.exception))
+
+    def test_se_niega_fuera_de_su_carpeta_con_deltas_pendientes_o_sin_la_congelacion_nueva(self):
+        ruta = self.absorcion()
+        fuera = self.tmp / "corredor-v2.json"
+        fuera.write_bytes(ruta.read_bytes())
+        with self.assertRaises(SystemExit) as e:
+            absorber.construir(fuera, str(MINI), str(MINI_V2))
+        self.assertIn("knowledge/corpus/absorptions/", str(e.exception))
+        esq = json.loads(ruta.read_text(encoding="utf-8"))
+        Path(esq["to"]["path"]).unlink()
+        with self.assertRaises(SystemExit) as e:
+            absorber.construir(ruta, str(MINI), str(MINI_V2))
+        self.assertIn("se congela antes de absorberla", str(e.exception))
+        ruta = self.absorcion()
+        self.construir(ruta)
+        with self.assertRaises(SystemExit) as e:
+            absorber.construir(ruta, str(MINI), str(MINI_V2))
+        self.assertIn("deltas sin aplicar", str(e.exception))
+
+    def test_una_seccion_ingerida_sin_convertir_se_convierte_antes(self):
+        with contextlib.redirect_stdout(io.StringIO()):
+            corredor.ingerir(str(MINI), "01", None, False)
+            assert delta_mod.cmd(self.tmp / "deltas" / "SEC-000002.json", False, False) == 0
+        with self.assertRaises(SystemExit) as e:
+            absorber.construir(self.absorcion(), str(MINI), str(MINI_V2))
+        self.assertIn("sin convertir: 01", str(e.exception))
+
+    def test_el_snapshot_ve_una_congelacion_editada_a_mano_y_un_fichero_de_absorcion_alterado(self):
+        ruta = self.absorcion()
+        self.aplicar(self.construir(ruta))
+        # snapshot.py resuelve sus rutas desde ROOT: se le da un árbol con los
+        # deltas y el manifiesto de este libro mayor.
+        raiz = self.tmp / "raiz"
+        shutil.copytree(self.tmp / "deltas", raiz / "knowledge" / "deltas")
+        manifiesto = raiz / "knowledge" / "corpus" / "manifests" / "dataset.json"
+        manifiesto.parent.mkdir(parents=True)
+        shutil.copy(self.tmp / "dataset.json", manifiesto)
+        with mock.patch.object(snapshot, "ROOT", raiz), mock.patch.object(snapshot, "MANIFEST", manifiesto):
+            self.assertEqual((snapshot.congelacion_incoherente(), snapshot.conversiones_alteradas()), ([], []))
+            datos = json.loads(manifiesto.read_text(encoding="utf-8"))
+            datos["corpus_freeze"]["fingerprint"] = self.entorno.huella
+            manifiesto.write_text(json.dumps(datos), encoding="utf-8")
+            self.assertIn("los deltas aplicados dejan", "\n".join(snapshot.congelacion_incoherente()))
+            ruta.write_text(ruta.read_text(encoding="utf-8") + "\n", encoding="utf-8")
+            self.assertIn("no es el que guardó", "\n".join(snapshot.conversiones_alteradas()))
+
+    def test_reconstruir_tras_revertir_reutiliza_los_pasajes(self):
+        ruta = self.absorcion()
+        nombre = self.construir(ruta)
+        self.aplicar(nombre)
+        self.aplicar(nombre, revertir=True)
+        otro = absorber.construir(ruta, str(MINI), str(MINI_V2))["delta"]
+        primero = json.loads((self.tmp / "deltas" / nombre).read_text(encoding="utf-8"))
+        self.assertEqual(otro["absorption"]["sections"]["00"]["passages"],
+                         primero["absorption"]["sections"]["00"]["passages"])
 
 
 if __name__ == "__main__":
