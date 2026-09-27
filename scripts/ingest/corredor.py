@@ -179,10 +179,20 @@ def correspondencia() -> dict[str, dict]:
     """
     secciones: dict[str, dict] = {}
     de_sec_id: dict[str, str] = {}
+    historial = delta_mod.read_jsonl(delta_mod.HISTORIAL)
     for nombre in delta_mod.aplicados():
         ruta = base.DELTAS / nombre
         if not ruta.exists():
             raise SystemExit(f"ERROR el historial da por aplicado {nombre}, que no está en knowledge/deltas/")
+        # Los registros salieron del delta tal como se aplicó la primera vez; si
+        # el fichero cambió, su mapa de filas ya no los describe. El mismo
+        # criterio que delta.py y el snapshot.
+        primera = next((h.get("sha256") for h in historial
+                        if h.get("delta") == nombre and h.get("accion") == "aplicar"), None)
+        if not primera or delta_mod.huella(ruta) != primera:
+            raise SystemExit(f"ERROR {nombre}, ya aplicado, no es el que se aplicó"
+                             + (f" ({primera})" if primera else " (el historial no guarda su huella)")
+                             + ": la correspondencia de sus filas no describiría el libro mayor")
         d = json.loads(ruta.read_text(encoding="utf-8"))
         origen = d.get("corpus_origin")
         if origen:
