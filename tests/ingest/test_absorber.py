@@ -19,6 +19,7 @@ import sys
 import tempfile
 import unittest
 from collections import Counter
+from unittest import mock
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
@@ -66,6 +67,12 @@ class Informe(unittest.TestCase):
 
     def texto(self, ruta: str) -> str:
         return (MINI_V2 / ruta).read_text(encoding="utf-8")
+
+    def con_registro_viejo(self, viejo: dict[str, list[str]]):
+        """corredor-mini no trae registro de sucesiones: éste hace de registro de antes."""
+        leer = absorber.leer_sucesiones
+        return mock.patch.object(absorber, "leer_sucesiones",
+                                 lambda raiz: viejo if Path(raiz).resolve() == MINI.resolve() else leer(raiz))
 
     @classmethod
     def tearDownClass(cls):
@@ -203,6 +210,54 @@ class Informe(unittest.TestCase):
         finally:
             ruta.write_bytes(original)
         self.assertIn("SEC-000002.json", str(e.exception))
+
+    def test_un_fichero_de_conversion_editado_no_da_primeras_filas(self):
+        # Las filas de cada registro salen del fichero que se convirtió; si
+        # cambió después, ya no se sabe de qué fila salen sus ejes.
+        ruta = absorber.base.ROOT / self.conversion["conversion"]["spec"]["path"]
+        original = ruta.read_bytes()
+        ruta.write_bytes(original + b"\n")
+        try:
+            r = absorber.informe(str(MINI), str(MINI_V2))
+        finally:
+            ruta.write_bytes(original)
+        [f] = [f for f in r["sections"]["00"]["rows"] if f["row"] == "C-001"]
+        self.assertEqual(f["first_row_of"], [])
+        self.assertTrue(any("primera fila" in a for a in r["warnings"]))
+
+    def test_una_sucesora_retirada_no_es_la_fila_nueva_que_reutiliza_su_numero(self):
+        # Antes, C-002 → C-005. C-005 se retira y una fila nueva de la sección 1
+        # ocupa su número: el registro nuevo apunta a otra afirmación.
+        fila = ('"C-005","FIX-Zeta tiene otra edad.","FIX-Zeta","tiene_edad_estimada","n/a","expresa",'
+                '"S01 x","no evaluado","baja","m","resuelta","vigente"\n')
+        suc = self.texto("data/auditoria/sucesiones_afirmaciones.csv") + '"C-002","C-005","Otra.","2026-09-27T00:00:00Z"\n'
+        v = self.version({"data/afirmaciones/01.csv": self.texto("data/afirmaciones/01.csv") + fila,
+                          "data/auditoria/sucesiones_afirmaciones.csv": suc})
+        with self.con_registro_viejo({"C-002": ["C-005"]}):
+            r = absorber.informe(str(MINI), str(v))
+        self.assertIn("C-005", {n["row"] for n in r["sections"]["01"]["new_rows"]})
+        self.assertEqual(r["sections"]["00"]["successions"]["C-002"],
+                         {"to": "C-002", "before": ["C-005[retirada]"], "after": ["C-005"]})
+
+    def test_una_fila_que_cambia_conserva_sus_sucesoras_de_antes(self):
+        with self.con_registro_viejo({"C-003": ["C-004"]}):
+            r = absorber.informe(str(MINI), str(MINI_V2))
+        [f] = [f for f in r["sections"]["00"]["rows"] if f["row"] == "C-003"]
+        self.assertEqual((f["successors"], f["successors_before"]), (["C-007", "C-008"], ["C-004"]))
+        self.assertEqual(absorber.esqueleto(r)["sections"]["00"]["rows"]["C-003"]["successors_before"], ["C-004"])
+        # Si el registro nuevo la borra, lo de antes sigue ahí y se avisa.
+        cabecera = self.texto("data/auditoria/sucesiones_afirmaciones.csv").splitlines(keepends=True)[0]
+        with self.con_registro_viejo({"C-003": ["C-004"]}):
+            r = absorber.informe(str(MINI), str(self.version({"data/auditoria/sucesiones_afirmaciones.csv": cabecera})))
+        [f] = [f for f in r["sections"]["00"]["rows"] if f["row"] == "C-003"]
+        self.assertNotIn("successors", f)
+        self.assertEqual(f["successors_before"], ["C-004"])
+        self.assertIn("le quita sus sucesoras", f["aviso"])
+
+    def test_dos_ficheros_de_prosa_para_una_seccion_se_rechazan(self):
+        with self.assertRaises(SystemExit) as e:
+            absorber.informe(str(MINI), str(self.version({"docs/secciones/002-00-1-otra.md": "# Otra\n\nC-001.\n"})))
+        self.assertIn("ficheros de prosa", str(e.exception))
 
     def test_una_columna_nueva_del_apendice_b_cuenta_solo_donde_tiene_valor(self):
         lineas = self.texto("data/apendices/B_entidades.csv").splitlines()
@@ -358,6 +413,8 @@ class Informe(unittest.TestCase):
         self.assertEqual(set(nuevas), {"C-007", "C-008", "C-009"})
         self.assertTrue(all(f["destination"] is None for f in nuevas.values()))
         self.assertEqual(filas["C-003"]["successors"], {"C-007": [], "C-008": []})
+        # Su entrada del registro de sucesiones es nueva: antes no tenía ninguna.
+        self.assertEqual(filas["C-003"]["successors_before"], [])
         self.assertEqual(set(e["sections"]["01"]["rows"]), {"C-006"})
         self.assertEqual(list(e["sources"]), ["S01"])
         self.assertEqual(e["from"]["fingerprint"], self.entorno.huella)

@@ -125,14 +125,18 @@ def verificar(src: freeze.Fuente, ruta: Path, registro: dict) -> None:
 # Construcción, sin escribir nada
 # ---------------------------------------------------------------------------
 
+def prosas_de_seccion(raiz: Path, sec: str) -> list[Path]:
+    """Los ficheros de prosa de una sección: `docs/secciones/NNN-<sec>-….md`."""
+    return [p for p in sorted((raiz / "docs" / "secciones").glob("*.md")) if p.name.split("-")[1:2] == [sec]]
+
+
 def ficheros_de_seccion(raiz: Path, sec: str) -> tuple[Path, Path]:
     registro = raiz / "data" / "afirmaciones" / f"{sec}.csv"
     if not registro.exists():
         hay = ", ".join(p.stem for p in sorted((raiz / "data" / "afirmaciones").glob("*.csv")))
         raise SystemExit(f"ERROR la sección {sec} no tiene registro de afirmaciones. Hay: {hay}. "
                          "Los apéndices no se ingieren por este camino todavía")
-    prosa = [p for p in sorted((raiz / "docs" / "secciones").glob("*.md"))
-             if p.name.split("-")[1:2] == [sec]]
+    prosa = prosas_de_seccion(raiz, sec)
     if len(prosa) != 1:
         raise SystemExit(f"ERROR la sección {sec} tiene {len(prosa)} ficheros de prosa en "
                          "docs/secciones/; se esperaba uno")

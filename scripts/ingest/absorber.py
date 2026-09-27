@@ -81,22 +81,22 @@ def entradas_de_conversion(conversion: dict) -> tuple[dict[str, dict], list[str]
     fichero, en su orden, así que se emparejan uno a uno. Sin esto no se sabría
     cuál es la primera fila de un registro, que es la que fija sus ejes.
     """
-    avisos = []
     ruta = base.ROOT / conversion["spec"]["path"]
     if not ruta.exists():
         return {}, [f"{conversion['spec']['path']} no existe: no se sabe la primera fila de cada registro"]
     datos = ruta.read_bytes()
     if convertir.sha256(datos) != conversion["spec"]["sha256"]:
-        avisos.append(f"{conversion['spec']['path']} no es el fichero que convirtió la sección: "
-                      "las primeras filas pueden no ser éstas")
+        # Sus filas pueden ser otras que las que se convirtieron: no se usan.
+        return {}, [f"{conversion['spec']['path']} cambió después de convertir la sección: "
+                    "no se sabe la primera fila de cada registro"]
     entradas = json.loads(datos).get("records", [])
     delta = json.loads((base.DELTAS / conversion["delta"]).read_text(encoding="utf-8"))
     altas = [op for op in delta["operations"]
              if op["operation"] == "ADD_RECORD" and op["file"] != "sources.jsonl"]
     if len(altas) != len(entradas) or any(op["file"] != e["file"] for op, e in zip(altas, entradas)):
-        return {}, [*avisos, f"{conversion['delta']} no sigue el orden de su fichero de conversión: "
-                             "no se sabe la primera fila de cada registro"]
-    return {op["record_id"]: e for op, e in zip(altas, entradas)}, avisos
+        return {}, [f"{conversion['delta']} no sigue el orden de su fichero de conversión: "
+                    "no se sabe la primera fila de cada registro"]
+    return {op["record_id"]: e for op, e in zip(altas, entradas)}, []
 
 
 def leer_sucesiones(raiz: Path) -> dict[str, list[str]]:
@@ -227,8 +227,11 @@ def informe(anterior: str, nueva: str) -> dict:
     filas_a, filas_b = freeze.leer_afirmaciones(a.base), freeze.leer_afirmaciones(b.base)
     sucesiones = leer_sucesiones(b.base)
     # El registro de sucesiones de antes, con los números de ahora: lo que
-    # cambia en él pide decisión aunque la fila no cambie.
-    sucesiones_antes = {mapa.get(k, k): [mapa.get(x, x) for x in v] for k, v in leer_sucesiones(a.base).items()}
+    # cambia en él pide decisión aunque la fila no cambie. Una sucesora que se
+    # retiró queda marcada: su número puede ser ahora el de otra afirmación. La
+    # clave no, porque nombra justamente la fila retirada.
+    sucesiones_antes = {mapa.get(k, k): [traduccion.get(x, x) for x in v]
+                        for k, v in leer_sucesiones(a.base).items()}
     sucesion_cambia = {k for k in set(sucesiones_antes) | set(sucesiones)
                        if sucesiones_antes.get(k) != sucesiones.get(k)}
     proy = registros_actuales()
@@ -270,9 +273,17 @@ def informe(anterior: str, nueva: str) -> dict:
                 "columns": columnas,
                 "touches": sorted({QUE_TOCA.get(col, col) for col in columnas}),
             }
-            # El registro de la versión nueva usa los números nuevos.
-            if mapa.get(c, c) in sucesiones:
-                fila["successors"] = sucesiones[mapa.get(c, c)]
+            # El registro de la versión nueva usa los números nuevos. Si cambió
+            # para esta fila, va también lo de antes: una sucesión borrada o
+            # sustituida no puede desaparecer del informe.
+            clave = mapa.get(c, c)
+            if clave in sucesion_cambia:
+                fila["successors_before"] = sucesiones_antes.get(clave, [])
+            if clave in sucesiones:
+                fila["successors"] = sucesiones[clave]
+            elif fila.get("successors_before"):
+                fila["aviso"] = ("el registro de sucesiones le quita sus sucesoras (antes: "
+                                 + ", ".join(fila["successors_before"]) + ")")
             elif clase == "retirada":
                 fila["aviso"] = "retirada sin sucesoras en sucesiones_afirmaciones.csv"
             elif (columnas.get("Vigencia") or ["", ""])[1].strip().lower() == "superada":
@@ -300,13 +311,13 @@ def informe(anterior: str, nueva: str) -> dict:
             for mid in o["mention_ids"]:
                 filas_de_mencion[mid].append(c)
         viejos_p = base.PASSAGES / f"{s['section_id']}.json"
-        prosa_rel = s["files"]["prose"]["path"]
-        prosa_b = b.base / prosa_rel
-        if not prosa_b.exists():
-            try:
-                prosa_b = corredor.ficheros_de_seccion(b.base, sec)[0]
-            except SystemExit:
-                prosa_b = None
+        # La misma búsqueda que la ingestión: con dos prosas para la sección, la
+        # ingestión se negaría, y el informe no puede elegir una.
+        prosas = corredor.prosas_de_seccion(b.base, sec)
+        if len(prosas) > 1:
+            raise SystemExit(f"ERROR la sección {sec} tiene {len(prosas)} ficheros de prosa en docs/secciones/ "
+                             "de la versión nueva; se esperaba uno")
+        prosa_b = prosas[0] if prosas else None
         if prosa_b is None:
             avisos.append(f"la sección {sec} no tiene prosa en la versión nueva")
         if viejos_p.exists():
@@ -545,6 +556,8 @@ def esqueleto(r: dict) -> dict:
                  "columns": sorted(f["columns"]), "decision": None, "reason": None}
             if "successors" in f:
                 e["successors"] = {suc: [] for suc in f["successors"]}
+            if "successors_before" in f:
+                e["successors_before"] = f["successors_before"]
             filas[f["row"]] = e
         # Aparte de las filas ingeridas: una fila nueva puede ocupar el número
         # que otra dejó al renumerarse o retirarse, y las dos piden decisión.
@@ -626,6 +639,8 @@ def markdown(r: dict) -> list[str]:
                     detalle.append("toca " + "; ".join(f["touches"]))
                 if f.get("successors"):
                     detalle.append("sucesoras declaradas: " + ", ".join(f["successors"]))
+                if f.get("successors_before"):
+                    detalle.append("sucesoras antes: " + ", ".join(f["successors_before"]))
                 if f.get("aviso"):
                     detalle.append(f["aviso"])
                 if f.get("new_labels"):
