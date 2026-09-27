@@ -146,6 +146,47 @@ def pasajes_cambiados(viejos: list[dict], texto: str) -> list[dict]:
     return salida
 
 
+def registros_actuales() -> dict[str, tuple[str, dict]]:
+    """El libro mayor tal como está, sin superponer los deltas pendientes.
+
+    `convertir.proyeccion()` los superpone porque convierte encima de ellos; el
+    informe compara con lo aplicado, igual que `corredor.correspondencia()`.
+    """
+    salida = {}
+    for ruta in sorted(base.RECORDS.glob("*.jsonl")):
+        for r in convertir.registros(ruta.name):
+            if isinstance(r.get("id"), str):
+                salida[r["id"]] = (ruta.name, r)
+    return salida
+
+
+def anclaje_nuevo(raiz: Path, parrafos: list[tuple[int, int, str]], filas: list[str]) -> dict[str, tuple[list, str]]:
+    """De qué párrafo de la prosa nueva colgaría cada fila, con la regla de la ingestión.
+
+    Una tabla de síntesis o el índice de tablas pueden cambiar de qué párrafo
+    cuelga una fila sin tocar la fila ni la prosa.
+    """
+    citadas = {n: corredor.citas(c) for n, (_, _, c) in enumerate(parrafos, 1)}
+    marcadores = {}
+    for n, (_, _, c) in enumerate(parrafos, 1):
+        for tid in corredor.MARCADOR.findall(c):
+            marcadores[tid] = n
+    ruta_indice = raiz / "data" / "table_index.json"
+    indice = ({t["id"]: t for t in json.loads(ruta_indice.read_text(encoding="utf-8")).get("tables", [])}
+              if ruta_indice.exists() else {})
+
+    def leer(relativa: str) -> str:
+        # Sólo ficheros de la versión comparada, como exige la ingestión.
+        ruta = (raiz / relativa).resolve()
+        try:
+            ruta.relative_to(raiz.resolve())
+        except ValueError:
+            return ""
+        return ruta.read_text(encoding="utf-8") if ruta.is_file() else ""
+
+    return corredor.anclar(filas, citadas, marcadores, indice, leer) if citadas else {}
+
+
 def aparece(etiqueta: str, texto: str) -> bool:
     return re.search(r"(?<!\w)" + re.escape(etiqueta) + r"(?!\w)", texto, re.IGNORECASE) is not None
 
@@ -167,9 +208,9 @@ def informe(anterior: str, nueva: str) -> dict:
     traduccion = {**mapa, **{i: f"{i}[retirada]" for i in retiradas}}
     inverso = {j: i for i, j in mapa.items()}
     modificadas = {m["de"]: m for m in af["modificadas"]}
-    filas_b = freeze.leer_afirmaciones(b.base)
+    filas_a, filas_b = freeze.leer_afirmaciones(a.base), freeze.leer_afirmaciones(b.base)
     sucesiones = leer_sucesiones(b.base)
-    proy = convertir.proyeccion()
+    proy = registros_actuales()
     secciones = corredor.correspondencia()
     avisos: list[str] = []
 
@@ -242,15 +283,19 @@ def informe(anterior: str, nueva: str) -> dict:
         elif viejos_p.exists():
             viejos = json.loads(viejos_p.read_text(encoding="utf-8"))
             texto_b = prosa_b.read_text(encoding="utf-8")
+            parrafos = base.segmentar(texto_b)
             todos = pasajes_cambiados(viejos, texto_b)
             pasajes = [p for p in todos if p["estado"] != "igual"]
             por_antes = {p["antes"]: p for p in pasajes if p["antes"]}
+            alineado = {p["antes"]: p["ordinal"] for p in todos if p["antes"] and p["ordinal"]}
             # Dónde cita la prosa nueva cada fila: ahí se reanclaría lo que
             # colgaba de un pasaje que cambió o desapareció.
             citada_en = defaultdict(list)
-            for n, (_, _, cuerpo) in enumerate(base.segmentar(texto_b), 1):
+            for n, (_, _, cuerpo) in enumerate(parrafos, 1):
                 for c in corredor.citas(cuerpo):
                     citada_en[c].append(n)
+            anclaje = anclaje_nuevo(b.base, parrafos,
+                                    sorted((i for i, (sv, _) in filas_b.items() if sv == sec), key=freeze._num))
             for mid, m in sorted(menciones.items()):
                 p = por_antes.get(m.get("passage_id"))
                 if m.get("section_id") != s["section_id"] or not p:
@@ -274,12 +319,25 @@ def informe(anterior: str, nueva: str) -> dict:
                             else "; su fila no se cita en la prosa nueva")
                 afectadas_m.append({"mention": mid, "label": m["original_text"], "passage": m["passage_id"],
                                     "state": p["estado"], "what": que, "cited_in": destino})
+            # Al ingerirla ahora, ¿de qué párrafos colgaría cada fila, y por qué
+            # vía? La prosa, una tabla de síntesis o el índice pueden cambiarlo.
+            # Pide juicio si cambia la vía o si deja de colgar de un párrafo del
+            # que colgaba: lo que decían sus registros venía de ahí. Si los
+            # párrafos sólo se mueven, se reescriben en su sitio o se le suman
+            # otros que también la citan, reanclarla es mecánico.
             for c, o in s["rows"].items():
+                if c in retiradas:
+                    continue
+                parrafos_n, via_n = anclaje.get(mapa.get(c, c), ([], None))
+                pierde = [pid for pid in o["passage_ids"] if alineado.get(pid, -1) not in parrafos_n]
+                gana = sorted(set(parrafos_n) - {alineado.get(pid) for pid in o["passage_ids"]})
+                juicio = via_n != o["via"] or bool(pierde)
                 tocados = [pid for pid in o["passage_ids"] if pid in por_antes]
-                if tocados and o["record_ids"]:
-                    procedencia[c] = {"passages": tocados, "record_ids": o["record_ids"],
-                                      "mechanical": all(por_antes[pid]["estado"] == "desplazado" for pid in tocados),
-                                      "cited_in": citada_en.get(mapa.get(c, c), [])}
+                if juicio or ((tocados or gana) and (o["record_ids"] or o["mention_ids"])):
+                    procedencia[c] = {"passages": o["passage_ids"], "record_ids": o["record_ids"],
+                                      "mention_ids": o["mention_ids"], "mechanical": not juicio,
+                                      "via_before": o["via"], "via_after": via_n, "paragraphs_after": parrafos_n,
+                                      "loses": pierde, "gains": gana}
 
         # Etiquetas que la versión nueva introduce en filas modificadas.
         etiquetas = {m["original_text"] for m in menciones.values() if m.get("section_id") == s["section_id"]}
@@ -318,8 +376,12 @@ def informe(anterior: str, nueva: str) -> dict:
                 if ch["despues"] is None:
                     cambia = ["retirada del apéndice A"]
                 else:
+                    # Todo lo que el registro guarda del apéndice, no sólo la
+                    # bibliografía: también las notas de calidad y la fecha de
+                    # consulta. La verificación y el estado son de este proyecto.
                     nueva_f = convertir.fuente_de_apendice(ch["despues"], col_doi)
-                    cambia = [k for k in convertir.BIBLIOGRAFIA if previa.get(k) != nueva_f[k]]
+                    cambia = [k for k in nueva_f if k not in ("verification_status", "record_status")
+                              and previa.get(k) != nueva_f[k]]
                 fuentes.append({"key": ch["clave"], "record_id": rid, "state": ch["estado"], "fields": cambia})
             if ruta_r == ENTIDADES:
                 fila_e = ch["antes"] or ch["despues"]
@@ -354,17 +416,23 @@ def informe(anterior: str, nueva: str) -> dict:
         if rel in convertidos or (spec.get("freeze") or {}).get("fingerprint") != activa["fingerprint"]:
             continue
         sec_b = spec.get("section")
+        # Una renumeración también deja el borrador desfasado: sus claves de
+        # fila y los `rows` de sus registros siguen con el número viejo.
         cambiadas = sorted({*(m["de"] for m in af["modificadas"] if m["seccion"] == sec_b),
-                            *(x["id"] for x in (*af["nuevas"], *af["retiradas"]) if x["seccion"] == sec_b)},
+                            *(x["id"] for x in (*af["nuevas"], *af["retiradas"]) if x["seccion"] == sec_b),
+                            *(x["de"] for x in af["solo_renumeracion"] if filas_a.get(x["de"], (None,))[0] == sec_b)},
                            key=freeze._num)
         borradores.append({"path": rel, "section": sec_b, "changed_rows": cambiadas})
 
     otras = {sec: c for sec, c in af["secciones_afectadas"].items() if sec not in secciones}
-    sufijo = (b.commit or dif["nueva"]["fingerprint"].split(":")[1])[:7]
+    # Una copia de trabajo con cambios sin confirmar no es su commit: se nombra
+    # por su huella, o dos copias distintas compartirían nombre.
+    commit_b = b.commit if b.limpia is not False else None
+    sufijo = (commit_b or dif["nueva"]["fingerprint"].split(":")[1])[:7]
     return {
         "from": {"path": corredor._rel(Path(ruta)), "fingerprint": activa["fingerprint"],
                  "commit": activa.get("commit"), "version": activa.get("version")},
-        "to": {"source": b.etiqueta, "fingerprint": dif["nueva"]["fingerprint"], "commit": b.commit,
+        "to": {"source": b.etiqueta, "fingerprint": dif["nueva"]["fingerprint"], "commit": commit_b,
                "version": dif["nueva"].get("version"),
                "path": corredor._rel(freeze.MANIFESTS / f"corredor-v{dif['nueva'].get('version') or 'sin-version'}"
                                                          f"-{sufijo}.json")},
@@ -396,8 +464,13 @@ def esqueleto(r: dict) -> dict:
                                **({"successor_of": n["successor_of"]} if n["successor_of"] else {})}
         menciones = {m["mention"]: {"label": m["label"], "state": m["state"], "decision": None, "reason": None}
                      for m in s["mentions"] if m["state"] != "desplazado"}
-        if filas or menciones:
-            secciones[sec] = {"section_id": s["section_id"], "rows": filas, "records": [], "mentions": menciones}
+        procedencia = {c: {"record_ids": x["record_ids"], "mention_ids": x["mention_ids"],
+                           "via_before": x["via_before"], "via_after": x["via_after"],
+                           "paragraphs_after": x["paragraphs_after"], "decision": None, "reason": None}
+                       for c, x in s["provenance"].items() if not x["mechanical"]}
+        if filas or menciones or procedencia:
+            secciones[sec] = {"section_id": s["section_id"], "rows": filas, "records": [], "mentions": menciones,
+                              "provenance": procedencia}
     return {
         "from": {k: r["from"][k] for k in ("path", "fingerprint")},
         "to": {k: r["to"][k] for k in ("path", "fingerprint")},
@@ -407,6 +480,9 @@ def esqueleto(r: dict) -> dict:
         "sections": secciones,
         "sources": {f["key"]: {"record_id": f["record_id"], "fields": f["fields"], "decision": None}
                     for f in r["sources"] if f["fields"]},
+        "entities": {e["label"]: {"section": e["section"], "row": e["row"], "state": e["state"],
+                                  "columns": e["columns"], "mention_ids": e["mention_ids"],
+                                  "decision": None, "reason": None} for e in r["entities"]},
         # Una lista por apéndice: sin clave única (F_magnitudes), dos filas
         # cambiadas pueden empezar igual.
         "appendices": {ruta: [{"key": x["key"], "state": x["state"], "rows": x["rows"], "decision": None,
@@ -436,10 +512,13 @@ def markdown(r: dict) -> list[str]:
     for sec, s in r["sections"].items():
         estado = "convertida" if s["converted"] else "ingerida, sin convertir"
         lineas += [f"## Sección {sec} · {s['section_id']} ({estado})", ""]
-        if not (s["rows"] or s["new_rows"] or s["passages"]):
+        marcas = d["secciones_afectadas"].get(sec)
+        if not (s["rows"] or s["new_rows"] or s["passages"] or s["provenance"] or marcas):
             lineas += [f"Sin cambios: sus {s['unchanged']} filas y su prosa son las mismas.", ""]
             continue
         lineas.append(f"{s['unchanged']} filas sin cambios.")
+        if marcas:
+            lineas.append("El diff la marca por " + ", ".join(f"{k} ({n})" for k, n in sorted(marcas.items())) + ".")
         lineas.append("")
         if s["rows"]:
             lineas += ["| Fila | Clase | Columnas | Registros | Primera fila de |", "|---|---|---|---|---|"]
@@ -480,14 +559,26 @@ def markdown(r: dict) -> list[str]:
                 lineas.append(f"{mecanicas} menciones sólo cambian de offsets.")
             for m in decidir:
                 lineas.append(f"- {m['mention']} «{m['label']}» ({m['passage']}): {m['what']}")
+            lineas.append("")
+        if s["provenance"]:
             juicio = sorted((c for c, x in s["provenance"].items() if not x["mechanical"]), key=freeze._num)
             mecanica = len(s["provenance"]) - len(juicio)
             if juicio:
-                lineas.append(f"{len(juicio)} filas tienen registros cuya procedencia cita pasajes que cambian de "
-                              "texto o desaparecen: " + ", ".join(juicio) + ".")
+                lineas.append("Filas que al ingerirlas ahora dejarían de colgar de un párrafo o cambiarían de vía:")
+                for c in juicio:
+                    x = s["provenance"][c]
+                    via = (f"{x['via_before']} → {x['via_after'] or 'no está en la versión nueva'}"
+                           if x["via_after"] != x["via_before"] else x["via_before"])
+                    lineas.append(f"- {c}: {via}"
+                                  + (f"; deja {', '.join(x['loses'])}" if x["loses"] else "")
+                                  + (f"; ahora cuelga del párrafo {', '.join(map(str, x['paragraphs_after']))}"
+                                     if x["paragraphs_after"] else "")
+                                  + f"; registros {', '.join(x['record_ids']) or '—'}")
+            ganan = sum(1 for x in s["provenance"].values() if x["mechanical"] and x["gains"])
             if mecanica:
-                lineas.append(f"{mecanica} filas tienen registros cuya procedencia cita pasajes que sólo se "
-                              "desplazan: se reanclan sin decidir nada.")
+                lineas.append(f"{mecanica} filas siguen colgando de sus párrafos, que sólo se mueven o se reescriben en "
+                              f"su sitio" + (f" ({ganan} ganan además párrafos nuevos que las citan)" if ganan else "")
+                              + ": se reanclan sin decidir nada.")
             lineas.append("")
 
     if r["sources"]:

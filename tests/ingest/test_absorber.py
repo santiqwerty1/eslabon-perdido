@@ -13,6 +13,8 @@ import contextlib
 import importlib.util
 import io
 import json
+import shutil
+import subprocess
 import sys
 import tempfile
 import unittest
@@ -85,8 +87,10 @@ class Informe(unittest.TestCase):
         self.assertTrue(any("01" in a and "sin convertir" in a for a in self.r["warnings"]))
 
     def test_una_fuente_que_ya_es_registro_y_cambia(self):
+        # También lo que el registro guarda fuera de la bibliografía: la fecha de
+        # consulta y las notas de calidad.
         [f] = self.r["sources"]
-        self.assertEqual((f["key"], f["state"], f["fields"]), ("S01", "modificada", ["title"]))
+        self.assertEqual((f["key"], f["state"], f["fields"]), ("S01", "modificada", ["title", "consulted_at"]))
         self.assertTrue(f["record_id"].startswith("SRC-"))
 
     def test_una_entidad_retirada_lleva_sus_menciones(self):
@@ -111,6 +115,63 @@ class Informe(unittest.TestCase):
         self.assertIn("no aparecía literal y sigue sin aparecer", menciones["taxón histórico"]["what"])
         # Y se busca por su número nuevo: la prosa nueva cita C-010, no C-006.
         self.assertEqual(menciones["FIX-Zeta"]["cited_in"], [2])
+
+    def test_una_tabla_que_deja_de_citar_una_fila_cambia_su_procedencia(self):
+        # C-004 no cambia, pero la tabla de edades deja de citarla: al ingerirla
+        # colgaría del registro y no de la tabla, como decide corredor.construir.
+        p = self.r["sections"]["00"]["provenance"]["C-004"]
+        self.assertEqual((p["via_before"], p["via_after"]), ("tabla table-01-00-edades", "sólo el registro"))
+        self.assertFalse(p["mechanical"])
+        e = absorber.esqueleto(self.r)
+        self.assertIsNone(e["sections"]["00"]["provenance"]["C-004"]["decision"])
+
+    def test_las_entidades_del_apendice_b_piden_decision(self):
+        e = absorber.esqueleto(self.r)
+        self.assertEqual(e["entities"]["FIX-Omega"]["state"], "retirada")
+        self.assertIsNone(e["entities"]["FIX-Omega"]["decision"])
+
+    def test_un_borrador_de_una_seccion_solo_renumerada_se_senala(self):
+        borrador = self.tmp / "corredor-01.json"
+        borrador.write_text(json.dumps({"freeze": {"fingerprint": self.entorno.huella}, "section": "01"}),
+                            encoding="utf-8")
+        try:
+            r = absorber.informe(str(MINI), str(MINI_V2))
+        finally:
+            borrador.unlink()
+        self.assertEqual([(d["section"], d["changed_rows"]) for d in r["drafts"]], [("01", ["C-006"])])
+
+    def test_un_delta_pendiente_no_cuenta_como_libro_mayor(self):
+        # Un delta sin aplicar que ya pusiera S01 al día no puede hacer creer al
+        # informe que el registro está al día.
+        rid = self.r["sources"][0]["record_id"]
+        antes = next(json.loads(l) for l in (self.entorno.records / "sources.jsonl").read_text(
+            encoding="utf-8").splitlines() if json.loads(l)["id"] == rid)
+        despues = {**antes, "title": "Trabajo ficticio número uno", "consulted_at": "2026-09-27"}
+        pendiente = self.tmp / "deltas" / "SEC-000099.json"
+        pendiente.write_text(json.dumps({
+            "dataset_revision_before": "REV-000003", "dataset_revision_after": "REV-000004",
+            "operations": [{"operation": "UPDATE_RECORD", "file": "sources.jsonl", "record_id": rid,
+                            "before": antes, "after": despues}]}), encoding="utf-8")
+        try:
+            r = absorber.informe(str(MINI), str(MINI_V2))
+        finally:
+            pendiente.unlink()
+        self.assertEqual(r["sources"][0]["fields"], ["title", "consulted_at"])
+        self.assertTrue(any("sin aplicar" in a for a in r["warnings"]))
+
+    def test_una_copia_con_cambios_sin_confirmar_se_nombra_por_su_huella(self):
+        # Su commit no describe lo que se compara: dos copias distintas no pueden
+        # compartir carpeta de salida ni nombre de congelación.
+        copia = self.tmp / "copia"
+        shutil.copytree(MINI_V2, copia)
+        git = ["git", "-C", str(copia), "-c", "user.name=x", "-c", "user.email=x@x"]
+        for orden in (["init", "-q"], ["add", "-A"], ["commit", "-q", "-m", "v2"]):
+            subprocess.run(git + orden, check=True, capture_output=True)
+        with (copia / "data" / "afirmaciones" / "01.csv").open("a", encoding="utf-8") as fh:
+            fh.write('"C-011","Otra.","FIX-Zeta","es","otra","expresa","S01 x","no evaluado","baja","m","resuelta","vigente"\n')
+        r = absorber.informe(str(MINI), str(copia))
+        self.assertIsNone(r["to"]["commit"])
+        self.assertEqual(r["suffix"], r["to"]["fingerprint"].split(":")[1][:7])
 
     def test_el_esqueleto_pide_una_decision_por_cambio(self):
         e = absorber.esqueleto(self.r)
@@ -139,7 +200,9 @@ class Informe(unittest.TestCase):
         self.assertIn({"de": "C-006", "a": "C-010", "via": "contenido"}, diff["afirmaciones"]["correspondencia"])
         esqueleto = json.loads((salida / f"corredor-{self.r['suffix']}.json").read_text(encoding="utf-8"))
         self.assertEqual(esqueleto["decision"], "DEC-059")
-        self.assertIn("C-003", (salida / "informe.md").read_text(encoding="utf-8"))
+        texto = (salida / "informe.md").read_text(encoding="utf-8")
+        self.assertIn("C-003", texto)
+        self.assertIn("C-004", texto)
 
 
 if __name__ == "__main__":

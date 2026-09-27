@@ -10,7 +10,7 @@ huella: está fuera de la capa canónica.
 | C-001 | Cambian la fuerza y el motivo; el enunciado es el mismo | modificada (por el texto de la afirmación) |
 | C-002 | Nada | sin cambios |
 | C-003 | Se retira por no ser atómica. Su número queda como fila de registro (glosa, `tiene_estado*`, vigencia superada) y sus dos proposiciones pasan a C-007 y C-008, declaradas en `data/auditoria/sucesiones_afirmaciones.csv` | modificada (por posición) |
-| C-004 | Nada | sin cambios |
+| C-004 | La fila no cambia; la tabla de edades deja de citarla | sin cambios (cambia su procedencia) |
 | C-005 | Se retira sin sucesoras | retirada |
 | C-006 → C-010 | Se renumera sin cambiar, en la sección 1 | sólo renumeración |
 | C-007, C-008 | Las sucesoras de C-003 | nuevas |
@@ -18,7 +18,7 @@ huella: está fuera de la capa canónica.
 
 Además:
 
-- **A_fuentes:** S01 corrige su título.
+- **A_fuentes:** S01 corrige su título y su fecha de consulta.
 - **B_entidades:**
   - FIX-Omega, cuya primera fila era C-003, se retira;
   - FIX-Zeta pasa a citar C-010.
@@ -27,6 +27,7 @@ Además:
   - se añade uno de C-009;
   - lo que viene detrás se desplaza.
 - **Prosa de la sección 1:** sólo cambia su cita, de C-006 a C-010.
+- **Tabla de edades de la sección 0:** deja de citar C-004. La fila no cambia, pero ya no cuelga del párrafo de la tabla sino del registro: cambia su procedencia.
 
 Las sucesoras llevan números nuevos, por encima de los que ya existían, como hace
 el corredor. Con números intercalados, el emparejamiento por posición dejaría de
