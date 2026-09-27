@@ -267,6 +267,16 @@ class Registros(unittest.TestCase):
         self.assertGreaterEqual(r["solo_renumeracion"], 0)
         self.assertEqual((r["nuevas"], r["retiradas"]), (2, 2))
 
+    def test_sin_clave_unica_una_fila_repetida_que_se_retira_es_un_solo_cambio(self):
+        # Dos filas idénticas y se retira una: el recuento dice 1, y las filas
+        # cambiadas también tienen que ser 1, no las dos copias.
+        cab = ["magnitud", "valor"]
+        a = self.escribir("a.csv", cab, [["m", "1"], ["m", "1"], ["n", "2"]])
+        b = self.escribir("b.csv", cab, [["m", "1"], ["n", "2"], ["o", "3"], ["o", "3"]])
+        r, filas = freeze.cambios_de_registro(a, b, {})
+        self.assertEqual((r["retiradas"], r["nuevas"]), (1, 2))
+        self.assertEqual(sorted(f["estado"] for f in filas), ["nueva", "nueva", "retirada"])
+
 
 class Congelacion(unittest.TestCase):
     def setUp(self):

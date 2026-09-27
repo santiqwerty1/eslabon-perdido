@@ -562,11 +562,17 @@ def cambios_de_registro(pa: Path | None, pb: Path | None,
             "modificadas": [],
             "solo_renumeracion": renumeradas,
         })
+        # De filas repetidas sólo cambian tantas copias como dice el recuento:
+        # cada una que se emite gasta una.
         solo_a, solo_b = fa - fb, fb - fa
-        filas = ([{"estado": "retirada", "clave": None, "antes": f, "despues": None}
-                  for f, t in zip(filas_a, traducidas) if solo_a[forma(t)] > 0]
-                 + [{"estado": "nueva", "clave": None, "antes": None, "despues": f}
-                    for f in filas_b if solo_b[forma(f)] > 0])
+        for f, t in zip(filas_a, traducidas):
+            if solo_a[forma(t)] > 0:
+                solo_a[forma(t)] -= 1
+                filas.append({"estado": "retirada", "clave": None, "antes": f, "despues": None})
+        for f in filas_b:
+            if solo_b[forma(f)] > 0:
+                solo_b[forma(f)] -= 1
+                filas.append({"estado": "nueva", "clave": None, "antes": None, "despues": f})
     return res, filas
 
 
