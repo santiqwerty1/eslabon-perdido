@@ -1,0 +1,565 @@
+#!/usr/bin/env python3
+"""Absorber una versión nueva del corpus en lo ya ingerido (DEC-059).
+
+Una versión nueva del corredor no se ingiere encima de la congelada: se congela
+aparte, se compara con la activa y sólo lo que cambió en las secciones ya
+ingeridas pide trabajo (DEC-056). Qué hacer con cada cambio es juicio —una fila
+corregida puede ser una errata o cambiar el nodo que fecha—, así que se decide
+en un fichero de absorción que se revisa, como la conversión se decide en su
+fichero (DEC-057). Este script hace lo mecánico.
+
+    informe ANTES DESPUES   qué registros toca cada cambio, y el esqueleto del
+                            fichero de absorción con las decisiones en blanco
+
+ANTES tiene que ser la congelación activa: el informe cruza el diff con lo que
+se ingirió de ella. `informe` no escribe nada en `knowledge/`; deja en
+`generated/absorcion/<commit>/` el diff completo, el informe y el esqueleto.
+
+Por sección ingerida, el informe dice:
+
+- cada fila que cambió, con su clase —modificada, retirada, renumerada—, las
+  columnas que cambian y los registros que salieron de ella. De cada registro
+  dice si esa fila es la primera, porque de la primera salen sus ejes;
+- las filas nuevas de la sección, que piden destino como en una conversión;
+- las divisiones que declara `data/auditoria/sucesiones_afirmaciones.csv` y
+  las filas retiradas que no declaran sucesoras;
+- los pasajes cuya prosa cambió o se desplazó, y las menciones y la procedencia
+  que dependen de ellos;
+- las filas de los apéndices que citan filas ingeridas, y las fuentes del
+  apéndice A que ya son registros y el apéndice nuevo describe de otra manera.
+
+La correspondencia de cada fila con sus registros no vive en un fichero aparte:
+`corredor.correspondencia()` la reconstruye de los deltas aplicados.
+"""
+
+from __future__ import annotations
+
+import argparse
+import difflib
+import json
+import re
+import sys
+from collections import defaultdict
+from pathlib import Path
+
+HERE = Path(__file__).resolve().parent
+sys.path.insert(0, str(HERE))
+sys.path.insert(0, str(HERE.parent / "validate"))
+
+import convertir  # noqa: E402
+import corredor  # noqa: E402
+import freeze  # noqa: E402
+import ingest as base  # noqa: E402
+
+GENERATED = base.ROOT / "generated" / "absorcion"
+SUCESIONES = "data/auditoria/sucesiones_afirmaciones.csv"
+FUENTES = "data/apendices/A_fuentes.csv"
+ENTIDADES = "data/apendices/B_entidades.csv"
+
+EJES = ("Aceptación", "Fuerza", "Motivo", "Resolución", "Vigencia")
+QUE_TOCA = {
+    "Afirmación": "el enunciado: revisar lo que afirma cada registro",
+    "Sujeto": "el sujeto y su mención",
+    "Predicado": "el predicado",
+    "Objeto": "el objeto y su mención",
+    "Atribución": "el origen de la procedencia (expresa, síntesis, glosa)",
+    "Fuente": "source_ids, la procedencia y una evidencia por fuente",
+    "(sección)": "la fila cambia de sección",
+    **{e: "los ejes de los registros cuya primera fila es ésta; en una fila J, la nota de sus evidencias"
+       for e in EJES},
+}
+
+
+# ---------------------------------------------------------------------------
+# Lo que se ingirió
+# ---------------------------------------------------------------------------
+
+def entradas_de_conversion(conversion: dict) -> tuple[dict[str, dict], list[str]]:
+    """Por registro convertido, su entrada del fichero de conversión: clave y filas.
+
+    El delta de conversión añade las fuentes nuevas y después los registros del
+    fichero, en su orden, así que se emparejan uno a uno. Sin esto no se sabría
+    cuál es la primera fila de un registro, que es la que fija sus ejes.
+    """
+    avisos = []
+    ruta = base.ROOT / conversion["spec"]["path"]
+    if not ruta.exists():
+        return {}, [f"{conversion['spec']['path']} no existe: no se sabe la primera fila de cada registro"]
+    datos = ruta.read_bytes()
+    if convertir.sha256(datos) != conversion["spec"]["sha256"]:
+        avisos.append(f"{conversion['spec']['path']} no es el fichero que convirtió la sección: "
+                      "las primeras filas pueden no ser éstas")
+    entradas = json.loads(datos).get("records", [])
+    delta = json.loads((base.DELTAS / conversion["delta"]).read_text(encoding="utf-8"))
+    altas = [op for op in delta["operations"]
+             if op["operation"] == "ADD_RECORD" and op["file"] != "sources.jsonl"]
+    if len(altas) != len(entradas) or any(op["file"] != e["file"] for op, e in zip(altas, entradas)):
+        return {}, [*avisos, f"{conversion['delta']} no sigue el orden de su fichero de conversión: "
+                             "no se sabe la primera fila de cada registro"]
+    return {op["record_id"]: e for op, e in zip(altas, entradas)}, avisos
+
+
+def leer_sucesiones(raiz: Path) -> dict[str, list[str]]:
+    ruta = raiz / SUCESIONES
+    if not ruta.exists():
+        return {}
+    _, filas = freeze.leer_csv(ruta)
+    return {f["fila_retirada"].strip(): [x.strip() for x in f["filas_sustitutas"].split(";") if x.strip()]
+            for f in filas if (f.get("fila_retirada") or "").strip()}
+
+
+# ---------------------------------------------------------------------------
+# Pasajes
+# ---------------------------------------------------------------------------
+
+def pasajes_cambiados(viejos: list[dict], texto: str) -> list[dict]:
+    """Los pasajes de la versión anterior frente a los párrafos de la nueva.
+
+    Se alinean por texto. Un pasaje igual en otro sitio está desplazado: sus
+    menciones siguen valiendo, pero sus offsets no. Si en un tramo cambian tantos
+    párrafos como había, se emparejan como cambiados; si no, se declaran
+    retirados y nuevos, sin adivinar.
+    """
+    nuevos = base.segmentar(texto)
+    sm = difflib.SequenceMatcher(a=[p["text"] for p in viejos], b=[c for _, _, c in nuevos], autojunk=False)
+    salida = []
+
+    def uno(estado: str, i: int | None, j: int | None) -> dict:
+        return {"estado": estado,
+                "antes": viejos[i]["id"] if i is not None else None,
+                "texto_antes": viejos[i]["text"] if i is not None else None,
+                "ordinal": j + 1 if j is not None else None,
+                "texto": nuevos[j][2] if j is not None else None,
+                "offsets": [nuevos[j][0], nuevos[j][1]] if j is not None else None}
+
+    for tag, i1, i2, j1, j2 in sm.get_opcodes():
+        if tag == "equal":
+            for i, j in zip(range(i1, i2), range(j1, j2)):
+                o = viejos[i]["character_offsets"]
+                salida.append(uno("igual" if [o["start"], o["end"]] == [nuevos[j][0], nuevos[j][1]]
+                                  else "desplazado", i, j))
+        elif tag == "replace" and i2 - i1 == j2 - j1:
+            salida += [uno("cambiado", i, j) for i, j in zip(range(i1, i2), range(j1, j2))]
+        else:
+            salida += [uno("retirado", i, None) for i in range(i1, i2)]
+            salida += [uno("nuevo", None, j) for j in range(j1, j2)]
+    return salida
+
+
+def aparece(etiqueta: str, texto: str) -> bool:
+    return re.search(r"(?<!\w)" + re.escape(etiqueta) + r"(?!\w)", texto, re.IGNORECASE) is not None
+
+
+# ---------------------------------------------------------------------------
+# Informe
+# ---------------------------------------------------------------------------
+
+def informe(anterior: str, nueva: str) -> dict:
+    ruta, activa = corredor.congelacion(None)
+    a = freeze.abrir(anterior)
+    corredor.verificar(a, ruta, activa)
+    b = freeze.abrir(nueva)
+    dif = freeze.diferencia(a, b)
+    af = dif["afirmaciones"]
+
+    mapa = {x["de"]: x["a"] for x in af["correspondencia"]}
+    retiradas = {x["id"] for x in af["retiradas"]}
+    traduccion = {**mapa, **{i: f"{i}[retirada]" for i in retiradas}}
+    inverso = {j: i for i, j in mapa.items()}
+    modificadas = {m["de"]: m for m in af["modificadas"]}
+    filas_b = freeze.leer_afirmaciones(b.base)
+    sucesiones = leer_sucesiones(b.base)
+    proy = convertir.proyeccion()
+    secciones = corredor.correspondencia()
+    avisos: list[str] = []
+
+    manifiesto = json.loads(base.MANIFEST.read_text(encoding="utf-8")) if base.MANIFEST.exists() else {}
+    pendientes = base.revision_siguiente(manifiesto)[2]
+    if pendientes:
+        avisos.append(f"hay deltas sin aplicar ({', '.join(pendientes)}): el informe sólo ve lo aplicado")
+
+    # Toda fila ingerida, de cualquier sección: las citas de los apéndices se
+    # cruzan con ellas.
+    fila_de: dict[str, tuple[str, dict]] = {c: (sec, o) for sec, s in secciones.items() for c, o in s["rows"].items()}
+    menciones = {rid: r for rid, (f, r) in proy.items() if f == "mentions.jsonl"}
+
+    salida_secciones = {}
+    for sec, s in sorted(secciones.items()):
+        entradas, av = entradas_de_conversion(s["conversion"]) if s["conversion"] else ({}, [])
+        avisos += av
+        primera = {rid: e["rows"][0] for rid, e in entradas.items() if e.get("rows")}
+        filas, sin_cambios = [], 0
+        for c in sorted(s["rows"], key=freeze._num):
+            o = s["rows"][c]
+            if c in retiradas:
+                clase = "retirada"
+            elif c in modificadas:
+                clase = "modificada"
+            elif mapa.get(c) != c:
+                clase = "renumerada"
+            else:
+                sin_cambios += 1
+                continue
+            columnas = modificadas.get(c, {}).get("columnas", {})
+            fila = {
+                "row": c, "class": clase, "to": mapa.get(c), "via": modificadas.get(c, {}).get("via"),
+                "destination": o["destination"], "record_ids": o["record_ids"],
+                "first_row_of": [r for r in o["record_ids"] if primera.get(r) == c],
+                "columns": columnas,
+                "touches": sorted({QUE_TOCA.get(col, col) for col in columnas}),
+            }
+            if c in sucesiones:
+                fila["successors"] = sucesiones[c]
+            elif clase == "retirada":
+                fila["aviso"] = "retirada sin sucesoras en sucesiones_afirmaciones.csv"
+            elif (columnas.get("Vigencia") or ["", ""])[1].strip().lower() == "superada":
+                fila["aviso"] = "pasa a vigencia superada sin sucesoras declaradas"
+            filas.append(fila)
+
+        # Filas que entran en la sección: nuevas, o que vienen de otra.
+        nuevas = [n["id"] for n in af["nuevas"] if n["seccion"] == sec]
+        nuevas += [m["a"] for m in af["modificadas"] if m["seccion"] == sec and m["de"] not in s["rows"]]
+        nuevas_l = [{"row": n, "statement": filas_b[n][1].get("Afirmación", ""),
+                     "successor_of": sorted(v for v, suc in sucesiones.items() if n in suc)}
+                    for n in sorted(set(nuevas), key=freeze._num)]
+
+        # Pasajes y menciones.
+        pasajes, afectadas_m, procedencia = [], [], {}
+        filas_de_mencion = defaultdict(list)
+        for c, o in s["rows"].items():
+            for mid in o["mention_ids"]:
+                filas_de_mencion[mid].append(c)
+        viejos_p = base.PASSAGES / f"{s['section_id']}.json"
+        prosa_rel = s["files"]["prose"]["path"]
+        prosa_b = b.base / prosa_rel
+        if not prosa_b.exists():
+            try:
+                prosa_b = corredor.ficheros_de_seccion(b.base, sec)[0]
+            except SystemExit:
+                prosa_b = None
+        if prosa_b is None:
+            avisos.append(f"la sección {sec} no tiene prosa en la versión nueva")
+        elif viejos_p.exists():
+            viejos = json.loads(viejos_p.read_text(encoding="utf-8"))
+            texto_b = prosa_b.read_text(encoding="utf-8")
+            todos = pasajes_cambiados(viejos, texto_b)
+            pasajes = [p for p in todos if p["estado"] != "igual"]
+            por_antes = {p["antes"]: p for p in pasajes if p["antes"]}
+            # Dónde cita la prosa nueva cada fila: ahí se reanclaría lo que
+            # colgaba de un pasaje que cambió o desapareció.
+            citada_en = defaultdict(list)
+            for n, (_, _, cuerpo) in enumerate(base.segmentar(texto_b), 1):
+                for c in corredor.citas(cuerpo):
+                    citada_en[c].append(n)
+            for mid, m in sorted(menciones.items()):
+                p = por_antes.get(m.get("passage_id"))
+                if m.get("section_id") != s["section_id"] or not p:
+                    continue
+                antes = aparece(m["original_text"], p["texto_antes"] or "")
+                if p["estado"] == "desplazado":
+                    que = "offsets desplazados: se reancla sin decidir nada"
+                elif p["estado"] == "retirado":
+                    que = "su pasaje desaparece"
+                elif not antes:
+                    que = ("su pasaje cambió; la etiqueta no aparecía literal y "
+                           + ("ahora sí aparece" if aparece(m["original_text"], p["texto"]) else "sigue sin aparecer"))
+                elif aparece(m["original_text"], p["texto"]):
+                    que = "su pasaje cambió; la etiqueta sigue en él"
+                else:
+                    que = "su pasaje cambió y la etiqueta ya no aparece en él"
+                # La prosa nueva cita las filas por su número nuevo.
+                destino = sorted({n for c in filas_de_mencion.get(mid, []) for n in citada_en.get(mapa.get(c, c), [])})
+                if p["estado"] != "desplazado":
+                    que += (f"; su fila se cita ahora en el párrafo {', '.join(map(str, destino))}" if destino
+                            else "; su fila no se cita en la prosa nueva")
+                afectadas_m.append({"mention": mid, "label": m["original_text"], "passage": m["passage_id"],
+                                    "state": p["estado"], "what": que, "cited_in": destino})
+            for c, o in s["rows"].items():
+                tocados = [pid for pid in o["passage_ids"] if pid in por_antes]
+                if tocados and o["record_ids"]:
+                    procedencia[c] = {"passages": tocados, "record_ids": o["record_ids"],
+                                      "mechanical": all(por_antes[pid]["estado"] == "desplazado" for pid in tocados),
+                                      "cited_in": citada_en.get(mapa.get(c, c), [])}
+
+        # Etiquetas que la versión nueva introduce en filas modificadas.
+        etiquetas = {m["original_text"] for m in menciones.values() if m.get("section_id") == s["section_id"]}
+        for f in filas:
+            for col in ("Sujeto", "Objeto"):
+                if col in f["columns"]:
+                    nueva_et = f["columns"][col][1].strip()
+                    if nueva_et and nueva_et not in etiquetas:
+                        f.setdefault("new_labels", []).append(nueva_et)
+
+        salida_secciones[sec] = {
+            "section_id": s["section_id"], "converted": s["conversion"] is not None,
+            "unchanged": sin_cambios, "rows": filas, "new_rows": nuevas_l,
+            "passages": pasajes, "mentions": afectadas_m, "provenance": procedencia,
+        }
+        if s["conversion"] is None:
+            avisos.append(f"la sección {sec} está ingerida pero sin convertir: se absorbe sólo su ingestión")
+
+    # --- apéndices -----------------------------------------------------------
+    apendices, fuentes, entidades = [], [], []
+    existentes_src = {r.get("citation_key"): (rid, r) for rid, (f, r) in proy.items()
+                      if f == "sources.jsonl" and r.get("citation_key")}
+    for ruta_r in sorted(dif["registros"]):
+        pa, pb = a.base / ruta_r, b.base / ruta_r
+        cab = (freeze.leer_csv(pb)[0] if pb.exists() else freeze.leer_csv(pa)[0])
+        _, cambios = freeze.cambios_de_registro(pa if pa.exists() else None, pb if pb.exists() else None,
+                                                traduccion)
+        for ch in cambios:
+            viejas = {x for v in (ch["antes"] or {}).values() for x in freeze.C_REF.findall(v)}
+            nuevas_c = {inverso.get(x, x) for v in (ch["despues"] or {}).values() for x in freeze.C_REF.findall(v)}
+            ingeridas = sorted((viejas | nuevas_c) & fila_de.keys(), key=freeze._num)
+            clave = ch["clave"] if ch["clave"] is not None else next(iter((ch["antes"] or ch["despues"]).values()))
+            if ruta_r == FUENTES and ch["clave"] in existentes_src:
+                rid, previa = existentes_src[ch["clave"]]
+                col_doi = next((c for c in cab if c.strip().lower().startswith("doi")), "")
+                if ch["despues"] is None:
+                    cambia = ["retirada del apéndice A"]
+                else:
+                    nueva_f = convertir.fuente_de_apendice(ch["despues"], col_doi)
+                    cambia = [k for k in convertir.BIBLIOGRAFIA if previa.get(k) != nueva_f[k]]
+                fuentes.append({"key": ch["clave"], "record_id": rid, "state": ch["estado"], "fields": cambia})
+            if ruta_r == ENTIDADES:
+                fila_e = ch["antes"] or ch["despues"]
+                primera_fila = (fila_e.get(corredor.COL_PRIMERA) or "").strip()
+                if primera_fila in fila_de:
+                    sec_e = fila_de[primera_fila][0]
+                    etiqueta = (fila_e.get("etiqueta preferida") or "").strip()
+                    mids = sorted(mid for mid, m in menciones.items()
+                                  if m.get("section_id") == secciones[sec_e]["section_id"]
+                                  and m.get("original_text") == etiqueta)
+                    cols = sorted(k for k in (ch["antes"] or {}) if ch["despues"] and ch["antes"][k] != ch["despues"].get(k))
+                    entidades.append({"label": etiqueta, "state": ch["estado"], "section": sec_e,
+                                      "mention_ids": mids, "columns": cols, "row": primera_fila,
+                                      "record_ids": fila_de[primera_fila][1]["record_ids"]})
+                continue
+            if ingeridas:
+                apendices.append({
+                    "path": ruta_r, "key": clave, "state": ch["estado"], "rows": ingeridas,
+                    "record_ids": sorted({r for c in ingeridas for r in fila_de[c][1]["record_ids"]}),
+                    "sections": sorted({fila_de[c][0] for c in ingeridas}),
+                })
+
+    # --- borradores de conversión anclados a la congelación activa -------------
+    convertidos = {s["conversion"]["spec"]["path"] for s in secciones.values() if s["conversion"]}
+    borradores = []
+    for p in sorted(convertir.CONVERSIONS.glob("*.json")):
+        try:
+            spec = json.loads(p.read_text(encoding="utf-8"))
+        except json.JSONDecodeError:
+            continue
+        rel = corredor._rel(p)
+        if rel in convertidos or (spec.get("freeze") or {}).get("fingerprint") != activa["fingerprint"]:
+            continue
+        sec_b = spec.get("section")
+        cambiadas = sorted({*(m["de"] for m in af["modificadas"] if m["seccion"] == sec_b),
+                            *(x["id"] for x in (*af["nuevas"], *af["retiradas"]) if x["seccion"] == sec_b)},
+                           key=freeze._num)
+        borradores.append({"path": rel, "section": sec_b, "changed_rows": cambiadas})
+
+    otras = {sec: c for sec, c in af["secciones_afectadas"].items() if sec not in secciones}
+    sufijo = (b.commit or dif["nueva"]["fingerprint"].split(":")[1])[:7]
+    return {
+        "from": {"path": corredor._rel(Path(ruta)), "fingerprint": activa["fingerprint"],
+                 "commit": activa.get("commit"), "version": activa.get("version")},
+        "to": {"source": b.etiqueta, "fingerprint": dif["nueva"]["fingerprint"], "commit": b.commit,
+               "version": dif["nueva"].get("version"),
+               "path": corredor._rel(freeze.MANIFESTS / f"corredor-v{dif['nueva'].get('version') or 'sin-version'}"
+                                                         f"-{sufijo}.json")},
+        "suffix": sufijo,
+        "sections": salida_secciones,
+        "sources": fuentes,
+        "entities": entidades,
+        "appendices": apendices,
+        "drafts": borradores,
+        "other_sections": otras,
+        "warnings": avisos,
+        "diff": dif,
+    }
+
+
+def esqueleto(r: dict) -> dict:
+    """El fichero de absorción por rellenar: una decisión por cambio, todas en blanco."""
+    secciones = {}
+    for sec, s in r["sections"].items():
+        filas = {}
+        for f in s["rows"]:
+            e = {"class": f["class"], "to": f["to"], "record_ids": f["record_ids"],
+                 "columns": sorted(f["columns"]), "decision": None, "reason": None}
+            if "successors" in f:
+                e["successors"] = {suc: [] for suc in f["successors"]}
+            filas[f["row"]] = e
+        for n in s["new_rows"]:
+            filas[n["row"]] = {"class": "nueva", "destination": None, "keys": [], "note": None,
+                               **({"successor_of": n["successor_of"]} if n["successor_of"] else {})}
+        menciones = {m["mention"]: {"label": m["label"], "state": m["state"], "decision": None, "reason": None}
+                     for m in s["mentions"] if m["state"] != "desplazado"}
+        if filas or menciones:
+            secciones[sec] = {"section_id": s["section_id"], "rows": filas, "records": [], "mentions": menciones}
+    return {
+        "from": {k: r["from"][k] for k in ("path", "fingerprint")},
+        "to": {k: r["to"][k] for k in ("path", "fingerprint")},
+        "decision": "DEC-059",
+        "received_at": None,
+        "pairing": {},
+        "sections": secciones,
+        "sources": {f["key"]: {"record_id": f["record_id"], "fields": f["fields"], "decision": None}
+                    for f in r["sources"] if f["fields"]},
+        # Una lista por apéndice: sin clave única (F_magnitudes), dos filas
+        # cambiadas pueden empezar igual.
+        "appendices": {ruta: [{"key": x["key"], "state": x["state"], "rows": x["rows"], "decision": None,
+                               "reason": None} for x in r["appendices"] if x["path"] == ruta]
+                       for ruta in dict.fromkeys(x["path"] for x in r["appendices"])},
+    }
+
+
+def markdown(r: dict) -> list[str]:
+    d = r["diff"]["afirmaciones"]
+    lineas = [
+        f"# Absorción · {r['from']['version']} ({(r['from']['commit'] or '')[:7]}) → "
+        f"{r['to']['version']} ({(r['to']['commit'] or '')[:7] or 'copia de trabajo'})",
+        "",
+        f"- Congelación activa: `{r['from']['path']}`",
+        f"- Versión nueva: {r['to']['source']} · huella `{r['to']['fingerprint']}`",
+        f"- Afirmaciones {d['anterior']} → {d['nueva']}: {d['sin_cambios']} sin cambios, "
+        f"{len(d['solo_renumeracion'])} sólo renumeradas, {len(d['modificadas'])} modificadas, "
+        f"{len(d['nuevas'])} nuevas, {len(d['retiradas'])} retiradas",
+        "",
+    ]
+    for aviso in r["warnings"]:
+        lineas.append(f"> **Aviso.** {aviso}")
+    if r["warnings"]:
+        lineas.append("")
+
+    for sec, s in r["sections"].items():
+        estado = "convertida" if s["converted"] else "ingerida, sin convertir"
+        lineas += [f"## Sección {sec} · {s['section_id']} ({estado})", ""]
+        if not (s["rows"] or s["new_rows"] or s["passages"]):
+            lineas += [f"Sin cambios: sus {s['unchanged']} filas y su prosa son las mismas.", ""]
+            continue
+        lineas.append(f"{s['unchanged']} filas sin cambios.")
+        lineas.append("")
+        if s["rows"]:
+            lineas += ["| Fila | Clase | Columnas | Registros | Primera fila de |", "|---|---|---|---|---|"]
+            for f in s["rows"]:
+                destino = f"{f['row']} → {f['to']}" if f["to"] and f["to"] != f["row"] else f["row"]
+                lineas.append(f"| {destino} | {f['class']} | {', '.join(f['columns']) or '—'} | "
+                              f"{', '.join(f['record_ids']) or '—'} | {', '.join(f['first_row_of']) or '—'} |")
+            lineas.append("")
+            for f in s["rows"]:
+                detalle = []
+                if f["touches"]:
+                    detalle.append("toca " + "; ".join(f["touches"]))
+                if f.get("successors"):
+                    detalle.append("sucesoras declaradas: " + ", ".join(f["successors"]))
+                if f.get("aviso"):
+                    detalle.append(f["aviso"])
+                if f.get("new_labels"):
+                    detalle.append("etiquetas nuevas sin mención: " + ", ".join(f"«{x}»" for x in f["new_labels"]))
+                if detalle:
+                    lineas.append(f"- **{f['row']}**: " + ". ".join(detalle) + ".")
+                for col, (antes, despues) in f["columns"].items():
+                    lineas += [f"  - {col}", f"    - antes: {antes}", f"    - ahora: {despues}"]
+            lineas.append("")
+        if s["new_rows"]:
+            lineas += ["Filas nuevas, que piden destino:", ""]
+            for n in s["new_rows"]:
+                de = f" (sucede a {', '.join(n['successor_of'])})" if n["successor_of"] else ""
+                lineas.append(f"- {n['row']}{de}: {n['statement']}")
+            lineas.append("")
+        if s["passages"]:
+            cuenta = defaultdict(int)
+            for p in s["passages"]:
+                cuenta[p["estado"]] += 1
+            lineas.append("Pasajes: " + ", ".join(f"{n} {e}" for e, n in sorted(cuenta.items())) + ".")
+            decidir = [m for m in s["mentions"] if m["state"] != "desplazado"]
+            mecanicas = len(s["mentions"]) - len(decidir)
+            if mecanicas:
+                lineas.append(f"{mecanicas} menciones sólo cambian de offsets.")
+            for m in decidir:
+                lineas.append(f"- {m['mention']} «{m['label']}» ({m['passage']}): {m['what']}")
+            juicio = sorted((c for c, x in s["provenance"].items() if not x["mechanical"]), key=freeze._num)
+            mecanica = len(s["provenance"]) - len(juicio)
+            if juicio:
+                lineas.append(f"{len(juicio)} filas tienen registros cuya procedencia cita pasajes que cambian de "
+                              "texto o desaparecen: " + ", ".join(juicio) + ".")
+            if mecanica:
+                lineas.append(f"{mecanica} filas tienen registros cuya procedencia cita pasajes que sólo se "
+                              "desplazan: se reanclan sin decidir nada.")
+            lineas.append("")
+
+    if r["sources"]:
+        lineas += ["## Fuentes del apéndice A que ya son registros", ""]
+        for f in r["sources"]:
+            que = ", ".join(f["fields"]) if f["fields"] else "nada del registro (sólo columnas que no se ingieren)"
+            lineas.append(f"- {f['key']} ({f['record_id']}), {f['state']}: cambia {que}")
+        lineas.append("")
+    if r["entities"]:
+        lineas += ["## Entidades del apéndice B de secciones ingeridas", ""]
+        for e in r["entities"]:
+            cols = f" ({', '.join(e['columns'])})" if e["columns"] else ""
+            lineas.append(f"- «{e['label']}», sección {e['section']}, {e['state']}{cols}: "
+                          f"menciones {', '.join(e['mention_ids']) or 'ninguna'}")
+        lineas.append("")
+    if r["appendices"]:
+        lineas += ["## Filas de los apéndices que citan filas ingeridas", "",
+                   "| Apéndice | Clave | Estado | Filas | Registros |", "|---|---|---|---|---|"]
+        for x in r["appendices"]:
+            clave = str(x["key"])[:60]
+            lineas.append(f"| {Path(x['path']).name} | {clave} | {x['state']} | {', '.join(x['rows'])} | "
+                          f"{', '.join(x['record_ids']) or '—'} |")
+        lineas.append("")
+    if r["drafts"]:
+        lineas += ["## Borradores de conversión anclados a la congelación activa", ""]
+        for bdr in r["drafts"]:
+            lineas.append(f"- `{bdr['path']}` (sección {bdr['section']}): "
+                          + (f"cambian {', '.join(bdr['changed_rows'])}" if bdr["changed_rows"]
+                             else "su sección no cambia"))
+        lineas.append("")
+    if r["other_sections"]:
+        lineas += ["## Secciones sin ingerir", "",
+                   "Se ingerirán desde la versión nueva; no hay nada que absorber en ellas: "
+                   + ", ".join(sorted(r["other_sections"])) + ".", ""]
+    return lineas
+
+
+def cmd_informe(args) -> int:
+    r = informe(args.anterior, args.nueva)
+    salida = Path(args.salida) if args.salida else GENERATED / r["suffix"]
+    salida.mkdir(parents=True, exist_ok=True)
+    (salida / "diff.json").write_text(json.dumps({**r["diff"], "afirmaciones": {
+        k: v for k, v in r["diff"]["afirmaciones"].items() if k != "mapa"}}, indent=2, ensure_ascii=False) + "\n",
+        encoding="utf-8")
+    (salida / "informe.md").write_text("\n".join(markdown(r)) + "\n", encoding="utf-8")
+    nombre = f"corredor-{r['suffix']}.json"
+    (salida / nombre).write_text(
+        json.dumps(esqueleto(r), indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    for sec, s in r["sections"].items():
+        print(f"sección {sec} ({s['section_id']}): {len(s['rows'])} filas cambiadas, {len(s['new_rows'])} nuevas, "
+              f"{len(s['passages'])} pasajes y {len(s['mentions'])} menciones afectados")
+    print(f"fuentes {len(r['sources'])} · entidades {len(r['entities'])} · filas de apéndices {len(r['appendices'])}"
+          f" · borradores {len(r['drafts'])}")
+    for aviso in r["warnings"]:
+        print(f"AVISO {aviso}")
+    print(f"\n  informe    {corredor._rel(salida / 'informe.md')}")
+    print(f"  esqueleto  {corredor._rel(salida / nombre)}")
+    print(f"  diff       {corredor._rel(salida / 'diff.json')}")
+    return 0
+
+
+def main() -> int:
+    ap = argparse.ArgumentParser(description="Absorbe una versión nueva del corpus en lo ya ingerido (DEC-059)")
+    sub = ap.add_subparsers(dest="orden", required=True)
+    i = sub.add_parser("informe", help="qué registros toca cada cambio, y el esqueleto del fichero de absorción")
+    i.add_argument("anterior", help="la congelación activa: directorio del corpus, o directorio@ref")
+    i.add_argument("nueva", help="la versión nueva: directorio, o directorio@ref")
+    i.add_argument("--salida", default=None, help="carpeta de salida (por defecto, generated/absorcion/<commit>/)")
+    i.set_defaults(func=cmd_informe)
+    args = ap.parse_args()
+    return args.func(args)
+
+
+if __name__ == "__main__":
+    sys.exit(main())
