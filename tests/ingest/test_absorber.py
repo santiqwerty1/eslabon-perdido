@@ -242,6 +242,51 @@ class Informe(unittest.TestCase):
             absorber.informe(str(MINI), str(self.version({"data/table_index.json": indice})))
         self.assertIn("no-existe.csv", str(e.exception))
 
+    def test_un_fichero_de_absorcion_revisado_no_se_sobrescribe(self):
+        salida = self.tmp / "absorcion-revisada"
+        args = argparse.Namespace(anterior=str(MINI), nueva=str(MINI_V2), salida=str(salida), sobrescribir=False)
+        with contextlib.redirect_stdout(io.StringIO()):
+            absorber.cmd_informe(args)
+        fichero = salida / f"corredor-{self.r['suffix']}.json"
+        revisado = json.loads(fichero.read_text(encoding="utf-8"))
+        revisado["sections"]["00"]["rows"]["C-001"]["decision"] = "corregir"
+        fichero.write_text(json.dumps(revisado), encoding="utf-8")
+        with contextlib.redirect_stdout(io.StringIO()), self.assertRaises(SystemExit) as e:
+            absorber.cmd_informe(args)
+        self.assertIn("sobrescribir", str(e.exception))
+        self.assertEqual(json.loads(fichero.read_text(encoding="utf-8")), revisado)
+        # Pedido a propósito, se reescribe.
+        with contextlib.redirect_stdout(io.StringIO()):
+            absorber.cmd_informe(argparse.Namespace(**{**vars(args), "sobrescribir": True}))
+        self.assertIsNone(json.loads(fichero.read_text(encoding="utf-8"))["sections"]["00"]["rows"]["C-001"]["decision"])
+
+    def test_un_numero_reutilizado_no_pisa_la_decision_de_la_fila_vieja(self):
+        fila = ('"C-006","FIX-Zeta tiene una edad.","FIX-Zeta","tiene_edad_estimada","n/a","expresa",'
+                '"S01 x","no evaluado","baja","m","resuelta","vigente"\n')
+        v = self.version({"data/afirmaciones/01.csv": self.texto("data/afirmaciones/01.csv") + fila})
+        e = absorber.esqueleto(absorber.informe(str(MINI), str(v)))["sections"]["01"]
+        self.assertEqual((e["rows"]["C-006"]["class"], e["rows"]["C-006"]["to"]), ("renumerada", "C-010"))
+        self.assertIsNone(e["new_rows"]["C-006"]["destination"])
+
+    def test_un_marcador_de_tabla_fuera_del_indice_se_rechaza(self):
+        prosa = self.texto("docs/secciones/001-00-0-arranque.md") + "\n<!-- TABLE:no-indexada -->\n"
+        with self.assertRaises(SystemExit) as e:
+            absorber.informe(str(MINI), str(self.version({"docs/secciones/001-00-0-arranque.md": prosa})))
+        self.assertIn("no-indexada", str(e.exception))
+        indice = json.loads(self.texto("data/table_index.json"))
+        indice["tables"].append(dict(indice["tables"][0]))
+        with self.assertRaises(SystemExit) as e:
+            absorber.informe(str(MINI), str(self.version({"data/table_index.json": json.dumps(indice)})))
+        self.assertIn("claims-00", str(e.exception))
+
+    def test_una_fuente_que_cambia_de_clave_propone_su_pareja(self):
+        a = self.texto("data/apendices/A_fuentes.csv").replace('"S01",', '"S99",')
+        r = absorber.informe(str(MINI), str(self.version({"data/apendices/A_fuentes.csv": a})))
+        [f] = [f for f in r["sources"] if f["key"] == "S01"]
+        self.assertEqual((f["state"], f["candidates"]), ("retirada", ["S99"]))
+        fuente = absorber.esqueleto(r)["sources"]["S01"]
+        self.assertEqual((fuente["candidates"], fuente["pair_with"]), (["S99"], None))
+
     def test_una_fila_que_cambia_de_seccion_desfasa_los_dos_borradores(self):
         seccion0 = self.texto("data/afirmaciones/00.csv").splitlines(keepends=True)
         [c004] = [l for l in seccion0 if l.startswith('"C-004"')]
@@ -307,11 +352,11 @@ class Informe(unittest.TestCase):
 
     def test_el_esqueleto_pide_una_decision_por_cambio(self):
         e = absorber.esqueleto(self.r)
-        filas = e["sections"]["00"]["rows"]
-        self.assertEqual(set(filas), {"C-001", "C-003", "C-005", "C-007", "C-008", "C-009"})
-        self.assertTrue(all(f.get("decision", "sin decisión") is None for c, f in filas.items()
-                            if c in ("C-001", "C-003", "C-005")))
-        self.assertTrue(all(filas[c]["destination"] is None for c in ("C-007", "C-008", "C-009")))
+        filas, nuevas = e["sections"]["00"]["rows"], e["sections"]["00"]["new_rows"]
+        self.assertEqual(set(filas), {"C-001", "C-003", "C-005"})
+        self.assertTrue(all(f["decision"] is None for f in filas.values()))
+        self.assertEqual(set(nuevas), {"C-007", "C-008", "C-009"})
+        self.assertTrue(all(f["destination"] is None for f in nuevas.values()))
         self.assertEqual(filas["C-003"]["successors"], {"C-007": [], "C-008": []})
         self.assertEqual(set(e["sections"]["01"]["rows"]), {"C-006"})
         self.assertEqual(list(e["sources"]), ["S01"])
@@ -326,7 +371,8 @@ class Informe(unittest.TestCase):
         antes = sorted(p.name for p in (self.tmp / "deltas").iterdir())
         salida = self.tmp / "absorcion"
         with contextlib.redirect_stdout(io.StringIO()):
-            absorber.cmd_informe(argparse.Namespace(anterior=str(MINI), nueva=str(MINI_V2), salida=str(salida)))
+            absorber.cmd_informe(argparse.Namespace(anterior=str(MINI), nueva=str(MINI_V2), salida=str(salida),
+                                                    sobrescribir=False))
         self.assertEqual(sorted(p.name for p in (self.tmp / "deltas").iterdir()), antes)
         diff = json.loads((salida / "diff.json").read_text(encoding="utf-8"))
         self.assertIn({"de": "C-006", "a": "C-010", "via": "contenido"}, diff["afirmaciones"]["correspondencia"])

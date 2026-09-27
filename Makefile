@@ -66,7 +66,7 @@ corpus-diff: ## Qué cambió entre dos versiones: make corpus-diff ANTES=../corr
 
 corpus-impact: ## Qué registros toca una versión nueva: make corpus-impact ANTES=../corredor@af7e799 DESPUES=../corredor@ref
 	@test -n "$(ANTES)" -a -n "$(DESPUES)" || { echo "uso: make corpus-impact ANTES=ruta@congelación-activa DESPUES=ruta[@ref]"; exit 1; }
-	@$(PYTHON) scripts/ingest/absorber.py informe "$(ANTES)" "$(DESPUES)"
+	@$(PYTHON) scripts/ingest/absorber.py informe "$(ANTES)" "$(DESPUES)" $(if $(SOBRESCRIBIR),--sobrescribir,)
 
 snapshot: ## Crea un snapshot nuevo del estado actual
 	@$(PYTHON) scripts/snapshot/snapshot.py create --label "$(LABEL)"
