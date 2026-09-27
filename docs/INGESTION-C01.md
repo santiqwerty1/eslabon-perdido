@@ -212,9 +212,44 @@ Por cada sección ingerida, el informe da:
 - **Las filas cuya procedencia cambia.** De qué párrafos colgaría cada fila si se ingiriera ahora sale de la misma regla que la ingestión, `corredor.anclar()`: la prosa que la cita, una tabla de síntesis o el registro. Una tabla o el índice de tablas pueden cambiarlo sin tocar la fila ni la prosa. Pide decisión si la fila deja de colgar de un párrafo del que colgaba o cambia de vía. Si sólo gana párrafos que también la citan, es mecánico.
 - **Los apéndices:** las filas que citan filas ingeridas, las entidades del apéndice B cuya primera fila es de la sección, y las fuentes del apéndice A que ya son registros y el apéndice nuevo describe de otra manera. Una fuente que cambia de clave sale como retirada; el informe propone como pareja las filas nuevas con su DOI o su título.
 
-**Dónde vive la correspondencia.** La relación de cada fila con sus pasajes, sus menciones y sus registros no está en un fichero aparte que pudiera desincronizarse. `corredor.correspondencia()` la reconstruye recorriendo los deltas aplicados: el de la ingestión, `corpus_origin.rows`, y el de la conversión, `conversion.rows`. Un delta revertido no cuenta.
+**Dónde vive la correspondencia.** La relación de cada fila con sus pasajes, sus menciones y sus registros no está en un fichero aparte que pudiera desincronizarse. `corredor.correspondencia()` la reconstruye recorriendo los deltas aplicados: el de la ingestión, `corpus_origin.rows`, y el de la conversión, `conversion.rows`. Una absorción aplicada sustituye lo de sus secciones: su congelación, sus copias, sus pasajes vigentes y el mapa de filas con los números nuevos. Un delta revertido no cuenta.
 
-**Lo que falta.** Construir el delta de absorción desde el fichero de absorción, cambiar la congelación activa al aplicarlo y versionar las copias y los pasajes de las secciones. Viene en un paso aparte.
+**Construir y aplicar la absorción.** El esqueleto rellenado se guarda en `knowledge/corpus/absorptions/corredor-<commit>.json`, donde el snapshot lo registra, y la versión nueva se congela antes (`make corpus-freeze`). Después:
+
+```bash
+make corpus-absorb FICHERO=knowledge/corpus/absorptions/corredor-<commit>.json ANTES=../corredor@af7e799 DESPUES=../corredor@<commit> [DRY=1]
+python scripts/ingest/delta.py ABS-<commit>.json
+```
+
+El constructor rehace el informe y exige que el fichero cubra justo sus puntos de decisión, con lo que escribió el informe intacto. Se niega si:
+
+- hay deltas sin aplicar o secciones ingeridas sin convertir;
+- `ANTES` no es la congelación activa o `to` no es la versión congelada que se da;
+- falta `received_at`, la fecha de la absorción. El delta sale de ella, no del día en que se construye, y dos construcciones dan el mismo delta.
+
+Las decisiones que se ejecutan hoy:
+
+| Punto de decisión | Decisiones |
+|---|---|
+| fila que cambia | `conservar`, `corregir` con `patches` (`{registro: {campo: valor}}`), `retirar` (sólo si la versión nueva la retira; retira los registros cuyas filas se van todas) y, por cada etiqueta nueva, su mención en `new_mentions` con el vocabulario de una conversión |
+| fila nueva | destino H, sin registros |
+| mención de un pasaje cambiado o retirado | `reanclar` (al párrafo que cita ahora su fila, o a `passage`) o `retirar` |
+| procedencia | `aceptar` el anclaje nuevo o `fijar` sus `paragraphs` |
+| sucesión, entidad, fila de apéndice | `conservar` o `corregir`; una entidad también `retirar`, que retira sus menciones |
+| fuente | `actualizar` con el apéndice nuevo o `conservar` |
+
+Un parche no fija lo que se deduce (procedencia, ejes, enlaces de vuelta, estado) ni un enlace cuyo otro lado habría que rehacer. Todo `conservar`, `corregir` y `retirar` lleva `reason`.
+
+Lo mecánico lo hace el constructor:
+
+- **Versiones de las secciones.** Si la prosa cambió, copia la versión nueva en `sections/SEC-x.<commit>.md` y le da pasajes nuevos en `passages/SEC-x.<commit>.json`. Los de antes no se tocan: son el texto del que salieron los registros hasta hoy. Con el registro de la sección hace lo mismo.
+- **Menciones.** Las de un pasaje que sólo se desplazó pasan al pasaje nuevo con su mismo offset relativo.
+- **Registros.** La procedencia apunta a los párrafos nuevos de sus filas. Los ejes se rehacen si la primera fila cambió sus columnas de evaluación, y las fuentes si cambió la columna Fuente; una fuente citada que no existía se crea.
+- **Validación.** El estado resultante se valida entero, y el constructor se niega si aparece un error que antes no estaba.
+
+Al aplicarlo, la congelación activa pasa a la versión nueva; al revertirlo, vuelve la de antes. `delta.py` se niega a aplicarlo sobre otra congelación, y el snapshot detecta un `dataset.json` que no es el que dejan los deltas aplicados.
+
+**Lo que falta.** Las decisiones que crean registros nuevos: una fila nueva con destino, `reemplazar`, `dividir` y `ampliar`, una fuente que cambió de clave (`pair_with`), `pairing` y mover filas entre secciones. El constructor se niega a ellas y lo dice; llegan con el segundo paso del constructor.
 
 **Por qué los identificadores opacos importan aquí.** El `C-0412` del corredor no es una identidad estable; el `CLAIM-000412` de este proyecto sí (`DEC-052`). Una afirmación renumerada conserva su identificador opaco y sólo cambia su localizador en el corpus. Si se hubieran usado las claves del corredor como identidad, cada pasada de auditoría las habría roto todas.
 
