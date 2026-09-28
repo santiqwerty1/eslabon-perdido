@@ -227,18 +227,20 @@ El constructor rehace el informe y exige que el fichero cubra justo sus puntos d
 - `ANTES` no es la congelación activa o `to` no es la versión congelada que se da;
 - falta `received_at`, la fecha de la absorción. El delta sale de ella, no del día en que se construye, y dos construcciones dan el mismo delta.
 
-Las decisiones que se ejecutan hoy:
+Las decisiones:
 
 | Punto de decisión | Decisiones |
 |---|---|
-| fila que cambia | `conservar`, `corregir` con `patches` (`{registro: {campo: valor}}`), `retirar` (sólo si la versión nueva la retira; retira los registros cuyas filas se van todas) y, por cada etiqueta nueva, su mención en `new_mentions` con el vocabulario de una conversión |
-| fila nueva | destino H, sin registros |
+| fila que cambia | `conservar`; `corregir` con `patches` (`{registro: {campo: valor}}`); `retirar` (sólo si la versión nueva la retira; retira los registros cuyas filas se van todas); `ampliar` con `keys`, registros nuevos además de los que tenía; `reemplazar` con `replaced_by` (`{registro: "@clave" o identificador}`), que los sustituye (`replaced`, `superseded_by`), y `keys` si hay registros nuevos; `dividir`, en una fila con sucesoras declaradas, que reparte cada registro: lo atómico se reasigna a una sucesora (`successors`) y conserva su identidad, lo demás se sustituye (`replaced_by`), y la fila queda como glosa. Por cada etiqueta nueva, su mención en `new_mentions` con el vocabulario de una conversión |
+| fila nueva | destino A–J con `keys`, como en una conversión, y la mención de sus etiquetas nuevas |
 | mención de un pasaje cambiado o retirado | `reanclar` (al párrafo que cita ahora su fila, o a `passage`) o `retirar` |
 | procedencia | `aceptar` el anclaje nuevo o `fijar` sus `paragraphs` |
 | sucesión, entidad, fila de apéndice | `conservar` o `corregir`; una entidad también `retirar`, que retira sus menciones |
 | fuente | `actualizar` con el apéndice nuevo o `conservar` |
 
-Un parche no fija lo que se deduce (procedencia, ejes, enlaces de vuelta, estado) ni un enlace cuyo otro lado habría que rehacer. Todo `conservar`, `corregir` y `retirar` lleva `reason`.
+Los registros nuevos de una sección van en `sections.<sección>.records`, con el formato de un fichero de conversión (`key`, `file`, `rows` con los números nuevos, `sources`, `record`), y salen de la misma maquinaria que una conversión: identificadores, procedencia de la versión nueva, ejes de su primera fila, fuentes que se crean al citarse, enlaces de vuelta y esquemas. Una mención nueva, un `replaced_by` o un parche pueden nombrar sus claves.
+
+Un parche no fija lo que se deduce (procedencia, ejes, `claim_ids`, estado). Sí puede cambiar un enlace —`subject_id`, `object`, `supports_claim_ids`, `challenges_claim_ids`, `analysis_id`—, y el otro extremo se rehace solo: la afirmación sale de las `claim_ids` del sujeto de antes y entra en las del de ahora, y una datación se mueve de evento. Toda decisión sobre una fila lleva `reason`.
 
 Lo mecánico lo hace el constructor:
 
@@ -249,7 +251,9 @@ Lo mecánico lo hace el constructor:
 
 Al aplicarlo, la congelación activa pasa a la versión nueva; al revertirlo, vuelve la de antes. `delta.py` se niega a aplicarlo sobre otra congelación, y el snapshot detecta un `dataset.json` que no es el que dejan los deltas aplicados.
 
-**Lo que falta.** Las decisiones que crean registros nuevos: una fila nueva con destino, `reemplazar`, `dividir` y `ampliar`, una fuente que cambió de clave (`pair_with`), `pairing` y mover filas entre secciones. El constructor se niega a ellas y lo dice; llegan con el segundo paso del constructor.
+Una fuente del apéndice A que sólo cambió de clave sale en el informe como retirada, con las filas nuevas candidatas; `actualizar` con `pair_with` le da la clave nueva sin crear otra fuente.
+
+**Lo que falta.** Corregir a mano los emparejamientos del diff (`pairing`), mover filas entre secciones y retirar una sección entera. El constructor se niega a ellos y lo dice.
 
 **Por qué los identificadores opacos importan aquí.** El `C-0412` del corredor no es una identidad estable; el `CLAIM-000412` de este proyecto sí (`DEC-052`). Una afirmación renumerada conserva su identificador opaco y sólo cambia su localizador en el corpus. Si se hubieran usado las claves del corredor como identidad, cada pasada de auditoría las habría roto todas.
 
