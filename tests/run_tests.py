@@ -184,9 +184,10 @@ def main() -> int:
     # aviso— y la ingestión de una sección del corredor sobre corredor-mini.
     pruebas = sorted((ROOT / "tests" / "ingest").glob("test_*.py"))
     pruebas += sorted((ROOT / "tests" / "validation").glob("test_*.py"))
+    pruebas += sorted((ROOT / "tests" / "views").glob("test_*.py"))
     if pruebas:
         import subprocess
-        print(f"\n{DIM}ingestión y validación — congelación, diff, secciones del corredor y familias del validador{RESET}")
+        print(f"\n{DIM}ingestión, validación y vistas — congelación, diff, secciones del corredor, familias del validador y vistas derivadas{RESET}")
         for prueba in pruebas:
             r = subprocess.run([sys.executable, str(prueba)], capture_output=True, text=True)
             # unittest resume en stderr; las pruebas por tabla, en stdout.

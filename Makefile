@@ -10,7 +10,7 @@
 VENV   := .venv
 PYTHON := $(shell [ -x $(VENV)/bin/python ] && echo $(VENV)/bin/python || echo python3)
 
-.PHONY: help setup validate verify snapshot test check clean-generated ingest corpus-freeze corpus-verify corpus-diff corpus-impact corpus-absorb convert
+.PHONY: help setup validate verify snapshot test check clean-generated ingest corpus-freeze corpus-verify corpus-diff corpus-impact corpus-absorb convert views
 
 help: ## Muestra estos objetivos
 	@grep -hE '^[a-z-]+:.*?## ' $(MAKEFILE_LIST) \
@@ -71,6 +71,9 @@ corpus-impact: ## Qué registros toca una versión nueva: make corpus-impact ANT
 corpus-absorb: ## Construye el delta de absorción: make corpus-absorb FICHERO=knowledge/corpus/absorptions/… ANTES=… DESPUES=… [DRY=1]
 	@test -n "$(FICHERO)" -a -n "$(ANTES)" -a -n "$(DESPUES)" || { echo "uso: make corpus-absorb FICHERO=fichero-de-absorción ANTES=ruta@congelación-activa DESPUES=ruta@ref [DRY=1]"; exit 1; }
 	@$(PYTHON) scripts/ingest/absorber.py construir "$(FICHERO)" "$(ANTES)" "$(DESPUES)" $(if $(DRY),--dry-run,)
+
+views: ## Construye «Relojes y rocas», la vista temporal de lo convertido: generated/views/cronologia.html
+	@$(PYTHON) scripts/build_views/cronologia.py
 
 snapshot: ## Crea un snapshot nuevo del estado actual
 	@$(PYTHON) scripts/snapshot/snapshot.py create --label "$(LABEL)"
