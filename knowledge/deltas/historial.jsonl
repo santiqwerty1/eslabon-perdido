@@ -6,3 +6,5 @@
 {"delta": "SEC-000001-correccion-4.json", "accion": "aplicar", "revision": "REV-000006", "fecha": "2026-09-26T20:27:46+00:00", "sha256": "sha256:02dfc882930f9c7295d6427d6d398828462217911de721121c99dea481c484b1"}
 {"delta": "SEC-000002.json", "accion": "aplicar", "revision": "REV-000007", "fecha": "2026-09-26T21:05:45+00:00", "sha256": "sha256:303f5e15eb211ea02c7220c4fa4f15c57c30bfb0176b3840566d518a07aeec6e"}
 {"delta": "SEC-000002-conversion.json", "accion": "aplicar", "revision": "REV-000008", "fecha": "2026-09-26T21:06:06+00:00", "sha256": "sha256:d2d0d7a032cd43d6e6a56e8c8265cd0758d8d4f3ed024354911a8387000737b7"}
+{"delta": "SEC-000003.json", "accion": "aplicar", "revision": "REV-000009", "fecha": "2026-09-28T02:06:51+00:00", "sha256": "sha256:8ab18de351b79b70a85d860cce25a41e74b36b62dbc08f8854d91543dd1448e7"}
+{"delta": "SEC-000003-conversion.json", "accion": "aplicar", "revision": "REV-000010", "fecha": "2026-09-28T02:39:08+00:00", "sha256": "sha256:82d9628f8d06198fb1971bb09d7e419b254faf4ec3342152bb060fc14d7ccb28"}
