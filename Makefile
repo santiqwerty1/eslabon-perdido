@@ -72,8 +72,9 @@ corpus-absorb: ## Construye el delta de absorción: make corpus-absorb FICHERO=k
 	@test -n "$(FICHERO)" -a -n "$(ANTES)" -a -n "$(DESPUES)" || { echo "uso: make corpus-absorb FICHERO=fichero-de-absorción ANTES=ruta@congelación-activa DESPUES=ruta@ref [DRY=1]"; exit 1; }
 	@$(PYTHON) scripts/ingest/absorber.py construir "$(FICHERO)" "$(ANTES)" "$(DESPUES)" $(if $(DRY),--dry-run,)
 
-views: ## Construye «Relojes y rocas», la vista temporal de lo convertido: generated/views/cronologia.html
+views: ## Construye las vistas: «Relojes y rocas» (generated/views/cronologia.html) y la red por hipótesis (knowledge/views/ y generated/views/red.html)
 	@$(PYTHON) scripts/build_views/cronologia.py
+	@$(PYTHON) scripts/build_views/red.py
 
 snapshot: ## Crea un snapshot nuevo del estado actual
 	@$(PYTHON) scripts/snapshot/snapshot.py create --label "$(LABEL)"

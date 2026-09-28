@@ -1,0 +1,53 @@
+{
+  "nombre": "La red por hipótesis",
+  "decision": "DEC-061",
+  "escala": "campaign-01-eukarya",
+  "raiz": "CLADE-000001",
+  "anclas": {
+    "CONFLICT-000001": {
+      "nodo": "CLADE-000001",
+      "lectura": "primera_divergencia",
+      "motivo": "Las seis hipótesis del grupo chocan «en la primera divergencia» de Eukaryota (apéndice E, en las notas de cada una): la afirmación hermana de cada hipótesis parte Eukaryota en dos, no agrupa a dos hermanos dentro de ella."
+    }
+  },
+  "complementos": {
+    "CLADE-000018": {
+      "de": "CLADE-000003",
+      "dentro_de": "CLADE-000001",
+      "motivo": "Su ficha lo define como «clado complementario de Discoba bajo la raíz de He et al. 2014»: es el resto de Eukaryota."
+    },
+    "CLADE-000019": {
+      "de": "CLADE-000002",
+      "dentro_de": "CLADE-000001",
+      "motivo": "Su ficha lo define como «clado complementario de Opisthokonta bajo la raíz de Cerón-Romero et al. 2022»: es el resto de Eukaryota."
+    }
+  },
+  "composiciones": {
+    "CLADE-000025": {
+      "miembros": ["CLADE-000022", "CLADE-000004"],
+      "motivo": "Su ficha: «Clado formado por CRuMs y Amorphea (Brown et al. 2018)». Ninguna afirmación member_of lo dice."
+    },
+    "CLADE-000036": {
+      "miembros": ["CLADE-000035", "CLADE-000002"],
+      "motivo": "Su ficha: «Clado de Apusomonadida y Opisthokonta en la topología de trabajo de S109». Ninguna afirmación member_of lo dice."
+    },
+    "CLADE-000049": {
+      "miembros": ["CLADE-000039", "CLADE-000040"],
+      "motivo": "Su ficha: «Pluriformea+Ichthyosporea, recuperada por la matriz OrthoFinder de Liu et al. 2024». Ninguna afirmación member_of lo dice."
+    }
+  },
+  "vistas": [
+    {"hipotesis": []},
+    {"hipotesis": ["HYP-000010"]},
+    {"hipotesis": ["HYP-000011"]},
+    {"hipotesis": ["HYP-000012"]},
+    {"hipotesis": ["HYP-000013"]},
+    {"hipotesis": ["HYP-000014"]},
+    {"hipotesis": ["HYP-000015"]},
+    {"hipotesis": ["HYP-000017"]},
+    {"hipotesis": ["HYP-000018"]},
+    {"hipotesis": ["HYP-000019"]},
+    {"hipotesis": ["HYP-000020"]},
+    {"hipotesis": ["HYP-000021"]}
+  ]
+}

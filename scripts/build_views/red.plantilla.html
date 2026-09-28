@@ -1,0 +1,390 @@
+<title>La red por hipótesis</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap">
+<style>
+  /* Paleta y medidas del sistema de diseño del visor (Nocturne, _ds/), las mismas
+     de «Relojes y rocas». Es un sistema de un solo tema, oscuro. */
+  :root {
+    color-scheme: dark;
+    --bg: #161826;
+    --surface: #232532;
+    --surface-2: #1c1e2c;
+    --text: #e9e9ed;
+    --text-2: #cfd3e5;
+    --muted: #b2b6ca;
+    --faint: #9397ab;
+    --line: #3f424d;
+    --line-2: #595d6c;
+    --accent: #9184d9;
+    --accent-200: #e7e5fe;
+    --accent-300: #d2cefd;
+    --accent-800: #423a6a;
+    --accent-900: #2b2741;
+    --mark: #e4e7f5;
+    --font: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+    --mono: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+    --space-2: 5.6px;
+    --space-3: 8.4px;
+    --space-4: 11.2px;
+    --space-6: 16.8px;
+    --space-8: 22.4px;
+    --radius-sm: 4px;
+    --radius-md: 8px;
+    --shadow-sm: 0 0 0 1px #3f424d;
+  }
+  body { background: var(--bg); color: var(--text); font: 14px/1.55 var(--font); }
+  .pagina { max-width: 1440px; margin: 0 auto; padding-block: 28px 64px; padding-inline: 16px; display: grid; gap: 36px; }
+  @media (min-width: 720px) { .pagina { padding-inline: 36px; } }
+
+  .ceja { font: 500 10.5px var(--font); letter-spacing: .16em; text-transform: uppercase; color: var(--accent-300); margin: 0 0 var(--space-3); }
+  h1 { font: 500 27px/1.25 var(--font); margin: 0 0 var(--space-3); text-wrap: balance; }
+  h2 { font: 500 17px/1.35 var(--font); margin: 0; text-wrap: balance; }
+  .entrada { margin: 0 0 var(--space-4); max-width: 68ch; font-size: 13.5px; line-height: 1.6; color: var(--text-2); text-wrap: pretty; }
+  .meta { margin: 0; font: 11.5px/1.6 var(--mono); color: var(--faint); font-variant-numeric: tabular-nums; }
+  .cuenta { margin: var(--space-2) 0 0; font-size: 12.5px; color: var(--muted); }
+
+  .leyenda { display: flex; flex-wrap: wrap; gap: var(--space-3) var(--space-8); margin-top: var(--space-6); padding-top: var(--space-4); border-top: 1px solid var(--line); font-size: 12px; color: var(--muted); }
+  .leyenda-grupo { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2) var(--space-4); }
+  .leyenda-titulo { font: 500 10.5px var(--font); letter-spacing: .12em; text-transform: uppercase; color: var(--faint); }
+  .leyenda-item { display: inline-flex; align-items: center; gap: var(--space-2); white-space: nowrap; }
+  .leyenda svg { flex: none; }
+
+  /* Un conflicto: sus hipótesis lado a lado (§20.3). */
+  .conflicto { display: grid; gap: var(--space-4); }
+  .conflicto-cabeza { display: grid; gap: var(--space-2); max-width: 90ch; }
+  .conflicto-cabeza p { margin: 0; font-size: 12.5px; line-height: 1.6; color: var(--muted); text-wrap: pretty; }
+  .conflicto-cabeza .foco { font: 11px var(--mono); color: var(--faint); }
+  .multiples { display: grid; gap: var(--space-4); grid-template-columns: repeat(auto-fill, minmax(min(100%, 270px), 1fr)); align-items: start; }
+
+  .vista { all: unset; box-sizing: border-box; display: grid; gap: var(--space-3); align-content: start; min-width: 0; padding: var(--space-4) var(--space-4) var(--space-3); background: var(--surface); border-radius: var(--radius-md); box-shadow: var(--shadow-sm); cursor: pointer; }
+  .vista:hover { box-shadow: 0 0 0 1px var(--line-2); }
+  .vista:focus-visible { outline: 2px solid var(--accent-300); outline-offset: 2px; }
+  .vista[aria-pressed="true"] { box-shadow: 0 0 0 1.5px var(--accent); background: color-mix(in oklab, var(--accent) 7%, var(--surface)); }
+  .vista-cabeza { display: flex; gap: var(--space-3); align-items: baseline; min-width: 0; }
+  .codigo { flex: none; font: 600 11px var(--mono); color: var(--accent-300); padding: 1px 6px; border-radius: var(--radius-sm); background: var(--accent-900); }
+  .vista-nombre { font-size: 13px; font-weight: 500; color: var(--text); line-height: 1.35; }
+  .mini { overflow-x: auto; padding-bottom: 2px; }
+  .mini + .mini { border-top: 1px dashed var(--line); padding-top: var(--space-2); }
+  .mini-rotulo { font: 500 10px var(--font); letter-spacing: .1em; text-transform: uppercase; color: var(--faint); margin: 0 0 2px; }
+
+  .chips { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+  .chip { font-size: 11.5px; padding: 2px 8px; border-radius: 999px; box-shadow: inset 0 0 0 1px var(--line-2); color: var(--text-2); white-space: nowrap; }
+  .chip.aviso { box-shadow: inset 0 0 0 1px var(--accent-800); background: var(--accent-900); color: var(--accent-200); }
+
+  /* El árbol: cada nodo con nombre en su fila, los hijos sangrados. */
+  .arbol { display: block; font-family: var(--font); }
+  .arbol .rama { stroke: var(--line-2); stroke-width: 1.3; fill: none; }
+  .arbol .rama.hipotesis, .arbol .rama.reenraizado { stroke: var(--mark); stroke-dasharray: 4 2.5; }
+  .arbol .rama.sin_lado { stroke: var(--faint); stroke-dasharray: 1.2 2.6; }
+  .arbol .clado { fill: var(--mark); }
+  .arbol .concepto { fill: var(--surface); stroke: var(--mark); stroke-width: 1.3; }
+  .arbol .linaje { fill: var(--mark); }
+  .arbol .sin-nombre { fill: var(--surface); stroke: var(--faint); stroke-width: 1.2; }
+  .arbol text { font-size: 12px; fill: var(--text-2); }
+  .arbol .hueco { fill: var(--faint); }
+  .arbol .complemento { font-style: italic; }
+  .arbol .apagado { fill: var(--faint); }
+  .arbol .anota { font-size: 10.5px; fill: var(--faint); letter-spacing: .02em; }
+  .arbol .es-hipotesis > text.nombre { fill: var(--text); font-weight: 500; }
+
+  /* La ficha de una vista. */
+  .ficha { background: var(--surface); border-radius: var(--radius-md); box-shadow: var(--shadow-sm); padding: var(--space-6); display: grid; gap: var(--space-6); scroll-margin-top: calc(env(safe-area-inset-top, 0px) + 16px); }
+  .ficha-cabeza { display: grid; gap: var(--space-3); }
+  .ficha-cabeza p { margin: 0; max-width: 72ch; font-size: 13px; color: var(--text-2); }
+  .ids { font: 11px/1.6 var(--mono); color: var(--faint); word-break: break-word; }
+  .lienzo { overflow-x: auto; background: var(--surface-2); border-radius: var(--radius-sm); padding: var(--space-4); }
+  .lienzo + .lienzo { margin-top: calc(-1 * var(--space-3)); }
+  .bloques { display: grid; gap: var(--space-8); }
+  @media (min-width: 980px) { .bloques { grid-template-columns: 1fr 1fr; } }
+  .bloque { display: grid; gap: var(--space-3); align-content: start; min-width: 0; }
+  .bloque h3 { font: 500 10.5px var(--font); letter-spacing: .16em; text-transform: uppercase; color: var(--accent-300); margin: 0; }
+  .declaracion { display: grid; gap: var(--space-3); margin: 0; padding: 0; list-style: none; font-size: 12.5px; color: var(--text-2); }
+  .declaracion li { padding-left: 14px; position: relative; max-width: 78ch; overflow-wrap: anywhere; }
+  .declaracion li::before { content: "·"; position: absolute; left: 3px; color: var(--faint); }
+  .hallazgo { font-size: 12.5px; color: var(--text); background: var(--accent-900); border-radius: var(--radius-sm); padding: var(--space-3) var(--space-4); margin: 0; overflow-wrap: anywhere; }
+  details.motivo { border-radius: var(--radius-sm); box-shadow: inset 0 0 0 1px var(--line); }
+  details.motivo summary { cursor: pointer; padding: var(--space-3) var(--space-4); font-size: 12.5px; color: var(--text); display: flex; gap: var(--space-3); align-items: baseline; }
+  details.motivo summary:focus-visible { outline: 2px solid var(--accent-300); outline-offset: -2px; }
+  details.motivo summary .n { font: 11px var(--mono); color: var(--faint); }
+  details.motivo .por-que { margin: 0; padding: 0 var(--space-4) var(--space-3); font-size: 12px; color: var(--muted); }
+  details.motivo ul { list-style: none; margin: 0; padding: 0 var(--space-4) var(--space-4); display: grid; gap: var(--space-3); }
+  details.motivo li { font-size: 12.5px; color: var(--text-2); }
+  details.motivo li code { font: 11px var(--mono); color: var(--faint); margin-right: 6px; }
+  details.motivo li .detalle { display: block; font-size: 11.5px; color: var(--faint); margin-top: 1px; }
+  .newick { margin: 0; font: 11px/1.6 var(--mono); color: var(--text-2); background: var(--surface-2); border-radius: var(--radius-sm); padding: var(--space-4); white-space: pre-wrap; overflow-wrap: anywhere; max-height: 180px; overflow-y: auto; }
+  .copiar { all: unset; cursor: pointer; justify-self: start; font-size: 12px; color: var(--accent-300); }
+  .copiar:focus-visible { outline: 2px solid var(--accent-300); outline-offset: 2px; }
+
+  footer { display: grid; gap: var(--space-3); max-width: 90ch; }
+  footer h2 { font-size: 15px; }
+  @media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
+</style>
+<!--CUERPO-->
+<div class="pagina">
+  <header>
+    <p class="ceja">Vista derivada · §6.7 · §20.3</p>
+    <h1>La red por hipótesis</h1>
+    <p class="entrada">Dónde cae la raíz de Eukaryota y cómo se ordena Holozoa, según cada hipótesis del libro mayor. Cada vista es el tronco común que ninguna hipótesis disputa más la topología de una sola hipótesis; las rivales no se dibujan juntas. Lo que una vista no puede dibujar, o lo que su raíz contradice, lo dice su ficha.</p>
+    <p class="meta">__META__</p>
+    <p class="cuenta">__CUENTA__</p>
+    <div class="leyenda" aria-label="Leyenda">
+      <div class="leyenda-grupo">
+        <span class="leyenda-titulo">Rama</span>
+        <span class="leyenda-item"><svg width="28" height="10" aria-hidden="true"><path d="M1 5H27" stroke="#595d6c" stroke-width="1.3"/></svg>tronco común</span>
+        <span class="leyenda-item"><svg width="28" height="10" aria-hidden="true"><path d="M1 5H27" stroke="#e4e7f5" stroke-width="1.3" stroke-dasharray="4 2.5"/></svg>la pone la hipótesis de la vista</span>
+        <span class="leyenda-item"><svg width="28" height="10" aria-hidden="true"><path d="M1 5H27" stroke="#9397ab" stroke-width="1.3" stroke-dasharray="1.2 2.6"/></svg>? sin lado declarado en la raíz</span>
+      </div>
+      <div class="leyenda-grupo">
+        <span class="leyenda-titulo">Nodo</span>
+        <span class="leyenda-item"><svg width="10" height="10" aria-hidden="true"><circle cx="5" cy="5" r="3.5" fill="#e4e7f5"/></svg>clado</span>
+        <span class="leyenda-item"><svg width="12" height="12" aria-hidden="true"><path d="M6 1.5L10.5 6L6 10.5L1.5 6Z" fill="#232532" stroke="#e4e7f5" stroke-width="1.3"/></svg>concepto taxonómico (sensu)</span>
+        <span class="leyenda-item"><svg width="12" height="12" aria-hidden="true"><path d="M6 1.5L10.5 10H1.5Z" fill="#e4e7f5"/></svg>linaje</span>
+        <span class="leyenda-item"><svg width="10" height="10" aria-hidden="true"><circle cx="5" cy="5" r="2.6" fill="#232532" stroke="#9397ab" stroke-width="1.2"/></svg>clado sin nombre</span>
+        <span class="leyenda-item"><i>cursiva</i> el resto, según la hipótesis</span>
+        <span class="leyenda-item">* miembros leídos de la especificación</span>
+        <span class="leyenda-item">+n plegados</span>
+      </div>
+    </div>
+  </header>
+
+  <section class="conflicto" aria-labelledby="titulo-tronco">
+    <div class="conflicto-cabeza">
+      <h2 id="titulo-tronco">Lo que ninguna hipótesis disputa</h2>
+      <p>El tronco común: las afirmaciones de topología sin alcance de hipótesis. Sobre él se construye cada vista, y cada raíz puede contradecir parte de él.</p>
+    </div>
+    <div class="multiples" id="tronco"></div>
+  </section>
+
+  <div id="conflictos" style="display: grid; gap: 36px;"></div>
+
+  <section class="ficha" id="ficha" aria-live="polite"></section>
+
+  <footer>
+    <h2>Cómo se arma cada vista</h2>
+    <ul class="declaracion">
+      <li>Topología es <code>member_of</code> (cuelga un nodo de su padre más interno), <code>sister_group_of</code> (junta dos hermanos), <code>stem_lineage_of</code> (pone un linaje en el tronco de un clado) y <code>diverges_from</code>, que sólo se comprueba.</li>
+      <li>Quedan fuera, con su motivo: las derivadas, las de otras hipótesis, las históricas del tronco y las que cuelgan algo de un concepto taxonómico, que son clasificación según una fuente y no topología.</li>
+      <li>En el conflicto de la raíz de Eukaryota, la afirmación hermana de cada hipótesis es la primera divergencia. Si un lado es «el resto de los eucariotas», recibe todo lo demás, y si el otro lado estaba en lo hondo del tronco, el árbol se re-enraíza: los clados del camino dejan de serlo.</li>
+      <li>Cada afirmación seleccionada se cumple en el árbol dibujado. La que no se cumple sale de la selección, y la ficha dice por qué.</li>
+      <li>Una vista es un producto editorial fechado (§15.4): excluir no borra, y las alternativas siguen en el libro mayor con su propia vista.</li>
+    </ul>
+  </footer>
+</div>
+<script type="application/json" id="datos">__DATOS__</script>
+<script>
+(() => {
+  const D = JSON.parse(document.getElementById("datos").textContent);
+  const V = Object.fromEntries(D.vistas.map(v => [v.id, v]));
+  const NS = "http://www.w3.org/2000/svg";
+
+  function nodo(tag, attrs, padre, texto) {
+    const e = document.createElement(tag);
+    for (const [k, v] of Object.entries(attrs || {})) if (v != null) e.setAttribute(k, v);
+    if (texto != null) e.textContent = texto;
+    if (padre) padre.appendChild(e);
+    return e;
+  }
+  function svgNodo(tag, attrs, padre, texto) {
+    const e = document.createElementNS(NS, tag);
+    for (const [k, v] of Object.entries(attrs || {})) if (v != null) e.setAttribute(k, v);
+    if (texto != null) e.textContent = texto;
+    if (padre) padre.appendChild(e);
+    return e;
+  }
+
+  function buscar(n, id) {
+    if (n.id === id) return n;
+    for (const h of n.hijos) { const r = buscar(h, id); if (r) return r; }
+    return null;
+  }
+  function nombrados(n) { return (n.id ? 1 : 0) + n.hijos.reduce((a, h) => a + nombrados(h), 0); }
+  function contiene(n, marca) { return n.marcas.includes(marca) || n.hijos.some(h => contiene(h, marca)); }
+
+  // Pliega lo que queda por debajo de `max` niveles con nombre; los nodos sin nombre no cuentan.
+  function recortar(n, max, prof = 0) {
+    return {...n, hijos: n.hijos.map(h => {
+      const p = prof + (h.id ? 1 : 0);
+      if (h.id && p >= max && h.hijos.length) return {...h, hijos: [], plegados: nombrados(h) - 1};
+      return recortar(h, max, p);
+    })};
+  }
+
+  function rotulo(n, completo) {
+    if (!n.id) return n.tipo === "tronco" ? "tronco" : (completo ? "sin nombre" : "");
+    // En las miniaturas, el nombre corto (sin «sensu») y recortado; la ficha lo da entero.
+    let t = completo ? n.etiqueta : (n.corta.length > 30 ? n.corta.slice(0, 29).trimEnd() + "…" : n.corta);
+    if (n.marcas.includes("composicion")) t += " *";
+    return t;
+  }
+
+  // Árbol sangrado: una fila por nodo, las ramas en codo desde el padre.
+  function dibujar(raiz, o) {
+    const F = o.fila, S = o.sangria, M = 6;
+    const filas = [];
+    (function poner(n, d) {
+      const f = {n, d, i: filas.length, hijos: []};
+      filas.push(f);
+      f.hijos = n.hijos.map(h => poner(h, d + 1));
+      return f;
+    })(raiz, 0);
+    const texto = f => {
+      const n = f.n;
+      let t = (n.marcas.includes("sin_lado") ? "? " : "") + rotulo(n, o.completo);
+      if (n.plegados) t += `  +${n.plegados}`;
+      if (n.anotaciones.length) t += "  · " + n.anotaciones.map(a => a.etiqueta).join(", ");
+      return t;
+    };
+    const x = f => M + 6 + f.d * S;
+    const y = f => M + f.i * F + F / 2;
+    const ancho = Math.ceil(Math.max(...filas.map(f => x(f) + 10 + texto(f).length * o.fuente * 0.56)) + M);
+    const alto = filas.length * F + 2 * M;
+    const svg = svgNodo("svg", {class: "arbol", width: ancho, height: alto, viewBox: `0 0 ${ancho} ${alto}`,
+                                role: "img", "aria-label": o.etiqueta});
+    for (const f of filas) {
+      if (!f.hijos.length) continue;
+      const ultimo = f.hijos[f.hijos.length - 1];
+      svgNodo("path", {class: "rama", d: `M${x(f)} ${y(f) + 4}V${y(ultimo)}`}, svg);
+      for (const h of f.hijos) {
+        const clase = ["hipotesis", "reenraizado", "sin_lado"].find(m => h.n.marcas.includes(m));
+        svgNodo("path", {class: "rama" + (clase ? " " + clase : ""), d: `M${x(f)} ${y(h)}H${x(h) - 5}`}, svg);
+      }
+    }
+    for (const f of filas) {
+      const n = f.n, cx = x(f), cy = y(f);
+      const g = svgNodo("g", {class: n.marcas.includes("hipotesis") ? "es-hipotesis" : null}, svg);
+      if (!n.id) svgNodo("circle", {class: "sin-nombre", cx, cy, r: 2.6}, g);
+      else if (n.tipo === "concepto") svgNodo("path", {class: "concepto", d: `M${cx} ${cy - 4.5}L${cx + 4.5} ${cy}L${cx} ${cy + 4.5}L${cx - 4.5} ${cy}Z`}, g);
+      else if (n.tipo === "linaje") svgNodo("path", {class: "linaje", d: `M${cx} ${cy - 4.5}L${cx + 4.5} ${cy + 4}H${cx - 4.5}Z`}, g);
+      else svgNodo("circle", {class: "clado", cx, cy, r: 3.5}, g);
+      const t = svgNodo("text", {x: cx + 9, y: cy + 4}, g);
+      if (n.marcas.includes("sin_lado")) svgNodo("tspan", {class: "hueco"}, t, "? ");
+      const nombre = rotulo(n, o.completo);
+      svgNodo("tspan", {class: "nombre" + (n.marcas.includes("complemento") ? " complemento" : "")
+                         + (!n.id ? " apagado" : "")}, t, nombre);
+      if (n.plegados) svgNodo("tspan", {class: "apagado"}, t, `  +${n.plegados}`);
+      if (n.anotaciones.length) svgNodo("tspan", {class: "anota"}, t, "  · " + n.anotaciones.map(a => a.etiqueta).join(", "));
+      if (o.completo && n.id) svgNodo("title", {}, g, `${n.id}${n.origen ? " · colocado por " + n.origen : ""}`);
+    }
+    return svg;
+  }
+
+  function chips(v, padre) {
+    const c = nodo("span", {class: "chips"}, padre);
+    if (v.rotos.length) nodo("span", {class: "chip aviso"}, c, `rompe ${v.rotos.length} ${v.rotos.length === 1 ? "clado" : "clados"}`);
+    if (v.sin_lado.length) nodo("span", {class: "chip"}, c, `${v.sin_lado.length} sin lado`);
+    if (v.sin_raiz.length) nodo("span", {class: "chip"}, c, "no trae raíz");
+    const contra = v.excluidas.find(e => e.motivo === "contradicha");
+    if (contra) nodo("span", {class: "chip"}, c, `${contra.afirmaciones.length} contradichas`);
+    nodo("span", {class: "chip"}, c, `${v.seleccionadas} dibujadas`);
+    return c;
+  }
+
+  const botones = [];
+  function tarjeta(v, foco, padre) {
+    const b = nodo("button", {class: "vista", type: "button", "aria-pressed": "false", "data-id": v.id,
+                              "aria-controls": "ficha"}, padre);
+    const cab = nodo("span", {class: "vista-cabeza"}, b);
+    if (v.corto) nodo("span", {class: "codigo"}, cab, v.corto);
+    nodo("span", {class: "vista-nombre"}, cab, v.titulo);
+    const raiz = (foco && buscar(v.arbol, foco)) || v.arbol;
+    const m = nodo("span", {class: "mini"}, b);
+    m.appendChild(dibujar(recortar(raiz, foco ? 2 : 1), {fila: 17, sangria: 14, fuente: 12, completo: false,
+                                                          etiqueta: `Árbol de ${v.nombre}`}));
+    for (const s of v.sueltos.filter(s => contiene(s, "hipotesis"))) {
+      const ms = nodo("span", {class: "mini"}, b);
+      nodo("span", {class: "mini-rotulo", style: "display:block"}, ms, "Fuera del árbol");
+      ms.appendChild(dibujar(recortar(s, 2), {fila: 17, sangria: 14, fuente: 12, completo: false,
+                                                  etiqueta: "Árbol suelto"}));
+    }
+    chips(v, b);
+    b.addEventListener("click", () => elegir(v.id, true));
+    botones.push(b);
+  }
+
+  const tronco = V[D.tronco];
+  if (tronco) tarjeta(tronco, D.raiz, document.getElementById("tronco"));
+  const conflictos = document.getElementById("conflictos");
+  for (const g of D.grupos) {
+    const s = nodo("section", {class: "conflicto", "aria-labelledby": "titulo-" + g.id}, conflictos);
+    const cab = nodo("div", {class: "conflicto-cabeza"}, s);
+    nodo("h2", {id: "titulo-" + g.id}, cab, `${g.nombre} · ${g.vistas.length} hipótesis`);
+    nodo("p", {}, cab, g.descripcion);
+    const focoEtq = tronco && buscar(tronco.arbol, g.foco);
+    nodo("p", {class: "foco"}, cab, `${g.id} · árboles centrados en ${focoEtq ? focoEtq.etiqueta : g.foco}`);
+    const grid = nodo("div", {class: "multiples"}, s);
+    for (const id of g.vistas) tarjeta(V[id], g.foco, grid);
+  }
+
+  function lista(titulo, filas, padre, clase) {
+    if (!filas.length) return;
+    const b = nodo("div", {class: "bloque"}, padre);
+    nodo("h3", {}, b, titulo);
+    if (clase === "hallazgo") { for (const f of filas) nodo("p", {class: "hallazgo"}, b, f); return; }
+    const ul = nodo("ul", {class: "declaracion"}, b);
+    for (const f of filas) nodo("li", {}, ul, f);
+  }
+
+  function ficha(v) {
+    const f = document.getElementById("ficha");
+    f.replaceChildren();
+    const cab = nodo("div", {class: "ficha-cabeza"}, f);
+    nodo("p", {class: "ceja"}, cab, "Ficha de la vista");
+    nodo("h2", {}, cab, v.corto ? `${v.corto} · ${v.titulo}` : v.titulo);
+    nodo("p", {}, cab, v.descripcion);
+    nodo("div", {class: "ids"}, cab, [v.id, "v" + v.version, v.revision, ...v.hipotesis, ...v.grupos].join(" · "));
+    chips(v, cab);
+    const l = nodo("div", {class: "lienzo"}, f);
+    l.appendChild(dibujar(v.arbol, {fila: 21, sangria: 18, fuente: 12.5, completo: true, etiqueta: `Árbol completo de ${v.nombre}`}));
+    for (const s of v.sueltos) {
+      const ls = nodo("div", {class: "lienzo"}, f);
+      nodo("p", {class: "mini-rotulo"}, ls, "Fuera del árbol principal");
+      ls.appendChild(dibujar(s, {fila: 21, sangria: 18, fuente: 12.5, completo: true, etiqueta: "Árbol suelto"}));
+    }
+    const bl = nodo("div", {class: "bloques"}, f);
+    const izq = nodo("div", {class: "bloque"}, bl), der = nodo("div", {class: "bloque"}, bl);
+    lista("Hallazgos", v.notas, izq, "hallazgo");
+    if (v.rotos.length) lista("Dejan de ser clados con esta raíz", v.rotos.map(r => `${r.etiqueta} (${r.id})`), izq);
+    lista("Lo que la vista no dibuja", v.simplificaciones, izq);
+    lista("Criterios", v.criterios.filter(c => !c.startsWith("Excluidas porque")), izq);
+    const ex = nodo("div", {class: "bloque"}, der);
+    nodo("h3", {}, ex, `Excluidas, por motivo`);
+    for (const e of v.excluidas) {
+      const d = nodo("details", {class: "motivo"}, ex);
+      if (e.motivo === "contradicha" || e.motivo === "no_dibujable") d.open = true;
+      const s = nodo("summary", {}, d);
+      nodo("span", {}, s, e.titulo);
+      nodo("span", {class: "n"}, s, String(e.afirmaciones.length));
+      nodo("p", {class: "por-que"}, d, `Quedan fuera porque ${e.por_que}.`);
+      const ul = nodo("ul", {}, d);
+      for (const a of e.afirmaciones) {
+        const li = nodo("li", {}, ul);
+        nodo("code", {}, li, a.id);
+        li.appendChild(document.createTextNode(a.texto));
+        if (a.detalle) nodo("span", {class: "detalle"}, li, a.detalle);
+      }
+    }
+    const nw = nodo("div", {class: "bloque"}, der);
+    nodo("h3", {}, nw, "Newick");
+    const pre = nodo("pre", {class: "newick", id: "newick"}, nw, v.newick);
+    const cp = nodo("button", {class: "copiar", type: "button"}, nw, "Copiar el Newick");
+    cp.addEventListener("click", () => {
+      const listo = () => { cp.textContent = "Copiado"; setTimeout(() => cp.textContent = "Copiar el Newick", 1600); };
+      const seleccionar = () => { const r = document.createRange(); r.selectNodeContents(pre); const s = getSelection(); s.removeAllRanges(); s.addRange(r); };
+      try { navigator.clipboard.writeText(v.newick).then(listo, seleccionar); } catch (e) { seleccionar(); }
+    });
+  }
+
+  function elegir(id, desplazar) {
+    const v = V[id] || tronco;
+    if (!v) return;
+    for (const b of botones) b.setAttribute("aria-pressed", String(b.dataset.id === v.id));
+    ficha(v);
+    try { history.replaceState(null, "", "#" + v.id); } catch (e) {}
+    if (desplazar) document.getElementById("ficha").scrollIntoView({block: "start"});
+  }
+
+  const pedido = (location.hash || "").slice(1);
+  elegir(V[pedido] ? pedido : D.tronco, false);
+})();
+</script>
