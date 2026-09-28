@@ -211,7 +211,7 @@ def correspondencia() -> dict[str, dict]:
                 "files": {**origen["files"],
                           "passages": origen["files"].get("passages",
                                                           f"knowledge/corpus/passages/{d['section_id']}.json")},
-                "conversion": None, "absorption": None, "record_rows": None,
+                "conversion": None, "absorption": None, "record_rows": None, "editorial_rows": {},
                 "rows": {c: {"passage_ids": list(o["passage_ids"]), "via": o["via"],
                              "mention_ids": list(o["mention_ids"]), "destination": None, "record_ids": []}
                          for c, o in origen["rows"].items()},
@@ -231,12 +231,28 @@ def correspondencia() -> dict[str, dict]:
                 if sec not in secciones:
                     raise SystemExit(f"ERROR {nombre} absorbe la sección {sec}, que ningún delta aplicado ingirió")
                 s = secciones[sec]
+                # Tras la absorción, `record_rows` ya lleva los registros editoriales.
                 s.update(freeze={k: destino.get(k) for k in ("path", "fingerprint", "commit")},
-                         files=a["files"], absorption=nombre, record_rows=a["record_rows"],
+                         files=a["files"], absorption=nombre, record_rows=a["record_rows"], editorial_rows={},
                          rows={c: {"passage_ids": list(o["passage_ids"]), "via": o["via"],
                                    "mention_ids": list(o["mention_ids"]), "destination": o["destination"],
                                    "record_ids": list(o["record_ids"])}
                                for c, o in a["rows"].items()})
+        # Una corrección editorial (DEC-062) da de alta registros que salen de
+        # filas ya ingeridas: cuentan en esas filas como los de la conversión.
+        editorial = d.get("editorial")
+        if editorial:
+            for sec_id, filas in (editorial.get("rows") or {}).items():
+                if sec_id not in de_sec_id:
+                    raise SystemExit(f"ERROR {nombre} corrige {sec_id}, que ningún delta aplicado ingirió")
+                s = secciones[de_sec_id[sec_id]]
+                for c, rids in filas.items():
+                    if c in s["rows"]:
+                        s["rows"][c]["record_ids"] += [r for r in rids if r not in s["rows"][c]["record_ids"]]
+                    for rid in rids:
+                        propias = s["editorial_rows"].setdefault(rid, [])
+                        if c not in propias:
+                            propias.append(c)
     return secciones
 
 

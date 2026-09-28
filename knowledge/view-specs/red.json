@@ -22,20 +22,7 @@
       "motivo": "Su ficha lo define como «clado complementario de Opisthokonta bajo la raíz de Cerón-Romero et al. 2022»: es el resto de Eukaryota."
     }
   },
-  "composiciones": {
-    "CLADE-000025": {
-      "miembros": ["CLADE-000022", "CLADE-000004"],
-      "motivo": "Su ficha: «Clado formado por CRuMs y Amorphea (Brown et al. 2018)». Ninguna afirmación member_of lo dice."
-    },
-    "CLADE-000036": {
-      "miembros": ["CLADE-000035", "CLADE-000002"],
-      "motivo": "Su ficha: «Clado de Apusomonadida y Opisthokonta en la topología de trabajo de S109». Ninguna afirmación member_of lo dice."
-    },
-    "CLADE-000049": {
-      "miembros": ["CLADE-000039", "CLADE-000040"],
-      "motivo": "Su ficha: «Pluriformea+Ichthyosporea, recuperada por la matriz OrthoFinder de Liu et al. 2024». Ninguna afirmación member_of lo dice."
-    }
-  },
+  "composiciones": {},
   "vistas": [
     {"hipotesis": []},
     {"hipotesis": ["HYP-000010"]},

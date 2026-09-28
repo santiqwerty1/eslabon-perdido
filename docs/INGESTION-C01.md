@@ -257,6 +257,32 @@ Una fuente del apéndice A que sólo cambió de clave sale en el informe como re
 
 **Por qué los identificadores opacos importan aquí.** El `C-0412` del corredor no es una identidad estable; el `CLAIM-000412` de este proyecto sí (`DEC-052`). Una afirmación renumerada conserva su identificador opaco y sólo cambia su localizador en el corpus. Si se hubieran usado las claves del corredor como identidad, cada pasada de auditoría las habría roto todas.
 
+## Corregir sin cambiar de versión: la corrección editorial (`DEC-062`)
+
+Una conversión se aplica una vez, y una absorción sólo corrige lo que cambió entre dos versiones del corpus. Lo que la conversión dejó sin declarar sobre la versión activa se corrige con un fichero editorial en `knowledge/corpus/editorials/<nombre>.json`:
+
+```bash
+make editorial FICHERO=knowledge/corpus/editorials/red.json DRY=1   # ver sin escribir
+make editorial FICHERO=knowledge/corpus/editorials/red.json         # escribe knowledge/deltas/ED-red.json
+python scripts/ingest/delta.py ED-red.json
+```
+
+El fichero lleva `decision`, `reason`, `records` y `patches`.
+
+- **Un registro nuevo** dice de qué sección y de qué filas sale (`section`, `rows`) y por qué (`reason`). Su procedencia, sus fuentes y sus ejes se deducen de esas filas, como en una conversión, con origen `editorial`.
+- **Un parche** va de un registro a `{reason, set, add}`: `set` sustituye un campo y `add` añade a una lista sin repetir. Puede citar un registro nuevo por su `@clave`.
+- Ni uno ni otro fijan lo que se deduce: el identificador, la procedencia, los ejes, los enlaces de vuelta ni el estado.
+- **Los enlaces de vuelta** se rehacen en los dos extremos. Para que una evidencia que ya existía apoye una afirmación nueva, se parchea su `supports_claim_ids`, y la afirmación la lista sola.
+
+El script se niega si:
+- hay deltas sin aplicar;
+- hay secciones ingeridas sin convertir;
+- una fila no es de su sección;
+- una fila cita una fuente sin ficha, porque dar de alta fuentes es de una conversión o de una absorción;
+- el estado que dejaría tiene errores de validación nuevos.
+
+La correspondencia fila → registros cuenta los registros editoriales, así que una absorción posterior sabe de qué filas salen.
+
 ## Qué se cierra al ingerir
 
 Seis cuestiones de `ISSUES.md` se escribieron para cerrarse ingiriendo. Cinco ya están cerradas sin haber ingerido nada, y la sexta cambió de campaña:

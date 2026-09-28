@@ -119,12 +119,14 @@ def filas_de_registros(s: dict) -> tuple[dict[str, list[str]], list[str]]:
     La primera fila fija sus ejes. Tras una absorción lo dice su delta, con los
     números de la versión absorbida; antes, el fichero de conversión.
     """
+    # Y los registros de una corrección editorial (DEC-062), con sus filas.
+    editoriales = {rid: list(filas) for rid, filas in (s.get("editorial_rows") or {}).items()}
     if s.get("record_rows") is not None:
-        return {rid: list(filas) for rid, filas in s["record_rows"].items()}, []
+        return {**{rid: list(filas) for rid, filas in s["record_rows"].items()}, **editoriales}, []
     if not s["conversion"]:
-        return {}, []
+        return editoriales, []
     entradas, avisos = entradas_de_conversion(s["conversion"])
-    return {rid: list(e.get("rows") or []) for rid, e in entradas.items()}, avisos
+    return {**{rid: list(e.get("rows") or []) for rid, e in entradas.items()}, **editoriales}, avisos
 
 
 def pasajes_vigentes(s: dict) -> Path:

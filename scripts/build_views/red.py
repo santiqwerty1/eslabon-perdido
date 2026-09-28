@@ -288,23 +288,40 @@ def construir_vista(libro: Libro, espec: dict, hyps: list[str]) -> dict:
             continue
         de_raiz[a["claims"][0]["id"]] = a
 
-    todas = {c["id"]: c for c in candidatas}
-    for c in candidatas:
+    # Una raíz con complemento puede re-enraizar el tronco. Las afirmaciones del
+    # tronco que la hipótesis excluye por eso siguen diciendo cómo es el árbol sin
+    # raíz: sirven de andamio para re-enraizarlo, pero no se seleccionan.
+    andamio: list[dict] = []
+    if any(x in comps for cid in de_raiz for x in (de_raiz[cid]["claims"][0]["subject_id"],
+                                                   objeto(de_raiz[cid]["claims"][0]))):
+        for cid in sorted(fuera):
+            c = libro.r.claims[cid]
+            if (fuera[cid][0] == "excluida" and c["predicate"] in TOPOLOGIA and not c.get("derivation")
+                    and not (c.get("scope") or {}).get("hypothesis_ids")
+                    and not (c["predicate"] == "member_of" and (objeto(c) or "").startswith("TAXCONCEPT-"))):
+                andamio.append(c)
+    construccion = candidatas + andamio
+
+    todas = {c["id"]: c for c in construccion}
+    for c in construccion:
         arbol.nodos.add(c["subject_id"])
         if objeto(c):
             arbol.nodos.add(objeto(c))
 
     # 1 · contención ----------------------------------------------------------------------
     padres: dict[str, dict[str, str]] = defaultdict(dict)
-    for c in candidatas:
+    for c in construccion:
         if c["predicate"] == "member_of" and objeto(c):
             padres[c["subject_id"]][objeto(c)] = c["id"]
     # Un lado de la raíz sin padre cuelga del nodo anclado; el complemento se coloca después.
+    lados: dict[str, tuple[str, str]] = {}
     for cid, a in de_raiz.items():
         c = todas[cid]
         for lado in (c["subject_id"], objeto(c)):
             if lado not in comps and not padres.get(lado):
                 padres[lado][a["nodo"]] = cid
+            if lado not in comps and a["nodo"] in padres.get(lado, {}):
+                lados[lado] = (a["nodo"], cid)
 
     def arriba(n: str, visto: frozenset = frozenset()) -> set[str]:
         out: set[str] = set()
@@ -315,9 +332,33 @@ def construir_vista(libro: Libro, espec: dict, hyps: list[str]) -> dict:
             out |= arriba(p, visto | {n})
         return out
 
+    def internos_de(ps: dict[str, str]) -> list[str]:
+        return [p for p in sorted(ps) if all(q == p or q in arriba(p) for q in ps)]
+
+    # Dos padres que no se contienen, uno de ellos un lado de la raíz y el otro un
+    # clado del tronco bajo el nodo anclado: dos clados que comparten un miembro
+    # están anidados, y en una raíz partida en dos lados, el del tronco cae dentro
+    # del lado que contiene a su miembro.
+    cambio = True
+    while cambio:
+        cambio = False
+        for hijo in sorted(padres):
+            ps = padres[hijo]
+            if internos_de(ps):
+                continue
+            suyos = [p for p in ps if p in lados]
+            if len(suyos) != 1:
+                continue
+            nodo, cid = lados[suyos[0]]
+            otros = [p for p in ps if p not in lados and p != nodo]
+            if otros and all(nodo in arriba(p) for p in otros):
+                for p in otros:
+                    padres[p][suyos[0]] = cid
+                cambio = True
+
     for hijo in sorted(padres):
         ps = padres[hijo]
-        internos = [p for p in sorted(ps) if all(q == p or q in arriba(p) for q in ps)]
+        internos = internos_de(ps)
         if internos:
             elegido = internos[0]
         else:
@@ -332,7 +373,7 @@ def construir_vista(libro: Libro, espec: dict, hyps: list[str]) -> dict:
             arbol.poner(hijo, elegido, ps[elegido])
 
     # 2 · composiciones y hermanos, hasta que no cambie nada -----------------------------
-    hermanas = sorted((c for c in candidatas if c["predicate"] == "sister_group_of" and c["id"] not in de_raiz),
+    hermanas = sorted((c for c in construccion if c["predicate"] == "sister_group_of" and c["id"] not in de_raiz),
                       key=lambda c: c["id"])
     pendientes = {k for k in composiciones if k in arbol.nodos} | {k for k in comps if k in arbol.nodos}
 
@@ -388,7 +429,7 @@ def construir_vista(libro: Libro, espec: dict, hyps: list[str]) -> dict:
                 cambio = True
 
     # 3 · linajes troncales -----------------------------------------------------------------
-    for c in sorted((c for c in candidatas if c["predicate"] == "stem_lineage_of"), key=lambda c: c["id"]):
+    for c in sorted((c for c in construccion if c["predicate"] == "stem_lineage_of"), key=lambda c: c["id"]):
         linaje, clado = c["subject_id"], objeto(c)
         if not clado or linaje in arbol.padre:
             continue
@@ -443,6 +484,10 @@ def construir_vista(libro: Libro, espec: dict, hyps: list[str]) -> dict:
                         arbol.marcas[arbol.subir_troncos(x)].add("hipotesis")
         else:
             fuera[c["id"]] = (motivo, detalle)
+    for c in andamio:
+        if cumple(arbol, libro, c, set(rotos))[0]:
+            hallazgos.append(f"{', '.join(hyps)} excluye {c['id']}, y el árbol re-enraizado la cumple: la exclusión "
+                             "no se debe a su raíz.")
     return {
         "hipotesis": hyps, "arbol": arbol, "principal": principal, "seleccionadas": sorted(seleccionadas),
         "fuera": fuera, "rotos": rotos, "usadas": usadas, "hallazgos": hallazgos, "sin_raiz": sin_raiz,

@@ -10,7 +10,7 @@
 VENV   := .venv
 PYTHON := $(shell [ -x $(VENV)/bin/python ] && echo $(VENV)/bin/python || echo python3)
 
-.PHONY: help setup validate verify snapshot test check clean-generated ingest corpus-freeze corpus-verify corpus-diff corpus-impact corpus-absorb convert views
+.PHONY: help setup validate verify snapshot test check clean-generated ingest corpus-freeze corpus-verify corpus-diff corpus-impact corpus-absorb convert editorial views
 
 help: ## Muestra estos objetivos
 	@grep -hE '^[a-z-]+:.*?## ' $(MAKEFILE_LIST) \
@@ -71,6 +71,10 @@ corpus-impact: ## Qué registros toca una versión nueva: make corpus-impact ANT
 corpus-absorb: ## Construye el delta de absorción: make corpus-absorb FICHERO=knowledge/corpus/absorptions/… ANTES=… DESPUES=… [DRY=1]
 	@test -n "$(FICHERO)" -a -n "$(ANTES)" -a -n "$(DESPUES)" || { echo "uso: make corpus-absorb FICHERO=fichero-de-absorción ANTES=ruta@congelación-activa DESPUES=ruta@ref [DRY=1]"; exit 1; }
 	@$(PYTHON) scripts/ingest/absorber.py construir "$(FICHERO)" "$(ANTES)" "$(DESPUES)" $(if $(DRY),--dry-run,)
+
+editorial: ## Construye el delta de una corrección editorial: make editorial FICHERO=knowledge/corpus/editorials/… [DRY=1]
+	@test -n "$(FICHERO)" || { echo "uso: make editorial FICHERO=knowledge/corpus/editorials/<nombre>.json [DRY=1]"; exit 1; }
+	@$(PYTHON) scripts/ingest/editorial.py construir "$(FICHERO)" $(if $(DRY),--dry-run,)
 
 views: ## Construye las vistas: «Relojes y rocas» (generated/views/cronologia.html) y la red por hipótesis (knowledge/views/ y generated/views/red.html)
 	@$(PYTHON) scripts/build_views/cronologia.py

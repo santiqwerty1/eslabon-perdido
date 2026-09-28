@@ -1,0 +1,101 @@
+{
+  "decision": "DEC-062",
+  "reason": "La primera construcción de la red por hipótesis (DEC-061) encontró lo que la conversión de la sección 4 dejó sin declarar: los miembros de tres clados compuestos, Discoba dentro de Eukaryota, el enlace entre el clado Pluriformea y lo que contiene, y las afirmaciones del tronco que la raíz en Opisthokonta (H27) contradice.",
+  "records": [
+    {
+      "key": "@CRuMs_en_CA", "file": "claims.jsonl", "section": "SEC-000003", "rows": ["C-491"],
+      "reason": "CRuMs+Amorphea (CLADE-000025) es el clado que forman los hermanos de C-491; ninguna afirmación decía que CRuMs es miembro.",
+      "record": {"claim_type": "relational", "subject_id": "CLADE-000022", "predicate": "member_of",
+                 "object": {"entity_id": "CLADE-000025"},
+                 "notes": ["CRuMs y Amorphea forman juntos CRuMs+Amorphea (C-491)."]}
+    },
+    {
+      "key": "@Amorphea_en_CA", "file": "claims.jsonl", "section": "SEC-000003", "rows": ["C-491"],
+      "reason": "Amorphea es el otro miembro del clado de C-491.",
+      "record": {"claim_type": "relational", "subject_id": "CLADE-000004", "predicate": "member_of",
+                 "object": {"entity_id": "CLADE-000025"},
+                 "notes": ["CRuMs y Amorphea forman juntos CRuMs+Amorphea (C-491)."]}
+    },
+    {
+      "key": "@CA_en_Eukaryota", "file": "claims.jsonl", "section": "SEC-000003", "rows": ["C-683", "C-491"],
+      "reason": "CRuMs+Amorphea es un clado de eucariotas: contiene a Amorphea, que C-683 sitúa en Eukaryota.",
+      "record": {"claim_type": "relational", "subject_id": "CLADE-000025", "predicate": "member_of",
+                 "object": {"entity_id": "CLADE-000001"}, "notes": []}
+    },
+    {
+      "key": "@Apusomonadida_en_AO", "file": "claims.jsonl", "section": "SEC-000003", "rows": ["C-553", "C-544"],
+      "reason": "Apusomonadida+Opisthokonta (CLADE-000036), el grupo hermano de Breviatea en C-553, es el clado de los hermanos de C-544.",
+      "record": {"claim_type": "relational", "subject_id": "CLADE-000035", "predicate": "member_of",
+                 "object": {"entity_id": "CLADE-000036"}, "notes": []}
+    },
+    {
+      "key": "@Opisthokonta_en_AO", "file": "claims.jsonl", "section": "SEC-000003", "rows": ["C-553", "C-544"],
+      "reason": "Opisthokonta es el otro miembro de Apusomonadida+Opisthokonta.",
+      "record": {"claim_type": "relational", "subject_id": "CLADE-000002", "predicate": "member_of",
+                 "object": {"entity_id": "CLADE-000036"}, "notes": []}
+    },
+    {
+      "key": "@AO_en_Obazoa", "file": "claims.jsonl", "section": "SEC-000003", "rows": ["C-553", "C-535"],
+      "reason": "Apusomonadida+Opisthokonta está dentro de Obazoa, que contiene a sus dos miembros y a Breviatea (C-535).",
+      "record": {"claim_type": "relational", "subject_id": "CLADE-000036", "predicate": "member_of",
+                 "object": {"entity_id": "CLADE-000014"}, "notes": []}
+    },
+    {
+      "key": "@Discoba_en_Eukaryota", "file": "claims.jsonl", "section": "SEC-000003", "rows": ["C-511", "C-446"],
+      "reason": "Ninguna afirmación situaba a Discoba en Eukaryota, que contiene todos los eucariotas vivientes (C-511); C-446 la trata como una rama de los eucariotas.",
+      "record": {"claim_type": "relational", "subject_id": "CLADE-000003", "predicate": "member_of",
+                 "object": {"entity_id": "CLADE-000001"}, "notes": []}
+    },
+    {
+      "key": "@Corallochytrea_en_Pluriformea", "file": "claims.jsonl", "section": "SEC-000003", "rows": ["C-601", "C-592"],
+      "reason": "C-601 pone a Corallochytrea y Syssomonas como hermanos dentro de Pluriformea; el clado Pluriformea (CLADE-000039) sólo tenía esa relación en su ficha.",
+      "record": {"claim_type": "relational", "subject_id": "CLADE-000044", "predicate": "member_of",
+                 "object": {"entity_id": "CLADE-000039"}, "notes": []}
+    },
+    {
+      "key": "@Syssomonas_en_Pluriformea", "file": "claims.jsonl", "section": "SEC-000003", "rows": ["C-601", "C-592"],
+      "reason": "Syssomonas es el otro hermano de C-601 dentro de Pluriformea.",
+      "record": {"claim_type": "relational", "subject_id": "TAXCONCEPT-000037", "predicate": "member_of",
+                 "object": {"entity_id": "CLADE-000039"}, "notes": []}
+    },
+    {
+      "key": "@Pluriformea_en_Teretosporea", "file": "claims.jsonl", "section": "SEC-000003", "rows": ["C-657"],
+      "reason": "Teretosporea es Pluriformea+Ichthyosporea (C-657), un clado que sólo existe dentro de H33.",
+      "record": {"claim_type": "relational", "subject_id": "CLADE-000039", "predicate": "member_of",
+                 "object": {"entity_id": "CLADE-000049"},
+                 "scope": {"hypothesis_ids": ["HYP-000020"]}, "notes": []}
+    },
+    {
+      "key": "@Ichthyosporea_en_Teretosporea", "file": "claims.jsonl", "section": "SEC-000003", "rows": ["C-657"],
+      "reason": "Ichthyosporea es el otro miembro de Teretosporea (C-657).",
+      "record": {"claim_type": "relational", "subject_id": "CLADE-000040", "predicate": "member_of",
+                 "object": {"entity_id": "CLADE-000049"},
+                 "scope": {"hypothesis_ids": ["HYP-000020"]}, "notes": []}
+    },
+    {
+      "key": "@Teretosporea_en_Holozoa", "file": "claims.jsonl", "section": "SEC-000003", "rows": ["C-657", "C-576"],
+      "reason": "Teretosporea está dentro de Holozoa, que contiene a sus dos miembros (C-576).",
+      "record": {"claim_type": "relational", "subject_id": "CLADE-000049", "predicate": "member_of",
+                 "object": {"entity_id": "CLADE-000010"},
+                 "scope": {"hypothesis_ids": ["HYP-000020"]}, "notes": []}
+    }
+  ],
+  "patches": {
+    "EVID-000181": {"reason": "El soporte de C-491 para CRuMs hermano de Amorphea es el del clado que forman.",
+                    "add": {"supports_claim_ids": ["@CRuMs_en_CA", "@Amorphea_en_CA"]}},
+    "EVID-000210": {"reason": "La tabla 1 de S01 sitúa en Eukaryota a Amorphea y a CRuMs.",
+                    "add": {"supports_claim_ids": ["@CA_en_Eukaryota"]}},
+    "EVID-000244": {"reason": "El árbol de S109 que da a Breviatea como hermana de Apusomonadida+Opisthokonta es el que define ese clado.",
+                    "add": {"supports_claim_ids": ["@Apusomonadida_en_AO", "@Opisthokonta_en_AO", "@AO_en_Obazoa"]}},
+    "EVID-000212": {"reason": "La tabla 1 de S01 incluye Discoba en Eukaryota.",
+                    "add": {"supports_claim_ids": ["@Discoba_en_Eukaryota"]}},
+    "EVID-000290": {"reason": "Los resultados de S129 ponen a Corallochytrea y Syssomonas juntas dentro de Pluriformea.",
+                    "add": {"supports_claim_ids": ["@Corallochytrea_en_Pluriformea", "@Syssomonas_en_Pluriformea"]}},
+    "EVID-000329": {"reason": "El árbol OrthoFinder de S126 que recupera Teretosporea es el que la define.",
+                    "add": {"supports_claim_ids": ["@Pluriformea_en_Teretosporea", "@Ichthyosporea_en_Teretosporea", "@Teretosporea_en_Holozoa"]}},
+    "HYP-000020": {"reason": "Los miembros de Teretosporea son parte de la topología de H33.",
+                   "add": {"included_claim_ids": ["@Pluriformea_en_Teretosporea", "@Ichthyosporea_en_Teretosporea", "@Teretosporea_en_Holozoa"]}},
+    "HYP-000014": {"reason": "Con la raíz en Opisthokonta, Amorphea, Obazoa, CRuMs+Amorphea y Apusomonadida+Opisthokonta dejan de ser clados con raíz: H27 no sostiene las afirmaciones del tronco que los usan así. La red por hipótesis (DEC-061) las encontró contradichas sin que la hipótesis lo declarara.",
+                   "set": {"excluded_claim_ids": ["CLAIM-000131", "CLAIM-000132", "CLAIM-000133", "CLAIM-000138", "CLAIM-000140", "CLAIM-000162", "CLAIM-000177", "CLAIM-000178", "CLAIM-000179", "CLAIM-000183", "CLAIM-000191", "@CRuMs_en_CA", "@Amorphea_en_CA", "@CA_en_Eukaryota", "@Apusomonadida_en_AO", "@Opisthokonta_en_AO", "@AO_en_Obazoa"]}}
+  }
+}
