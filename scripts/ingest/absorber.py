@@ -35,11 +35,13 @@ La correspondencia de cada fila con sus registros no vive en un fichero aparte:
 `corredor.correspondencia()` la reconstruye de los deltas aplicados.
 
 `construir` rehace el informe, exige que el fichero cubra justo sus puntos de
-decisión y ejecuta las decisiones sobre lo que ya existe: conservar, corregir
-con parches, retirar, reanclar, dar mención a las etiquetas nuevas y actualizar
-fuentes. Las que crearían registros nuevos se niegan con su motivo. La prosa,
-el registro y los pasajes nuevos van a ficheros con sufijo de versión; los de
-antes no se tocan. El estado resultante se valida entero antes de escribir.
+decisión y las ejecuta: conservar, corregir con parches (un enlace cambiado se
+rehace en sus dos extremos), retirar, reemplazar, ampliar, dividir, reanclar,
+dar mención a las etiquetas nuevas y actualizar o emparejar fuentes. Los
+registros nuevos salen de `convertir.generar()`, la misma maquinaria que una
+conversión. La prosa, el registro y los pasajes nuevos van a ficheros con
+sufijo de versión; los de antes no se tocan. El estado resultante se valida
+entero antes de escribir.
 """
 
 from __future__ import annotations
@@ -415,14 +417,22 @@ def informe_de(a: freeze.Fuente, b: freeze.Fuente) -> dict:
                                       "via_before": o["via"], "via_after": via_n, "paragraphs_after": parrafos_n,
                                       "loses": pierde, "gains": gana}
 
-        # Etiquetas que la versión nueva introduce en filas modificadas.
+        # Etiquetas que la versión nueva introduce: las de las columnas que
+        # cambian en una fila modificada y las de una fila nueva. Cada una pide
+        # una mención, en la primera fila que la usa, como al ingerir; lo que no
+        # nombra nada —un hueco, una cifra— no la pide.
         etiquetas = {m["original_text"] for m in menciones.values() if m.get("section_id") == s["section_id"]}
-        for f in filas:
+        por_fila = {f["to"]: f for f in filas if f["to"]}
+        por_nueva = {n["row"]: n for n in nuevas_l}
+        for c in sorted(set(por_fila) | set(por_nueva), key=freeze._num):
+            f = por_fila.get(c)
             for col in ("Sujeto", "Objeto"):
-                if col in f["columns"]:
-                    nueva_et = f["columns"][col][1].strip()
-                    if nueva_et and nueva_et not in etiquetas:
-                        f.setdefault("new_labels", []).append(nueva_et)
+                if f is not None and col not in f["columns"]:
+                    continue
+                nueva_et = (filas_b[c][1].get(col) or "").strip()
+                if nueva_et and not corredor.descartable(nueva_et) and nueva_et not in etiquetas:
+                    (f if f is not None else por_nueva[c]).setdefault("new_labels", []).append(nueva_et)
+                    etiquetas.add(nueva_et)
 
         salida_secciones[sec] = {
             "section_id": s["section_id"], "converted": s["conversion"] is not None,
@@ -600,7 +610,9 @@ def esqueleto(r: dict) -> dict:
         # Aparte de las filas ingeridas: una fila nueva puede ocupar el número
         # que otra dejó al renumerarse o retirarse, y las dos piden decisión.
         nuevas = {n["row"]: {"destination": None, "keys": [], "note": None,
-                             **({"successor_of": n["successor_of"]} if n["successor_of"] else {})}
+                             **({"successor_of": n["successor_of"]} if n["successor_of"] else {}),
+                             **({"new_mentions": {et: dict(MENCION_EN_BLANCO) for et in n["new_labels"]}}
+                                if n.get("new_labels") else {})}
                   for n in s["new_rows"]}
         menciones = {m["mention"]: {"label": m["label"], "state": m["state"], "decision": None, "reason": None}
                      for m in s["mentions"] if m["state"] != "desplazado"}
@@ -697,7 +709,9 @@ def markdown(r: dict) -> list[str]:
             lineas += ["Filas nuevas, que piden destino:", ""]
             for n in s["new_rows"]:
                 de = f" (sucede a {', '.join(n['successor_of'])})" if n["successor_of"] else ""
-                lineas.append(f"- {n['row']}{de}: {n['statement']}")
+                et = ("; etiquetas nuevas sin mención: " + ", ".join(f"«{x}»" for x in n["new_labels"])
+                      if n.get("new_labels") else "")
+                lineas.append(f"- {n['row']}{de}: {n['statement']}{et}")
             lineas.append("")
         if s["passages"]:
             cuenta = defaultdict(int)
@@ -778,12 +792,9 @@ def markdown(r: dict) -> list[str]:
 # Construir el delta de absorción
 # ---------------------------------------------------------------------------
 
-# Qué decisión vale en cada punto de decisión. Las que crean registros nuevos o
-# parten una fila —reemplazar, dividir, ampliar, una fila nueva con registros,
-# emparejar— llegan con el constructor de registros nuevos: se nombran para
-# negarlas con su motivo, no para ignorarlas.
+# Qué decisión vale en cada punto de decisión.
 DECISIONES = {
-    "rows": {"conservar", "corregir", "retirar"},
+    "rows": {"conservar", "corregir", "retirar", "ampliar", "reemplazar", "dividir"},
     "mentions": {"reanclar", "retirar"},
     "provenance": {"aceptar", "fijar"},
     "successions": {"conservar", "corregir"},
@@ -791,13 +802,14 @@ DECISIONES = {
     "entities": {"conservar", "corregir", "retirar"},
     "appendices": {"conservar", "corregir"},
 }
-DE_REGISTROS_NUEVOS = {"reemplazar", "dividir", "ampliar"}
-CON_MOTIVO = {"conservar", "corregir", "retirar"}
+CON_MOTIVO = {"conservar", "corregir", "retirar", "ampliar", "reemplazar", "dividir"}
+# Las decisiones que tocan registros con parches, y las que dan de alta.
+CON_PARCHES = {"corregir", "ampliar", "reemplazar", "dividir"}
 # Lo que se rellena a mano. Lo demás lo escribió el informe y tiene que seguir
 # igual: un fichero rellenado para otro diff no describe éste.
 RELLENABLES = {
-    "rows": {"decision", "reason", "patches", "new_mentions"},
-    "new_rows": {"destination", "keys", "note"},
+    "rows": {"decision", "reason", "patches", "new_mentions", "keys", "replaced_by", "successors"},
+    "new_rows": {"destination", "keys", "note", "new_mentions"},
     "mentions": {"decision", "reason", "passage"},
     "provenance": {"decision", "reason", "paragraphs"},
     "successions": {"decision", "reason", "patches"},
@@ -805,11 +817,11 @@ RELLENABLES = {
     "entities": {"decision", "reason", "patches"},
     "appendices": {"decision", "reason", "patches"},
 }
-# Un parche no fija lo que se deduce (convertir.DERIVADOS) ni un enlace cuyo
-# otro lado habría que rehacer: eso es trabajo del constructor de registros.
-ENLACES = {"subject_id", "object", "supports_claim_ids", "challenges_claim_ids", "analysis_id", "result_ids",
-           "temporal_expression_ids", "temporal_expression_id", "issue_ids", "affects", "superseded_by",
-           "merged_into"}
+# Enlaces que un parche puede cambiar: el otro lado se rehace solo. Los demás
+# se deducen, o son el ciclo de vida del registro, y no se fijan a mano.
+ENLACES_REHECHOS = {"subject_id", "object", "supports_claim_ids", "challenges_claim_ids", "analysis_id"}
+ENLACES_FIJOS = {"result_ids", "temporal_expression_ids", "temporal_expression_id", "issue_ids", "affects",
+                 "superseded_by", "merged_into"}
 FECHA = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 
 
@@ -830,22 +842,24 @@ def revisar(spec: dict, esq: dict) -> list[str]:
         if fijos != puestos:
             distintos = sorted(k for k in set(fijos) | set(puestos) if fijos.get(k) != puestos.get(k))
             errores.append(f"{donde}: {', '.join(distintos)} no es lo que dice el informe de esta versión")
+        nuevas = hecho.get("new_mentions") or {}
+        if set(nuevas) != set(pedido.get("new_mentions") or {}):
+            errores.append(f"{donde}: `new_mentions` no son las etiquetas nuevas que da el informe")
+            nuevas = {}
         if tipo == "new_rows":
             destino = hecho.get("destination")
             if destino is None:
                 errores.append(f"{donde}: sin destino")
-            elif destino != "H" or hecho.get("keys"):
-                errores.append(f"{donde}: una fila nueva con registros (destino {destino}) llega con el "
-                               "constructor de registros nuevos; hoy sólo se absorbe como glosa (H) sin `keys`")
+            elif destino not in convertir.DESTINOS:
+                errores.append(f"{donde}: destino {destino!r} fuera de A–J")
+            for etiqueta, m in sorted(nuevas.items()):
+                errores.extend(f"{donde}, mención nueva «{etiqueta}»: {e}" for e in mencion_mal(m))
             return
         decision = hecho.get("decision")
         if decision is None:
             # Una fila sólo renumerada se arrastra sin decidir nada.
             if not (tipo == "rows" and pedido.get("class") == "renumerada"):
                 errores.append(f"{donde}: sin decisión")
-        elif decision in DE_REGISTROS_NUEVOS:
-            errores.append(f"{donde}: «{decision}» crea registros nuevos, y eso llega con el constructor de "
-                           "registros nuevos; hoy se puede conservar, corregir o retirar")
         elif decision not in DECISIONES[tipo]:
             errores.append(f"{donde}: decisión «{decision}» desconocida; aquí vale "
                            + ", ".join(sorted(DECISIONES[tipo])))
@@ -854,18 +868,52 @@ def revisar(spec: dict, esq: dict) -> list[str]:
             errores.append(f"{donde}: «{decision}» sin `reason`")
         if decision == "corregir" and not hecho.get("patches"):
             errores.append(f"{donde}: «corregir» sin `patches`")
-        if decision != "corregir" and hecho.get("patches"):
-            errores.append(f"{donde}: `patches` sólo acompaña a «corregir»")
+        if decision not in CON_PARCHES and hecho.get("patches"):
+            errores.append(f"{donde}: `patches` sólo acompaña a «corregir», «ampliar», «reemplazar» o «dividir»")
         if tipo == "rows":
-            if pedido.get("class") == "retirada" and decision not in (None, "retirar", "conservar"):
-                errores.append(f"{donde}: la fila ya no está en la versión nueva; se retira o se conserva")
-            if decision == "retirar" and pedido.get("class") != "retirada":
+            clase = pedido.get("class")
+            if clase == "retirada" and decision not in (None, "retirar", "conservar", "dividir"):
+                errores.append(f"{donde}: la fila ya no está en la versión nueva; se retira, se conserva o se divide")
+            if decision == "retirar" and clase != "retirada":
                 errores.append(f"{donde}: sólo se retira una fila que la versión nueva retira; los registros de "
-                               "una fila que sigue se corrigen, o se reemplazan con el constructor de registros nuevos")
-            nuevas = hecho.get("new_mentions") or {}
-            if set(nuevas) != set(pedido.get("new_mentions") or {}):
-                errores.append(f"{donde}: `new_mentions` no son las etiquetas nuevas que da el informe")
-            elif decision in ("conservar", "corregir"):
+                               "una fila que sigue se corrigen o se reemplazan")
+            if decision == "ampliar" and not hecho.get("keys"):
+                errores.append(f"{donde}: «ampliar» sin `keys`, los registros nuevos de la fila")
+            if decision not in ("ampliar", "reemplazar") and hecho.get("keys"):
+                errores.append(f"{donde}: `keys` sólo acompaña a «ampliar» o «reemplazar»; los registros de una "
+                               "sucesora van en su fila nueva")
+            sustitutos = hecho.get("replaced_by") or {}
+            if decision == "reemplazar" and not sustitutos:
+                errores.append(f"{donde}: «reemplazar» sin `replaced_by`")
+            if decision not in ("reemplazar", "dividir") and sustitutos:
+                errores.append(f"{donde}: `replaced_by` sólo acompaña a «reemplazar» o «dividir»")
+            if not isinstance(sustitutos, dict):
+                errores.append(f"{donde}: `replaced_by` va de registro a su sustituto")
+                sustitutos = {}
+            ajenos = sorted(set(sustitutos) - set(pedido.get("record_ids") or []))
+            if ajenos:
+                errores.append(f"{donde}: `replaced_by` nombra {', '.join(ajenos)}, que no salió de esta fila")
+            pedidas = pedido.get("successors")
+            sucesoras = hecho.get("successors")
+            if (pedidas is None) != (sucesoras is None) or (pedidas is not None and set(pedidas) != set(sucesoras)):
+                errores.append(f"{donde}: `successors` no son las sucesoras que declara el registro de sucesiones")
+            elif decision == "dividir":
+                if pedidas is None:
+                    errores.append(f"{donde}: «dividir» sin sucesoras declaradas en sucesiones_afirmaciones.csv")
+                else:
+                    repartidos = [rid for v in sucesoras.values() for rid in v] + list(sustitutos)
+                    faltan = sorted(set(pedido.get("record_ids") or []) - set(repartidos))
+                    dobles = sorted({rid for rid in repartidos if repartidos.count(rid) > 1})
+                    extra = sorted(set(repartidos) - set(pedido.get("record_ids") or []))
+                    if faltan:
+                        errores.append(f"{donde}: {', '.join(faltan)} no se reasigna a ninguna sucesora ni se sustituye")
+                    if dobles:
+                        errores.append(f"{donde}: {', '.join(dobles)} va a más de un sitio")
+                    if extra:
+                        errores.append(f"{donde}: {', '.join(extra)} no salió de esta fila")
+            elif pedidas is not None and any(sucesoras.values()):
+                errores.append(f"{donde}: sólo «dividir» reparte registros entre las sucesoras")
+            if decision not in (None, "retirar"):
                 for etiqueta, m in sorted(nuevas.items()):
                     errores.extend(f"{donde}, mención nueva «{etiqueta}»: {e}" for e in mencion_mal(m))
         if tipo == "mentions" and hecho.get("passage") is not None and (
@@ -879,8 +927,10 @@ def revisar(spec: dict, esq: dict) -> list[str]:
             if decision != "fijar" and parrafos:
                 errores.append(f"{donde}: `paragraphs` sólo acompaña a «fijar»")
         if tipo == "sources" and hecho.get("pair_with") is not None:
-            errores.append(f"{donde}: emparejar una fuente que cambió de clave llega con el constructor de "
-                           "registros nuevos")
+            if pedido.get("candidates") is None:
+                errores.append(f"{donde}: `pair_with` sólo empareja una fuente que el apéndice nuevo retira")
+            elif decision != "actualizar" or not isinstance(hecho["pair_with"], str):
+                errores.append(f"{donde}: `pair_with` es la clave nueva de la fuente, y va con «actualizar»")
 
     def diccionario(donde: str, tipo: str, hechos, pedidos: dict) -> None:
         hechos = hechos if isinstance(hechos, dict) else {}
@@ -908,9 +958,8 @@ def revisar(spec: dict, esq: dict) -> list[str]:
         h, e = secciones[sec], esq["sections"][sec]
         if h.get("section_id") != e["section_id"]:
             errores.append(f"sección {sec}: `section_id` no es {e['section_id']}")
-        if h.get("records"):
-            errores.append(f"sección {sec}: `records` declara registros nuevos, y eso llega con el constructor "
-                           "de registros nuevos")
+        if not isinstance(h.get("records", []), list):
+            errores.append(f"sección {sec}: `records` es la lista de registros nuevos")
         for tipo in ("rows", "new_rows", "mentions", "provenance", "successions"):
             diccionario(f"sección {sec}, {tipo}", tipo, h.get(tipo), e[tipo])
     diccionario("sources", "sources", spec.get("sources"), esq["sources"])
@@ -939,10 +988,10 @@ def mencion_mal(m) -> list[str]:
             errores.append("descartada sin `reason`")
     elif not m.get("targets"):
         errores.append(f"{m['disposition']} sin `targets`")
-    claves = [t for t in m.get("targets") or [] if not (isinstance(t, str) and convertir.LITERAL.match(t))]
-    if claves:
-        errores.append(f"`targets` {', '.join(map(str, claves))} no son identificadores: una mención nueva apunta a "
-                       "registros que ya existen; a uno nuevo, con el constructor de registros nuevos")
+    raros = [t for t in m.get("targets") or []
+             if not (isinstance(t, str) and (convertir.LITERAL.match(t) or convertir.CLAVE.match(t)))]
+    if raros:
+        errores.append(f"`targets` {', '.join(map(str, raros))} no son identificadores ni claves «@…»")
     return errores
 
 
@@ -964,6 +1013,34 @@ def nota_j(fila: str, datos: dict) -> str:
 def claves_de_fuente(filas: list[str], datos: dict[str, tuple[str, dict]]) -> list[str]:
     return sorted({k for c in filas for k in convertir.CITA.findall(datos[c][1].get("Fuente", ""))},
                   key=lambda k: int(k[1:]))
+
+
+def punteros(rec: dict, fichero: str) -> dict[str, set[str]]:
+    """Adónde apunta un registro por cada enlace que un parche puede cambiar, por campo de vuelta."""
+    salida: dict[str, set[str]] = defaultdict(set)
+    if fichero == "claims.jsonl":
+        for rid in (rec.get("subject_id"), (rec.get("object") or {}).get("entity_id")):
+            if isinstance(rid, str):
+                salida["claim_ids"].add(rid)
+        t = (rec.get("object") or {}).get("temporal_expression_id")
+        if rec.get("predicate") == "dated_to" and isinstance(rec.get("subject_id"), str) and isinstance(t, str):
+            salida["temporal_expression_ids"].add(rec["subject_id"])
+    if fichero == "evidence.jsonl":
+        salida["evidence_ids"] |= set(rec.get("supports_claim_ids") or [])
+        salida["counterevidence_ids"] |= set(rec.get("challenges_claim_ids") or [])
+    if fichero == "results.jsonl" and isinstance(rec.get("analysis_id"), str):
+        salida["result_ids"].add(rec["analysis_id"])
+    return salida
+
+
+def valor_de_vuelta(campo: str, destino: str, estado: dict[str, tuple[str, dict]]) -> list[str]:
+    """Lo que dice ahora el estado entero que tiene que haber en `destino[campo]`."""
+    if campo == "temporal_expression_ids":
+        return [c["object"]["temporal_expression_id"] for f, c in estado.values()
+                if f == "claims.jsonl" and c.get("predicate") == "dated_to" and c.get("subject_id") == destino
+                and c.get("record_status", "active") == "active"
+                and isinstance((c.get("object") or {}).get("temporal_expression_id"), str)]
+    return [rid for rid, (f, r) in estado.items() if destino in punteros(r, f).get(campo, set())]
 
 
 def validar_estado(cambios: dict, altas: list[tuple[str, dict]]) -> list[str]:
@@ -1045,8 +1122,8 @@ def construir(ruta_spec: Path, anterior: str, nueva: str) -> dict:
         raise SystemExit("ERROR `received_at` tiene que ser la fecha de la absorción (AAAA-MM-DD): el delta sale "
                          "de ella, no del día en que se construye")
     if spec.get("pairing"):
-        raise SystemExit("ERROR `pairing` corrige emparejamientos del diff, y eso llega con el constructor de "
-                         "registros nuevos; hoy tiene que estar vacío")
+        raise SystemExit("ERROR `pairing` corrige emparejamientos del diff, y eso todavía no se ejecuta: hoy "
+                         "tiene que estar vacío")
     errores = revisar(spec, esqueleto(r))
     if errores:
         raise SystemExit("ERROR el fichero de absorción no cubre esta versión:\n  " + "\n  ".join(errores))
@@ -1062,8 +1139,11 @@ def construir(ruta_spec: Path, anterior: str, nueva: str) -> dict:
     avisos = list(r["warnings"])
     cambios: dict[str, list] = {}
     retirados: dict[str, str] = {}
+    sustituidos: dict[str, str] = {}
     altas: list[tuple[str, dict]] = []
     ficheros: dict[Path, bytes] = {}
+    nuevo = convertir.asignador()
+    emitidos: set[str] = set()
 
     def tocar(rid: str) -> dict:
         if rid not in cambios:
@@ -1078,14 +1158,21 @@ def construir(ruta_spec: Path, anterior: str, nueva: str) -> dict:
             rec["notes"] = [*(rec.get("notes") or []), f"absorción {suf}: retirado; {motivo}"]
         retirados[rid] = motivo
 
+    def vigente() -> dict[str, tuple[str, dict]]:
+        """El libro mayor como va quedando: lo de partida, lo cambiado y lo nuevo."""
+        estado = dict(proy)
+        estado.update({rid: (f, despues) for rid, (f, _, despues) in cambios.items()})
+        estado.update({rec["id"]: (f, rec) for f, rec in altas})
+        return estado
+
     # --- parches: sólo registros que salieron del corpus, uno por sitio ------------
     derivados = {rid for s in secciones.values() for o in s["rows"].values() for rid in o["record_ids"]}
-    parches: dict[str, tuple[str, dict]] = {}
+    parches: dict[str, tuple[str, str | None, dict]] = {}
 
-    def recoger(donde: str, d: dict) -> None:
-        if d.get("decision") != "corregir":
+    def recoger(donde: str, sec: str | None, d: dict) -> None:
+        if d.get("decision") not in CON_PARCHES or not d.get("patches"):
             return
-        if not isinstance(d.get("patches"), dict):
+        if not isinstance(d["patches"], dict):
             errores.append(f"{donde}: `patches` va de registro a {{campo: valor}}")
             return
         for rid, parche in sorted(d["patches"].items()):
@@ -1103,26 +1190,26 @@ def construir(ruta_spec: Path, anterior: str, nueva: str) -> dict:
                 continue
             fichero = proy[rid][0]
             prohibidos = sorted(set(parche) & {*convertir.DERIVADOS, *convertir.DERIVADOS_POR_FICHERO.get(fichero, ())})
-            enlaces = sorted(set(parche) & ENLACES)
+            fijos = sorted(set(parche) & ENLACES_FIJOS)
             ajenos = sorted(set(parche) - convertir.propiedades(fichero)) if fichero in convertir.ESQUEMA else []
             if prohibidos:
                 errores.append(f"{donde}: {rid}: {', '.join(prohibidos)} se deduce, no se corrige a mano")
-            if enlaces:
-                errores.append(f"{donde}: {rid}: cambiar {', '.join(enlaces)} obliga a rehacer el otro lado del "
-                               "enlace, y eso llega con el constructor de registros nuevos")
+            if fijos:
+                errores.append(f"{donde}: {rid}: {', '.join(fijos)} se deduce de otros registros o es su ciclo de "
+                               "vida; no se fija con un parche")
             if ajenos:
                 errores.append(f"{donde}: {rid}: {', '.join(ajenos)} no es un campo de {fichero}")
-            parches[rid] = (donde, parche)
+            parches[rid] = (donde, sec, parche)
 
     for sec, h in sorted(por_seccion.items()):
         for tipo in ("rows", "successions"):
             for k, d in sorted(h.get(tipo, {}).items()):
-                recoger(f"sección {sec}, {tipo} {k}", d)
+                recoger(f"sección {sec}, {tipo} {k}", sec, d)
     for n, d in enumerate(spec.get("entities") or [], 1):
-        recoger(f"entities #{n}", d)
+        recoger(f"entities #{n}", None, d)
     for ruta, entradas in sorted((spec.get("appendices") or {}).items()):
         for n, d in enumerate(entradas, 1):
-            recoger(f"appendices {ruta} #{n}", d)
+            recoger(f"appendices {ruta} #{n}", None, d)
 
     # --- menciones que se retiran por su entidad --------------------------------------
     menciones_fuera: dict[str, str] = {}
@@ -1134,10 +1221,12 @@ def construir(ruta_spec: Path, anterior: str, nueva: str) -> dict:
     # --- fuentes ----------------------------------------------------------------------------
     fuente_de_clave = {rec.get("citation_key"): rid for rid, (f, rec) in proy.items()
                        if f == "sources.jsonl" and rec.get("citation_key")}
+    # Las claves de la versión de antes: con ellas se sabe si las fuentes de un
+    # registro salían de sus filas, aunque una fuente cambie de clave.
+    fuente_de_clave_antes = dict(fuente_de_clave)
     cab, filas_ap = freeze.leer_csv(b.base / FUENTES) if (b.base / FUENTES).exists() else ([], [])
     col_doi = next((c for c in cab if c.strip().lower().startswith("doi")), "")
     apendice_a = {f["clave"].strip(): f for f in filas_ap if (f.get("clave") or "").strip()}
-    siguiente_src = [None]
 
     def fuente(clave: str, donde: str) -> str | None:
         if clave in fuente_de_clave:
@@ -1145,24 +1234,33 @@ def construir(ruta_spec: Path, anterior: str, nueva: str) -> dict:
         if clave not in apendice_a:
             errores.append(f"{donde}: cita {clave}, que el apéndice A de la versión nueva no tiene")
             return None
-        if siguiente_src[0] is None:
-            siguiente_src[0] = base.siguiente_libre("SRC", convertir.usados("SRC"))
-        rid = f"SRC-{siguiente_src[0]:06d}"
-        siguiente_src[0] += 1
+        rid = nuevo("SRC")
         altas.append(("sources.jsonl", {"id": rid, **convertir.fuente_de_apendice(apendice_a[clave], col_doi)}))
         fuente_de_clave[clave] = rid
         return rid
 
     for clave, d in sorted((spec.get("sources") or {}).items()):
-        if d.get("decision") == "actualizar":
-            if clave not in apendice_a:
-                errores.append(f"sources {clave}: el apéndice A de la versión nueva ya no la tiene; no hay "
-                               "con qué actualizarla")
+        if d.get("decision") != "actualizar":
+            continue
+        # Una fuente que sólo cambió de clave se empareja con su fila nueva: el
+        # registro es el mismo y pasa a citarse por la clave nueva.
+        pareja = d.get("pair_with")
+        nueva_clave = pareja or clave
+        if pareja is not None:
+            if pareja in fuente_de_clave:
+                errores.append(f"sources {clave}: {pareja} ya es la clave de {fuente_de_clave[pareja]}")
                 continue
-            rec = tocar(d["record_id"])
-            for k, v in convertir.fuente_de_apendice(apendice_a[clave], col_doi).items():
-                if k not in ("verification_status", "record_status"):
-                    rec[k] = v
+        if nueva_clave not in apendice_a:
+            errores.append(f"sources {clave}: el apéndice A de la versión nueva no tiene {nueva_clave}; no hay "
+                           "con qué actualizarla")
+            continue
+        rec = tocar(d["record_id"])
+        for k, v in convertir.fuente_de_apendice(apendice_a[nueva_clave], col_doi).items():
+            if k not in ("verification_status", "record_status"):
+                rec[k] = v
+        if pareja is not None:
+            fuente_de_clave.pop(clave, None)
+            fuente_de_clave[pareja] = d["record_id"]
 
     # --- secciones ----------------------------------------------------------------------------
     siguiente_pasaje = base.siguiente_libre("PASSAGE", base.ids_de_pasajes())
@@ -1170,25 +1268,29 @@ def construir(ruta_spec: Path, anterior: str, nueva: str) -> dict:
                                              | base.reservados_por_deltas("MENTION"))
     bloque: dict[str, dict] = {}
     resumen: dict[str, dict] = {}
+    ids_de: dict[str, dict[str, str]] = {}
+    pendientes_sust: list[tuple[str, str, str, str]] = []
     for sec, s in sorted(secciones.items()):
         sid = s["section_id"]
         h = por_seccion.get(sec, {})
+        filas_h = h.get("rows", {})
+        nuevas_h = h.get("new_rows", {})
         propias = sorted((c for c, (sv, _) in filas_b.items() if sv == sec), key=freeze._num)
         # Una fila que cambia de sección se lleva sus registros a otra: eso es
-        # rehacer dos secciones, trabajo del constructor de registros nuevos.
+        # rehacer dos secciones a la vez, y todavía no se ejecuta.
         for c in propias:
             if c in inverso and inverso[c] not in s["rows"]:
                 errores.append(f"{c} llega a la sección {sec} desde otra ({inverso[c]}); mover filas entre "
-                               "secciones llega con el constructor de registros nuevos")
+                               "secciones todavía no se ejecuta")
         for c in s["rows"]:
             if c in mapa and filas_b[mapa[c]][0] != sec:
-                errores.append(f"{c} deja la sección {sec} ({mapa[c]}); mover filas entre secciones llega con el "
-                               "constructor de registros nuevos")
+                errores.append(f"{c} deja la sección {sec} ({mapa[c]}); mover filas entre secciones todavía no "
+                               "se ejecuta")
         prosas = corredor.prosas_de_seccion(b.base, sec)
         registro_b = b.base / "data" / "afirmaciones" / f"{sec}.csv"
         if not prosas or not registro_b.exists():
-            errores.append(f"la sección {sec} desaparece de la versión nueva; retirarla entera llega con el "
-                           "constructor de registros nuevos")
+            errores.append(f"la sección {sec} desaparece de la versión nueva; retirarla entera todavía no se "
+                           "ejecuta")
             continue
         prosa_b = prosas[0]
         texto_bytes, registro_bytes = prosa_b.read_bytes(), registro_b.read_bytes()
@@ -1216,6 +1318,7 @@ def construir(ruta_spec: Path, anterior: str, nueva: str) -> dict:
                            "text": c, "character_offsets": {"start": i, "end": f}, "record_status": "active"}
                           for n, (c, i, f) in enumerate(forma)]
                 siguiente_pasaje += len(nuevos)
+            emitidos.update(p["id"] for p in nuevos)
             ficheros[ruta_p] = (json.dumps(nuevos, indent=2, ensure_ascii=False) + "\n").encode("utf-8")
             ficheros[base.SECTIONS / f"{sid}.{suf}.md"] = texto_bytes
             files["prose"] = {"path": prosa_b.relative_to(b.base).as_posix(), "sha256": base.sha256(texto_bytes),
@@ -1278,10 +1381,10 @@ def construir(ruta_spec: Path, anterior: str, nueva: str) -> dict:
             if estado is None:
                 continue  # cuelga de un pasaje de otra versión: ya no es de la prosa vigente
             if estado in ("igual", "desplazado"):
-                nuevo = pasaje[mapa_p[m["passage_id"]]]
-                salto = nuevo["character_offsets"]["start"] - viejo_p[m["passage_id"]]["character_offsets"]["start"]
+                nuevo_p = pasaje[mapa_p[m["passage_id"]]]
+                salto = nuevo_p["character_offsets"]["start"] - viejo_p[m["passage_id"]]["character_offsets"]["start"]
                 rec = tocar(mid)
-                rec["passage_id"] = nuevo["id"]
+                rec["passage_id"] = nuevo_p["id"]
                 rec["character_offsets"] = {k: v + salto for k, v in m["character_offsets"].items()}
                 reancladas += 1
                 continue
@@ -1313,84 +1416,98 @@ def construir(ruta_spec: Path, anterior: str, nueva: str) -> dict:
             rec["notes"] += [f"absorción {suf}: reanclada al párrafo {ordinal}", *([nota] if nota else [])]
             reancladas += 1
 
-        # Menciones nuevas: las etiquetas que la versión nueva introduce.
-        nuevas_de_fila: dict[str, list[str]] = defaultdict(list)
-        for viejo, d in sorted(h.get("rows", {}).items(), key=lambda x: freeze._num(x[0])):
-            if d.get("decision") not in ("conservar", "corregir"):
-                continue
-            c = mapa[viejo]
+        # Menciones nuevas: las etiquetas que la versión nueva introduce, en su
+        # fila dueña (modificada o nueva). Nacen pendientes y las resuelve la
+        # misma maquinaria que una conversión, que admite claves de registros
+        # nuevos de la sección.
+        pendientes_m: dict[str, dict] = {}
+        decisiones_m: dict[str, dict] = {}
+        con_etiqueta_nueva: list[tuple[str, dict]] = []
+        for viejo, d in sorted(filas_h.items(), key=lambda x: freeze._num(x[0])):
+            if d.get("decision") not in (None, "retirar") and viejo in mapa:
+                con_etiqueta_nueva.append((mapa[viejo], d))
+        con_etiqueta_nueva += sorted(nuevas_h.items(), key=lambda x: freeze._num(x[0]))
+        for c, d in con_etiqueta_nueva:
             pids, _ = colgar(c)
             for etiqueta, dm in sorted((d.get("new_mentions") or {}).items()):
                 if not pids:
-                    errores.append(f"sección {sec}, rows {viejo}: la fila no cuelga de ningún párrafo nuevo; "
-                                   f"no hay dónde anclar «{etiqueta}»")
-                    continue
-                ajenos = [t for t in dm["targets"] if t not in proy]
-                if ajenos:
-                    errores.append(f"sección {sec}, rows {viejo}, mención nueva «{etiqueta}»: "
-                                   f"{', '.join(ajenos)} no existe")
+                    errores.append(f"sección {sec}, {c}: la fila no cuelga de ningún párrafo nuevo; no hay dónde "
+                                   f"anclar «{etiqueta}»")
                     continue
                 ini, fin, nota = corredor.localizar(etiqueta, pasaje[pids[0]])
                 mid = f"MENTION-{siguiente_mencion:06d}"
                 siguiente_mencion += 1
-                cuestiones = [t for t in dm["targets"] if t.startswith("ISSUE-")]
-                altas.append(("mentions.jsonl", {
+                pendientes_m[mid] = {
                     "id": mid, "section_id": sid, "passage_id": pids[0], "original_text": etiqueta,
-                    "normalized_form": base.normalizar(etiqueta), "mention_type": dm["mention_type"],
+                    "normalized_form": base.normalizar(etiqueta), "mention_type": "unresolved",
                     "character_offsets": {"start": ini, "end": fin},
-                    "resolution": {"status": "resolved", "target_ids": list(dm["targets"]), "reason": dm.get("reason")},
-                    "disposition": dm["disposition"], "issue_ids": cuestiones,
-                    "notes": [f"absorción {suf}: etiqueta nueva de {c}", *([nota] if nota else []),
-                              *([f"destino: {dm['reason']}"] if dm.get("reason") else [])],
-                    "record_status": "active"}))
-                for iid in cuestiones:
-                    afecta = tocar(iid).setdefault("affects", {})
-                    afecta["mention_ids"] = [*afecta.get("mention_ids", []), mid]
-                nuevas_de_fila[c].append(mid)
+                    "resolution": {"status": "pending", "target_ids": [], "reason": None},
+                    "disposition": None, "issue_ids": [],
+                    "notes": [f"absorción {suf}: etiqueta nueva de {c}", *([nota] if nota else [])],
+                    "record_status": "active"}
+                decisiones_m[mid] = dm
 
-        # --- registros ------------------------------------------------------------------
+        # --- qué pasa con los registros que ya existían -----------------------------------
+        # Los que se sustituyen dejan de derivarse; los que una división
+        # reasigna pasan a colgar de su sucesora.
+        reasignados: dict[str, str] = {}
+        sustituye: dict[str, str] = {}
+        for viejo, d in filas_h.items():
+            for rid, otro in (d.get("replaced_by") or {}).items():
+                sustituye[rid] = otro
+                pendientes_sust.append((sec, rid, otro, d["reason"]))
+            if d.get("decision") == "dividir":
+                for sucesora, rids in (d.get("successors") or {}).items():
+                    for rid in rids:
+                        reasignados[rid] = sucesora
+
         de_registro, av = filas_de_registros(s)
         if av:
             errores.extend(f"sección {sec}: {x}" for x in av)
-        decision_fila = {c: d.get("decision") for c, d in h.get("rows", {}).items()}
+        decision_fila = {c: d.get("decision") for c, d in filas_h.items()}
         filas_nuevas_de: dict[str, list[str]] = {}
         for rid in sorted({rid for o in s["rows"].values() for rid in o["record_ids"]}):
             if rid not in proy:
                 errores.append(f"sección {sec}: {rid} está en la correspondencia y no en el libro mayor")
                 continue
             viejas = de_registro.get(rid) or [c for c, o in s["rows"].items() if rid in o["record_ids"]]
-            vivas = [mapa[c] for c in viejas if c in mapa]
-            filas_nuevas_de[rid] = vivas
             fichero, antes = proy[rid]
-            if antes.get("record_status", "active") != "active":
+            if rid in sustituye or antes.get("record_status", "active") != "active":
                 continue
+            # Un registro reasignado cambia su fila dividida por la sucesora.
+            pares = [(c, reasignados[rid] if rid in reasignados and decision_fila.get(c) == "dividir" else mapa.get(c))
+                     for c in viejas]
+            pares = [(v, n) for v, n in pares if n]
+            vivas = list(dict.fromkeys(n for _, n in pares))
+            filas_nuevas_de[rid] = vivas
             if not vivas:
                 # Todas sus filas se van. Si alguna se conserva, el registro sigue
                 # tal cual; si todas se retiran, se retira con ellas.
                 if all(decision_fila.get(c) == "retirar" for c in viejas):
-                    motivos = "; ".join(dict.fromkeys(h["rows"][c]["reason"] for c in viejas))
+                    motivos = "; ".join(dict.fromkeys(filas_h[c]["reason"] for c in viejas))
                     retirar(rid, f"sus filas ({', '.join(viejas)}) salen del corpus: {motivos}")
                 continue
             # Procedencia: los párrafos nuevos de sus filas y, si cambió la
             # columna Fuente y sus fuentes salían de ella, las fuentes nuevas.
             prov = antes.get("provenance")
+            reasignado = rid in reasignados
             if isinstance(prov, dict):
                 nueva_prov = dict(prov)
                 esperados = list(dict.fromkeys(p for c in viejas if c in s["rows"] for p in s["rows"][c]["passage_ids"]))
                 colgados = list(dict.fromkeys(p for c in vivas for p in colgar(c)[0]))
-                if prov.get("passage_ids") == esperados:
+                if prov.get("passage_ids") == esperados or reasignado:
                     nueva_prov["passage_ids"] = colgados
                 elif prosa_cambia:
                     nueva_prov["passage_ids"] = [mapa_p[p] for p in prov.get("passage_ids", []) if mapa_p.get(p)]
                     avisos.append(f"{rid}: sus pasajes no eran los de sus filas; se traducen a la prosa nueva "
                                   "sin recalcularlos")
-                if any("Fuente" in modificadas.get(c, {}).get("columnas", {}) for c in viejas):
-                    automaticas = [fuente_de_clave.get(k) for k in claves_de_fuente(viejas, filas_a)]
+                if reasignado or any("Fuente" in modificadas.get(c, {}).get("columnas", {}) for c in viejas):
+                    automaticas = [fuente_de_clave_antes.get(k) for k in claves_de_fuente(viejas, filas_a)]
                     if prov.get("source_ids") == automaticas:
                         fuentes_r = [fuente(k, f"{rid} ({', '.join(vivas)})") for k in claves_de_fuente(vivas, filas_b)]
                         nueva_prov["source_ids"] = [x for x in fuentes_r if x]
                     else:
-                        avisos.append(f"{rid}: la columna Fuente cambió, pero sus fuentes no salían de ella; "
+                        avisos.append(f"{rid}: sus filas cambiaron de fuente, pero sus fuentes no salían de ellas; "
                                       "se dejan como están")
                 if nueva_prov != prov:
                     nueva_prov["dataset_revision"] = rev_despues
@@ -1409,42 +1526,170 @@ def construir(ruta_spec: Path, anterior: str, nueva: str) -> dict:
                         tocar(rid)["epistemic_dimensions"] = ejes_n
             if fichero == "evidence.jsonl" and antes.get("quality_notes"):
                 notas = list(antes["quality_notes"])
-                for c in vivas:
-                    v = inverso[c]
+                for v, n in pares:
                     if s["rows"].get(v, {}).get("destination") != "J":
                         continue
                     previa = f"Evaluación de la fila {v} (destino J)"
-                    notas = [nota_j(c, filas_b[c][1]) if n.startswith(previa) else n for n in notas]
+                    notas = [nota_j(n, filas_b[n][1]) if x.startswith(previa) else x for x in notas]
                 if notas != antes["quality_notes"]:
                     tocar(rid)["quality_notes"] = notas
 
+        # --- registros nuevos ---------------------------------------------------------------
+        # Los de las filas nuevas, los que amplían o reemplazan una fila que
+        # sigue, y los de las sucesoras de una división: la misma maquinaria que
+        # una conversión, con las filas y la procedencia de la versión nueva.
+        registros_h = h.get("records") or []
+        destino_de = {}
+        for c in propias:
+            viejo = inverso.get(c)
+            if viejo is None:
+                destino_de[c] = (nuevas_h.get(c) or {}).get("destination") or "H"
+            elif decision_fila.get(viejo) == "dividir":
+                destino_de[c] = "H"
+            else:
+                destino_de[c] = (s["rows"].get(viejo) or {}).get("destination", "H")
+        claves_de_fila: dict[str, list[str]] = {}
+        for c, d in nuevas_h.items():
+            claves_de_fila[c] = list(d.get("keys") or [])
+        for viejo, d in filas_h.items():
+            if d.get("keys") and viejo in mapa:
+                claves_de_fila[mapa[viejo]] = list(d["keys"])
+        filas_g = {c: filas_b[c][1] for c in propias}
+        filas_spec = {c: {"destination": destino_de[c], "keys": claves} for c, claves in claves_de_fila.items()}
+        _, fallos = convertir.revisar_registros(registros_h, filas_spec, filas_g, sec)
+        errores.extend(f"sección {sec}: {x}" for x in fallos)
+        ids: dict[str, str] = {}
+        if (registros_h or pendientes_m) and not fallos:
+            try:
+                g = convertir.generar(
+                    sec_id=sid, records=registros_h,
+                    rows={c: {"destination": destino_de[c]} for c in propias}, filas=filas_g,
+                    origen={c: {"passage_ids": colgar(c)[0]} for c in propias},
+                    decisiones=decisiones_m, menciones=pendientes_m, fechas=h.get("occurrence_dates") or {},
+                    apendice=b.base / FUENTES, rev=rev_despues, proy=vigente(), nuevo=nuevo,
+                    ya_emitidos=frozenset(emitidos))
+            except SystemExit as e:
+                errores.append(f"sección {sec}: {str(e).removeprefix('ERROR ')}")
+                g = None
+            if g is not None:
+                ids = g["ids"]
+                altas.extend(g["salida"])
+                altas.extend(("mentions.jsonl", despues) for _, despues in g["actualizadas"])
+                for rid, (fichero, _, despues) in g["cambios"].items():
+                    if rid in cambios:
+                        cambios[rid][2] = despues
+                    elif rid in proy:
+                        cambios[rid] = [fichero, proy[rid][1], despues]
+                    else:
+                        # Un registro nuevo de otra sección de esta misma absorción.
+                        altas[:] = [(f, despues if x["id"] == rid else x) for f, x in altas]
+                for fichero, rec in g["salida"]:
+                    if fichero == "sources.jsonl":
+                        fuente_de_clave[rec["citation_key"]] = rec["id"]
+        ids_de[sec] = ids
+        nuevos_de_fila: dict[str, list[str]] = defaultdict(list)
+        for rspec in registros_h:
+            if rspec["key"] in ids:
+                for c in rspec.get("rows", []):
+                    nuevos_de_fila[c].append(ids[rspec["key"]])
+                filas_nuevas_de[ids[rspec["key"]]] = list(rspec.get("rows", []))
+        for c, claves in claves_de_fila.items():
+            for k in claves:
+                if k in ids and ids[k] not in nuevos_de_fila[c]:
+                    nuevos_de_fila[c].append(ids[k])
+
         # --- el mapa de filas de la versión nueva ----------------------------------------------
+        activas = {m["original_text"]: mid for mid, m in de_la_seccion.items() if mid not in retiradas_m}
+        activas.update({m["original_text"]: mid for mid, m in pendientes_m.items()})
         filas_mapa = {}
         for c in propias:
             viejo = inverso.get(c)
             pids, via = colgar(c)
-            if viejo is None:
-                clase, o = "nueva", {"destination": "H", "record_ids": [], "mention_ids": []}
+            if viejo is None or viejo not in s["rows"]:
+                clase, o = "nueva", {"destination": destino_de[c], "record_ids": [], "mention_ids": []}
             else:
                 o = s["rows"][viejo]
                 clase = ("modificada" if viejo in modificadas else "renumerada" if viejo != c else "sin cambios")
+            etiquetas = [(filas_b[c][1].get(col) or "").strip() for col in ("Sujeto", "Objeto")]
+            menciones_c = [m for m in o["mention_ids"] if m not in retiradas_m]
+            menciones_c += [activas[e] for e in etiquetas if e in activas]
+            # Lo que la fila deriva ahora: lo suyo que sigue, lo reasignado a
+            # ella y lo nuevo.
+            propios = [x for x in o["record_ids"] if x not in sustituye and not
+                       (x in reasignados and decision_fila.get(viejo) == "dividir")]
+            propios += [x for x, suc in reasignados.items() if suc == c]
             filas_mapa[c] = {"from": viejo, "class": clase, "passage_ids": pids, "via": via,
-                             "mention_ids": [m for m in o["mention_ids"] if m not in retiradas_m] + nuevas_de_fila[c],
-                             "destination": o["destination"], "record_ids": list(o["record_ids"])}
+                             "mention_ids": list(dict.fromkeys(menciones_c)),
+                             "destination": destino_de[c],
+                             "record_ids": list(dict.fromkeys([*propios, *nuevos_de_fila[c]]))}
         bloque[sec] = {"section_id": sid, "files": files,
                        **({"passages": mapa_p} if prosa_cambia else {}),
                        "rows": filas_mapa,
                        "record_rows": {rid: filas_nuevas_de.get(rid, []) for rid in sorted(filas_nuevas_de)}}
         resumen[sec] = {"section_id": sid, "prose": prosa_cambia, "registry": registro_cambia,
-                        "passages": len(nuevos) if prosa_cambia else 0, "reanchored": reancladas}
+                        "passages": len(nuevos) if prosa_cambia else 0, "reanchored": reancladas,
+                        "new_records": sum(1 for rspec in registros_h if rspec["key"] in ids)}
 
-    # --- parches ------------------------------------------------------------------------------
-    for rid, (donde, parche) in sorted(parches.items()):
-        if rid in retirados:
-            errores.append(f"{donde}: {rid} se corrige y se retira a la vez")
+    # --- sustituciones ------------------------------------------------------------------------
+    estado = vigente()
+    for sec, rid, otro, motivo in pendientes_sust:
+        destino_id = ids_de.get(sec, {}).get(otro) if convertir.CLAVE.match(otro) else otro
+        if destino_id is None or destino_id not in estado:
+            errores.append(f"sección {sec}: {rid} se sustituye por {otro}, que no existe ni es un registro nuevo "
+                           "de la sección")
+            continue
+        if destino_id == rid:
+            errores.append(f"sección {sec}: {rid} no se sustituye por sí mismo")
             continue
         rec = tocar(rid)
-        rec.update(json.loads(json.dumps(parche)))
+        rec["record_status"] = "replaced"
+        rec["superseded_by"] = destino_id
+        rec["notes"] = [*(rec.get("notes") or []), f"absorción {suf}: sustituido por {destino_id}; {motivo}"]
+        sustituidos[rid] = destino_id
+
+    # --- parches ------------------------------------------------------------------------------
+    antes_de_parches = {rid: json.loads(json.dumps(r_)) for rid, (_, r_) in vigente().items() if rid in parches}
+    for rid, (donde, sec, parche) in sorted(parches.items()):
+        if rid in retirados or rid in sustituidos:
+            errores.append(f"{donde}: {rid} se corrige y se {'retira' if rid in retirados else 'sustituye'} a la vez")
+            continue
+        faltan: set[str] = set()
+        valor = convertir.sustituir(json.loads(json.dumps(parche)), ids_de.get(sec, {}) if sec else {}, faltan)
+        if faltan:
+            errores.append(f"{donde}: {rid}: claves sin definir en la sección: {', '.join(sorted(faltan))}")
+            continue
+        tocar(rid).update(valor)
+    # Un enlace cambiado se rehace en sus dos extremos: sale del destino de
+    # antes y entra en el de ahora.
+    estado = vigente()
+    tocados_vuelta: set[tuple[str, str]] = set()
+    for rid in sorted(parches):
+        if rid not in antes_de_parches or rid in retirados or rid in sustituidos:
+            continue
+        fichero = estado[rid][0]
+        antes_p, ahora_p = punteros(antes_de_parches[rid], fichero), punteros(estado[rid][1], fichero)
+        for campo in set(antes_p) | set(ahora_p):
+            for destino_id in antes_p.get(campo, set()) ^ ahora_p.get(campo, set()):
+                tocados_vuelta.add((destino_id, campo))
+    for destino_id, campo in sorted(tocados_vuelta):
+        if destino_id not in estado:
+            errores.append(f"un parche enlaza con {destino_id}, que no existe")
+            continue
+        fichero, rec_d = estado[destino_id]
+        if campo == "temporal_expression_ids" and fichero == "occurrences.jsonl":
+            errores.append(f"{destino_id}: cambiar la datación de una ocurrencia no se rehace sola; su fecha "
+                           "se fija a mano")
+            continue
+        if fichero in convertir.ESQUEMA and campo not in convertir.propiedades(fichero):
+            continue
+        debe = valor_de_vuelta(campo, destino_id, estado)
+        previo = list(rec_d.get(campo) or [])
+        nuevo_v = [x for x in previo if x in debe] + [x for x in sorted(set(debe)) if x not in previo]
+        if nuevo_v != previo:
+            if destino_id in proy:
+                tocar(destino_id)[campo] = nuevo_v
+            else:
+                rec_d[campo] = nuevo_v
     # Una evidencia dice de qué obra sale: tiene que ser una de su procedencia.
     for rid, (fichero, _, rec) in sorted(cambios.items()):
         prov = rec.get("provenance")
@@ -1464,23 +1709,29 @@ def construir(ruta_spec: Path, anterior: str, nueva: str) -> dict:
         raise SystemExit("ERROR el libro mayor dejaría de validar:\n  " + "\n  ".join(invalidos))
 
     # --- delta ---------------------------------------------------------------------------------
+    def operacion(rid: str) -> str:
+        return ("DEPRECATE_RECORD" if rid in retirados else "SUPERSEDE_RECORD" if rid in sustituidos
+                else "UPDATE_RECORD")
+
     operaciones = [{"operation": "ADD_RECORD", "file": f, "record_id": rec["id"], "before": None, "after": rec}
                    for f, rec in altas]
-    operaciones += [{"operation": "DEPRECATE_RECORD" if rid in retirados else "UPDATE_RECORD", "file": f,
-                     "record_id": rid, "before": antes, "after": despues}
+    operaciones += [{"operation": operacion(rid), "file": f, "record_id": rid, "before": antes, "after": despues}
                     for rid, (f, antes, despues) in sorted(cambios.items())]
     de_partida = dict(manifiesto["corpus_freeze"])
     llegada = {"path": destino["path"], "version": congelada.get("version"), "commit": congelada.get("commit"),
                "fingerprint": congelada["fingerprint"], "decision": spec.get("decision") or "DEC-059"}
+    nuevos_de = lambda f: [rec["id"] for g_, rec in altas if g_ == f]  # noqa: E731
     delta = {
         "schema_version": base.SCHEMA_VERSION,
         "dataset_revision_before": rev_antes,
         "dataset_revision_after": rev_despues,
         "operations": operaciones,
         "records_added": [rec["id"] for _, rec in altas],
-        "records_updated": sorted(rid for rid in cambios if rid not in retirados),
-        "claims_added": [], "events_added": [], "hypotheses_added": [], "issues_added": [], "issues_resolved": [],
-        "records_deprecated": sorted(retirados),
+        "records_updated": sorted(rid for rid in cambios if rid not in retirados and rid not in sustituidos),
+        "claims_added": nuevos_de("claims.jsonl"), "events_added": nuevos_de("events.jsonl"),
+        "hypotheses_added": nuevos_de("hypotheses.jsonl"), "issues_added": nuevos_de("issues.jsonl"),
+        "issues_resolved": [],
+        "records_deprecated": sorted([*retirados, *sustituidos]),
         "views_invalidated": [], "views_built": [], "validation_results": {},
         "absorption": {
             "spec": {"path": corredor._rel(ruta_spec), "sha256": convertir.sha256(spec_bytes)},
@@ -1492,7 +1743,7 @@ def construir(ruta_spec: Path, anterior: str, nueva: str) -> dict:
     }
     return {"suffix": suf, "delta": delta, "files": ficheros, "summary": resumen, "warnings": avisos,
             "rev": (rev_antes, rev_despues), "added": altas, "changed": cambios, "deprecated": retirados,
-            "from": de_partida, "to": llegada}
+            "replaced": sustituidos, "from": de_partida, "to": llegada}
 
 
 def informe_construccion(c: dict) -> list[str]:
@@ -1507,15 +1758,16 @@ def informe_construccion(c: dict) -> list[str]:
         "",
         "## Secciones",
         "",
-        "| Sección | SEC | Prosa | Registro | Pasajes nuevos | Menciones reancladas |",
-        "|---|---|---|---|---:|---:|",
+        "| Sección | SEC | Prosa | Registro | Pasajes nuevos | Menciones reancladas | Registros nuevos |",
+        "|---|---|---|---|---:|---:|---:|",
     ]
     for sec, x in c["summary"].items():
         lineas.append(f"| {sec} | {x['section_id']} | {'cambia' if x['prose'] else 'igual'} | "
-                      f"{'cambia' if x['registry'] else 'igual'} | {x['passages']} | {x['reanchored']} |")
+                      f"{'cambia' if x['registry'] else 'igual'} | {x['passages']} | {x['reanchored']} | "
+                      f"{x['new_records']} |")
     por_fichero: dict[str, int] = defaultdict(int)
     for rid, (f, _, _) in c["changed"].items():
-        if rid not in c["deprecated"]:
+        if rid not in c["deprecated"] and rid not in c["replaced"]:
             por_fichero[f] += 1
     lineas += ["", "## Operaciones", "", "| Operación | Fichero | Registros |", "|---|---|---:|"]
     for f, n in sorted(Counter(f for f, _ in c["added"]).items()):
@@ -1524,6 +1776,8 @@ def informe_construccion(c: dict) -> list[str]:
         lineas.append(f"| actualización | `{f}` | {n} |")
     if c["deprecated"]:
         lineas += ["", "## Retirados", ""] + [f"- {rid}: {m}" for rid, m in sorted(c["deprecated"].items())]
+    if c["replaced"]:
+        lineas += ["", "## Sustituidos", ""] + [f"- {rid} → {otro}" for rid, otro in sorted(c["replaced"].items())]
     if c["warnings"]:
         lineas += ["", "## Avisos", ""] + [f"- {a}" for a in c["warnings"]]
     lineas += ["", f"Se aplica con `python scripts/ingest/delta.py ABS-{c['suffix']}.json` y se revierte con `--revert`: "

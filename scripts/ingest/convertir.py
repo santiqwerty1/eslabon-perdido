@@ -467,13 +467,16 @@ def revisar_registros(records: list[dict], rows: dict[str, dict], filas: dict,
 
 def generar(*, sec_id: str, records: list[dict], rows: dict[str, dict], filas: dict,
             origen: dict[str, dict], decisiones: dict[str, dict], menciones: dict[str, dict],
-            fechas, apendice: Path, rev: str, proy: dict[str, tuple[str, dict]], nuevo) -> dict:
+            fechas, apendice: Path, rev: str, proy: dict[str, tuple[str, dict]], nuevo,
+            ya_emitidos: frozenset = frozenset()) -> dict:
     """Los registros de un fichero ya revisado, con todo lo que se deduce de sus filas.
 
     Lo comparten la conversión y la absorción (DEC-059). `filas` son las filas
     del CSV de la versión de la que salen; `origen`, de qué pasajes cuelga cada
     una; `menciones`, las que se resuelven con `decisiones`; `proy`, los
     registros que ya existen, y `nuevo`, quien reparte los identificadores.
+    `ya_emitidos` son identificadores que existirán al aplicar el delta aunque
+    todavía no estén escritos (los pasajes nuevos de una absorción).
     Devuelve los registros nuevos (fuentes primero), las claves, las menciones
     resueltas y los cambios en registros que ya existían.
     """
@@ -781,7 +784,7 @@ def generar(*, sec_id: str, records: list[dict], rows: dict[str, dict], filas: d
     # objeto o un participante colgando pasarían.
     existentes_id = proy
     conocidos = (set(por_id) | set(existentes_id) | base.ids_de_pasajes() | base.ids_de_secciones()
-                 | set(menciones) | ids_de_vistas())
+                 | set(menciones) | ids_de_vistas() | set(ya_emitidos))
     colgando = []
     for fichero, rec in salida:
         colgando += [f"{rec['id']} → {x}" for x in sorted(literales(rec) - conocidos)]
