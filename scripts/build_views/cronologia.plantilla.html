@@ -1,0 +1,372 @@
+<title>Relojes y rocas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap">
+<style>
+  /* Paleta y medidas del sistema de diseño del visor (Nocturne, _ds/).
+     Es un sistema de un solo tema, oscuro, y esta página lo sigue. */
+  :root {
+    color-scheme: dark;
+    --bg: #161826;
+    --surface: #232532;
+    --surface-2: #1c1e2c;
+    --text: #e9e9ed;
+    --text-2: #cfd3e5;
+    --muted: #b2b6ca;
+    --faint: #9397ab;
+    --line: #3f424d;
+    --line-2: #595d6c;
+    --accent: #9184d9;
+    --accent-200: #e7e5fe;
+    --accent-300: #d2cefd;
+    --accent-800: #423a6a;
+    --accent-900: #2b2741;
+    --mark: #e4e7f5;
+    --font: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+    --mono: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+    --space-2: 5.6px;
+    --space-3: 8.4px;
+    --space-4: 11.2px;
+    --space-6: 16.8px;
+    --space-8: 22.4px;
+    --radius-sm: 4px;
+    --radius-md: 8px;
+    --shadow-sm: 0 0 0 1px #3f424d;
+  }
+  body { background: var(--bg); color: var(--text); font: 14px/1.55 var(--font); }
+  .pagina { max-width: 1440px; margin: 0 auto; padding-block: 28px 64px; padding-inline: 16px; }
+  @media (min-width: 720px) { .pagina { padding-inline: 36px; } }
+
+  .ceja { font: 500 10.5px var(--font); letter-spacing: .16em; text-transform: uppercase; color: var(--accent-300); margin: 0 0 var(--space-3); }
+  h1 { font: 500 27px/1.25 var(--font); margin: 0 0 var(--space-3); text-wrap: balance; }
+  .entrada { margin: 0 0 var(--space-4); max-width: 66ch; font-size: 13.5px; line-height: 1.6; color: var(--text-2); text-wrap: pretty; }
+  .meta { margin: 0; font: 11.5px/1.6 var(--mono); color: var(--faint); font-variant-numeric: tabular-nums; }
+  .cuenta { margin: var(--space-2) 0 0; font-size: 12.5px; color: var(--muted); }
+  header { margin-bottom: var(--space-8); }
+
+  .disposicion { display: grid; gap: var(--space-8); align-items: start; }
+  @media (min-width: 1200px) {
+    .disposicion { grid-template-columns: minmax(0, 1fr) 420px; }
+    .ficha { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 16px); max-height: calc(100vh - 32px); overflow-y: auto; }
+  }
+  .principal { display: grid; gap: var(--space-8); min-width: 0; }
+
+  .tarjeta { background: var(--surface); box-shadow: var(--shadow-sm); border-radius: var(--radius-md); }
+  .eje-tarjeta { padding: var(--space-6) var(--space-6) var(--space-4); }
+  .desplazable { overflow-x: auto; }
+
+  /* El eje. La forma dice qué es; el relleno, la fuerza de la evidencia. */
+  .eje { display: block; width: 100%; min-width: 820px; height: auto; font-family: var(--font); }
+  .ics { stroke: var(--surface); stroke-width: 1; }
+  .ics-rotulo { font-size: 10px; font-weight: 500; fill: #161826; }
+  .tic { stroke: var(--faint); }
+  .tic-rotulo { font: 11px var(--mono); fill: var(--muted); }
+  .rejilla { stroke: var(--line); stroke-dasharray: 2 4; }
+  .carril { font-size: 11px; font-weight: 500; letter-spacing: .16em; fill: var(--accent-300); }
+  .carril-detalle { font-size: 11px; fill: var(--faint); }
+  .grupo { font-size: 12.5px; font-weight: 600; fill: var(--text); }
+  .grupo-detalle { font: 400 11px var(--mono); fill: var(--faint); }
+  .rotulo { font-size: 12px; fill: var(--muted); }
+  .valor { font: 11px var(--mono); fill: var(--faint); }
+  .marca { cursor: pointer; outline: none; }
+  .fondo-fila { fill: transparent; }
+  .marca:hover .fondo-fila { fill: color-mix(in oklab, var(--accent) 10%, transparent); }
+  .marca:focus-visible .fondo-fila { fill: color-mix(in oklab, var(--accent) 10%, transparent); stroke: var(--accent-300); stroke-width: 1; }
+  .marca.activa .fondo-fila { fill: color-mix(in oklab, var(--accent) 20%, transparent); }
+  .marca.activa .rotulo, .marca.activa .valor { fill: var(--accent-200); }
+  .figura { stroke: var(--mark); stroke-width: 1.5; }
+  .fuerza-alta .figura { fill: var(--mark); }
+  .fuerza-media .figura { fill: url(#rayado); }
+  .fuerza-baja .figura { fill: var(--surface); }
+  .fuerza-desconocida .figura { fill: var(--surface); stroke-dasharray: 3 2; }
+  .figura.corchete { fill: none; stroke-width: 2; }
+  .fuerza-media .corchete { stroke-dasharray: 6 2; }
+  .fuerza-baja .corchete, .fuerza-desconocida .corchete { stroke-dasharray: 2 2; }
+  .flecha { fill: var(--mark); }
+  .rayado-fondo { fill: var(--surface); }
+  .rayado-linea { stroke: var(--mark); stroke-width: 1.8; }
+
+  .leyenda { display: flex; flex-wrap: wrap; gap: var(--space-4) var(--space-8); margin-top: var(--space-4); padding-top: var(--space-4); border-top: 1px solid var(--line); font-size: 12px; color: var(--muted); }
+  .leyenda-grupo { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2) var(--space-4); }
+  .leyenda-titulo { font: 500 10.5px var(--font); letter-spacing: .12em; text-transform: uppercase; color: var(--faint); }
+  .leyenda-item { display: inline-flex; align-items: center; gap: var(--space-2); white-space: nowrap; }
+  .leyenda svg { flex: none; }
+
+  .bloques { display: grid; gap: var(--space-8); }
+  @media (min-width: 900px) { .bloques { grid-template-columns: 1fr 1fr; } }
+  .bloque h2, .ficha h3 { font: 500 10.5px var(--font); letter-spacing: .16em; text-transform: uppercase; color: var(--accent-300); margin: 0 0 var(--space-3); }
+  .bloque > p { margin: 0 0 var(--space-4); font-size: 12.5px; color: var(--muted); max-width: 60ch; }
+  .lista { list-style: none; margin: 0; padding: 0; display: grid; gap: 1px; background: var(--line); border-radius: var(--radius-md); overflow: hidden; box-shadow: var(--shadow-sm); }
+  .lista li { background: var(--surface); }
+  .enlace-afirmacion { all: unset; box-sizing: border-box; display: grid; gap: 2px; width: 100%; padding: var(--space-3) var(--space-4); cursor: pointer; }
+  .enlace-afirmacion:hover { background: color-mix(in oklab, var(--accent) 10%, var(--surface)); }
+  .enlace-afirmacion:focus-visible { outline: 2px solid var(--accent-300); outline-offset: -2px; }
+  .enlace-afirmacion .texto { font-size: 13px; color: var(--text); }
+  .enlace-afirmacion .sub { font: 11px var(--mono); color: var(--faint); }
+  .enlace-afirmacion .sub em { font: 11px var(--font); font-style: normal; color: var(--muted); }
+  .motivo { font-size: 12.5px; color: var(--muted); margin: var(--space-4) 0 var(--space-3); }
+  .declaracion { display: grid; gap: var(--space-3); margin: 0; padding: 0; list-style: none; font-size: 12.5px; color: var(--text-2); }
+  .declaracion li { padding-left: 14px; position: relative; max-width: 70ch; }
+  .declaracion li::before { content: "·"; position: absolute; left: 3px; color: var(--faint); }
+  .aviso { font-size: 12.5px; color: var(--text); background: var(--accent-900); border-radius: var(--radius-sm); padding: var(--space-3) var(--space-4); margin: 0 0 var(--space-4); }
+
+  /* La ficha: de la afirmación a su evidencia, su fuente y su pasaje. */
+  .ficha { padding: var(--space-6); display: grid; gap: var(--space-6); align-content: start; }
+  .ficha h2 { font: 500 17px/1.35 var(--font); margin: 0; text-wrap: balance; }
+  .ficha .ceja { margin-bottom: var(--space-2); }
+  .ids { font: 11px/1.6 var(--mono); color: var(--faint); margin-top: var(--space-2); word-break: break-word; }
+  .chips { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+  .chip { font-size: 11.5px; padding: 2px 8px; border-radius: 999px; box-shadow: inset 0 0 0 1px var(--line-2); color: var(--text-2); white-space: nowrap; }
+  .chip b { font-weight: 500; color: var(--faint); margin-right: 4px; }
+  .razon { margin: var(--space-3) 0 0; font-size: 12.5px; color: var(--muted); }
+  .pares { display: grid; grid-template-columns: max-content 1fr; gap: 4px var(--space-4); margin: 0; font-size: 12.5px; }
+  .pares dt { color: var(--faint); }
+  .pares dd { margin: 0; color: var(--text-2); overflow-wrap: anywhere; }
+  .elementos { display: grid; gap: var(--space-4); margin: 0; padding: 0; list-style: none; font-size: 12.5px; color: var(--text-2); }
+  .elementos .cola { display: block; font: 11px/1.6 var(--mono); color: var(--faint); margin-top: 2px; overflow-wrap: anywhere; }
+  .etiqueta { font: 500 10px var(--font); letter-spacing: .08em; text-transform: uppercase; color: var(--faint); margin-right: 6px; }
+  .hipotesis { border-radius: var(--radius-sm); box-shadow: inset 0 0 0 1px var(--line); padding: var(--space-4); display: grid; gap: var(--space-2); }
+  .hipotesis .nombre { font-weight: 500; color: var(--text); }
+  .hipotesis p { margin: 0; }
+  .pasaje { margin: 0; padding: var(--space-4); background: var(--surface-2); border-radius: var(--radius-sm); font-size: 12.5px; line-height: 1.65; color: var(--text-2); white-space: pre-wrap; max-height: 260px; overflow-y: auto; }
+  .ficha a { color: var(--accent-300); }
+  .ficha a:hover { color: var(--accent-200); }
+  .volver { all: unset; cursor: pointer; font-size: 12px; color: var(--accent-300); justify-self: start; }
+  .volver:focus-visible { outline: 2px solid var(--accent-300); outline-offset: 2px; }
+  @media (min-width: 1200px) { .volver { display: none; } }
+  @media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }
+</style>
+<!--CUERPO-->
+<div class="pagina">
+  <header>
+    <p class="ceja">Vista derivada · secciones __SECCIONES__</p>
+    <h1>Relojes y rocas</h1>
+    <p class="entrada">Cuándo aparecen los eucariotas según los relojes moleculares y según lo que registran las rocas. Cada marca es una afirmación del libro mayor: al elegirla se ve su evidencia, su fuente y el pasaje del corpus del que sale. Las estimaciones de un mismo evento no se promedian.</p>
+    <p class="meta">__META__</p>
+    <p class="cuenta">__CUENTA__</p>
+  </header>
+
+  <div class="disposicion">
+    <div class="principal">
+      <section class="tarjeta eje-tarjeta" aria-labelledby="titulo-eje">
+        <h2 id="titulo-eje" hidden>Eje de dataciones</h2>
+        <div class="desplazable">__EJE__</div>
+        <div class="leyenda">
+          <div class="leyenda-grupo">
+            <span class="leyenda-titulo">Forma</span>
+            <span class="leyenda-item"><svg width="26" height="12" aria-hidden="true"><rect x="1" y="2" width="24" height="8" rx="1.5" fill="#e4e7f5"/></svg>reloj o fósil datado por intervalo</span>
+            <span class="leyenda-item"><svg width="14" height="14" aria-hidden="true"><path d="M7 1L13 7L7 13L1 7Z" fill="#e4e7f5"/></svg>fósil con fecha aproximada</span>
+            <span class="leyenda-item"><svg width="26" height="12" aria-hidden="true"><rect x="1" y="2" width="24" height="8" rx="4" fill="#e4e7f5"/></svg>biomarcador</span>
+            <span class="leyenda-item"><svg width="26" height="14" aria-hidden="true"><path d="M2 2V12M2 7H24M24 2V12" stroke="#e4e7f5" stroke-width="2" fill="none"/></svg>roca datada</span>
+            <span class="leyenda-item"><svg width="12" height="12" aria-hidden="true"><path d="M1 6l8 -5v10z" fill="#e4e7f5"/></svg>sigue más allá del eje o no tiene límite</span>
+          </div>
+          <div class="leyenda-grupo">
+            <span class="leyenda-titulo">Fuerza de la evidencia</span>
+            <span class="leyenda-item"><svg width="26" height="12" aria-hidden="true"><rect x="1" y="2" width="24" height="8" rx="1.5" fill="#e4e7f5" stroke="#e4e7f5" stroke-width="1.5"/></svg>alta</span>
+            <span class="leyenda-item"><svg width="26" height="12" aria-hidden="true"><defs><pattern id="rayado-leyenda" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="5" height="5" fill="#232532"/><line x1="0" y1="0" x2="0" y2="5" stroke="#e4e7f5" stroke-width="1.8"/></pattern></defs><rect x="1" y="2" width="24" height="8" rx="1.5" fill="url(#rayado-leyenda)" stroke="#e4e7f5" stroke-width="1.5"/></svg>media</span>
+            <span class="leyenda-item"><svg width="26" height="12" aria-hidden="true"><rect x="1" y="2" width="24" height="8" rx="1.5" fill="#232532" stroke="#e4e7f5" stroke-width="1.5"/></svg>baja</span>
+            <span class="leyenda-item"><svg width="26" height="12" aria-hidden="true"><rect x="1" y="2" width="24" height="8" rx="1.5" fill="#232532" stroke="#e4e7f5" stroke-width="1.5" stroke-dasharray="3 2"/></svg>desconocida</span>
+            <span class="leyenda-item"><span class="valor-leyenda" style="font: 11px var(--mono); color: var(--faint);">?</span>posición no resuelta</span>
+          </div>
+          <div class="leyenda-grupo">
+            <span class="leyenda-titulo">Escala</span>
+            <span class="leyenda-item">colores y límites de la __ICS__</span>
+          </div>
+        </div>
+      </section>
+
+      <div class="bloques">
+        <section class="bloque" aria-labelledby="titulo-metodo">
+          <h2 id="titulo-metodo">Por qué no coinciden</h2>
+          <p>Lo que el corpus dice de los métodos: qué supone cada reloj, qué limita la datación y qué aporta un fósil como calibración.</p>
+          <ul class="lista" id="lista-metodo"></ul>
+        </section>
+        <section class="bloque" aria-labelledby="titulo-hipotesis">
+          <h2 id="titulo-hipotesis">Lecturas de los fósiles</h2>
+          <p>Las hipótesis del libro mayor. Las rivales se leen lado a lado en la ficha y no se dibujan en el eje.</p>
+          <ul class="lista" id="lista-hipotesis"></ul>
+        </section>
+        <section class="bloque" aria-labelledby="titulo-fuera">
+          <h2 id="titulo-fuera">Fuera de esta vista</h2>
+          <div id="lista-fuera"></div>
+        </section>
+        <section class="bloque" aria-labelledby="titulo-como">
+          <h2 id="titulo-como">Cómo se hizo</h2>
+          <p class="aviso">__SIN_TOPOLOGIA__</p>
+          <ul class="declaracion" id="lista-declaracion"></ul>
+        </section>
+      </div>
+    </div>
+
+    <aside class="tarjeta ficha" id="ficha" aria-live="polite" aria-label="Ficha de la afirmación elegida"></aside>
+  </div>
+</div>
+
+<script type="application/json" id="datos">__DATOS__</script>
+<script>
+(function () {
+  "use strict";
+  var datos = JSON.parse(document.getElementById("datos").textContent);
+  var fichas = datos.fichas;
+
+  var FUERZA = { high: "alta", medium: "media", low: "baja", unknown: "desconocida" };
+  var RESOLUCION = { resolved: "resuelta", partially_resolved: "parcialmente resuelta", unresolved: "no resuelta", insufficient_information: "información insuficiente" };
+  var ACEPTACION = { broad_consensus: "consenso amplio", majority_acceptance: "aceptación mayoritaria", mixed_acceptance: "aceptación dividida", minority_position: "posición minoritaria", abandoned: "abandonada", not_assessed: "sin evaluar" };
+  var HISTORICO = { current: "vigente", historical: "histórica", superseded: "superada", rejected: "rechazada" };
+  var DETERMINACION = { observed: "observada", inferred: "inferida", modelled: "modelada", reported_without_basis: "sin base declarada", unknown: "desconocida" };
+  var CALIBRACION = { calibrated: "calibrada", uncalibrated: "sin calibrar", geological_timescale: "escala geológica", molecular_clock: "reloj molecular", stratigraphic: "estratigráfica", not_applicable: "no aplica", unknown: "desconocida" };
+  var METODO = { radiometric: "radiométrico", molecular_clock: "reloj molecular", stratigraphic_correlation: "correlación estratigráfica", literature_report: "según la literatura", biostratigraphic: "bioestratigráfico", not_stated: "no declarado", other: "otro" };
+  var TIPO_TIEMPO = { occurrence_date: "fecha de una ocurrencia", observed_taxon_range: "rango observado de un taxón", inferred_lineage_range: "rango inferido de un linaje", divergence_estimate: "estimación de divergencia", event_date: "fecha de un evento" };
+  var EVIDENCIA = { morphological: "morfológica", fossil: "fósil", stratigraphic: "estratigráfica", sedimentological: "sedimentológica", molecular: "molecular", genomic: "genómica", chronological: "cronológica", statistical: "estadística", methodological: "metodológica", geochemical: "geoquímica", taxonomic: "taxonómica", historical: "histórica", ecological: "ecológica" };
+  var VERIFICACION = { verified: "verificada", pending_verification: "pendiente de verificar" };
+
+  function esc(s) {
+    return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
+  }
+  function t(mapa, v) { return v == null ? "—" : (mapa[v] || v); }
+  function enlace(cid, sub) {
+    var f = fichas[cid];
+    return '<button type="button" class="enlace-afirmacion" data-ir="' + esc(cid) + '"><span class="texto">' +
+      esc(f ? f.resumen : cid) + '</span><span class="sub">' + esc(cid) + (sub ? " · <em>" + esc(sub) + "</em>" : "") + "</span></button>";
+  }
+  function seccion(titulo, cuerpo) {
+    return cuerpo ? "<section><h3>" + esc(titulo) + "</h3>" + cuerpo + "</section>" : "";
+  }
+  function evidencias(lista) {
+    if (!lista.length) return "";
+    return '<ul class="elementos">' + lista.map(function (e) {
+      var res = (e.resultados || []).filter(function (r) { return r.valor; }).map(function (r) {
+        return esc(r.descripcion || "") + (r.valor ? " — " + esc(r.valor) : "");
+      }).join("; ");
+      return "<li><span class=\"etiqueta\">" + esc(t(EVIDENCIA, e.tipo)) + "</span>" + esc(e.descripcion) +
+        (res ? "<br>" + res : "") +
+        '<span class="cola">' + esc(e.id) + " · " + esc(e.cita) + (e.localizador ? ", " + esc(e.localizador) : "") + "</span></li>";
+    }).join("") + "</ul>";
+  }
+
+  function pintarFicha(cid) {
+    var f = fichas[cid];
+    if (!f) return;
+    var d = f.dimensiones || {};
+    var h = [];
+    h.push('<div><p class="ceja">Ficha · ' + esc(f.id) + '</p><h2>' + esc(f.resumen) + '</h2><div class="ids">' +
+      esc(f.sujeto.id) + (f.datacion ? " · " + esc(f.datacion.id) : "") + " · " +
+      esc((f.pasajes[0] || {}).seccion || "") + "</div></div>");
+    h.push('<div><div class="chips">' +
+      '<span class="chip"><b>evidencia</b>' + esc(t(FUERZA, d.evidence_strength)) + "</span>" +
+      '<span class="chip"><b>resolución</b>' + esc(t(RESOLUCION, d.resolution)) + "</span>" +
+      '<span class="chip"><b>aceptación</b>' + esc(t(ACEPTACION, d.acceptance)) + "</span>" +
+      '<span class="chip"><b>estado</b>' + esc(t(HISTORICO, d.historical_status)) + "</span></div>" +
+      (d.evidence_strength_reason ? '<p class="razon">' + esc(d.evidence_strength_reason) + "</p>" : "") + "</div>");
+    if (f.datacion) {
+      var dt = f.datacion;
+      var filas = [["Tal como la da el corpus", dt.original], ["Tipo", t(TIPO_TIEMPO, dt.tipo)],
+        ["Método", dt.metodo || t(METODO, dt.tipo_de_metodo)], ["Calibración", t(CALIBRACION, dt.calibracion)],
+        ["Determinación", t(DETERMINACION, dt.determinacion)], ["Incertidumbre", dt.incertidumbre]];
+      if (dt.forma === "geologico") filas.push(["En el eje", dt.nombre + ": " + dt.desde + "–" + dt.hasta + " Ma, según la carta ICS"]);
+      h.push(seccion("Datación", '<dl class="pares">' + filas.filter(function (x) { return x[1]; }).map(function (x) {
+        return "<dt>" + esc(x[0]) + "</dt><dd>" + esc(x[1]) + "</dd>";
+      }).join("") + "</dl>" + (dt.notas.length ? '<p class="razon">' + dt.notas.map(esc).join(" ") + "</p>" : "")));
+    }
+    h.push(seccion("Evidencia", evidencias(f.evidencia)));
+    h.push(seccion("Contraevidencia", evidencias(f.contraevidencia)));
+    if (f.hipotesis.length) {
+      h.push(seccion(f.hipotesis.length > 1 ? "Hipótesis que la leen" : "Hipótesis que la lee", f.hipotesis.map(function (x) {
+        var rivales = x.alternativas.length ? "<p><span class=\"etiqueta\">rivales</span>" + x.alternativas.map(esc).join(", ") + "</p>" : "";
+        return '<div class="hipotesis"><div class="nombre">' + esc(x.nombre) + '</div><div class="ids" style="margin:0">' + esc(x.id) + "</div>" +
+          "<p>" + esc(x.descripcion) + "</p>" +
+          (x.supuestos.length ? "<p><span class=\"etiqueta\">supone</span>" + x.supuestos.map(esc).join(" ") + "</p>" : "") +
+          (x.a_favor.length ? "<p><span class=\"etiqueta\">a favor</span>" + x.a_favor.map(esc).join(", ") + "</p>" : "") +
+          (x.en_contra.length ? "<p><span class=\"etiqueta\">en contra</span>" + x.en_contra.map(esc).join(", ") + "</p>" : "") +
+          rivales + (x.notas.length ? '<p class="razon" style="margin:0">' + x.notas.map(esc).join(" ") + "</p>" : "") + "</div>";
+      }).join('<div style="height:8px"></div>')));
+    }
+    if (f.relacionadas.length) {
+      h.push(seccion("También se afirma", '<ul class="lista">' + f.relacionadas.map(function (x) {
+        return "<li>" + enlace(x.id) + "</li>";
+      }).join("") + "</ul>"));
+    }
+    if (f.cuestiones.length) {
+      h.push(seccion("Cuestiones abiertas", '<ul class="elementos">' + f.cuestiones.map(function (x) {
+        return "<li>" + esc(x.titulo) + '<span class="cola">' + esc(x.id) + "</span>" + (x.descripcion ? '<span class="razon" style="display:block;margin:2px 0 0">' + esc(x.descripcion) + "</span>" : "") + "</li>";
+      }).join("") + "</ul>"));
+    }
+    h.push(seccion("Fuentes", '<ul class="elementos">' + f.fuentes.map(function (s) {
+      var doi = s.doi ? ' <a href="' + esc(s.doi) + '" target="_blank" rel="noopener">DOI</a>' : "";
+      return "<li>" + esc(s.cita) + (s.titulo ? ". " + esc(s.titulo) : "") + (s.revista ? ". <i>" + esc(s.revista) + "</i>" : "") + "." + doi +
+        '<span class="cola">' + esc(s.id) + " · " + esc(s.clave || "") + " · " + esc(t(VERIFICACION, s.verificacion)) + "</span></li>";
+    }).join("") + "</ul>"));
+    h.push(seccion("En el corpus", f.pasajes.map(function (p) {
+      return '<div class="ids" style="margin:0 0 4px">' + esc(p.id) + " · " + esc(p.seccion || "") + '</div><p class="pasaje">' + esc(p.texto || "pasaje no encontrado") + "</p>";
+    }).join('<div style="height:8px"></div>')));
+    if (f.notas.length) h.push(seccion("Notas", '<p class="razon" style="margin:0">' + f.notas.map(esc).join(" ") + "</p>"));
+    h.push('<button type="button" class="volver" data-volver>Volver al eje</button>');
+    document.getElementById("ficha").innerHTML = h.join("");
+  }
+
+  var marcas = Array.prototype.slice.call(document.querySelectorAll(".marca"));
+  function elegir(cid, desplazar) {
+    if (!fichas[cid]) return;
+    pintarFicha(cid);
+    var destino = (fichas[cid].marcas || []);
+    marcas.forEach(function (g) { g.classList.toggle("activa", destino.indexOf(g.getAttribute("data-claim")) >= 0); });
+    try { history.replaceState(null, "", "#" + cid); } catch (e) { /* sin historial en el marco */ }
+    if (desplazar) {
+      var ficha = document.getElementById("ficha");
+      var caja = ficha.getBoundingClientRect();
+      if (caja.top > window.innerHeight || caja.bottom < 0) ficha.scrollIntoView({ block: "start", behavior: "smooth" });
+      else ficha.scrollTop = 0;
+    }
+  }
+  marcas.forEach(function (g) {
+    g.addEventListener("click", function () { elegir(g.getAttribute("data-claim"), true); });
+    g.addEventListener("keydown", function (e) {
+      if (e.key === "Enter" || e.key === " ") { e.preventDefault(); elegir(g.getAttribute("data-claim"), true); }
+    });
+  });
+  document.addEventListener("click", function (e) {
+    var b = e.target.closest("[data-ir]");
+    if (b) { elegir(b.getAttribute("data-ir"), true); return; }
+    if (e.target.closest("[data-volver]")) {
+      var activa = document.querySelector(".marca.activa") || document.querySelector(".eje");
+      if (activa) activa.scrollIntoView({ block: "center", behavior: "smooth" });
+    }
+  });
+
+  // Por qué no coinciden
+  document.getElementById("lista-metodo").innerHTML = datos.metodo.map(function (cid) {
+    return "<li>" + enlace(cid, "evidencia " + t(FUERZA, (fichas[cid].dimensiones || {}).evidence_strength)) + "</li>";
+  }).join("");
+
+  // Lecturas de los fósiles
+  document.getElementById("lista-hipotesis").innerHTML = datos.hipotesis.map(function (x) {
+    var ir = x.marcas[0] || x.claims[0];
+    var sub = x.marcas.length ? "llega al eje por " + x.marcas.join(", ") : "no llega al eje: ninguna de sus afirmaciones tiene fecha";
+    if (x.alternativas.length) sub += " · rivales " + x.alternativas.join(", ");
+    return '<li><button type="button" class="enlace-afirmacion" data-ir="' + esc(ir) + '"><span class="texto">' + esc(x.nombre) +
+      '</span><span class="sub">' + esc(x.id) + " · <em>" + esc(sub) + "</em></span></button></li>";
+  }).join("");
+
+  // Fuera de esta vista, agrupado por motivo
+  var porMotivo = {};
+  datos.fuera.forEach(function (x) { (porMotivo[x.motivo] = porMotivo[x.motivo] || []).push(x.claim); });
+  document.getElementById("lista-fuera").innerHTML = Object.keys(porMotivo).map(function (m) {
+    return '<p class="motivo">' + esc(m) + " " + porMotivo[m].length + (porMotivo[m].length === 1 ? " afirmación." : " afirmaciones.") + "</p>" +
+      '<ul class="lista">' + porMotivo[m].map(function (cid) { return "<li>" + enlace(cid) + "</li>"; }).join("") + "</ul>";
+  }).join("");
+
+  // Cómo se hizo
+  document.getElementById("lista-declaracion").innerHTML = datos.vista.criterios.concat(datos.vista.simplificaciones).map(function (x) {
+    return "<li>" + esc(x) + "</li>";
+  }).join("");
+
+  var inicial = (location.hash || "").slice(1);
+  if (!fichas[inicial]) {
+    var ev = datos.eventos[0];
+    inicial = ev ? ev.claims[0] : (datos.marcas[0] || {}).claim;
+  }
+  elegir(inicial, false);
+})();
+</script>
