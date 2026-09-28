@@ -53,6 +53,7 @@ archive/        versiones rectoras anteriores — trazabilidad, no basurero
 ```bash
 make setup      # entorno virtual y dependencias
 make check      # validación + integridad del snapshot + fixtures
+make views      # «Relojes y rocas»: relojes moleculares y registro fósil en un eje (generated/views/)
 ```
 
 El corpus de investigación vive en su propio repositorio, `corredor-eukaryota-holozoa`, y se clona al lado de éste:
