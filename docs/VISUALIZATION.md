@@ -85,13 +85,14 @@ Hay una vista del **tronco común**, que reúne las afirmaciones de topología s
 - En el conflicto de la raíz de Eukaryota, la afirmación hermana de la hipótesis es la primera divergencia. Si un lado es «el resto», recibe todo lo demás. Si el otro lado estaba en lo hondo del tronco, el árbol se re-enraíza, y los clados del camino dejan de serlo.
 - Dos clados que comparten un miembro están anidados: un clado del tronco que contiene a un miembro de un lado de la raíz cae dentro de ese lado.
 - Al re-enraizar, las afirmaciones del tronco que la hipótesis excluye sirven de andamio sin raíz: dan la forma del resto del árbol, pero no se seleccionan.
+- Si ninguno de los dos lados de la raíz tiene miembros declarados, la raíz no parte nada: todo queda sin lado, y la vista lo anota.
 
 Cada afirmación seleccionada se cumple en el árbol; la que no, se excluye con su motivo. También quedan fuera:
 
 - las derivadas;
 - las de otras hipótesis;
 - las históricas del tronco;
-- las que cuelgan algo de un concepto taxonómico, que son clasificación según una fuente (§4.3) y no topología.
+- las que cuelgan algo de un concepto taxonómico, que son clasificación según una fuente (§4.3) y no topología, salvo que las afirme la hipótesis de la vista: H23 enuncia su raíz entre dos conceptos, Unikonta y Bikonta, y su vista los trata como clados.
 
 Lo que el libro mayor no declara y la vista necesita leer está en `knowledge/view-specs/red.json`. Allí se dice qué conflicto decide qué primera divergencia y qué clados son «el resto», y cabe la composición de un clado compuesto que el libro mayor no declare. Cada vista cita la lectura que usó.
 
@@ -108,14 +109,16 @@ Lo que el libro mayor no declara y la vista necesita leer está en `knowledge/vi
 | Asterisco | miembros leídos de la especificación |
 | +n | nodos plegados en la miniatura |
 
-**Lo que encontró la primera construcción** (`REV-000010`), para el libro mayor. La corrección editorial `ED-red` (`DEC-062`, `REV-000011`) resolvió lo que se podía declarar:
+**Lo que encontró la primera construcción** (`REV-000010`), para el libro mayor. Las correcciones editoriales `ED-red` (`DEC-062`, `REV-000011`) y `ED-raices` (`REV-000012`) resolvieron lo que se podía declarar:
 
 - **H27 (raíz en Opisthokonta)** rompe Amorphea, Obazoa, CRuMs+Amorphea y Apusomonadida+Opisthokonta como clados con raíz. Contradecía once afirmaciones del tronco que HYP-000014 no declaraba. *Resuelto:* HYP-000014 excluye ahora las diecisiete afirmaciones que su raíz no sostiene.
 - **Clados compuestos sin miembros:** CLADE-000025, CLADE-000036 y CLADE-000049 no tenían afirmaciones `member_of`. *Resuelto:* las declara el libro mayor, y la especificación ya no las lee. Los complementos CLADE-000018 y CLADE-000019 siguen sin afirmación que los defina, porque «el resto» no se enumera: la especificación los lee de su ficha.
 - **Raíces sin contenido:** H23 (Unikonta–Bikonta) y H28 (Opimoda+–Diphoda+) enraízan sobre nodos sin miembros declarados, y el resto queda sin lado. H26 no trae afirmación de raíz: sus afirmaciones clasifican.
+  - *H23, resuelto:* Amoebozoa y Opisthokonta son miembros de Unikonta con alcance de H23 (C-438), y Bikonta es el resto, leído de la especificación. Unikonta queda con CRuMs+Amorphea dentro, porque el tronco lo hace un clado que contiene a los dos.
+  - *Del corredor:* C-459 y C-460 no dicen qué contienen Opimoda+ y Diphoda+, así que H28 sigue sin partir nada. En H24, Opimoda y Diphoda incluyen «linajes profundos asociados» y «varios linajes excavados» sin nombrarlos (C-443, C-444): Discoba, Ancyromonadida, Malawimonadida y Excavata quedan sin lado. Las filas de H26 no nombran sus linajes.
 - **Fuera del árbol:**
   - Discoba no aparecía en el tronco, porque ninguna afirmación lo ubicaba en Eukaryota. *Resuelto.*
-  - Ancyromonadida sólo se relaciona con CRuMs+Amorphea por `diverges_from`, que no lo ubica en el árbol.
+  - Ancyromonadida sólo se relacionaba con CRuMs+Amorphea por `diverges_from`, que no lo ubica en el árbol, y Malawimonadida sólo por hipótesis. *Resuelto:* los dos son miembros de Eukaryota (C-511, C-493, C-494). H30 los junta en un clado profundo y H31 pone a Malawimonadida con CRuMs+Amorphea.
   - Corallochytrea, *Syssomonas* y *Corallochytrium* quedaban sueltos, porque el clado Pluriformea (CLADE-000039) no declaraba lo que contiene. *Resuelto:* Corallochytrea y *Syssomonas* son miembros del clado.
 
 ## Bandas poblacionales · `RETENIDO` para prototipo

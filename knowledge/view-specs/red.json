@@ -20,21 +20,72 @@
       "de": "CLADE-000002",
       "dentro_de": "CLADE-000001",
       "motivo": "Su ficha lo define como «clado complementario de Opisthokonta bajo la raíz de Cerón-Romero et al. 2022»: es el resto de Eukaryota."
+    },
+    "TAXCONCEPT-000019": {
+      "de": "TAXCONCEPT-000018",
+      "dentro_de": "CLADE-000001",
+      "motivo": "C-438: la raíz separaba un conjunto que incluía Amoebozoa y Opisthokonta de «otro conjunto de eucariotas ancestrales supuestamente biciliados»: Bikonta es el resto de Eukaryota. Lo que el libro mayor no pone en Unikonta cae en Bikonta por esta lectura, no porque H23 lo declare (Ancyromonadida y Malawimonadida, entre otros)."
     }
   },
   "composiciones": {},
   "vistas": [
-    {"hipotesis": []},
-    {"hipotesis": ["HYP-000010"]},
-    {"hipotesis": ["HYP-000011"]},
-    {"hipotesis": ["HYP-000012"]},
-    {"hipotesis": ["HYP-000013"]},
-    {"hipotesis": ["HYP-000014"]},
-    {"hipotesis": ["HYP-000015"]},
-    {"hipotesis": ["HYP-000017"]},
-    {"hipotesis": ["HYP-000018"]},
-    {"hipotesis": ["HYP-000019"]},
-    {"hipotesis": ["HYP-000020"]},
-    {"hipotesis": ["HYP-000021"]}
+    {
+      "hipotesis": []
+    },
+    {
+      "hipotesis": [
+        "HYP-000010"
+      ]
+    },
+    {
+      "hipotesis": [
+        "HYP-000011"
+      ]
+    },
+    {
+      "hipotesis": [
+        "HYP-000012"
+      ]
+    },
+    {
+      "hipotesis": [
+        "HYP-000013"
+      ]
+    },
+    {
+      "hipotesis": [
+        "HYP-000014"
+      ]
+    },
+    {
+      "hipotesis": [
+        "HYP-000015"
+      ]
+    },
+    {
+      "hipotesis": [
+        "HYP-000017"
+      ]
+    },
+    {
+      "hipotesis": [
+        "HYP-000018"
+      ]
+    },
+    {
+      "hipotesis": [
+        "HYP-000019"
+      ]
+    },
+    {
+      "hipotesis": [
+        "HYP-000020"
+      ]
+    },
+    {
+      "hipotesis": [
+        "HYP-000021"
+      ]
+    }
   ]
 }

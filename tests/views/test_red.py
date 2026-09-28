@@ -98,7 +98,7 @@ def jsonl(path: Path, filas: list[dict]) -> None:
 
 class LibroMinimo:
     def __init__(self, raiz: Path, extra: list[dict] = (), hipotesis: list[dict] | None = None,
-                 clados: dict[str, str] | None = None):
+                 clados: dict[str, str] | None = None, conceptos: dict[str, str] | None = None):
         self.raiz = raiz
         self.base = raiz / "knowledge" / "records"
         self.base.mkdir(parents=True)
@@ -118,10 +118,13 @@ class LibroMinimo:
             {"id": TALLO, "preferred_label": "biota troncal", "record_status": "active"},
             {"id": ASGARD, "preferred_label": "asgard", "record_status": "active"}])
         jsonl(self.base / "populations.jsonl", [{"id": LECA, "preferred_label": "LECA", "record_status": "active"}])
-        jsonl(self.base / "taxonomic-names.jsonl", [{"id": "NAME-000901", "canonical_spelling": "Sulco",
-                                                     "record_status": "active"}])
-        jsonl(self.base / "taxon-concepts.jsonl", [{"id": CONCEPTO, "name_id": "NAME-000901",
-                                                    "according_to_source_id": None, "record_status": "active"}])
+        conceptos = {CONCEPTO: "Sulco", **(conceptos or {})}
+        jsonl(self.base / "taxonomic-names.jsonl", [
+            {"id": f"NAME-{900 + i:06d}", "canonical_spelling": v, "record_status": "active"}
+            for i, v in enumerate(conceptos.values(), start=1)])
+        jsonl(self.base / "taxon-concepts.jsonl", [
+            {"id": k, "name_id": f"NAME-{900 + i:06d}", "according_to_source_id": None, "record_status": "active"}
+            for i, k in enumerate(conceptos, start=1)])
         jsonl(self.base / "conflict-groups.jsonl", [
             {"id": RAIZ, "name": "Raíz", "description": "raíz", "scope": "topology", "record_status": "active"},
             {"id": HOLO, "name": "Holo", "description": "holo", "scope": "topology", "record_status": "active"}])
@@ -335,6 +338,34 @@ class TestRedLecturas(unittest.TestCase):
             self.assertEqual(v["fuera"][cid][0], "excluida", cid)
         self.assertFalse(any("no declara en excluded_claim_ids" in n for n in rec["notes"]))
         self.assertEqual(v["hallazgos"], [])
+
+
+    def test_una_hipotesis_enunciada_sobre_conceptos_los_trata_como_clados(self):
+        uni, bi = "TAXCONCEPT-000902", "TAXCONCEPT-000903"
+        extra = [af(51, uni, "sister_group_of", bi, hyp=["HYP-000911"]),
+                 af(52, A, "member_of", uni, hyp=["HYP-000911"])]
+        hipotesis = HIPOTESIS + [hip(911, "Raíz Uni–Bi", ["CLAIM-000051", "CLAIM-000052"], [RAIZ], "H11")]
+        libro = LibroMinimo(Path(self.tmp.name), extra=extra, hipotesis=hipotesis, conceptos={uni: "Uni", bi: "Bi"})
+        espec = json.loads(json.dumps(ESPEC))
+        espec["complementos"][bi] = {"de": uni, "dentro_de": E, "motivo": "el resto sin Uni"}
+        espec["vistas"].append({"hipotesis": ["HYP-000911"]})
+        rec, v = vista(libro.construir(espec), "HYP-000911")
+        self.assertEqual(hijos(v, E), {uni, bi})
+        self.assertEqual(v["arbol"].padre[A], uni)
+        self.assertEqual(hijos(v, bi), {D})
+        self.assertIn("CLAIM-000052", rec["selected_claim_ids"], "dentro de su hipótesis no es clasificación")
+        _, tronco = vista(libro.construir(espec), None)
+        self.assertEqual(tronco["fuera"]["CLAIM-000014"][0], "clasificacion", "fuera de ella, sí")
+
+    def test_una_raiz_entre_lados_sin_miembros_se_anota(self):
+        p1, p2 = "CLADE-000931", "CLADE-000932"
+        hipotesis = HIPOTESIS + [hip(912, "Raíz P1–P2", ["CLAIM-000053"], [RAIZ], "H12")]
+        libro = LibroMinimo(Path(self.tmp.name), extra=[af(53, p1, "sister_group_of", p2, hyp=["HYP-000912"])],
+                            hipotesis=hipotesis, clados={p1: "P1", p2: "P2"})
+        espec = dict(ESPEC, vistas=ESPEC["vistas"] + [{"hipotesis": ["HYP-000912"]}])
+        rec, v = vista(libro.construir(espec), "HYP-000912")
+        self.assertIn("sin_lado", v["arbol"].marcas[A])
+        self.assertTrue(any("no tienen miembros declarados" in n for n in rec["notes"]))
 
 
 class TestRedReal(unittest.TestCase):

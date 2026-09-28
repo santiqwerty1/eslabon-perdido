@@ -1,0 +1,1068 @@
+{
+  "section_id": null,
+  "schema_version": "1.3.0",
+  "dataset_revision_before": "REV-000011",
+  "dataset_revision_after": "REV-000012",
+  "operations": [
+    {
+      "operation": "ADD_RECORD",
+      "file": "claims.jsonl",
+      "record_id": "CLAIM-000262",
+      "before": null,
+      "after": {
+        "id": "CLAIM-000262",
+        "claim_type": "relational",
+        "subject_id": "CLADE-000026",
+        "predicate": "member_of",
+        "object": {
+          "entity_id": "CLADE-000001"
+        },
+        "notes": [
+          "Corrección editorial (DEC-062, raices): Eukaryota contiene todos los eucariotas vivientes (C-511); C-493 sitúa Ancyromonadida entre ellos, fuera de Amorphea y más lejos de ella que CRuMs."
+        ],
+        "provenance": {
+          "section_ids": [
+            "SEC-000003"
+          ],
+          "passage_ids": [
+            "PASSAGE-000241",
+            "PASSAGE-000212"
+          ],
+          "source_ids": [
+            "SRC-000038",
+            "SRC-000039",
+            "SRC-000047"
+          ],
+          "operation_id": null,
+          "dataset_revision": "REV-000012",
+          "origin": "editorial"
+        },
+        "epistemic_dimensions": {
+          "acceptance": "not_assessed",
+          "evidence_strength": "high",
+          "evidence_strength_reason": "La composición procede de la clasificación o filogenia citada.",
+          "resolution": "partially_resolved",
+          "historical_status": "current"
+        },
+        "scope": {
+          "hypothesis_ids": [],
+          "classification_view_ids": [],
+          "temporal_expression_ids": [],
+          "region_ids": []
+        },
+        "quantitative_support": [],
+        "evidence_ids": [
+          "EVID-000212"
+        ],
+        "counterevidence_ids": [],
+        "derivation": null,
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "claims.jsonl",
+      "record_id": "CLAIM-000263",
+      "before": null,
+      "after": {
+        "id": "CLAIM-000263",
+        "claim_type": "relational",
+        "subject_id": "CLADE-000027",
+        "predicate": "member_of",
+        "object": {
+          "entity_id": "CLADE-000001"
+        },
+        "notes": [
+          "Corrección editorial (DEC-062, raices): Eukaryota contiene todos los eucariotas vivientes (C-511); C-494 y C-495 sitúan Malawimonadida entre ellos, con dos posiciones candidatas."
+        ],
+        "provenance": {
+          "section_ids": [
+            "SEC-000003"
+          ],
+          "passage_ids": [
+            "PASSAGE-000241",
+            "PASSAGE-000213"
+          ],
+          "source_ids": [
+            "SRC-000038",
+            "SRC-000039",
+            "SRC-000047"
+          ],
+          "operation_id": null,
+          "dataset_revision": "REV-000012",
+          "origin": "editorial"
+        },
+        "epistemic_dimensions": {
+          "acceptance": "not_assessed",
+          "evidence_strength": "high",
+          "evidence_strength_reason": "La composición procede de la clasificación o filogenia citada.",
+          "resolution": "partially_resolved",
+          "historical_status": "current"
+        },
+        "scope": {
+          "hypothesis_ids": [],
+          "classification_view_ids": [],
+          "temporal_expression_ids": [],
+          "region_ids": []
+        },
+        "quantitative_support": [],
+        "evidence_ids": [
+          "EVID-000212"
+        ],
+        "counterevidence_ids": [],
+        "derivation": null,
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "claims.jsonl",
+      "record_id": "CLAIM-000264",
+      "before": null,
+      "after": {
+        "id": "CLAIM-000264",
+        "claim_type": "relational",
+        "subject_id": "CLADE-000008",
+        "predicate": "member_of",
+        "object": {
+          "entity_id": "TAXCONCEPT-000018"
+        },
+        "scope": {
+          "hypothesis_ids": [
+            "HYP-000010"
+          ],
+          "classification_view_ids": [],
+          "temporal_expression_ids": [],
+          "region_ids": []
+        },
+        "notes": [
+          "El conjunto «incluía» a Amoebozoa y Opisthokonta: no se dice que fueran los únicos.",
+          "Corrección editorial (DEC-062, raices): C-438: la división unikonta–bikonta situó la raíz entre un conjunto que incluía Amoebozoa y Opisthokonta y otro conjunto de eucariotas."
+        ],
+        "provenance": {
+          "section_ids": [
+            "SEC-000003"
+          ],
+          "passage_ids": [
+            "PASSAGE-000128",
+            "PASSAGE-000129"
+          ],
+          "source_ids": [
+            "SRC-000040",
+            "SRC-000053",
+            "SRC-000055"
+          ],
+          "operation_id": null,
+          "dataset_revision": "REV-000012",
+          "origin": "editorial"
+        },
+        "epistemic_dimensions": {
+          "acceptance": "not_assessed",
+          "evidence_strength": "medium",
+          "evidence_strength_reason": "La división combinó caracteres celulares, una fusión génica y repertorios de miosina.",
+          "resolution": "unresolved",
+          "historical_status": "historical"
+        },
+        "quantitative_support": [],
+        "evidence_ids": [
+          "EVID-000112",
+          "EVID-000113",
+          "EVID-000114"
+        ],
+        "counterevidence_ids": [],
+        "derivation": null,
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "claims.jsonl",
+      "record_id": "CLAIM-000265",
+      "before": null,
+      "after": {
+        "id": "CLAIM-000265",
+        "claim_type": "relational",
+        "subject_id": "CLADE-000002",
+        "predicate": "member_of",
+        "object": {
+          "entity_id": "TAXCONCEPT-000018"
+        },
+        "scope": {
+          "hypothesis_ids": [
+            "HYP-000010"
+          ],
+          "classification_view_ids": [],
+          "temporal_expression_ids": [],
+          "region_ids": []
+        },
+        "notes": [
+          "El conjunto «incluía» a Amoebozoa y Opisthokonta: no se dice que fueran los únicos.",
+          "Corrección editorial (DEC-062, raices): El otro grupo que C-438 nombra dentro del conjunto unikonta."
+        ],
+        "provenance": {
+          "section_ids": [
+            "SEC-000003"
+          ],
+          "passage_ids": [
+            "PASSAGE-000128",
+            "PASSAGE-000129"
+          ],
+          "source_ids": [
+            "SRC-000040",
+            "SRC-000053",
+            "SRC-000055"
+          ],
+          "operation_id": null,
+          "dataset_revision": "REV-000012",
+          "origin": "editorial"
+        },
+        "epistemic_dimensions": {
+          "acceptance": "not_assessed",
+          "evidence_strength": "medium",
+          "evidence_strength_reason": "La división combinó caracteres celulares, una fusión génica y repertorios de miosina.",
+          "resolution": "unresolved",
+          "historical_status": "historical"
+        },
+        "quantitative_support": [],
+        "evidence_ids": [
+          "EVID-000112",
+          "EVID-000113",
+          "EVID-000114"
+        ],
+        "counterevidence_ids": [],
+        "derivation": null,
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "UPDATE_RECORD",
+      "file": "clades.jsonl",
+      "record_id": "CLADE-000001",
+      "before": {
+        "id": "CLADE-000001",
+        "preferred_label": "Eukaryota",
+        "description": "Clado de los eucariotas.",
+        "entity_type": "clade",
+        "first_introduced_in": "SEC-000001",
+        "notes": [],
+        "record_status": "active",
+        "claim_ids": [
+          "CLAIM-000007",
+          "CLAIM-000032",
+          "CLAIM-000037",
+          "CLAIM-000038",
+          "CLAIM-000040",
+          "CLAIM-000076",
+          "CLAIM-000112",
+          "CLAIM-000113",
+          "CLAIM-000118",
+          "CLAIM-000119",
+          "CLAIM-000127",
+          "CLAIM-000128",
+          "CLAIM-000162",
+          "CLAIM-000163",
+          "CLAIM-000164",
+          "CLAIM-000252",
+          "CLAIM-000256"
+        ]
+      },
+      "after": {
+        "id": "CLADE-000001",
+        "preferred_label": "Eukaryota",
+        "description": "Clado de los eucariotas.",
+        "entity_type": "clade",
+        "first_introduced_in": "SEC-000001",
+        "notes": [],
+        "record_status": "active",
+        "claim_ids": [
+          "CLAIM-000007",
+          "CLAIM-000032",
+          "CLAIM-000037",
+          "CLAIM-000038",
+          "CLAIM-000040",
+          "CLAIM-000076",
+          "CLAIM-000112",
+          "CLAIM-000113",
+          "CLAIM-000118",
+          "CLAIM-000119",
+          "CLAIM-000127",
+          "CLAIM-000128",
+          "CLAIM-000162",
+          "CLAIM-000163",
+          "CLAIM-000164",
+          "CLAIM-000252",
+          "CLAIM-000256",
+          "CLAIM-000262",
+          "CLAIM-000263"
+        ]
+      }
+    },
+    {
+      "operation": "UPDATE_RECORD",
+      "file": "clades.jsonl",
+      "record_id": "CLADE-000002",
+      "before": {
+        "id": "CLADE-000002",
+        "preferred_label": "Opisthokonta",
+        "description": "Clado de los opistocontos.",
+        "entity_type": "clade",
+        "first_introduced_in": "SEC-000001",
+        "notes": [],
+        "record_status": "active",
+        "claim_ids": [
+          "CLAIM-000106",
+          "CLAIM-000123",
+          "CLAIM-000124",
+          "CLAIM-000125",
+          "CLAIM-000179",
+          "CLAIM-000183",
+          "CLAIM-000197",
+          "CLAIM-000198",
+          "CLAIM-000199",
+          "CLAIM-000200",
+          "CLAIM-000254"
+        ],
+        "issue_ids": [
+          "ISSUE-000043"
+        ]
+      },
+      "after": {
+        "id": "CLADE-000002",
+        "preferred_label": "Opisthokonta",
+        "description": "Clado de los opistocontos.",
+        "entity_type": "clade",
+        "first_introduced_in": "SEC-000001",
+        "notes": [],
+        "record_status": "active",
+        "claim_ids": [
+          "CLAIM-000106",
+          "CLAIM-000123",
+          "CLAIM-000124",
+          "CLAIM-000125",
+          "CLAIM-000179",
+          "CLAIM-000183",
+          "CLAIM-000197",
+          "CLAIM-000198",
+          "CLAIM-000199",
+          "CLAIM-000200",
+          "CLAIM-000254",
+          "CLAIM-000265"
+        ],
+        "issue_ids": [
+          "ISSUE-000043"
+        ]
+      }
+    },
+    {
+      "operation": "UPDATE_RECORD",
+      "file": "clades.jsonl",
+      "record_id": "CLADE-000008",
+      "before": {
+        "id": "CLADE-000008",
+        "preferred_label": "Amoebozoa",
+        "description": "Clado de los amebozoos.",
+        "notes": [],
+        "entity_type": "clade",
+        "first_introduced_in": "SEC-000002",
+        "record_status": "active",
+        "claim_ids": [
+          "CLAIM-000043",
+          "CLAIM-000131",
+          "CLAIM-000133",
+          "CLAIM-000172",
+          "CLAIM-000173",
+          "CLAIM-000174"
+        ]
+      },
+      "after": {
+        "id": "CLADE-000008",
+        "preferred_label": "Amoebozoa",
+        "description": "Clado de los amebozoos.",
+        "notes": [],
+        "entity_type": "clade",
+        "first_introduced_in": "SEC-000002",
+        "record_status": "active",
+        "claim_ids": [
+          "CLAIM-000043",
+          "CLAIM-000131",
+          "CLAIM-000133",
+          "CLAIM-000172",
+          "CLAIM-000173",
+          "CLAIM-000174",
+          "CLAIM-000264"
+        ]
+      }
+    },
+    {
+      "operation": "UPDATE_RECORD",
+      "file": "clades.jsonl",
+      "record_id": "CLADE-000026",
+      "before": {
+        "id": "CLADE-000026",
+        "preferred_label": "Ancyromonadida",
+        "description": null,
+        "notes": [],
+        "entity_type": "clade",
+        "first_introduced_in": "SEC-000003",
+        "record_status": "active",
+        "claim_ids": [
+          "CLAIM-000140",
+          "CLAIM-000141"
+        ],
+        "issue_ids": [
+          "ISSUE-000048"
+        ]
+      },
+      "after": {
+        "id": "CLADE-000026",
+        "preferred_label": "Ancyromonadida",
+        "description": null,
+        "notes": [],
+        "entity_type": "clade",
+        "first_introduced_in": "SEC-000003",
+        "record_status": "active",
+        "claim_ids": [
+          "CLAIM-000140",
+          "CLAIM-000141",
+          "CLAIM-000262"
+        ],
+        "issue_ids": [
+          "ISSUE-000048"
+        ]
+      }
+    },
+    {
+      "operation": "UPDATE_RECORD",
+      "file": "clades.jsonl",
+      "record_id": "CLADE-000027",
+      "before": {
+        "id": "CLADE-000027",
+        "preferred_label": "Malawimonadida",
+        "description": null,
+        "notes": [],
+        "entity_type": "clade",
+        "first_introduced_in": "SEC-000003",
+        "record_status": "active",
+        "claim_ids": [
+          "CLAIM-000141",
+          "CLAIM-000142"
+        ],
+        "issue_ids": [
+          "ISSUE-000048"
+        ]
+      },
+      "after": {
+        "id": "CLADE-000027",
+        "preferred_label": "Malawimonadida",
+        "description": null,
+        "notes": [],
+        "entity_type": "clade",
+        "first_introduced_in": "SEC-000003",
+        "record_status": "active",
+        "claim_ids": [
+          "CLAIM-000141",
+          "CLAIM-000142",
+          "CLAIM-000263"
+        ],
+        "issue_ids": [
+          "ISSUE-000048"
+        ]
+      }
+    },
+    {
+      "operation": "UPDATE_RECORD",
+      "file": "evidence.jsonl",
+      "record_id": "EVID-000112",
+      "before": {
+        "id": "EVID-000112",
+        "evidence_type": "molecular",
+        "description": "La división histórica unikonta–bikonta situó la raíz entre un conjunto que incluía Amoebozoa y Opisthokonta y otro conjunto de eucariotas ancestrales supuestamente biciliados.",
+        "source_id": "SRC-000053",
+        "locator": "tesis general (sin localizar con mayor precisión)",
+        "dataset_ids": [],
+        "analysis_ids": [],
+        "result_ids": [],
+        "supports_claim_ids": [
+          "CLAIM-000093"
+        ],
+        "challenges_claim_ids": [],
+        "notes": [],
+        "provenance": {
+          "section_ids": [
+            "SEC-000003"
+          ],
+          "passage_ids": [
+            "PASSAGE-000128",
+            "PASSAGE-000129"
+          ],
+          "source_ids": [
+            "SRC-000053"
+          ],
+          "operation_id": null,
+          "dataset_revision": "REV-000010",
+          "origin": "ingestion"
+        },
+        "record_status": "active"
+      },
+      "after": {
+        "id": "EVID-000112",
+        "evidence_type": "molecular",
+        "description": "La división histórica unikonta–bikonta situó la raíz entre un conjunto que incluía Amoebozoa y Opisthokonta y otro conjunto de eucariotas ancestrales supuestamente biciliados.",
+        "source_id": "SRC-000053",
+        "locator": "tesis general (sin localizar con mayor precisión)",
+        "dataset_ids": [],
+        "analysis_ids": [],
+        "result_ids": [],
+        "supports_claim_ids": [
+          "CLAIM-000093",
+          "CLAIM-000264",
+          "CLAIM-000265"
+        ],
+        "challenges_claim_ids": [],
+        "notes": [
+          "Corrección editorial (DEC-062, raices): La tesis de S116 que da la raíz unikonta–bikonta es la que pone a Amoebozoa y Opisthokonta en Unikonta."
+        ],
+        "provenance": {
+          "section_ids": [
+            "SEC-000003"
+          ],
+          "passage_ids": [
+            "PASSAGE-000128",
+            "PASSAGE-000129"
+          ],
+          "source_ids": [
+            "SRC-000053"
+          ],
+          "operation_id": null,
+          "dataset_revision": "REV-000010",
+          "origin": "ingestion"
+        },
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "UPDATE_RECORD",
+      "file": "evidence.jsonl",
+      "record_id": "EVID-000113",
+      "before": {
+        "id": "EVID-000113",
+        "evidence_type": "molecular",
+        "description": "La división histórica unikonta–bikonta situó la raíz entre un conjunto que incluía Amoebozoa y Opisthokonta y otro conjunto de eucariotas ancestrales supuestamente biciliados.",
+        "source_id": "SRC-000055",
+        "locator": "tesis general (sin localizar con mayor precisión)",
+        "dataset_ids": [],
+        "analysis_ids": [],
+        "result_ids": [],
+        "supports_claim_ids": [
+          "CLAIM-000093"
+        ],
+        "challenges_claim_ids": [],
+        "notes": [],
+        "provenance": {
+          "section_ids": [
+            "SEC-000003"
+          ],
+          "passage_ids": [
+            "PASSAGE-000128",
+            "PASSAGE-000129"
+          ],
+          "source_ids": [
+            "SRC-000055"
+          ],
+          "operation_id": null,
+          "dataset_revision": "REV-000010",
+          "origin": "ingestion"
+        },
+        "record_status": "active"
+      },
+      "after": {
+        "id": "EVID-000113",
+        "evidence_type": "molecular",
+        "description": "La división histórica unikonta–bikonta situó la raíz entre un conjunto que incluía Amoebozoa y Opisthokonta y otro conjunto de eucariotas ancestrales supuestamente biciliados.",
+        "source_id": "SRC-000055",
+        "locator": "tesis general (sin localizar con mayor precisión)",
+        "dataset_ids": [],
+        "analysis_ids": [],
+        "result_ids": [],
+        "supports_claim_ids": [
+          "CLAIM-000093",
+          "CLAIM-000264",
+          "CLAIM-000265"
+        ],
+        "challenges_claim_ids": [],
+        "notes": [
+          "Corrección editorial (DEC-062, raices): Como la de S116, la tesis de S118 sostiene la división unikonta–bikonta con Amoebozoa y Opisthokonta en Unikonta."
+        ],
+        "provenance": {
+          "section_ids": [
+            "SEC-000003"
+          ],
+          "passage_ids": [
+            "PASSAGE-000128",
+            "PASSAGE-000129"
+          ],
+          "source_ids": [
+            "SRC-000055"
+          ],
+          "operation_id": null,
+          "dataset_revision": "REV-000010",
+          "origin": "ingestion"
+        },
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "UPDATE_RECORD",
+      "file": "evidence.jsonl",
+      "record_id": "EVID-000114",
+      "before": {
+        "id": "EVID-000114",
+        "evidence_type": "taxonomic",
+        "description": "La división histórica unikonta–bikonta situó la raíz entre un conjunto que incluía Amoebozoa y Opisthokonta y otro conjunto de eucariotas ancestrales supuestamente biciliados.",
+        "source_id": "SRC-000040",
+        "locator": "clasificación (sin localizar)",
+        "dataset_ids": [],
+        "analysis_ids": [],
+        "result_ids": [],
+        "supports_claim_ids": [
+          "CLAIM-000093"
+        ],
+        "challenges_claim_ids": [],
+        "notes": [],
+        "provenance": {
+          "section_ids": [
+            "SEC-000003"
+          ],
+          "passage_ids": [
+            "PASSAGE-000128",
+            "PASSAGE-000129"
+          ],
+          "source_ids": [
+            "SRC-000040"
+          ],
+          "operation_id": null,
+          "dataset_revision": "REV-000010",
+          "origin": "ingestion"
+        },
+        "record_status": "active"
+      },
+      "after": {
+        "id": "EVID-000114",
+        "evidence_type": "taxonomic",
+        "description": "La división histórica unikonta–bikonta situó la raíz entre un conjunto que incluía Amoebozoa y Opisthokonta y otro conjunto de eucariotas ancestrales supuestamente biciliados.",
+        "source_id": "SRC-000040",
+        "locator": "clasificación (sin localizar)",
+        "dataset_ids": [],
+        "analysis_ids": [],
+        "result_ids": [],
+        "supports_claim_ids": [
+          "CLAIM-000093",
+          "CLAIM-000264",
+          "CLAIM-000265"
+        ],
+        "challenges_claim_ids": [],
+        "notes": [
+          "Corrección editorial (DEC-062, raices): La clasificación de S89 circunscribe Unikonta con Amoebozoa y Opisthokonta."
+        ],
+        "provenance": {
+          "section_ids": [
+            "SEC-000003"
+          ],
+          "passage_ids": [
+            "PASSAGE-000128",
+            "PASSAGE-000129"
+          ],
+          "source_ids": [
+            "SRC-000040"
+          ],
+          "operation_id": null,
+          "dataset_revision": "REV-000010",
+          "origin": "ingestion"
+        },
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "UPDATE_RECORD",
+      "file": "evidence.jsonl",
+      "record_id": "EVID-000212",
+      "before": {
+        "id": "EVID-000212",
+        "evidence_type": "taxonomic",
+        "description": "Eukaryota contiene todos los eucariotas vivientes y la población LECA reconstruida.",
+        "source_id": "SRC-000038",
+        "locator": "tabla 1",
+        "dataset_ids": [],
+        "analysis_ids": [],
+        "result_ids": [],
+        "supports_claim_ids": [
+          "CLAIM-000163",
+          "CLAIM-000256"
+        ],
+        "challenges_claim_ids": [],
+        "notes": [
+          "Corrección editorial (DEC-062, red): La tabla 1 de S01 incluye Discoba en Eukaryota."
+        ],
+        "provenance": {
+          "section_ids": [
+            "SEC-000003"
+          ],
+          "passage_ids": [
+            "PASSAGE-000241"
+          ],
+          "source_ids": [
+            "SRC-000038"
+          ],
+          "operation_id": null,
+          "dataset_revision": "REV-000010",
+          "origin": "ingestion"
+        },
+        "record_status": "active"
+      },
+      "after": {
+        "id": "EVID-000212",
+        "evidence_type": "taxonomic",
+        "description": "Eukaryota contiene todos los eucariotas vivientes y la población LECA reconstruida.",
+        "source_id": "SRC-000038",
+        "locator": "tabla 1",
+        "dataset_ids": [],
+        "analysis_ids": [],
+        "result_ids": [],
+        "supports_claim_ids": [
+          "CLAIM-000163",
+          "CLAIM-000256",
+          "CLAIM-000262",
+          "CLAIM-000263"
+        ],
+        "challenges_claim_ids": [],
+        "notes": [
+          "Corrección editorial (DEC-062, red): La tabla 1 de S01 incluye Discoba en Eukaryota.",
+          "Corrección editorial (DEC-062, raices): La tabla 1 de S01 sitúa en Eukaryota a Ancyromonadida y a Malawimonadida."
+        ],
+        "provenance": {
+          "section_ids": [
+            "SEC-000003"
+          ],
+          "passage_ids": [
+            "PASSAGE-000241"
+          ],
+          "source_ids": [
+            "SRC-000038"
+          ],
+          "operation_id": null,
+          "dataset_revision": "REV-000010",
+          "origin": "ingestion"
+        },
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "UPDATE_RECORD",
+      "file": "hypotheses.jsonl",
+      "record_id": "HYP-000010",
+      "before": {
+        "id": "HYP-000010",
+        "name": "Raíz unikonta–bikonta",
+        "description": "La primera divergencia de Eukaryota separa Unikonta de Bikonta. (H23 del corredor)",
+        "included_claim_ids": [
+          "CLAIM-000093",
+          "CLAIM-000094",
+          "CLAIM-000095",
+          "CLAIM-000117",
+          "CLAIM-000121"
+        ],
+        "excluded_claim_ids": [],
+        "assumptions": [
+          "La fusión DHFR–TS, miosinas y estados flagelares son cambios únicos polarizables."
+        ],
+        "supporting_evidence_ids": [
+          "EVID-000112",
+          "EVID-000113",
+          "EVID-000114"
+        ],
+        "counterevidence_ids": [
+          "EVID-000147",
+          "EVID-000152",
+          "EVID-000166"
+        ],
+        "supporting_source_ids": [
+          "SRC-000053",
+          "SRC-000055",
+          "SRC-000040"
+        ],
+        "opposing_source_ids": [
+          "SRC-000054",
+          "SRC-000056",
+          "SRC-000057",
+          "SRC-000041",
+          "SRC-000042",
+          "SRC-000043",
+          "SRC-000044",
+          "SRC-000045",
+          "SRC-000046"
+        ],
+        "alternative_hypothesis_ids": [
+          "HYP-000011",
+          "HYP-000012",
+          "HYP-000013",
+          "HYP-000014",
+          "HYP-000015"
+        ],
+        "conflict_group_ids": [
+          "CONFLICT-000001"
+        ],
+        "open_question_issue_ids": [
+          "ISSUE-000046"
+        ],
+        "notes": [
+          "Choque según el apéndice E: H24, H25, H26, H27, H28 en la posición y circunscripción de la raíz.",
+          "La falsaría: Una filogenómica robusta y caracteres raros con historia incompatible la falsan; esa contraevidencia existe.",
+          "Hipótesis histórica: la contraevidencia de C-466, C-472 y C-482 está en counterevidence_ids."
+        ],
+        "introduced_in": "SEC-000003",
+        "provenance": {
+          "section_ids": [
+            "SEC-000003"
+          ],
+          "passage_ids": [
+            "PASSAGE-000128",
+            "PASSAGE-000129"
+          ],
+          "source_ids": [
+            "SRC-000040",
+            "SRC-000053",
+            "SRC-000055"
+          ],
+          "operation_id": null,
+          "dataset_revision": "REV-000010",
+          "origin": "ingestion"
+        },
+        "epistemic_dimensions": {
+          "acceptance": "not_assessed",
+          "evidence_strength": "medium",
+          "evidence_strength_reason": "La división combinó caracteres celulares, una fusión génica y repertorios de miosina.",
+          "resolution": "unresolved",
+          "historical_status": "historical"
+        },
+        "record_status": "active"
+      },
+      "after": {
+        "id": "HYP-000010",
+        "name": "Raíz unikonta–bikonta",
+        "description": "La primera divergencia de Eukaryota separa Unikonta de Bikonta. (H23 del corredor)",
+        "included_claim_ids": [
+          "CLAIM-000093",
+          "CLAIM-000094",
+          "CLAIM-000095",
+          "CLAIM-000117",
+          "CLAIM-000121",
+          "CLAIM-000264",
+          "CLAIM-000265"
+        ],
+        "excluded_claim_ids": [],
+        "assumptions": [
+          "La fusión DHFR–TS, miosinas y estados flagelares son cambios únicos polarizables."
+        ],
+        "supporting_evidence_ids": [
+          "EVID-000112",
+          "EVID-000113",
+          "EVID-000114"
+        ],
+        "counterevidence_ids": [
+          "EVID-000147",
+          "EVID-000152",
+          "EVID-000166"
+        ],
+        "supporting_source_ids": [
+          "SRC-000053",
+          "SRC-000055",
+          "SRC-000040"
+        ],
+        "opposing_source_ids": [
+          "SRC-000054",
+          "SRC-000056",
+          "SRC-000057",
+          "SRC-000041",
+          "SRC-000042",
+          "SRC-000043",
+          "SRC-000044",
+          "SRC-000045",
+          "SRC-000046"
+        ],
+        "alternative_hypothesis_ids": [
+          "HYP-000011",
+          "HYP-000012",
+          "HYP-000013",
+          "HYP-000014",
+          "HYP-000015"
+        ],
+        "conflict_group_ids": [
+          "CONFLICT-000001"
+        ],
+        "open_question_issue_ids": [
+          "ISSUE-000046"
+        ],
+        "notes": [
+          "Choque según el apéndice E: H24, H25, H26, H27, H28 en la posición y circunscripción de la raíz.",
+          "La falsaría: Una filogenómica robusta y caracteres raros con historia incompatible la falsan; esa contraevidencia existe.",
+          "Hipótesis histórica: la contraevidencia de C-466, C-472 y C-482 está en counterevidence_ids.",
+          "Corrección editorial (DEC-062, raices): Lo que contiene el lado unikonta es parte de la topología de H23 (C-438)."
+        ],
+        "introduced_in": "SEC-000003",
+        "provenance": {
+          "section_ids": [
+            "SEC-000003"
+          ],
+          "passage_ids": [
+            "PASSAGE-000128",
+            "PASSAGE-000129"
+          ],
+          "source_ids": [
+            "SRC-000040",
+            "SRC-000053",
+            "SRC-000055"
+          ],
+          "operation_id": null,
+          "dataset_revision": "REV-000010",
+          "origin": "ingestion"
+        },
+        "epistemic_dimensions": {
+          "acceptance": "not_assessed",
+          "evidence_strength": "medium",
+          "evidence_strength_reason": "La división combinó caracteres celulares, una fusión génica y repertorios de miosina.",
+          "resolution": "unresolved",
+          "historical_status": "historical"
+        },
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "UPDATE_RECORD",
+      "file": "taxon-concepts.jsonl",
+      "record_id": "TAXCONCEPT-000018",
+      "before": {
+        "id": "TAXCONCEPT-000018",
+        "name_id": "NAME-000018",
+        "according_to_source_id": "SRC-000040",
+        "circumscription": {
+          "included_entity_ids": [],
+          "excluded_entity_ids": [],
+          "definition_text": "Circunscrito mediante una reconstrucción ancestral uniciliada y caracteres moleculares asociados."
+        },
+        "rank_assignment": {
+          "rank": "not_stated",
+          "parent_concept_id": null
+        },
+        "taxonomic_status": "not_stated",
+        "phylogenetic_interpretation": "not_assessed",
+        "notes": [
+          "Nombre abandonado en la clasificación de Adl et al. 2012 (C-499); Amorphea lo sustituye en parte (C-500)."
+        ],
+        "first_introduced_in": "SEC-000003",
+        "record_status": "active",
+        "claim_ids": [
+          "CLAIM-000093",
+          "CLAIM-000094",
+          "CLAIM-000096",
+          "CLAIM-000143",
+          "CLAIM-000144"
+        ]
+      },
+      "after": {
+        "id": "TAXCONCEPT-000018",
+        "name_id": "NAME-000018",
+        "according_to_source_id": "SRC-000040",
+        "circumscription": {
+          "included_entity_ids": [],
+          "excluded_entity_ids": [],
+          "definition_text": "Circunscrito mediante una reconstrucción ancestral uniciliada y caracteres moleculares asociados."
+        },
+        "rank_assignment": {
+          "rank": "not_stated",
+          "parent_concept_id": null
+        },
+        "taxonomic_status": "not_stated",
+        "phylogenetic_interpretation": "not_assessed",
+        "notes": [
+          "Nombre abandonado en la clasificación de Adl et al. 2012 (C-499); Amorphea lo sustituye en parte (C-500)."
+        ],
+        "first_introduced_in": "SEC-000003",
+        "record_status": "active",
+        "claim_ids": [
+          "CLAIM-000093",
+          "CLAIM-000094",
+          "CLAIM-000096",
+          "CLAIM-000143",
+          "CLAIM-000144",
+          "CLAIM-000264",
+          "CLAIM-000265"
+        ]
+      }
+    }
+  ],
+  "records_added": [
+    "CLAIM-000262",
+    "CLAIM-000263",
+    "CLAIM-000264",
+    "CLAIM-000265"
+  ],
+  "records_updated": [
+    "CLADE-000001",
+    "CLADE-000002",
+    "CLADE-000008",
+    "CLADE-000026",
+    "CLADE-000027",
+    "EVID-000112",
+    "EVID-000113",
+    "EVID-000114",
+    "EVID-000212",
+    "HYP-000010",
+    "TAXCONCEPT-000018"
+  ],
+  "claims_added": [
+    "CLAIM-000262",
+    "CLAIM-000263",
+    "CLAIM-000264",
+    "CLAIM-000265"
+  ],
+  "events_added": [],
+  "hypotheses_added": [],
+  "issues_added": [],
+  "issues_resolved": [],
+  "records_deprecated": [],
+  "views_invalidated": [],
+  "views_built": [],
+  "validation_results": {},
+  "editorial": {
+    "spec": {
+      "path": "knowledge/corpus/editorials/raices.json",
+      "sha256": "sha256:eacfa062825fbe1a47bb536f91a03f9d7b04264f502022cdc4421595a337c4f3"
+    },
+    "decision": "DEC-062",
+    "reason": "La red por hipótesis dejaba fuera del árbol a Ancyromonadida y Malawimonadida, que ninguna afirmación situaba en Eukaryota, y dibujaba la raíz de H23 entre dos conceptos sin contenido. C-438 dice qué contenía uno de los dos lados y que el otro era el resto de los eucariotas.",
+    "keys": {
+      "@Amoebozoa_en_Unikonta": "CLAIM-000264",
+      "@Ancyromonadida_en_Eukaryota": "CLAIM-000262",
+      "@Malawimonadida_en_Eukaryota": "CLAIM-000263",
+      "@Opisthokonta_en_Unikonta": "CLAIM-000265"
+    },
+    "rows": {
+      "SEC-000003": {
+        "C-511": [
+          "CLAIM-000262",
+          "CLAIM-000263"
+        ],
+        "C-493": [
+          "CLAIM-000262"
+        ],
+        "C-494": [
+          "CLAIM-000263"
+        ],
+        "C-438": [
+          "CLAIM-000264",
+          "CLAIM-000265"
+        ]
+      }
+    }
+  }
+}
