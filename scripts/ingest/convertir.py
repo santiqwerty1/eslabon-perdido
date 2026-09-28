@@ -403,78 +403,29 @@ def claves_usadas(valor) -> set[str]:
     return set()
 
 
-def construir(spec_path: Path, corpus: str) -> dict:
-    # La entrada revisada tiene que quedar donde el snapshot la registra: fuera
-    # de ahí, cambiarla o perderla no lo detectaría nadie y un clon limpio no
-    # podría reconstruir de dónde salieron los registros.
-    if spec_path.resolve().parent != CONVERSIONS.resolve() or spec_path.suffix != ".json":
-        raise SystemExit(f"ERROR el fichero de conversión tiene que estar en knowledge/corpus/conversions/ "
-                         f"({spec_path})")
-    spec_bytes = spec_path.read_bytes()
-    spec = json.loads(spec_bytes)
-    sec = spec["section"]
+def asignador():
+    """Quien reparte identificadores nuevos sin reutilizar ninguno ya emitido, prefijo a prefijo."""
+    contador: dict[str, int] = {}
 
-    # --- el corpus es el congelado ------------------------------------------
-    src = freeze.abrir(corpus)
-    ruta, congelada = corredor.congelacion(None)
-    if spec.get("freeze", {}).get("fingerprint") != congelada["fingerprint"]:
-        raise SystemExit("ERROR el fichero de conversión se escribió para otra versión del corpus "
-                         f"({spec.get('freeze', {}).get('fingerprint')}); la activa es "
-                         f"{congelada['fingerprint']}. Una versión nueva entra por diferencia")
-    corredor.verificar(src, ruta, congelada)
+    def nuevo(prefijo: str) -> str:
+        if prefijo not in contador:
+            contador[prefijo] = base.siguiente_libre(prefijo, usados(prefijo))
+        n = contador[prefijo]
+        contador[prefijo] += 1
+        return f"{prefijo}-{n:06d}"
+    return nuevo
 
-    # --- la sección ya se ingirió ---------------------------------------------
-    delta_path, delta_sec = delta_de_seccion(sec)
-    sec_id = delta_sec["section_id"]
-    huella_sec = ((delta_sec.get("corpus_origin") or {}).get("freeze") or {}).get("fingerprint")
-    if huella_sec != congelada["fingerprint"]:
-        # Sus pasajes y menciones son de otra versión: convertir con las filas de
-        # la activa mezclaría las dos.
-        raise SystemExit(f"ERROR {delta_path.name} se ingirió de otra versión del corpus ({huella_sec}); "
-                         f"la activa es {congelada['fingerprint']}. Una versión nueva entra por diferencia")
-    previa = ya_convertida(sec_id)
-    if previa:
-        raise SystemExit(f"ERROR {sec_id} ya se convirtió ({previa})")
-    origen = delta_sec["corpus_origin"]["rows"]
-    menciones = {op["after"]["id"]: op["after"] for op in delta_sec["operations"]
-                 if op.get("file") == "mentions.jsonl"}
 
-    _, registro_csv = corredor.ficheros_de_seccion(src.base, sec)
-    with registro_csv.open(encoding="utf-8", newline="") as fh:
-        filas = {f["#"].strip(): f for f in csv.DictReader(fh) if (f.get("#") or "").strip()}
+def revisar_registros(records: list[dict], rows: dict[str, dict], filas: dict,
+                      sec: str) -> tuple[dict[str, dict], list[str]]:
+    """Lo que falla en los registros de un fichero y en los destinos de sus filas.
 
-    # --- cobertura -----------------------------------------------------------
+    Lo comparten la conversión y la absorción (DEC-059): las claves, lo que se
+    deduce y no se fija a mano, el fichero, las filas de origen y las filas J.
+    """
     errores: list[str] = []
-    sin_destino = sorted(set(filas) - set(spec.get("rows", {})))
-    if sin_destino:
-        errores.append(f"filas sin destino: {', '.join(sin_destino)}")
-    ajenas = sorted(set(spec.get("rows", {})) - set(filas))
-    if ajenas:
-        errores.append(f"filas que la sección {sec} no tiene: {', '.join(ajenas)}")
-    # Una mención se decide por su texto o, si dos apariciones con el mismo
-    # texto son cosas distintas, por su identificador, que manda sobre el texto.
-    etiquetas = {m["original_text"] for m in menciones.values()}
-    decididas = set(spec.get("mentions", {}))
-    sin_mencion = sorted({m["original_text"] for mid, m in menciones.items()
-                          if mid not in decididas and m["original_text"] not in decididas})
-    if sin_mencion:
-        errores.append(f"menciones sin destino: {'; '.join(sin_mencion)}")
-    sobran = sorted(decididas - etiquetas - set(menciones))
-    if sobran:
-        errores.append(f"menciones que la sección no tiene: {'; '.join(sobran)}")
-    for etiqueta, destino in spec.get("mentions", {}).items():
-        if not destino.get("disposition"):
-            # El esquema admite null para la mención sin resolver; convertir es
-            # justo darle destino.
-            errores.append(f"mención {etiqueta}: sin `disposition`")
-        elif destino.get("disposition") not in SIN_OBJETIVO and not destino.get("targets"):
-            errores.append(f"mención {etiqueta}: {destino.get('disposition')} sin `targets`; "
-                           "sólo una descartada puede quedarse sin registro")
-        if destino.get("disposition") in SIN_OBJETIVO and not (destino.get("reason") or "").strip():
-            errores.append(f"mención {etiqueta}: descartada sin `reason`; la cobertura exige justificarla")
-
     definidas: dict[str, dict] = {}
-    for r in spec.get("records", []):
+    for r in records:
         if r["key"] in definidas:
             errores.append(f"clave definida dos veces: {r['key']}")
         if not CLAVE.match(r["key"]) or FUENTE.match(r["key"]):
@@ -495,7 +446,7 @@ def construir(spec_path: Path, corpus: str) -> dict:
             if fila not in filas:
                 errores.append(f"{r['key']}: la fila {fila} no es de la sección {sec}")
         definidas[r["key"]] = r
-    for fila, destino in spec.get("rows", {}).items():
+    for fila, destino in rows.items():
         # La procedencia de un registro sale de sus `rows`: una fila que lo
         # lista sin que él la declare diría que lo produjo sin haberlo hecho.
         for k in destino.get("keys", []):
@@ -511,24 +462,35 @@ def construir(spec_path: Path, corpus: str) -> dict:
                 errores.append(f"{fila}: la clave {k} no está definida")
         if destino.get("destination") in SOLO_EVIDENCIA:
             errores += evidencia_de_otra_fila(fila, destino, definidas)
-    if errores:
-        raise SystemExit("ERROR el fichero de conversión no cubre la sección:\n  " + "\n  ".join(errores))
+    return definidas, errores
 
+
+def generar(*, sec_id: str, records: list[dict], rows: dict[str, dict], filas: dict,
+            origen: dict[str, dict], decisiones: dict[str, dict], menciones: dict[str, dict],
+            fechas, apendice: Path, rev: str, proy: dict[str, tuple[str, dict]], nuevo) -> dict:
+    """Los registros de un fichero ya revisado, con todo lo que se deduce de sus filas.
+
+    Lo comparten la conversión y la absorción (DEC-059). `filas` son las filas
+    del CSV de la versión de la que salen; `origen`, de qué pasajes cuelga cada
+    una; `menciones`, las que se resuelven con `decisiones`; `proy`, los
+    registros que ya existen, y `nuevo`, quien reparte los identificadores.
+    Devuelve los registros nuevos (fuentes primero), las claves, las menciones
+    resueltas y los cambios en registros que ya existían.
+    """
     # --- fuentes citadas ---------------------------------------------------------
     citadas = set()
-    for r in spec.get("records", []):
+    for r in records:
         citadas |= {m.group(1) for k in claves_usadas(r["record"]) if (m := FUENTE.match(k))}
         citadas |= set(r.get("sources", []))
-    for destino in spec.get("mentions", {}).values():
+    for destino in decisiones.values():
         citadas |= {m.group(1) for k in destino.get("targets", []) if (m := FUENTE.match(k))}
     # Y las de la columna Fuente de las filas de cada registro que no las declara:
     # son las que irán a su procedencia.
-    for r in spec.get("records", []):
+    for r in records:
         if r.get("sources") is None:
             for fila in r.get("rows", []):
                 citadas |= set(CITA.findall(filas[fila].get("Fuente", "")))
 
-    apendice = src.base / "data" / "apendices" / "A_fuentes.csv"
     with apendice.open(encoding="utf-8", newline="") as fh:
         lector = list(csv.DictReader(fh))
     col_doi = next(c for c in lector[0] if c.strip().lower().startswith("doi"))
@@ -537,22 +499,11 @@ def construir(spec_path: Path, corpus: str) -> dict:
     if no_estan:
         raise SystemExit(f"ERROR fuentes citadas que el apéndice A no tiene: {', '.join(no_estan)}")
 
-    proy = proyeccion()
     existentes = {r.get("citation_key"): rid for rid, (f, r) in proy.items()
                   if f == "sources.jsonl" and r.get("citation_key")}
 
     # --- identificadores -----------------------------------------------------------
-    rev_antes, rev_despues, sin_aplicar = base.revision_siguiente(
-        json.loads(base.MANIFEST.read_text(encoding="utf-8")) if base.MANIFEST.exists() else {})
     ids: dict[str, str] = {}
-    contador: dict[str, int] = {}
-
-    def nuevo(prefijo: str) -> str:
-        if prefijo not in contador:
-            contador[prefijo] = base.siguiente_libre(prefijo, usados(prefijo))
-        n = contador[prefijo]
-        contador[prefijo] += 1
-        return f"{prefijo}-{n:06d}"
 
     fuentes_nuevas: list[dict] = []
     distintas = []
@@ -571,14 +522,14 @@ def construir(spec_path: Path, corpus: str) -> dict:
     if distintas:
         raise SystemExit("ERROR fuentes que ya existen y el apéndice A activo describe de otra manera; "
                          "hay que actualizarlas antes de convertir:\n  " + "\n  ".join(distintas))
-    for r in spec.get("records", []):
+    for r in records:
         ids[r["key"]] = nuevo(PREFIJO[r["file"]])
 
     # --- registros -----------------------------------------------------------------
     faltan: set[str] = set()
     ajenas_a_la_procedencia: list[str] = []
     salida: list[tuple[str, dict]] = [("sources.jsonl", f) for f in fuentes_nuevas]
-    for r in spec.get("records", []):
+    for r in records:
         fichero = r["file"]
         props = propiedades(fichero)
         rec = {"id": ids[r["key"]], **sustituir(r["record"], ids, faltan)}
@@ -605,7 +556,7 @@ def construir(spec_path: Path, corpus: str) -> dict:
             # Una afirmación con regla de derivación no es expresa de la fuente
             # (§9.4): su origen lo dice.
             rec["provenance"] = {"section_ids": [sec_id], "passage_ids": pasajes, "source_ids": fuentes_r,
-                                 "operation_id": None, "dataset_revision": rev_despues,
+                                 "operation_id": None, "dataset_revision": rev,
                                  "origin": "derived" if rec.get("derivation") else "ingestion"}
         if "source_ids" in props:
             rec["source_ids"] = fuentes_r
@@ -627,7 +578,7 @@ def construir(spec_path: Path, corpus: str) -> dict:
         # donde quedar: va a sus evidencias, que no tienen ese campo, como nota.
         if fichero == "evidence.jsonl":
             for fila in filas_r:
-                if spec["rows"].get(fila, {}).get("destination") in SOLO_EVIDENCIA:
+                if rows.get(fila, {}).get("destination") in SOLO_EVIDENCIA:
                     e = ejes(filas[fila])
                     nota = (f"Evaluación de la fila {fila} (destino J): acceptance={e['acceptance']}; "
                             f"evidence_strength={e['evidence_strength']}"
@@ -800,7 +751,7 @@ def construir(spec_path: Path, corpus: str) -> dict:
         # El estado del que parte es el proyectado: un delta intermedio pudo
         # anotar la mención, y el UPDATE no puede deshacerlo.
         antes = proy.get(mid, (None, ingerida))[1]
-        destino = spec["mentions"].get(mid) or spec["mentions"][ingerida["original_text"]]
+        destino = decisiones.get(mid) or decisiones[ingerida["original_text"]]
         objetivos = sustituir(destino.get("targets", []), ids, faltan)
         if faltan:
             raise SystemExit(f"ERROR claves usadas sin definir: {', '.join(sorted(faltan))}")
@@ -890,7 +841,7 @@ def construir(spec_path: Path, corpus: str) -> dict:
     # fichero elige cuál en `occurrence_dates`, como una nueva la elige en su
     # registro. Con fecha se queda como está: las dataciones nuevas son
     # afirmaciones con su fuente.
-    elegidas = spec.get("occurrence_dates") or {}
+    elegidas = fechas or {}
     if not isinstance(elegidas, dict):
         raise SystemExit("ERROR `occurrence_dates` tiene que ser un objeto: ocurrencia → fecha")
     elegidas = {ids.get(o, o): ids.get(t, t) for o, t in elegidas.items()}
@@ -974,6 +925,94 @@ def construir(spec_path: Path, corpus: str) -> dict:
                  for fallo in sorted(fallos - previos.get(donde, set()))]
     if invalidos:
         raise SystemExit("ERROR registros que no validan contra su esquema:\n  " + "\n  ".join(invalidos))
+
+    return {"salida": salida, "ids": ids, "actualizadas": actualizadas, "cambios": cambios,
+            "citadas": citadas, "existentes": existentes}
+
+
+def construir(spec_path: Path, corpus: str) -> dict:
+    # La entrada revisada tiene que quedar donde el snapshot la registra: fuera
+    # de ahí, cambiarla o perderla no lo detectaría nadie y un clon limpio no
+    # podría reconstruir de dónde salieron los registros.
+    if spec_path.resolve().parent != CONVERSIONS.resolve() or spec_path.suffix != ".json":
+        raise SystemExit(f"ERROR el fichero de conversión tiene que estar en knowledge/corpus/conversions/ "
+                         f"({spec_path})")
+    spec_bytes = spec_path.read_bytes()
+    spec = json.loads(spec_bytes)
+    sec = spec["section"]
+
+    # --- el corpus es el congelado ------------------------------------------
+    src = freeze.abrir(corpus)
+    ruta, congelada = corredor.congelacion(None)
+    if spec.get("freeze", {}).get("fingerprint") != congelada["fingerprint"]:
+        raise SystemExit("ERROR el fichero de conversión se escribió para otra versión del corpus "
+                         f"({spec.get('freeze', {}).get('fingerprint')}); la activa es "
+                         f"{congelada['fingerprint']}. Una versión nueva entra por diferencia")
+    corredor.verificar(src, ruta, congelada)
+
+    # --- la sección ya se ingirió ---------------------------------------------
+    delta_path, delta_sec = delta_de_seccion(sec)
+    sec_id = delta_sec["section_id"]
+    huella_sec = ((delta_sec.get("corpus_origin") or {}).get("freeze") or {}).get("fingerprint")
+    if huella_sec != congelada["fingerprint"]:
+        # Sus pasajes y menciones son de otra versión: convertir con las filas de
+        # la activa mezclaría las dos.
+        raise SystemExit(f"ERROR {delta_path.name} se ingirió de otra versión del corpus ({huella_sec}); "
+                         f"la activa es {congelada['fingerprint']}. Una versión nueva entra por diferencia")
+    previa = ya_convertida(sec_id)
+    if previa:
+        raise SystemExit(f"ERROR {sec_id} ya se convirtió ({previa})")
+    origen = delta_sec["corpus_origin"]["rows"]
+    menciones = {op["after"]["id"]: op["after"] for op in delta_sec["operations"]
+                 if op.get("file") == "mentions.jsonl"}
+
+    _, registro_csv = corredor.ficheros_de_seccion(src.base, sec)
+    with registro_csv.open(encoding="utf-8", newline="") as fh:
+        filas = {f["#"].strip(): f for f in csv.DictReader(fh) if (f.get("#") or "").strip()}
+
+    # --- cobertura -----------------------------------------------------------
+    errores: list[str] = []
+    sin_destino = sorted(set(filas) - set(spec.get("rows", {})))
+    if sin_destino:
+        errores.append(f"filas sin destino: {', '.join(sin_destino)}")
+    ajenas = sorted(set(spec.get("rows", {})) - set(filas))
+    if ajenas:
+        errores.append(f"filas que la sección {sec} no tiene: {', '.join(ajenas)}")
+    # Una mención se decide por su texto o, si dos apariciones con el mismo
+    # texto son cosas distintas, por su identificador, que manda sobre el texto.
+    etiquetas = {m["original_text"] for m in menciones.values()}
+    decididas = set(spec.get("mentions", {}))
+    sin_mencion = sorted({m["original_text"] for mid, m in menciones.items()
+                          if mid not in decididas and m["original_text"] not in decididas})
+    if sin_mencion:
+        errores.append(f"menciones sin destino: {'; '.join(sin_mencion)}")
+    sobran = sorted(decididas - etiquetas - set(menciones))
+    if sobran:
+        errores.append(f"menciones que la sección no tiene: {'; '.join(sobran)}")
+    for etiqueta, destino in spec.get("mentions", {}).items():
+        if not destino.get("disposition"):
+            # El esquema admite null para la mención sin resolver; convertir es
+            # justo darle destino.
+            errores.append(f"mención {etiqueta}: sin `disposition`")
+        elif destino.get("disposition") not in SIN_OBJETIVO and not destino.get("targets"):
+            errores.append(f"mención {etiqueta}: {destino.get('disposition')} sin `targets`; "
+                           "sólo una descartada puede quedarse sin registro")
+        if destino.get("disposition") in SIN_OBJETIVO and not (destino.get("reason") or "").strip():
+            errores.append(f"mención {etiqueta}: descartada sin `reason`; la cobertura exige justificarla")
+
+    _, fallos = revisar_registros(spec.get("records", []), spec.get("rows", {}), filas, sec)
+    errores += fallos
+    if errores:
+        raise SystemExit("ERROR el fichero de conversión no cubre la sección:\n  " + "\n  ".join(errores))
+
+    rev_antes, rev_despues, sin_aplicar = base.revision_siguiente(
+        json.loads(base.MANIFEST.read_text(encoding="utf-8")) if base.MANIFEST.exists() else {})
+    g = generar(sec_id=sec_id, records=spec.get("records", []), rows=spec["rows"], filas=filas, origen=origen,
+                decisiones=spec.get("mentions", {}), menciones=menciones, fechas=spec.get("occurrence_dates"),
+                apendice=src.base / "data" / "apendices" / "A_fuentes.csv", rev=rev_despues, proy=proyeccion(),
+                nuevo=asignador())
+    salida, ids, actualizadas, cambios = g["salida"], g["ids"], g["actualizadas"], g["cambios"]
+    citadas, existentes = g["citadas"], g["existentes"]
 
     # --- delta ------------------------------------------------------------------------------
     operaciones = [{"operation": "ADD_RECORD", "file": fichero, "record_id": rec["id"], "before": None, "after": rec}
