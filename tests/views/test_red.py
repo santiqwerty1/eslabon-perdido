@@ -97,7 +97,8 @@ def jsonl(path: Path, filas: list[dict]) -> None:
 
 
 class LibroMinimo:
-    def __init__(self, raiz: Path, extra: list[dict] = ()):
+    def __init__(self, raiz: Path, extra: list[dict] = (), hipotesis: list[dict] | None = None,
+                 clados: dict[str, str] | None = None):
         self.raiz = raiz
         self.base = raiz / "knowledge" / "records"
         self.base.mkdir(parents=True)
@@ -110,9 +111,9 @@ class LibroMinimo:
         (man / "corredor.json").write_text(json.dumps({"cutoff": "2026-08-08", "version": "0.1"}),
                                            encoding="utf-8")
         jsonl(self.base / "claims.jsonl", TRONCO + HIPOTESIS_AF + list(extra))
-        jsonl(self.base / "hypotheses.jsonl", HIPOTESIS)
+        jsonl(self.base / "hypotheses.jsonl", hipotesis or HIPOTESIS)
         jsonl(self.base / "clades.jsonl", [{"id": k, "preferred_label": v, "record_status": "active"}
-                                           for k, v in CLADOS.items()])
+                                           for k, v in {**CLADOS, **(clados or {})}.items()])
         jsonl(self.base / "lineages.jsonl", [
             {"id": TALLO, "preferred_label": "biota troncal", "record_status": "active"},
             {"id": ASGARD, "preferred_label": "asgard", "record_status": "active"}])
@@ -303,6 +304,37 @@ class TestRedMinima(unittest.TestCase):
         grupos = {g["id"]: g for g in datos["grupos"]}
         self.assertEqual(grupos[RAIZ]["foco"], E, "el grupo anclado se centra en su nodo")
         self.assertEqual(grupos[HOLO]["foco"], A2A, "el otro, en el ancestro común de lo que disputan")
+
+
+class TestRedLecturas(unittest.TestCase):
+    """Las dos lecturas que dependen de la raíz: anidar bajo un lado y re-enraizar con exclusiones declaradas."""
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.tmp.cleanup)
+
+    def test_un_clado_del_tronco_cae_dentro_del_lado_que_contiene_a_su_miembro(self):
+        w = "CLADE-000930"
+        libro = LibroMinimo(Path(self.tmp.name), extra=[af(41, A, "member_of", w), af(42, w, "member_of", E)],
+                            clados={w: "A+"})
+        _, v = vista(libro.construir(), "HYP-000903")
+        self.assertEqual(v["arbol"].padre[w], OPI, "W comparte a A con Opi: cae de ese lado")
+        self.assertEqual(v["arbol"].padre[A], w)
+        self.assertNotIn("CLAIM-000041", v["fuera"])
+        self.assertNotIn("CLAIM-000024", v["fuera"], "A sigue dentro de Opi")
+
+    def test_las_exclusiones_declaradas_sirven_de_andamio_al_re_enraizar(self):
+        contradichas = [f"CLAIM-{n:06d}" for n in (1, 3, 4, 5, 6, 7)]
+        hipotesis = [dict(h, excluded_claim_ids=contradichas) if h["id"] == "HYP-000902" else h for h in HIPOTESIS]
+        libro = LibroMinimo(Path(self.tmp.name), hipotesis=hipotesis)
+        rec, v = vista(libro.construir(), "HYP-000902")
+        self.assertEqual(hijos(v, E), {A2A, R2})
+        self.assertEqual(nombrados(v, R2), {D, A1, A2B}, "el resto conserva la forma que le da el andamio")
+        self.assertEqual(v["rotos"], sorted([A, K]))
+        for cid in contradichas:
+            self.assertEqual(v["fuera"][cid][0], "excluida", cid)
+        self.assertFalse(any("no declara en excluded_claim_ids" in n for n in rec["notes"]))
+        self.assertEqual(v["hallazgos"], [])
 
 
 class TestRedReal(unittest.TestCase):

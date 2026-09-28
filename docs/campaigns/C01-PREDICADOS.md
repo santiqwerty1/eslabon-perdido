@@ -566,3 +566,12 @@ Todo quedó corregido en el fichero de conversión. La validación termina sin
 errores y con una advertencia justificada: H29 no tiene oposición, porque el
 corredor no localizó ninguna, y la cuestión `content_gap` que la acompaña lo
 registra.
+
+La primera red por hipótesis (`DEC-061`) encontró lo que esta conversión dejó sin declarar. La corrección editorial `ED-red` (`DEC-062`, REV-000010 → REV-000011) lo añade desde las mismas filas:
+
+- los miembros de CRuMs+Amorphea (C-491), de Apusomonadida+Opisthokonta (C-553, C-544) y de Teretosporea (C-657, con alcance de H33);
+- Discoba dentro de Eukaryota (C-511);
+- Corallochytrea y *Syssomonas* dentro del clado Pluriformea (C-601);
+- las diecisiete afirmaciones del tronco que la raíz en Opisthokonta no sostiene, en `excluded_claim_ids` de H27.
+
+Cada afirmación nueva cita la evidencia que ya existía de su fila.

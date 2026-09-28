@@ -63,6 +63,7 @@ make corpus-verify CORPUS=../corredor-eukaryota-holozoa FREEZE=knowledge/corpus/
 make corpus-diff ANTES=../corredor-eukaryota-holozoa@af7e799 DESPUES=../corredor-eukaryota-holozoa
 make ingest  CORPUS=../corredor-eukaryota-holozoa SECCION=06 DRY=1   # sección, pasajes y menciones
 make convert CORPUS=../corredor-eukaryota-holozoa SECCION=06 DRY=1   # filas → registros (DEC-057)
+make editorial FICHERO=knowledge/corpus/editorials/red.json DRY=1    # corrección editorial (DEC-062)
 ```
 
 El orden completo, y lo que es juicio y no se automatiza, está en [`docs/INGESTION-C01.md`](docs/INGESTION-C01.md).

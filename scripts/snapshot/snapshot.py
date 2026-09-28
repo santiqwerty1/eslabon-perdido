@@ -82,12 +82,12 @@ def gather() -> dict:
     for p in sorted([*(corpus / "sections").glob("*.md"), *(corpus / "sections").glob("*.json"),
                      *(corpus / "sections").glob("*.registro.csv"), *(corpus / "passages").glob("*.json")]):
         files[str(p.relative_to(ROOT))] = digest(p)
-    # Y los ficheros de conversión y de absorción: son la entrada revisada de la
-    # que salieron los registros (DEC-057, DEC-059), y su delta sólo guarda su
+    # Y los ficheros de conversión, de absorción y editoriales: son la entrada
+    # revisada de la que salieron los registros (DEC-057, DEC-059, DEC-062), y su delta sólo guarda su
     # ruta y su hash. Las congelaciones del corredor también: una absorción
     # aplicada o revertida pasa de una a otra, y las dos tienen que seguir ahí.
     for p in sorted([*(corpus / "conversions").glob("*.json"), *(corpus / "absorptions").glob("*.json"),
-                     *(corpus / "manifests").glob("corredor-*.json")]):
+                     *(corpus / "editorials").glob("*.json"), *(corpus / "manifests").glob("corredor-*.json")]):
         files[str(p.relative_to(ROOT))] = digest(p)
     # Las vistas y la especificación de la que salen (DEC-061): una vista es un
     # producto editorial fechado, y cambiarla cambia lo que el estado publica.
@@ -107,7 +107,7 @@ def gather() -> dict:
 
 
 def conversiones_alteradas() -> list[str]:
-    """Ficheros de conversión o de absorción que ya no son los que guardó su delta.
+    """Ficheros de conversión, de absorción o editoriales que ya no son los que guardó su delta.
 
     El delta de una conversión guarda la ruta y el hash del fichero del que
     salió. Si el fichero cambió, un snapshot nuevo registraría el contenido
@@ -129,7 +129,7 @@ def conversiones_alteradas() -> list[str]:
     fichas = []
     for p in sorted(deltas.glob("*.json")) if deltas.exists() else []:
         d = json.loads(p.read_text(encoding="utf-8"))
-        for bloque in ("conversion", "absorption"):
+        for bloque in ("conversion", "absorption", "editorial"):
             ficha = (d.get(bloque) or {}).get("spec") or {}
             if ficha.get("path"):
                 fichas.append((p.name, ficha))

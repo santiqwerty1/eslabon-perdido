@@ -1,0 +1,2161 @@
+{
+  "section_id": null,
+  "schema_version": "1.3.0",
+  "dataset_revision_before": "REV-000010",
+  "dataset_revision_after": "REV-000011",
+  "operations": [
+    {
+      "operation": "ADD_RECORD",
+      "file": "claims.jsonl",
+      "record_id": "CLAIM-000250",
+      "before": null,
+      "after": {
+        "id": "CLAIM-000250",
+        "claim_type": "relational",
+        "subject_id": "CLADE-000022",
+        "predicate": "member_of",
+        "object": {
+          "entity_id": "CLADE-000025"
+        },
+        "notes": [
+          "CRuMs y Amorphea forman juntos CRuMs+Amorphea (C-491).",
+          "Corrección editorial (DEC-062, red): CRuMs+Amorphea (CLADE-000025) es el clado que forman los hermanos de C-491; ninguna afirmación decía que CRuMs es miembro."
+        ],
+        "provenance": {
+          "section_ids": [
+            "SEC-000003"
+          ],
+          "passage_ids": [
+            "PASSAGE-000204",
+            "PASSAGE-000209"
+          ],
+          "source_ids": [
+            "SRC-000047"
+          ],
+          "operation_id": null,
+          "dataset_revision": "REV-000011",
+          "origin": "editorial"
+        },
+        "epistemic_dimensions": {
+          "acceptance": "not_assessed",
+          "evidence_strength": "high",
+          "evidence_strength_reason": "La relación se mantuvo en ML y Bayes y en exclusión de sitios rápidos.",
+          "resolution": "partially_resolved",
+          "historical_status": "current"
+        },
+        "scope": {
+          "hypothesis_ids": [],
+          "classification_view_ids": [],
+          "temporal_expression_ids": [],
+          "region_ids": []
+        },
+        "quantitative_support": [],
+        "evidence_ids": [
+          "EVID-000181"
+        ],
+        "counterevidence_ids": [],
+        "derivation": null,
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "claims.jsonl",
+      "record_id": "CLAIM-000251",
+      "before": null,
+      "after": {
+        "id": "CLAIM-000251",
+        "claim_type": "relational",
+        "subject_id": "CLADE-000004",
+        "predicate": "member_of",
+        "object": {
+          "entity_id": "CLADE-000025"
+        },
+        "notes": [
+          "CRuMs y Amorphea forman juntos CRuMs+Amorphea (C-491).",
+          "Corrección editorial (DEC-062, red): Amorphea es el otro miembro del clado de C-491."
+        ],
+        "provenance": {
+          "section_ids": [
+            "SEC-000003"
+          ],
+          "passage_ids": [
+            "PASSAGE-000204",
+            "PASSAGE-000209"
+          ],
+          "source_ids": [
+            "SRC-000047"
+          ],
+          "operation_id": null,
+          "dataset_revision": "REV-000011",
+          "origin": "editorial"
+        },
+        "epistemic_dimensions": {
+          "acceptance": "not_assessed",
+          "evidence_strength": "high",
+          "evidence_strength_reason": "La relación se mantuvo en ML y Bayes y en exclusión de sitios rápidos.",
+          "resolution": "partially_resolved",
+          "historical_status": "current"
+        },
+        "scope": {
+          "hypothesis_ids": [],
+          "classification_view_ids": [],
+          "temporal_expression_ids": [],
+          "region_ids": []
+        },
+        "quantitative_support": [],
+        "evidence_ids": [
+          "EVID-000181"
+        ],
+        "counterevidence_ids": [],
+        "derivation": null,
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "claims.jsonl",
+      "record_id": "CLAIM-000252",
+      "before": null,
+      "after": {
+        "id": "CLAIM-000252",
+        "claim_type": "relational",
+        "subject_id": "CLADE-000025",
+        "predicate": "member_of",
+        "object": {
+          "entity_id": "CLADE-000001"
+        },
+        "notes": [
+          "Corrección editorial (DEC-062, red): CRuMs+Amorphea es un clado de eucariotas: contiene a Amorphea, que C-683 sitúa en Eukaryota."
+        ],
+        "provenance": {
+          "section_ids": [
+            "SEC-000003"
+          ],
+          "passage_ids": [
+            "PASSAGE-000238",
+            "PASSAGE-000239",
+            "PASSAGE-000204",
+            "PASSAGE-000209"
+          ],
+          "source_ids": [
+            "SRC-000038",
+            "SRC-000047",
+            "SRC-000061"
+          ],
+          "operation_id": null,
+          "dataset_revision": "REV-000011",
+          "origin": "editorial"
+        },
+        "epistemic_dimensions": {
+          "acceptance": "not_assessed",
+          "evidence_strength": "high",
+          "evidence_strength_reason": "La inclusión forma parte de la circunscripción filogenética publicada de Amorphea.",
+          "resolution": "resolved",
+          "historical_status": "current"
+        },
+        "scope": {
+          "hypothesis_ids": [],
+          "classification_view_ids": [],
+          "temporal_expression_ids": [],
+          "region_ids": []
+        },
+        "quantitative_support": [],
+        "evidence_ids": [
+          "EVID-000210"
+        ],
+        "counterevidence_ids": [],
+        "derivation": null,
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "claims.jsonl",
+      "record_id": "CLAIM-000253",
+      "before": null,
+      "after": {
+        "id": "CLAIM-000253",
+        "claim_type": "relational",
+        "subject_id": "CLADE-000035",
+        "predicate": "member_of",
+        "object": {
+          "entity_id": "CLADE-000036"
+        },
+        "notes": [
+          "Corrección editorial (DEC-062, red): Apusomonadida+Opisthokonta (CLADE-000036), el grupo hermano de Breviatea en C-553, es el clado de los hermanos de C-544."
+        ],
+        "provenance": {
+          "section_ids": [
+            "SEC-000003"
+          ],
+          "passage_ids": [
+            "PASSAGE-000238"
+          ],
+          "source_ids": [
+            "SRC-000048"
+          ],
+          "operation_id": null,
+          "dataset_revision": "REV-000011",
+          "origin": "editorial"
+        },
+        "epistemic_dimensions": {
+          "acceptance": "not_assessed",
+          "evidence_strength": "medium",
+          "evidence_strength_reason": "La relación depende de la topología y del muestreo indicados.",
+          "resolution": "unresolved",
+          "historical_status": "current"
+        },
+        "scope": {
+          "hypothesis_ids": [],
+          "classification_view_ids": [],
+          "temporal_expression_ids": [],
+          "region_ids": []
+        },
+        "quantitative_support": [],
+        "evidence_ids": [
+          "EVID-000244"
+        ],
+        "counterevidence_ids": [],
+        "derivation": null,
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "claims.jsonl",
+      "record_id": "CLAIM-000254",
+      "before": null,
+      "after": {
+        "id": "CLAIM-000254",
+        "claim_type": "relational",
+        "subject_id": "CLADE-000002",
+        "predicate": "member_of",
+        "object": {
+          "entity_id": "CLADE-000036"
+        },
+        "notes": [
+          "Corrección editorial (DEC-062, red): Opisthokonta es el otro miembro de Apusomonadida+Opisthokonta."
+        ],
+        "provenance": {
+          "section_ids": [
+            "SEC-000003"
+          ],
+          "passage_ids": [
+            "PASSAGE-000238"
+          ],
+          "source_ids": [
+            "SRC-000048"
+          ],
+          "operation_id": null,
+          "dataset_revision": "REV-000011",
+          "origin": "editorial"
+        },
+        "epistemic_dimensions": {
+          "acceptance": "not_assessed",
+          "evidence_strength": "medium",
+          "evidence_strength_reason": "La relación depende de la topología y del muestreo indicados.",
+          "resolution": "unresolved",
+          "historical_status": "current"
+        },
+        "scope": {
+          "hypothesis_ids": [],
+          "classification_view_ids": [],
+          "temporal_expression_ids": [],
+          "region_ids": []
+        },
+        "quantitative_support": [],
+        "evidence_ids": [
+          "EVID-000244"
+        ],
+        "counterevidence_ids": [],
+        "derivation": null,
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "claims.jsonl",
+      "record_id": "CLAIM-000255",
+      "before": null,
+      "after": {
+        "id": "CLAIM-000255",
+        "claim_type": "relational",
+        "subject_id": "CLADE-000036",
+        "predicate": "member_of",
+        "object": {
+          "entity_id": "CLADE-000014"
+        },
+        "notes": [
+          "Corrección editorial (DEC-062, red): Apusomonadida+Opisthokonta está dentro de Obazoa, que contiene a sus dos miembros y a Breviatea (C-535)."
+        ],
+        "provenance": {
+          "section_ids": [
+            "SEC-000003"
+          ],
+          "passage_ids": [
+            "PASSAGE-000238"
+          ],
+          "source_ids": [
+            "SRC-000048",
+            "SRC-000049"
+          ],
+          "operation_id": null,
+          "dataset_revision": "REV-000011",
+          "origin": "editorial"
+        },
+        "epistemic_dimensions": {
+          "acceptance": "not_assessed",
+          "evidence_strength": "medium",
+          "evidence_strength_reason": "La relación depende de la topología y del muestreo indicados.",
+          "resolution": "unresolved",
+          "historical_status": "current"
+        },
+        "scope": {
+          "hypothesis_ids": [],
+          "classification_view_ids": [],
+          "temporal_expression_ids": [],
+          "region_ids": []
+        },
+        "quantitative_support": [],
+        "evidence_ids": [
+          "EVID-000244"
+        ],
+        "counterevidence_ids": [],
+        "derivation": null,
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "claims.jsonl",
+      "record_id": "CLAIM-000256",
+      "before": null,
+      "after": {
+        "id": "CLAIM-000256",
+        "claim_type": "relational",
+        "subject_id": "CLADE-000003",
+        "predicate": "member_of",
+        "object": {
+          "entity_id": "CLADE-000001"
+        },
+        "notes": [
+          "Corrección editorial (DEC-062, red): Ninguna afirmación situaba a Discoba en Eukaryota, que contiene todos los eucariotas vivientes (C-511); C-446 la trata como una rama de los eucariotas."
+        ],
+        "provenance": {
+          "section_ids": [
+            "SEC-000003"
+          ],
+          "passage_ids": [
+            "PASSAGE-000241",
+            "PASSAGE-000145",
+            "PASSAGE-000146"
+          ],
+          "source_ids": [
+            "SRC-000038",
+            "SRC-000039",
+            "SRC-000045"
+          ],
+          "operation_id": null,
+          "dataset_revision": "REV-000011",
+          "origin": "editorial"
+        },
+        "epistemic_dimensions": {
+          "acceptance": "not_assessed",
+          "evidence_strength": "high",
+          "evidence_strength_reason": "La composición procede de la clasificación o filogenia citada.",
+          "resolution": "partially_resolved",
+          "historical_status": "current"
+        },
+        "scope": {
+          "hypothesis_ids": [],
+          "classification_view_ids": [],
+          "temporal_expression_ids": [],
+          "region_ids": []
+        },
+        "quantitative_support": [],
+        "evidence_ids": [
+          "EVID-000212"
+        ],
+        "counterevidence_ids": [],
+        "derivation": null,
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "claims.jsonl",
+      "record_id": "CLAIM-000257",
+      "before": null,
+      "after": {
+        "id": "CLAIM-000257",
+        "claim_type": "relational",
+        "subject_id": "CLADE-000044",
+        "predicate": "member_of",
+        "object": {
+          "entity_id": "CLADE-000039"
+        },
+        "notes": [
+          "Corrección editorial (DEC-062, red): C-601 pone a Corallochytrea y Syssomonas como hermanos dentro de Pluriformea; el clado Pluriformea (CLADE-000039) sólo tenía esa relación en su ficha."
+        ],
+        "provenance": {
+          "section_ids": [
+            "SEC-000003"
+          ],
+          "passage_ids": [
+            "PASSAGE-000238"
+          ],
+          "source_ids": [
+            "SRC-000065"
+          ],
+          "operation_id": null,
+          "dataset_revision": "REV-000011",
+          "origin": "editorial"
+        },
+        "epistemic_dimensions": {
+          "acceptance": "not_assessed",
+          "evidence_strength": "medium",
+          "evidence_strength_reason": "La relación depende de la topología y del muestreo indicados.",
+          "resolution": "partially_resolved",
+          "historical_status": "current"
+        },
+        "scope": {
+          "hypothesis_ids": [],
+          "classification_view_ids": [],
+          "temporal_expression_ids": [],
+          "region_ids": []
+        },
+        "quantitative_support": [],
+        "evidence_ids": [
+          "EVID-000290"
+        ],
+        "counterevidence_ids": [],
+        "derivation": null,
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "claims.jsonl",
+      "record_id": "CLAIM-000258",
+      "before": null,
+      "after": {
+        "id": "CLAIM-000258",
+        "claim_type": "relational",
+        "subject_id": "TAXCONCEPT-000037",
+        "predicate": "member_of",
+        "object": {
+          "entity_id": "CLADE-000039"
+        },
+        "notes": [
+          "Corrección editorial (DEC-062, red): Syssomonas es el otro hermano de C-601 dentro de Pluriformea."
+        ],
+        "provenance": {
+          "section_ids": [
+            "SEC-000003"
+          ],
+          "passage_ids": [
+            "PASSAGE-000238"
+          ],
+          "source_ids": [
+            "SRC-000065"
+          ],
+          "operation_id": null,
+          "dataset_revision": "REV-000011",
+          "origin": "editorial"
+        },
+        "epistemic_dimensions": {
+          "acceptance": "not_assessed",
+          "evidence_strength": "medium",
+          "evidence_strength_reason": "La relación depende de la topología y del muestreo indicados.",
+          "resolution": "partially_resolved",
+          "historical_status": "current"
+        },
+        "scope": {
+          "hypothesis_ids": [],
+          "classification_view_ids": [],
+          "temporal_expression_ids": [],
+          "region_ids": []
+        },
+        "quantitative_support": [],
+        "evidence_ids": [
+          "EVID-000290"
+        ],
+        "counterevidence_ids": [],
+        "derivation": null,
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "claims.jsonl",
+      "record_id": "CLAIM-000259",
+      "before": null,
+      "after": {
+        "id": "CLAIM-000259",
+        "claim_type": "relational",
+        "subject_id": "CLADE-000039",
+        "predicate": "member_of",
+        "object": {
+          "entity_id": "CLADE-000049"
+        },
+        "scope": {
+          "hypothesis_ids": [
+            "HYP-000020"
+          ],
+          "classification_view_ids": [],
+          "temporal_expression_ids": [],
+          "region_ids": []
+        },
+        "notes": [
+          "Corrección editorial (DEC-062, red): Teretosporea es Pluriformea+Ichthyosporea (C-657), un clado que sólo existe dentro de H33."
+        ],
+        "provenance": {
+          "section_ids": [
+            "SEC-000003"
+          ],
+          "passage_ids": [
+            "PASSAGE-000276",
+            "PASSAGE-000286"
+          ],
+          "source_ids": [
+            "SRC-000063"
+          ],
+          "operation_id": null,
+          "dataset_revision": "REV-000011",
+          "origin": "editorial"
+        },
+        "epistemic_dimensions": {
+          "acceptance": "not_assessed",
+          "evidence_strength": "medium",
+          "evidence_strength_reason": "La topología cambia al cambiar el conjunto de ortólogos.",
+          "resolution": "unresolved",
+          "historical_status": "current"
+        },
+        "quantitative_support": [],
+        "evidence_ids": [
+          "EVID-000329"
+        ],
+        "counterevidence_ids": [],
+        "derivation": null,
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "claims.jsonl",
+      "record_id": "CLAIM-000260",
+      "before": null,
+      "after": {
+        "id": "CLAIM-000260",
+        "claim_type": "relational",
+        "subject_id": "CLADE-000040",
+        "predicate": "member_of",
+        "object": {
+          "entity_id": "CLADE-000049"
+        },
+        "scope": {
+          "hypothesis_ids": [
+            "HYP-000020"
+          ],
+          "classification_view_ids": [],
+          "temporal_expression_ids": [],
+          "region_ids": []
+        },
+        "notes": [
+          "Corrección editorial (DEC-062, red): Ichthyosporea es el otro miembro de Teretosporea (C-657)."
+        ],
+        "provenance": {
+          "section_ids": [
+            "SEC-000003"
+          ],
+          "passage_ids": [
+            "PASSAGE-000276",
+            "PASSAGE-000286"
+          ],
+          "source_ids": [
+            "SRC-000063"
+          ],
+          "operation_id": null,
+          "dataset_revision": "REV-000011",
+          "origin": "editorial"
+        },
+        "epistemic_dimensions": {
+          "acceptance": "not_assessed",
+          "evidence_strength": "medium",
+          "evidence_strength_reason": "La topología cambia al cambiar el conjunto de ortólogos.",
+          "resolution": "unresolved",
+          "historical_status": "current"
+        },
+        "quantitative_support": [],
+        "evidence_ids": [
+          "EVID-000329"
+        ],
+        "counterevidence_ids": [],
+        "derivation": null,
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "ADD_RECORD",
+      "file": "claims.jsonl",
+      "record_id": "CLAIM-000261",
+      "before": null,
+      "after": {
+        "id": "CLAIM-000261",
+        "claim_type": "relational",
+        "subject_id": "CLADE-000049",
+        "predicate": "member_of",
+        "object": {
+          "entity_id": "CLADE-000010"
+        },
+        "scope": {
+          "hypothesis_ids": [
+            "HYP-000020"
+          ],
+          "classification_view_ids": [],
+          "temporal_expression_ids": [],
+          "region_ids": []
+        },
+        "notes": [
+          "Corrección editorial (DEC-062, red): Teretosporea está dentro de Holozoa, que contiene a sus dos miembros (C-576)."
+        ],
+        "provenance": {
+          "section_ids": [
+            "SEC-000003"
+          ],
+          "passage_ids": [
+            "PASSAGE-000276",
+            "PASSAGE-000286",
+            "PASSAGE-000238"
+          ],
+          "source_ids": [
+            "SRC-000063"
+          ],
+          "operation_id": null,
+          "dataset_revision": "REV-000011",
+          "origin": "editorial"
+        },
+        "epistemic_dimensions": {
+          "acceptance": "not_assessed",
+          "evidence_strength": "medium",
+          "evidence_strength_reason": "La topología cambia al cambiar el conjunto de ortólogos.",
+          "resolution": "unresolved",
+          "historical_status": "current"
+        },
+        "quantitative_support": [],
+        "evidence_ids": [
+          "EVID-000329"
+        ],
+        "counterevidence_ids": [],
+        "derivation": null,
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "UPDATE_RECORD",
+      "file": "clades.jsonl",
+      "record_id": "CLADE-000001",
+      "before": {
+        "id": "CLADE-000001",
+        "preferred_label": "Eukaryota",
+        "description": "Clado de los eucariotas.",
+        "entity_type": "clade",
+        "first_introduced_in": "SEC-000001",
+        "notes": [],
+        "record_status": "active",
+        "claim_ids": [
+          "CLAIM-000007",
+          "CLAIM-000032",
+          "CLAIM-000037",
+          "CLAIM-000038",
+          "CLAIM-000040",
+          "CLAIM-000076",
+          "CLAIM-000112",
+          "CLAIM-000113",
+          "CLAIM-000118",
+          "CLAIM-000119",
+          "CLAIM-000127",
+          "CLAIM-000128",
+          "CLAIM-000162",
+          "CLAIM-000163",
+          "CLAIM-000164"
+        ]
+      },
+      "after": {
+        "id": "CLADE-000001",
+        "preferred_label": "Eukaryota",
+        "description": "Clado de los eucariotas.",
+        "entity_type": "clade",
+        "first_introduced_in": "SEC-000001",
+        "notes": [],
+        "record_status": "active",
+        "claim_ids": [
+          "CLAIM-000007",
+          "CLAIM-000032",
+          "CLAIM-000037",
+          "CLAIM-000038",
+          "CLAIM-000040",
+          "CLAIM-000076",
+          "CLAIM-000112",
+          "CLAIM-000113",
+          "CLAIM-000118",
+          "CLAIM-000119",
+          "CLAIM-000127",
+          "CLAIM-000128",
+          "CLAIM-000162",
+          "CLAIM-000163",
+          "CLAIM-000164",
+          "CLAIM-000252",
+          "CLAIM-000256"
+        ]
+      }
+    },
+    {
+      "operation": "UPDATE_RECORD",
+      "file": "clades.jsonl",
+      "record_id": "CLADE-000002",
+      "before": {
+        "id": "CLADE-000002",
+        "preferred_label": "Opisthokonta",
+        "description": "Clado de los opistocontos.",
+        "entity_type": "clade",
+        "first_introduced_in": "SEC-000001",
+        "notes": [],
+        "record_status": "active",
+        "claim_ids": [
+          "CLAIM-000106",
+          "CLAIM-000123",
+          "CLAIM-000124",
+          "CLAIM-000125",
+          "CLAIM-000179",
+          "CLAIM-000183",
+          "CLAIM-000197",
+          "CLAIM-000198",
+          "CLAIM-000199",
+          "CLAIM-000200"
+        ],
+        "issue_ids": [
+          "ISSUE-000043"
+        ]
+      },
+      "after": {
+        "id": "CLADE-000002",
+        "preferred_label": "Opisthokonta",
+        "description": "Clado de los opistocontos.",
+        "entity_type": "clade",
+        "first_introduced_in": "SEC-000001",
+        "notes": [],
+        "record_status": "active",
+        "claim_ids": [
+          "CLAIM-000106",
+          "CLAIM-000123",
+          "CLAIM-000124",
+          "CLAIM-000125",
+          "CLAIM-000179",
+          "CLAIM-000183",
+          "CLAIM-000197",
+          "CLAIM-000198",
+          "CLAIM-000199",
+          "CLAIM-000200",
+          "CLAIM-000254"
+        ],
+        "issue_ids": [
+          "ISSUE-000043"
+        ]
+      }
+    },
+    {
+      "operation": "UPDATE_RECORD",
+      "file": "clades.jsonl",
+      "record_id": "CLADE-000003",
+      "before": {
+        "id": "CLADE-000003",
+        "preferred_label": "Discoba",
+        "description": "Clado de los discobas.",
+        "entity_type": "clade",
+        "first_introduced_in": "SEC-000001",
+        "notes": [],
+        "record_status": "active",
+        "claim_ids": [
+          "CLAIM-000101"
+        ]
+      },
+      "after": {
+        "id": "CLADE-000003",
+        "preferred_label": "Discoba",
+        "description": "Clado de los discobas.",
+        "entity_type": "clade",
+        "first_introduced_in": "SEC-000001",
+        "notes": [],
+        "record_status": "active",
+        "claim_ids": [
+          "CLAIM-000101",
+          "CLAIM-000256"
+        ]
+      }
+    },
+    {
+      "operation": "UPDATE_RECORD",
+      "file": "clades.jsonl",
+      "record_id": "CLADE-000004",
+      "before": {
+        "id": "CLADE-000004",
+        "preferred_label": "Amorphea",
+        "description": "Clado de los amorfeos.",
+        "entity_type": "clade",
+        "first_introduced_in": "SEC-000001",
+        "notes": [],
+        "record_status": "active",
+        "claim_ids": [
+          "CLAIM-000099",
+          "CLAIM-000131",
+          "CLAIM-000132",
+          "CLAIM-000138",
+          "CLAIM-000162"
+        ],
+        "issue_ids": [
+          "ISSUE-000044"
+        ]
+      },
+      "after": {
+        "id": "CLADE-000004",
+        "preferred_label": "Amorphea",
+        "description": "Clado de los amorfeos.",
+        "entity_type": "clade",
+        "first_introduced_in": "SEC-000001",
+        "notes": [],
+        "record_status": "active",
+        "claim_ids": [
+          "CLAIM-000099",
+          "CLAIM-000131",
+          "CLAIM-000132",
+          "CLAIM-000138",
+          "CLAIM-000162",
+          "CLAIM-000251"
+        ],
+        "issue_ids": [
+          "ISSUE-000044"
+        ]
+      }
+    },
+    {
+      "operation": "UPDATE_RECORD",
+      "file": "clades.jsonl",
+      "record_id": "CLADE-000010",
+      "before": {
+        "id": "CLADE-000010",
+        "preferred_label": "Holozoa",
+        "description": "Clado de los holozoos.",
+        "notes": [],
+        "entity_type": "clade",
+        "first_introduced_in": "SEC-000002",
+        "record_status": "active",
+        "claim_ids": [
+          "CLAIM-000056",
+          "CLAIM-000061",
+          "CLAIM-000065",
+          "CLAIM-000066",
+          "CLAIM-000198",
+          "CLAIM-000204",
+          "CLAIM-000207",
+          "CLAIM-000208",
+          "CLAIM-000209",
+          "CLAIM-000210"
+        ],
+        "issue_ids": [
+          "ISSUE-000050"
+        ]
+      },
+      "after": {
+        "id": "CLADE-000010",
+        "preferred_label": "Holozoa",
+        "description": "Clado de los holozoos.",
+        "notes": [],
+        "entity_type": "clade",
+        "first_introduced_in": "SEC-000002",
+        "record_status": "active",
+        "claim_ids": [
+          "CLAIM-000056",
+          "CLAIM-000061",
+          "CLAIM-000065",
+          "CLAIM-000066",
+          "CLAIM-000198",
+          "CLAIM-000204",
+          "CLAIM-000207",
+          "CLAIM-000208",
+          "CLAIM-000209",
+          "CLAIM-000210",
+          "CLAIM-000261"
+        ],
+        "issue_ids": [
+          "ISSUE-000050"
+        ]
+      }
+    },
+    {
+      "operation": "UPDATE_RECORD",
+      "file": "clades.jsonl",
+      "record_id": "CLADE-000014",
+      "before": {
+        "id": "CLADE-000014",
+        "preferred_label": "Obazoa",
+        "description": "Clado de los obazoos.",
+        "notes": [],
+        "entity_type": "clade",
+        "first_introduced_in": "SEC-000002",
+        "record_status": "active",
+        "claim_ids": [
+          "CLAIM-000132",
+          "CLAIM-000133",
+          "CLAIM-000177",
+          "CLAIM-000178",
+          "CLAIM-000179"
+        ],
+        "issue_ids": [
+          "ISSUE-000045",
+          "ISSUE-000049"
+        ]
+      },
+      "after": {
+        "id": "CLADE-000014",
+        "preferred_label": "Obazoa",
+        "description": "Clado de los obazoos.",
+        "notes": [],
+        "entity_type": "clade",
+        "first_introduced_in": "SEC-000002",
+        "record_status": "active",
+        "claim_ids": [
+          "CLAIM-000132",
+          "CLAIM-000133",
+          "CLAIM-000177",
+          "CLAIM-000178",
+          "CLAIM-000179",
+          "CLAIM-000255"
+        ],
+        "issue_ids": [
+          "ISSUE-000045",
+          "ISSUE-000049"
+        ]
+      }
+    },
+    {
+      "operation": "UPDATE_RECORD",
+      "file": "clades.jsonl",
+      "record_id": "CLADE-000022",
+      "before": {
+        "id": "CLADE-000022",
+        "preferred_label": "CRuMs",
+        "description": "Clado de Collodictyonida, Rigifilida y Mantamonas; rótulo provisional de Brown et al. 2018.",
+        "notes": [],
+        "entity_type": "clade",
+        "first_introduced_in": "SEC-000003",
+        "record_status": "active",
+        "claim_ids": [
+          "CLAIM-000135",
+          "CLAIM-000136",
+          "CLAIM-000137",
+          "CLAIM-000138",
+          "CLAIM-000139"
+        ]
+      },
+      "after": {
+        "id": "CLADE-000022",
+        "preferred_label": "CRuMs",
+        "description": "Clado de Collodictyonida, Rigifilida y Mantamonas; rótulo provisional de Brown et al. 2018.",
+        "notes": [],
+        "entity_type": "clade",
+        "first_introduced_in": "SEC-000003",
+        "record_status": "active",
+        "claim_ids": [
+          "CLAIM-000135",
+          "CLAIM-000136",
+          "CLAIM-000137",
+          "CLAIM-000138",
+          "CLAIM-000139",
+          "CLAIM-000250"
+        ]
+      }
+    },
+    {
+      "operation": "UPDATE_RECORD",
+      "file": "clades.jsonl",
+      "record_id": "CLADE-000025",
+      "before": {
+        "id": "CLADE-000025",
+        "preferred_label": "CRuMs+Amorphea",
+        "description": "Clado formado por CRuMs y Amorphea (Brown et al. 2018).",
+        "notes": [
+          "Podiata sensu filogenómico reciente puede designarlo (C-502)."
+        ],
+        "entity_type": "clade",
+        "first_introduced_in": "SEC-000003",
+        "record_status": "active",
+        "claim_ids": [
+          "CLAIM-000140",
+          "CLAIM-000142"
+        ]
+      },
+      "after": {
+        "id": "CLADE-000025",
+        "preferred_label": "CRuMs+Amorphea",
+        "description": "Clado formado por CRuMs y Amorphea (Brown et al. 2018).",
+        "notes": [
+          "Podiata sensu filogenómico reciente puede designarlo (C-502)."
+        ],
+        "entity_type": "clade",
+        "first_introduced_in": "SEC-000003",
+        "record_status": "active",
+        "claim_ids": [
+          "CLAIM-000140",
+          "CLAIM-000142",
+          "CLAIM-000250",
+          "CLAIM-000251",
+          "CLAIM-000252"
+        ]
+      }
+    },
+    {
+      "operation": "UPDATE_RECORD",
+      "file": "clades.jsonl",
+      "record_id": "CLADE-000035",
+      "before": {
+        "id": "CLADE-000035",
+        "preferred_label": "Apusomonadida",
+        "description": null,
+        "notes": [],
+        "entity_type": "clade",
+        "first_introduced_in": "SEC-000003",
+        "record_status": "active",
+        "claim_ids": [
+          "CLAIM-000178",
+          "CLAIM-000182",
+          "CLAIM-000183",
+          "CLAIM-000184",
+          "CLAIM-000185",
+          "CLAIM-000186"
+        ],
+        "issue_ids": [
+          "ISSUE-000049"
+        ]
+      },
+      "after": {
+        "id": "CLADE-000035",
+        "preferred_label": "Apusomonadida",
+        "description": null,
+        "notes": [],
+        "entity_type": "clade",
+        "first_introduced_in": "SEC-000003",
+        "record_status": "active",
+        "claim_ids": [
+          "CLAIM-000178",
+          "CLAIM-000182",
+          "CLAIM-000183",
+          "CLAIM-000184",
+          "CLAIM-000185",
+          "CLAIM-000186",
+          "CLAIM-000253"
+        ],
+        "issue_ids": [
+          "ISSUE-000049"
+        ]
+      }
+    },
+    {
+      "operation": "UPDATE_RECORD",
+      "file": "clades.jsonl",
+      "record_id": "CLADE-000036",
+      "before": {
+        "id": "CLADE-000036",
+        "preferred_label": "Apusomonadida+Opisthokonta",
+        "description": "Clado de Apusomonadida y Opisthokonta en la topología de trabajo de S109; el corpus no le da nombre.",
+        "notes": [],
+        "entity_type": "clade",
+        "first_introduced_in": "SEC-000003",
+        "record_status": "active",
+        "claim_ids": [
+          "CLAIM-000191"
+        ]
+      },
+      "after": {
+        "id": "CLADE-000036",
+        "preferred_label": "Apusomonadida+Opisthokonta",
+        "description": "Clado de Apusomonadida y Opisthokonta en la topología de trabajo de S109; el corpus no le da nombre.",
+        "notes": [],
+        "entity_type": "clade",
+        "first_introduced_in": "SEC-000003",
+        "record_status": "active",
+        "claim_ids": [
+          "CLAIM-000191",
+          "CLAIM-000253",
+          "CLAIM-000254",
+          "CLAIM-000255"
+        ]
+      }
+    },
+    {
+      "operation": "UPDATE_RECORD",
+      "file": "clades.jsonl",
+      "record_id": "CLADE-000039",
+      "before": {
+        "id": "CLADE-000039",
+        "preferred_label": "Pluriformea",
+        "description": "Clado de Syssomonas y Corallochytrium; en S126, abreviación operacional del muestreo (C-675).",
+        "notes": [
+          "Concepto de Hehenberger et al. 2017 y etiqueta operacional de Liu et al. 2024: TAXCONCEPT aparte."
+        ],
+        "entity_type": "clade",
+        "first_introduced_in": "SEC-000003",
+        "record_status": "active",
+        "claim_ids": [
+          "CLAIM-000207",
+          "CLAIM-000247",
+          "CLAIM-000249"
+        ]
+      },
+      "after": {
+        "id": "CLADE-000039",
+        "preferred_label": "Pluriformea",
+        "description": "Clado de Syssomonas y Corallochytrium; en S126, abreviación operacional del muestreo (C-675).",
+        "notes": [
+          "Concepto de Hehenberger et al. 2017 y etiqueta operacional de Liu et al. 2024: TAXCONCEPT aparte."
+        ],
+        "entity_type": "clade",
+        "first_introduced_in": "SEC-000003",
+        "record_status": "active",
+        "claim_ids": [
+          "CLAIM-000207",
+          "CLAIM-000247",
+          "CLAIM-000249",
+          "CLAIM-000257",
+          "CLAIM-000258",
+          "CLAIM-000259"
+        ]
+      }
+    },
+    {
+      "operation": "UPDATE_RECORD",
+      "file": "clades.jsonl",
+      "record_id": "CLADE-000040",
+      "before": {
+        "id": "CLADE-000040",
+        "preferred_label": "Ichthyosporea",
+        "description": null,
+        "notes": [],
+        "entity_type": "clade",
+        "first_introduced_in": "SEC-000003",
+        "record_status": "active",
+        "claim_ids": [
+          "CLAIM-000208",
+          "CLAIM-000212",
+          "CLAIM-000213",
+          "CLAIM-000214",
+          "CLAIM-000215",
+          "CLAIM-000246",
+          "CLAIM-000247"
+        ]
+      },
+      "after": {
+        "id": "CLADE-000040",
+        "preferred_label": "Ichthyosporea",
+        "description": null,
+        "notes": [],
+        "entity_type": "clade",
+        "first_introduced_in": "SEC-000003",
+        "record_status": "active",
+        "claim_ids": [
+          "CLAIM-000208",
+          "CLAIM-000212",
+          "CLAIM-000213",
+          "CLAIM-000214",
+          "CLAIM-000215",
+          "CLAIM-000246",
+          "CLAIM-000247",
+          "CLAIM-000260"
+        ]
+      }
+    },
+    {
+      "operation": "UPDATE_RECORD",
+      "file": "clades.jsonl",
+      "record_id": "CLADE-000044",
+      "before": {
+        "id": "CLADE-000044",
+        "preferred_label": "Corallochytrea",
+        "description": null,
+        "notes": [],
+        "entity_type": "clade",
+        "first_introduced_in": "SEC-000003",
+        "record_status": "active",
+        "claim_ids": [
+          "CLAIM-000160",
+          "CLAIM-000223",
+          "CLAIM-000224"
+        ]
+      },
+      "after": {
+        "id": "CLADE-000044",
+        "preferred_label": "Corallochytrea",
+        "description": null,
+        "notes": [],
+        "entity_type": "clade",
+        "first_introduced_in": "SEC-000003",
+        "record_status": "active",
+        "claim_ids": [
+          "CLAIM-000160",
+          "CLAIM-000223",
+          "CLAIM-000224",
+          "CLAIM-000257"
+        ]
+      }
+    },
+    {
+      "operation": "UPDATE_RECORD",
+      "file": "clades.jsonl",
+      "record_id": "CLADE-000049",
+      "before": {
+        "id": "CLADE-000049",
+        "preferred_label": "Teretosporea",
+        "description": "Pluriformea+Ichthyosporea, recuperada por la matriz OrthoFinder de Liu et al. 2024.",
+        "notes": [
+          "Clado sólo dentro de H33."
+        ],
+        "entity_type": "clade",
+        "first_introduced_in": "SEC-000003",
+        "record_status": "active",
+        "claim_ids": [
+          "CLAIM-000248"
+        ]
+      },
+      "after": {
+        "id": "CLADE-000049",
+        "preferred_label": "Teretosporea",
+        "description": "Pluriformea+Ichthyosporea, recuperada por la matriz OrthoFinder de Liu et al. 2024.",
+        "notes": [
+          "Clado sólo dentro de H33."
+        ],
+        "entity_type": "clade",
+        "first_introduced_in": "SEC-000003",
+        "record_status": "active",
+        "claim_ids": [
+          "CLAIM-000248",
+          "CLAIM-000259",
+          "CLAIM-000260",
+          "CLAIM-000261"
+        ]
+      }
+    },
+    {
+      "operation": "UPDATE_RECORD",
+      "file": "evidence.jsonl",
+      "record_id": "EVID-000181",
+      "before": {
+        "id": "EVID-000181",
+        "evidence_type": "genomic",
+        "description": "Brown et al. recuperaron CRuMs como grupo hermano de Amorphea con soporte máximo.",
+        "source_id": "SRC-000047",
+        "locator": "Results: fig. 1; líneas sobre maximal support",
+        "dataset_ids": [
+          "DATASET-000029"
+        ],
+        "analysis_ids": [
+          "ANALYSIS-000029"
+        ],
+        "result_ids": [],
+        "supports_claim_ids": [
+          "CLAIM-000138"
+        ],
+        "challenges_claim_ids": [],
+        "notes": [],
+        "provenance": {
+          "section_ids": [
+            "SEC-000003"
+          ],
+          "passage_ids": [
+            "PASSAGE-000204",
+            "PASSAGE-000209"
+          ],
+          "source_ids": [
+            "SRC-000047"
+          ],
+          "operation_id": null,
+          "dataset_revision": "REV-000010",
+          "origin": "ingestion"
+        },
+        "record_status": "active"
+      },
+      "after": {
+        "id": "EVID-000181",
+        "evidence_type": "genomic",
+        "description": "Brown et al. recuperaron CRuMs como grupo hermano de Amorphea con soporte máximo.",
+        "source_id": "SRC-000047",
+        "locator": "Results: fig. 1; líneas sobre maximal support",
+        "dataset_ids": [
+          "DATASET-000029"
+        ],
+        "analysis_ids": [
+          "ANALYSIS-000029"
+        ],
+        "result_ids": [],
+        "supports_claim_ids": [
+          "CLAIM-000138",
+          "CLAIM-000250",
+          "CLAIM-000251"
+        ],
+        "challenges_claim_ids": [],
+        "notes": [
+          "Corrección editorial (DEC-062, red): El soporte de C-491 para CRuMs hermano de Amorphea es el del clado que forman."
+        ],
+        "provenance": {
+          "section_ids": [
+            "SEC-000003"
+          ],
+          "passage_ids": [
+            "PASSAGE-000204",
+            "PASSAGE-000209"
+          ],
+          "source_ids": [
+            "SRC-000047"
+          ],
+          "operation_id": null,
+          "dataset_revision": "REV-000010",
+          "origin": "ingestion"
+        },
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "UPDATE_RECORD",
+      "file": "evidence.jsonl",
+      "record_id": "EVID-000210",
+      "before": {
+        "id": "EVID-000210",
+        "evidence_type": "taxonomic",
+        "description": "Amorphea es un clado incluido dentro de Eukaryota.",
+        "source_id": "SRC-000038",
+        "locator": "tabla 1",
+        "dataset_ids": [],
+        "analysis_ids": [],
+        "result_ids": [],
+        "supports_claim_ids": [
+          "CLAIM-000162"
+        ],
+        "challenges_claim_ids": [],
+        "notes": [],
+        "provenance": {
+          "section_ids": [
+            "SEC-000003"
+          ],
+          "passage_ids": [
+            "PASSAGE-000238",
+            "PASSAGE-000239"
+          ],
+          "source_ids": [
+            "SRC-000038"
+          ],
+          "operation_id": null,
+          "dataset_revision": "REV-000010",
+          "origin": "ingestion"
+        },
+        "record_status": "active"
+      },
+      "after": {
+        "id": "EVID-000210",
+        "evidence_type": "taxonomic",
+        "description": "Amorphea es un clado incluido dentro de Eukaryota.",
+        "source_id": "SRC-000038",
+        "locator": "tabla 1",
+        "dataset_ids": [],
+        "analysis_ids": [],
+        "result_ids": [],
+        "supports_claim_ids": [
+          "CLAIM-000162",
+          "CLAIM-000252"
+        ],
+        "challenges_claim_ids": [],
+        "notes": [
+          "Corrección editorial (DEC-062, red): La tabla 1 de S01 sitúa en Eukaryota a Amorphea y a CRuMs."
+        ],
+        "provenance": {
+          "section_ids": [
+            "SEC-000003"
+          ],
+          "passage_ids": [
+            "PASSAGE-000238",
+            "PASSAGE-000239"
+          ],
+          "source_ids": [
+            "SRC-000038"
+          ],
+          "operation_id": null,
+          "dataset_revision": "REV-000010",
+          "origin": "ingestion"
+        },
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "UPDATE_RECORD",
+      "file": "evidence.jsonl",
+      "record_id": "EVID-000212",
+      "before": {
+        "id": "EVID-000212",
+        "evidence_type": "taxonomic",
+        "description": "Eukaryota contiene todos los eucariotas vivientes y la población LECA reconstruida.",
+        "source_id": "SRC-000038",
+        "locator": "tabla 1",
+        "dataset_ids": [],
+        "analysis_ids": [],
+        "result_ids": [],
+        "supports_claim_ids": [
+          "CLAIM-000163"
+        ],
+        "challenges_claim_ids": [],
+        "notes": [],
+        "provenance": {
+          "section_ids": [
+            "SEC-000003"
+          ],
+          "passage_ids": [
+            "PASSAGE-000241"
+          ],
+          "source_ids": [
+            "SRC-000038"
+          ],
+          "operation_id": null,
+          "dataset_revision": "REV-000010",
+          "origin": "ingestion"
+        },
+        "record_status": "active"
+      },
+      "after": {
+        "id": "EVID-000212",
+        "evidence_type": "taxonomic",
+        "description": "Eukaryota contiene todos los eucariotas vivientes y la población LECA reconstruida.",
+        "source_id": "SRC-000038",
+        "locator": "tabla 1",
+        "dataset_ids": [],
+        "analysis_ids": [],
+        "result_ids": [],
+        "supports_claim_ids": [
+          "CLAIM-000163",
+          "CLAIM-000256"
+        ],
+        "challenges_claim_ids": [],
+        "notes": [
+          "Corrección editorial (DEC-062, red): La tabla 1 de S01 incluye Discoba en Eukaryota."
+        ],
+        "provenance": {
+          "section_ids": [
+            "SEC-000003"
+          ],
+          "passage_ids": [
+            "PASSAGE-000241"
+          ],
+          "source_ids": [
+            "SRC-000038"
+          ],
+          "operation_id": null,
+          "dataset_revision": "REV-000010",
+          "origin": "ingestion"
+        },
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "UPDATE_RECORD",
+      "file": "evidence.jsonl",
+      "record_id": "EVID-000244",
+      "before": {
+        "id": "EVID-000244",
+        "evidence_type": "genomic",
+        "description": "El grupo hermano operativo de Breviatea es Apusomonadida+Opisthokonta en la topología de trabajo de S109.",
+        "source_id": "SRC-000048",
+        "locator": "árbol, sin localizar",
+        "dataset_ids": [],
+        "analysis_ids": [],
+        "result_ids": [],
+        "supports_claim_ids": [
+          "CLAIM-000191"
+        ],
+        "challenges_claim_ids": [],
+        "notes": [],
+        "provenance": {
+          "section_ids": [
+            "SEC-000003"
+          ],
+          "passage_ids": [
+            "PASSAGE-000238"
+          ],
+          "source_ids": [
+            "SRC-000048"
+          ],
+          "operation_id": null,
+          "dataset_revision": "REV-000010",
+          "origin": "ingestion"
+        },
+        "record_status": "active"
+      },
+      "after": {
+        "id": "EVID-000244",
+        "evidence_type": "genomic",
+        "description": "El grupo hermano operativo de Breviatea es Apusomonadida+Opisthokonta en la topología de trabajo de S109.",
+        "source_id": "SRC-000048",
+        "locator": "árbol, sin localizar",
+        "dataset_ids": [],
+        "analysis_ids": [],
+        "result_ids": [],
+        "supports_claim_ids": [
+          "CLAIM-000191",
+          "CLAIM-000253",
+          "CLAIM-000254",
+          "CLAIM-000255"
+        ],
+        "challenges_claim_ids": [],
+        "notes": [
+          "Corrección editorial (DEC-062, red): El árbol de S109 que da a Breviatea como hermana de Apusomonadida+Opisthokonta es el que define ese clado."
+        ],
+        "provenance": {
+          "section_ids": [
+            "SEC-000003"
+          ],
+          "passage_ids": [
+            "PASSAGE-000238"
+          ],
+          "source_ids": [
+            "SRC-000048"
+          ],
+          "operation_id": null,
+          "dataset_revision": "REV-000010",
+          "origin": "ingestion"
+        },
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "UPDATE_RECORD",
+      "file": "evidence.jsonl",
+      "record_id": "EVID-000290",
+      "before": {
+        "id": "EVID-000290",
+        "evidence_type": "genomic",
+        "description": "El grupo hermano operativo de Corallochytrea es Syssomonas dentro de Pluriformea sensu S129.",
+        "source_id": "SRC-000065",
+        "locator": "Results",
+        "dataset_ids": [],
+        "analysis_ids": [],
+        "result_ids": [],
+        "supports_claim_ids": [
+          "CLAIM-000224"
+        ],
+        "challenges_claim_ids": [],
+        "notes": [],
+        "provenance": {
+          "section_ids": [
+            "SEC-000003"
+          ],
+          "passage_ids": [
+            "PASSAGE-000238"
+          ],
+          "source_ids": [
+            "SRC-000065"
+          ],
+          "operation_id": null,
+          "dataset_revision": "REV-000010",
+          "origin": "ingestion"
+        },
+        "record_status": "active"
+      },
+      "after": {
+        "id": "EVID-000290",
+        "evidence_type": "genomic",
+        "description": "El grupo hermano operativo de Corallochytrea es Syssomonas dentro de Pluriformea sensu S129.",
+        "source_id": "SRC-000065",
+        "locator": "Results",
+        "dataset_ids": [],
+        "analysis_ids": [],
+        "result_ids": [],
+        "supports_claim_ids": [
+          "CLAIM-000224",
+          "CLAIM-000257",
+          "CLAIM-000258"
+        ],
+        "challenges_claim_ids": [],
+        "notes": [
+          "Corrección editorial (DEC-062, red): Los resultados de S129 ponen a Corallochytrea y Syssomonas juntas dentro de Pluriformea."
+        ],
+        "provenance": {
+          "section_ids": [
+            "SEC-000003"
+          ],
+          "passage_ids": [
+            "PASSAGE-000238"
+          ],
+          "source_ids": [
+            "SRC-000065"
+          ],
+          "operation_id": null,
+          "dataset_revision": "REV-000010",
+          "origin": "ingestion"
+        },
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "UPDATE_RECORD",
+      "file": "evidence.jsonl",
+      "record_id": "EVID-000329",
+      "before": {
+        "id": "EVID-000329",
+        "evidence_type": "genomic",
+        "description": "OrthoFinder recuperó Pluriformea+Ichthyosporea como Teretosporea, hermana de Filozoa.",
+        "source_id": "SRC-000063",
+        "locator": "Results; fig. 4",
+        "dataset_ids": [
+          "DATASET-000037"
+        ],
+        "analysis_ids": [
+          "ANALYSIS-000036"
+        ],
+        "result_ids": [],
+        "supports_claim_ids": [
+          "CLAIM-000247",
+          "CLAIM-000248"
+        ],
+        "challenges_claim_ids": [],
+        "notes": [],
+        "provenance": {
+          "section_ids": [
+            "SEC-000003"
+          ],
+          "passage_ids": [
+            "PASSAGE-000276",
+            "PASSAGE-000286"
+          ],
+          "source_ids": [
+            "SRC-000063"
+          ],
+          "operation_id": null,
+          "dataset_revision": "REV-000010",
+          "origin": "ingestion"
+        },
+        "record_status": "active"
+      },
+      "after": {
+        "id": "EVID-000329",
+        "evidence_type": "genomic",
+        "description": "OrthoFinder recuperó Pluriformea+Ichthyosporea como Teretosporea, hermana de Filozoa.",
+        "source_id": "SRC-000063",
+        "locator": "Results; fig. 4",
+        "dataset_ids": [
+          "DATASET-000037"
+        ],
+        "analysis_ids": [
+          "ANALYSIS-000036"
+        ],
+        "result_ids": [],
+        "supports_claim_ids": [
+          "CLAIM-000247",
+          "CLAIM-000248",
+          "CLAIM-000259",
+          "CLAIM-000260",
+          "CLAIM-000261"
+        ],
+        "challenges_claim_ids": [],
+        "notes": [
+          "Corrección editorial (DEC-062, red): El árbol OrthoFinder de S126 que recupera Teretosporea es el que la define."
+        ],
+        "provenance": {
+          "section_ids": [
+            "SEC-000003"
+          ],
+          "passage_ids": [
+            "PASSAGE-000276",
+            "PASSAGE-000286"
+          ],
+          "source_ids": [
+            "SRC-000063"
+          ],
+          "operation_id": null,
+          "dataset_revision": "REV-000010",
+          "origin": "ingestion"
+        },
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "UPDATE_RECORD",
+      "file": "hypotheses.jsonl",
+      "record_id": "HYP-000014",
+      "before": {
+        "id": "HYP-000014",
+        "name": "Raíz Opisthokonta",
+        "description": "Opisthokonta es hermana de todos los demás eucariotas. (H27 del corredor)",
+        "included_claim_ids": [
+          "CLAIM-000106"
+        ],
+        "excluded_claim_ids": [],
+        "assumptions": [
+          "La reconciliación de 2.786 árboles génicos recupera la señal de especies pese a duplicación y pérdida."
+        ],
+        "supporting_evidence_ids": [
+          "EVID-000132"
+        ],
+        "counterevidence_ids": [],
+        "supporting_source_ids": [
+          "SRC-000046"
+        ],
+        "opposing_source_ids": [
+          "SRC-000041",
+          "SRC-000042",
+          "SRC-000043",
+          "SRC-000044",
+          "SRC-000045"
+        ],
+        "alternative_hypothesis_ids": [
+          "HYP-000010",
+          "HYP-000011",
+          "HYP-000012",
+          "HYP-000013",
+          "HYP-000015"
+        ],
+        "conflict_group_ids": [
+          "CONFLICT-000001"
+        ],
+        "open_question_issue_ids": [
+          "ISSUE-000046"
+        ],
+        "notes": [
+          "Choque según el apéndice E: H24, H25, H26 y H28 en la primera divergencia.",
+          "La falsaría: Reconciliaciones con modelos de transferencia/duplicación mejores que recuperen otra raíz estable."
+        ],
+        "introduced_in": "SEC-000003",
+        "provenance": {
+          "section_ids": [
+            "SEC-000003"
+          ],
+          "passage_ids": [
+            "PASSAGE-000155",
+            "PASSAGE-000157"
+          ],
+          "source_ids": [
+            "SRC-000046"
+          ],
+          "operation_id": null,
+          "dataset_revision": "REV-000010",
+          "origin": "ingestion"
+        },
+        "epistemic_dimensions": {
+          "acceptance": "not_assessed",
+          "evidence_strength": "medium",
+          "evidence_strength_reason": "La señal procede de reconciliación de miles de árboles génicos, no de una matriz concatenada única.",
+          "resolution": "unresolved",
+          "historical_status": "current"
+        },
+        "record_status": "active"
+      },
+      "after": {
+        "id": "HYP-000014",
+        "name": "Raíz Opisthokonta",
+        "description": "Opisthokonta es hermana de todos los demás eucariotas. (H27 del corredor)",
+        "included_claim_ids": [
+          "CLAIM-000106"
+        ],
+        "excluded_claim_ids": [
+          "CLAIM-000131",
+          "CLAIM-000132",
+          "CLAIM-000133",
+          "CLAIM-000138",
+          "CLAIM-000140",
+          "CLAIM-000162",
+          "CLAIM-000177",
+          "CLAIM-000178",
+          "CLAIM-000179",
+          "CLAIM-000183",
+          "CLAIM-000191",
+          "CLAIM-000250",
+          "CLAIM-000251",
+          "CLAIM-000252",
+          "CLAIM-000253",
+          "CLAIM-000254",
+          "CLAIM-000255"
+        ],
+        "assumptions": [
+          "La reconciliación de 2.786 árboles génicos recupera la señal de especies pese a duplicación y pérdida."
+        ],
+        "supporting_evidence_ids": [
+          "EVID-000132"
+        ],
+        "counterevidence_ids": [],
+        "supporting_source_ids": [
+          "SRC-000046"
+        ],
+        "opposing_source_ids": [
+          "SRC-000041",
+          "SRC-000042",
+          "SRC-000043",
+          "SRC-000044",
+          "SRC-000045"
+        ],
+        "alternative_hypothesis_ids": [
+          "HYP-000010",
+          "HYP-000011",
+          "HYP-000012",
+          "HYP-000013",
+          "HYP-000015"
+        ],
+        "conflict_group_ids": [
+          "CONFLICT-000001"
+        ],
+        "open_question_issue_ids": [
+          "ISSUE-000046"
+        ],
+        "notes": [
+          "Choque según el apéndice E: H24, H25, H26 y H28 en la primera divergencia.",
+          "La falsaría: Reconciliaciones con modelos de transferencia/duplicación mejores que recuperen otra raíz estable.",
+          "Corrección editorial (DEC-062, red): Con la raíz en Opisthokonta, Amorphea, Obazoa, CRuMs+Amorphea y Apusomonadida+Opisthokonta dejan de ser clados con raíz: H27 no sostiene las afirmaciones del tronco que los usan así. La red por hipótesis (DEC-061) las encontró contradichas sin que la hipótesis lo declarara."
+        ],
+        "introduced_in": "SEC-000003",
+        "provenance": {
+          "section_ids": [
+            "SEC-000003"
+          ],
+          "passage_ids": [
+            "PASSAGE-000155",
+            "PASSAGE-000157"
+          ],
+          "source_ids": [
+            "SRC-000046"
+          ],
+          "operation_id": null,
+          "dataset_revision": "REV-000010",
+          "origin": "ingestion"
+        },
+        "epistemic_dimensions": {
+          "acceptance": "not_assessed",
+          "evidence_strength": "medium",
+          "evidence_strength_reason": "La señal procede de reconciliación de miles de árboles génicos, no de una matriz concatenada única.",
+          "resolution": "unresolved",
+          "historical_status": "current"
+        },
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "UPDATE_RECORD",
+      "file": "hypotheses.jsonl",
+      "record_id": "HYP-000020",
+      "before": {
+        "id": "HYP-000020",
+        "name": "Teretosporea hermana de Filozoa",
+        "description": "Teretosporea, Pluriformea+Ichthyosporea, es hermana de Filozoa. (H33 del corredor)",
+        "included_claim_ids": [
+          "CLAIM-000247",
+          "CLAIM-000248"
+        ],
+        "excluded_claim_ids": [],
+        "assumptions": [
+          "OrthoFinder recupera ortólogos más informativos y UFB alto refleja la historia."
+        ],
+        "supporting_evidence_ids": [
+          "EVID-000329"
+        ],
+        "counterevidence_ids": [],
+        "supporting_source_ids": [
+          "SRC-000063",
+          "SRC-000064"
+        ],
+        "opposing_source_ids": [
+          "SRC-000063"
+        ],
+        "alternative_hypothesis_ids": [
+          "HYP-000019",
+          "HYP-000021"
+        ],
+        "conflict_group_ids": [
+          "CONFLICT-000003"
+        ],
+        "open_question_issue_ids": [
+          "ISSUE-000050"
+        ],
+        "notes": [
+          "Choque según el apéndice E: H32 y H34 en la primera divergencia holozoa.",
+          "La falsaría: Concordancia génica y de sitios elevada para Pluriformea-sister o Ichthyosporea-sister.",
+          "S126 aparece a favor (OrthoFinder) y en contra (BUSCO, Tikhonenkov_2020 y gCF bajo), como en el apéndice E."
+        ],
+        "introduced_in": "SEC-000003",
+        "provenance": {
+          "section_ids": [
+            "SEC-000003"
+          ],
+          "passage_ids": [
+            "PASSAGE-000276",
+            "PASSAGE-000286"
+          ],
+          "source_ids": [
+            "SRC-000063"
+          ],
+          "operation_id": null,
+          "dataset_revision": "REV-000010",
+          "origin": "ingestion"
+        },
+        "epistemic_dimensions": {
+          "acceptance": "not_assessed",
+          "evidence_strength": "medium",
+          "evidence_strength_reason": "La topología cambia al cambiar el conjunto de ortólogos.",
+          "resolution": "unresolved",
+          "historical_status": "current"
+        },
+        "record_status": "active"
+      },
+      "after": {
+        "id": "HYP-000020",
+        "name": "Teretosporea hermana de Filozoa",
+        "description": "Teretosporea, Pluriformea+Ichthyosporea, es hermana de Filozoa. (H33 del corredor)",
+        "included_claim_ids": [
+          "CLAIM-000247",
+          "CLAIM-000248",
+          "CLAIM-000259",
+          "CLAIM-000260",
+          "CLAIM-000261"
+        ],
+        "excluded_claim_ids": [],
+        "assumptions": [
+          "OrthoFinder recupera ortólogos más informativos y UFB alto refleja la historia."
+        ],
+        "supporting_evidence_ids": [
+          "EVID-000329"
+        ],
+        "counterevidence_ids": [],
+        "supporting_source_ids": [
+          "SRC-000063",
+          "SRC-000064"
+        ],
+        "opposing_source_ids": [
+          "SRC-000063"
+        ],
+        "alternative_hypothesis_ids": [
+          "HYP-000019",
+          "HYP-000021"
+        ],
+        "conflict_group_ids": [
+          "CONFLICT-000003"
+        ],
+        "open_question_issue_ids": [
+          "ISSUE-000050"
+        ],
+        "notes": [
+          "Choque según el apéndice E: H32 y H34 en la primera divergencia holozoa.",
+          "La falsaría: Concordancia génica y de sitios elevada para Pluriformea-sister o Ichthyosporea-sister.",
+          "S126 aparece a favor (OrthoFinder) y en contra (BUSCO, Tikhonenkov_2020 y gCF bajo), como en el apéndice E.",
+          "Corrección editorial (DEC-062, red): Los miembros de Teretosporea son parte de la topología de H33."
+        ],
+        "introduced_in": "SEC-000003",
+        "provenance": {
+          "section_ids": [
+            "SEC-000003"
+          ],
+          "passage_ids": [
+            "PASSAGE-000276",
+            "PASSAGE-000286"
+          ],
+          "source_ids": [
+            "SRC-000063"
+          ],
+          "operation_id": null,
+          "dataset_revision": "REV-000010",
+          "origin": "ingestion"
+        },
+        "epistemic_dimensions": {
+          "acceptance": "not_assessed",
+          "evidence_strength": "medium",
+          "evidence_strength_reason": "La topología cambia al cambiar el conjunto de ortólogos.",
+          "resolution": "unresolved",
+          "historical_status": "current"
+        },
+        "record_status": "active"
+      }
+    },
+    {
+      "operation": "UPDATE_RECORD",
+      "file": "taxon-concepts.jsonl",
+      "record_id": "TAXCONCEPT-000037",
+      "before": {
+        "id": "TAXCONCEPT-000037",
+        "name_id": "NAME-000033",
+        "according_to_source_id": "SRC-000065",
+        "circumscription": {
+          "included_entity_ids": [],
+          "excluded_entity_ids": [],
+          "definition_text": null
+        },
+        "rank_assignment": {
+          "rank": "not_stated",
+          "parent_concept_id": null
+        },
+        "taxonomic_status": "not_stated",
+        "phylogenetic_interpretation": "not_assessed",
+        "notes": [],
+        "first_introduced_in": "SEC-000003",
+        "record_status": "active",
+        "claim_ids": [
+          "CLAIM-000218",
+          "CLAIM-000224"
+        ]
+      },
+      "after": {
+        "id": "TAXCONCEPT-000037",
+        "name_id": "NAME-000033",
+        "according_to_source_id": "SRC-000065",
+        "circumscription": {
+          "included_entity_ids": [],
+          "excluded_entity_ids": [],
+          "definition_text": null
+        },
+        "rank_assignment": {
+          "rank": "not_stated",
+          "parent_concept_id": null
+        },
+        "taxonomic_status": "not_stated",
+        "phylogenetic_interpretation": "not_assessed",
+        "notes": [],
+        "first_introduced_in": "SEC-000003",
+        "record_status": "active",
+        "claim_ids": [
+          "CLAIM-000218",
+          "CLAIM-000224",
+          "CLAIM-000258"
+        ]
+      }
+    }
+  ],
+  "records_added": [
+    "CLAIM-000250",
+    "CLAIM-000251",
+    "CLAIM-000252",
+    "CLAIM-000253",
+    "CLAIM-000254",
+    "CLAIM-000255",
+    "CLAIM-000256",
+    "CLAIM-000257",
+    "CLAIM-000258",
+    "CLAIM-000259",
+    "CLAIM-000260",
+    "CLAIM-000261"
+  ],
+  "records_updated": [
+    "CLADE-000001",
+    "CLADE-000002",
+    "CLADE-000003",
+    "CLADE-000004",
+    "CLADE-000010",
+    "CLADE-000014",
+    "CLADE-000022",
+    "CLADE-000025",
+    "CLADE-000035",
+    "CLADE-000036",
+    "CLADE-000039",
+    "CLADE-000040",
+    "CLADE-000044",
+    "CLADE-000049",
+    "EVID-000181",
+    "EVID-000210",
+    "EVID-000212",
+    "EVID-000244",
+    "EVID-000290",
+    "EVID-000329",
+    "HYP-000014",
+    "HYP-000020",
+    "TAXCONCEPT-000037"
+  ],
+  "claims_added": [
+    "CLAIM-000250",
+    "CLAIM-000251",
+    "CLAIM-000252",
+    "CLAIM-000253",
+    "CLAIM-000254",
+    "CLAIM-000255",
+    "CLAIM-000256",
+    "CLAIM-000257",
+    "CLAIM-000258",
+    "CLAIM-000259",
+    "CLAIM-000260",
+    "CLAIM-000261"
+  ],
+  "events_added": [],
+  "hypotheses_added": [],
+  "issues_added": [],
+  "issues_resolved": [],
+  "records_deprecated": [],
+  "views_invalidated": [],
+  "views_built": [],
+  "validation_results": {},
+  "editorial": {
+    "spec": {
+      "path": "knowledge/corpus/editorials/red.json",
+      "sha256": "sha256:50b22d1800aee1cd081648369651eda6c199725118c71d89459a8366d0815326"
+    },
+    "decision": "DEC-062",
+    "reason": "La primera construcción de la red por hipótesis (DEC-061) encontró lo que la conversión de la sección 4 dejó sin declarar: los miembros de tres clados compuestos, Discoba dentro de Eukaryota, el enlace entre el clado Pluriformea y lo que contiene, y las afirmaciones del tronco que la raíz en Opisthokonta (H27) contradice.",
+    "keys": {
+      "@AO_en_Obazoa": "CLAIM-000255",
+      "@Amorphea_en_CA": "CLAIM-000251",
+      "@Apusomonadida_en_AO": "CLAIM-000253",
+      "@CA_en_Eukaryota": "CLAIM-000252",
+      "@CRuMs_en_CA": "CLAIM-000250",
+      "@Corallochytrea_en_Pluriformea": "CLAIM-000257",
+      "@Discoba_en_Eukaryota": "CLAIM-000256",
+      "@Ichthyosporea_en_Teretosporea": "CLAIM-000260",
+      "@Opisthokonta_en_AO": "CLAIM-000254",
+      "@Pluriformea_en_Teretosporea": "CLAIM-000259",
+      "@Syssomonas_en_Pluriformea": "CLAIM-000258",
+      "@Teretosporea_en_Holozoa": "CLAIM-000261"
+    },
+    "rows": {
+      "SEC-000003": {
+        "C-491": [
+          "CLAIM-000250",
+          "CLAIM-000251",
+          "CLAIM-000252"
+        ],
+        "C-683": [
+          "CLAIM-000252"
+        ],
+        "C-553": [
+          "CLAIM-000253",
+          "CLAIM-000254",
+          "CLAIM-000255"
+        ],
+        "C-544": [
+          "CLAIM-000253",
+          "CLAIM-000254"
+        ],
+        "C-535": [
+          "CLAIM-000255"
+        ],
+        "C-511": [
+          "CLAIM-000256"
+        ],
+        "C-446": [
+          "CLAIM-000256"
+        ],
+        "C-601": [
+          "CLAIM-000257",
+          "CLAIM-000258"
+        ],
+        "C-592": [
+          "CLAIM-000257",
+          "CLAIM-000258"
+        ],
+        "C-657": [
+          "CLAIM-000259",
+          "CLAIM-000260",
+          "CLAIM-000261"
+        ],
+        "C-576": [
+          "CLAIM-000261"
+        ]
+      }
+    }
+  }
+}
