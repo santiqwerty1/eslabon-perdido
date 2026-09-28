@@ -367,8 +367,8 @@ def construir(base: Path = RECORDS, raiz: Path = ROOT) -> dict:
             ],
             "sin_topologia": (
                 f"De {len(r.claims)} afirmaciones activas, {len(estructurales)} "
-                f"{'es estructural' if len(estructurales) == 1 else 'son estructurales'}: "
-                "la vista no puede dibujar un árbol."
+                f"{'es estructural' if len(estructurales) == 1 else 'son estructurales'} (topología): "
+                "esta vista es un eje de tiempo y no la dibuja."
             ),
         },
         "escala": {"eras": ERAS, "periodos": PERIODOS, "fuente": ICS_FUENTE},

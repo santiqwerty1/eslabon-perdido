@@ -1,11 +1,13 @@
 # Correspondencia de predicados · Campaña 1
 
-**Estado:** decidida y aplicada para dos secciones del corredor:
+**Estado:** decidida y aplicada para tres secciones del corredor:
 
 - la **6**: `SEC-000001`, `DEC-057`, convertida por
   [`corredor-06.json`](../../knowledge/corpus/conversions/corredor-06.json);
 - la **5**: `SEC-000002`, `DEC-058`, convertida por
-  [`corredor-05.json`](../../knowledge/corpus/conversions/corredor-05.json).
+  [`corredor-05.json`](../../knowledge/corpus/conversions/corredor-05.json);
+- la **4**: `SEC-000003`, `DEC-060`, convertida por
+  [`corredor-04.json`](../../knowledge/corpus/conversions/corredor-04.json).
 
 Las reglas se extienden al resto del corpus sección a sección.
 
@@ -407,3 +409,160 @@ filas, la prosa y los apéndices. Encontró resultados en Ga con unidad Ma,
 hipótesis cuya primera fila no las enunciaba, métodos de datación que la fila sí
 daba, y detalles que el corpus no dice. Todo quedó corregido en el fichero de
 conversión.
+
+# Sección 4 · La raíz eucariota y la forma de Amorphea
+
+263 filas (C-431–C-693), 53 predicados y 46 fuentes, 43 de ellas nuevas. Es la
+sección que trae la topología del corredor: dónde cae la raíz de Eukaryota,
+qué clados forman Amorphea y Obazoa, y cómo se ordena Holozoa unicelular. Se
+convierte desde la versión congelada `af7e799` (`DEC-060`), sin ampliar el
+esquema.
+
+## Lo que enseñó la sección 4
+
+**La topología cabe en el vocabulario de §14.1.** Una fila `contiene*` dice
+qué hay dentro de un clado, y §14.1 define `contains` como la inversa derivada
+de `member_of`: se escribe una afirmación `member_of` por cada miembro que la
+fila nombra, y lo que la fila deja sin nombrar («y otros linajes», «parientes
+unicelulares próximos») queda en una nota. Un grupo hermano es
+`sister_group_of`. Con eso, el corredor filogenético de la sección —Eukaryota,
+Amorphea, Obazoa, Opisthokonta, Holozoa, Filozoa, Choanozoa— se puede
+reconstruir desde los registros.
+
+**Un nombre no es un clado (§4.3).** La sección distingue a propósito
+circunscripciones rivales con el mismo nombre: Podiata *sensu* Cavalier-Smith
+y *sensu* filogenómico reciente, Choanozoa histórica y Choanozoa *sensu
+stricto*, Pluriformea de Hehenberger et al. y la etiqueta operacional de Liu et
+al. La regla:
+
+- la topología se afirma sobre **clados** (`CLADE-`);
+- cuando una fila nombra una circunscripción («*sensu* X»), un nombre histórico
+  o un género, la afirmación es sobre su **concepto taxonómico** (nombre y
+  concepto según su fuente), y los conceptos rivales son registros separados,
+  relacionados en `relation_to_other_concepts` (`conceptual_homonym`,
+  `overlapping`, `congruent`);
+- Corallochytrium (género), Corallochytrea (linaje) y Pluriformea se conservan
+  como tres entidades, como pide el propio corredor (C-676).
+
+**Las hipótesis de raíz llevan su topología.** El apéndice E da doce hipótesis
+para la sección (H23–H34). Cada una se crea con su topología como afirmaciones
+con alcance de hipótesis (`scope.hypothesis_ids`): H24 es «Opimoda
+`sister_group_of` Diphoda» dentro de H24, y nada fuera de ella. Cuando la raíz
+separa un clado del resto («Discoba frente a los demás eucariotas
+activamente mitocondriados»), el resto es un clado que sólo existe dentro de
+esa hipótesis, y su ficha lo dice. Las que se excluyen forman **grupos de
+conflicto** (`DEC-055`), los primeros del libro mayor:
+
+| Grupo | Hipótesis | En qué chocan |
+|---|---|---|
+| Posición de la raíz de Eukaryota | H23–H28 | la primera divergencia de Eukaryota |
+| Posición de Ancyromonadida y Malawimonadida | H30, H31 | la relación de Malawimonadida con CRuMs+Amorphea |
+| Raíz interna de Holozoa | H32–H34 | la primera divergencia de Holozoa |
+
+H29 (CRuMs hermano de Amorphea) no está en ningún grupo: el apéndice E la da
+por compatible con toda raíz que no corte ese nodo. Tampoco tiene fuentes en
+contra, porque el corredor no localizó ninguna; queda como cuestión abierta
+(`content_gap`) en vez de inventarle oposición.
+
+**El soporte no se convierte.** C-437 lo pide y §10.7 también: una
+probabilidad posterior, un bootstrap, un UFB, un gCF y un sCF son medidas
+distintas. Cada una es una entrada de `quantitative_support` de la afirmación
+del nodo o de la topología a la que se refiere, con su medida, su escala, su
+método, sus condiciones y su localizador. Un soporte cualitativo («máximo»,
+«alto, valor no localizado») se guarda tal cual.
+
+**Las tablas nodales repiten.** Cada nodo del corredor tiene una tabla, y la
+sección tiene una fila por celda. Las que sólo representan la tabla («la tabla
+consigna a Obazoa como grupo hermano») o resumen el tipo de evidencia de otras
+filas son glosas (H), igual que las que repiten una datación o un método ya
+convertidos en la sección 6 (C-517, C-518, C-630, C-631, C-638, C-639). La
+evidencia molecular de un nodo apoya su composición: con matriz descrita, es
+un estudio (D) con su evidencia; sin ella, evidencia (J).
+
+**Las edades de S126 son nodos, no fósiles.** Cada edad nodal de Liu et al.
+2024 es una datación de un evento `divergence` de la corona muestreada, como
+en la sección 6, con dos análisis: la raíz de 1,5 Ga (principal) y la de 1,9 Ga
+(sensibilidad), que no se promedian. Amorphea y Opisthokonta reutilizan sus
+eventos de la sección 6; el nodo 345 es el tallo Apusomonadida–Opisthokonta y
+no la corona de Apusomonadida, porque S126 muestrea un solo apusomonádido.
+
+## Reglas nuevas
+
+| Predicado del corredor | Regla |
+|---|---|
+| `contiene*`, `miembro_de`, `posee_miembro*` | **B**, `member_of` por miembro nombrado; lo no nombrado va a una nota |
+| `grupo_hermano_de` | **B**, `sister_group_of`. Si la fila dice que el grupo hermano varía según la matriz, es la raíz interna de Holozoa: **E**, grupo de conflicto |
+| `diverge_de` | **B**, `diverges_from` |
+| `propuesto_por` de una hipótesis del apéndice E, `respaldado_por` de una hipótesis, `se_recupera_consistentemente_en*` | **E**: la hipótesis y su topología con alcance |
+| `propuesto_por` de un nombre, `se_circunscribe_mediante*`, `definido_como*` | **B**: nombre y concepto según su fuente |
+| `sinonimo_propuesto_de` | **B**, `proposed_synonym_of`, con la relación entre conceptos |
+| `no_equivale_a*`, `no_es_sinonimo_de*`, `no_especifica*`, `se_distingue_de*` con fuentes | **B** o **F** (si es síntesis), `classified_as_by` con la categoría literal |
+| `tiene_soporte*` | **C**, `quantitative_support` de la afirmación del nodo |
+| `tiene_peso_actual*`, `no_resuelve*` y `tiene_estado*` sobre caracteres raros | **F**, `classified_as_by` sobre el carácter como método de enraizar |
+| `incompatible_con` entre raíces | **F**, `incompatible_with` entre sus topologías |
+| `consigna_como_grupo_hermano*`, `representa_como_ramas_inmediatas*`, `remite_a*`, `registra_como_definicion*`, tipo de evidencia resumido | **H** |
+| `tiene_estado*` sin resolver (raíz, Ancyromonadida, Obazoa, Holozoa) | **I** |
+| `usa_como_recurso*`, `aplica_marco*`, `se_normaliza_con*`, `usa_como_estandar*`, `se_interpreta_segun*` | **H**: convenciones documentales del corredor |
+
+Una fila derivada (F) cita a veces una fuente sin localizador; su evidencia
+toma el de la fila de la que depende y lo dice («localizador de C-442»).
+
+## Sección 4, por bloques
+
+| Bloque | Filas | Qué se escribe |
+|---|---|---|
+| 4.1 Por qué la raíz es difícil | C-431–C-437 | Seis relaciones metodológicas (G) sobre el enraizamiento: polaridad, grupo externo, saturación, atracción de ramas largas, modelo y matriz. C-432 es evidencia de CLAIM-000023, la misma proposición de la sección 6 |
+| 4.2 Hipótesis de raíz | C-438–C-462, C-677, C-690–C-693 | H23–H28 con sus topologías, el grupo de conflicto de la raíz y su cuestión (C-462). Unikonta, Bikonta y Excavata *sensu* histórico como conceptos; Opimoda, Diphoda, Opimoda+, Diphoda+ y Diaphoretickes como clados. Los estados ancestrales que suponen los nombres Unikonta y Bikonta son `assumes` dentro de H23, no rasgos observados. Brown et al. 2018 resumen H24 nombrando tres ensamblajes (C-691); la abreviación de dos lados «raíz entre Amorphea y Diaphoretickes» es otra cosa, una entidad de método, y de ella dicen C-692 y C-693 que no fija una bipartición ni equivale a H24 |
+| 4.3 Caracteres raros | C-463–C-483 | Fusión DHFR–TS, miosinas, indels e intrones como rasgos observados o reconstruidos (B), sus pérdidas (`loses_trait`), su contraevidencia (J) y su peso como polarizadores de la raíz (F). Lo que se propuso como sinapomorfía de Bikonta o se reconstruyó para LECA dentro de H23 lleva el alcance de H23 |
+| 4.4 Amorphea y su base | C-484–C-497, C-678 | El concepto de Amorphea, su composición, CRuMs (H29), Ancyromonadida y Malawimonadida (H30, H31 y su grupo de conflicto) |
+| 4.5 y 4.8 Nombres | C-498–C-510, C-667–C-676 | Unikonta, Podiata, Sulcozoa, Varisulca, Apusozoa, Choanozoa, Apoikozoa y Pluriformea como conceptos, con sus relaciones |
+| 4.6 Tablas nodales | C-511–C-647, C-682 | Composición, grupo hermano, caracteres, evidencia, soporte y edades de S126 de Eukaryota, Amorphea, Amoebozoa, Obazoa, Apusomonadida, Breviatea, Opisthokonta, Holomycota, Holozoa, Ichthyosporea, Pluriformea, Corallochytrea, Filasterea, Filozoa, Choanozoa, Choanoflagellata y Metazoa |
+| 4.7 Raíz interna de Holozoa | C-648–C-666, C-680 | El estudio de Liu et al. (matrices BUSCO, OrthoFinder y Tikhonenkov_2020, 18 árboles), H32–H34 con sus topologías, sus soportes (UFB, gCF, sCF) y su grupo de conflicto |
+| 4.9 Lo que queda sin resolver | C-677–C-683 | Cuestiones abiertas (C-678–C-680), la inclusión de Amorphea en Eukaryota (C-683) y el método de las edades de S126 (C-682) |
+| Convenciones | C-681, C-684–C-689 | Glosas del corredor, no se ingieren |
+
+## Resultado de la sección 4
+
+| Registros | |
+|---|---:|
+| Afirmaciones | 162: 48 `member_of`, 20 `sister_group_of`, 32 observaciones de rasgo (`shows_evidence_of`), 27 clasificaciones, 21 dataciones, 4 dependencias metodológicas, 2 `assumes`, 2 `may_bias`, 2 `incompatible_with`, y una de `limits`, `loses_trait`, `diverges_from` y `proposed_synonym_of`. 19 llevan alcance de hipótesis, 16 son derivadas y 27 llevan soporte (46 entradas: 18 numéricas y 28 cualitativas) |
+| Eventos | 10 de divergencia nuevos, con 21 dataciones de S126 (raíz de 1,5 Ga y de 1,9 Ga); Amorphea, Opisthokonta y la raíz de la sección 6 se reutilizan |
+| Estudios | 15 conjuntos de datos, 14 análisis y 24 resultados (21 edades en Ma y 3 medidas de congruencia en %) |
+| Evidencias | 233: 83 genómicas, 54 moleculares, 48 taxonómicas, 20 morfológicas, 14 metodológicas, 13 nomenclaturales y una histórica |
+| Entidades | 35 clados, 21 nombres y 25 conceptos taxonómicos, 25 rasgos con 33 observaciones, 12 métodos y 2 linajes |
+| Fuentes | 44 nuevas |
+| Hipótesis, conflictos y cuestiones | 12 (H23–H34), 3 grupos de conflicto y 5 cuestiones |
+
+Las 371 menciones tienen destino: 82 crean entidad, 161 son atributo de un
+registro, 24 repiten una entidad, 38 señalan su evidencia y 8 son cuestiones
+pendientes. Se descartan con razón 58, todas de glosas: celdas y títulos de las
+tablas nodales, resúmenes del tipo de evidencia, las convenciones de C-684–C-689
+y la fila retirada C-681.
+
+La conversión (`SEC-000003-conversion.json`, REV-000009 → REV-000010, con
+`SNAP-000022`) enlaza de vuelta 19 registros de las secciones 5 y 6:
+- diez clados (Eukaryota, Opisthokonta, Discoba, Amorphea, Holozoa, Obazoa…),
+  por las afirmaciones de topología que los nombran;
+- tres eventos, por sus dataciones nuevas;
+- el enraizamiento y la saturación como métodos;
+- CLAIM-000023 (C-432) e ISSUE-000040;
+- LECA y la presencia de mitocondrias.
+
+Antes de aplicar la conversión se hicieron dos auditorías fila a fila contra las
+filas, la prosa y los apéndices. Encontraron:
+
+- recuentos que sólo estaban en la fila, como las 37 combinaciones de miosinas y
+  los 228, 440 y 201 genes de las matrices de Liu et al.;
+- sujetos mal elegidos: la abreviación de dos lados confundida con el resumen de
+  Brown et al., Excavata *sensu* Brown atribuida al concepto de Burki, y los
+  cuatro linajes excavados de H26 igualados a Excavata;
+- estados supuestos y propuestas escritos como observaciones, sin el alcance de
+  H23;
+- fuentes citadas que se perdían, y localizadores cortados en el primer «;»;
+- un soporte contado dos veces, relaciones entre conceptos que la fila no dice,
+  y rangos de género que ninguna fila da.
+
+Todo quedó corregido en el fichero de conversión. La validación termina sin
+errores y con una advertencia justificada: H29 no tiene oposición, porque el
+corredor no localizó ninguna, y la cuestión `content_gap` que la acompaña lo
+registra.
