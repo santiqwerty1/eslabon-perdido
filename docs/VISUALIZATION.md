@@ -43,6 +43,28 @@ Nunca se dibuja como una bifurcación ordinaria. Es un evento n-ario con partici
 
 Esto no es sólo accesibilidad. Como el trazo carga el significado epistémico, si el color fuera el portador, la distinción entre backbone e hipótesis alternativa desaparecería al imprimir o ante un daltonismo. El rigor y la accesibilidad piden aquí lo mismo.
 
+## Eje de tiempo · «Relojes y rocas»
+
+`make views` construye `generated/views/cronologia.html` desde los registros activos (`scripts/build_views/cronologia.py`). Es una vista derivada: no escribe en `knowledge/` y dos ejecuciones sobre los mismos registros dan los mismos bytes.
+
+Pone en un eje en millones de años lo que dicen los relojes moleculares y lo que registran las rocas. Cada afirmación `dated_to` activa es una marca. Su datación decide el carril: la modelada por un método (`determination: modelled`) es un reloj; la observada o inferida del registro, una roca. Las estimaciones de un mismo evento conviven sin promediarse.
+
+Un eje de tiempo no dibuja relaciones, así que el trazo de arriba no le sirve. Usa estas convenciones, redundantes con el texto y sin color:
+
+| Marca | Significado |
+|---|---|
+| Barra | intervalo de una estimación o de una fecha |
+| Rombo | fósil con fecha aproximada, sin intervalo |
+| Barra de extremos redondos o círculo | biomarcador |
+| Corchete | unidad de roca datada |
+| Flecha en un extremo | la fecha sigue más allá del eje o no tiene ese límite |
+| Relleno lleno, rayado, hueco o de borde discontinuo | fuerza de la evidencia de la afirmación: alta, media, baja o desconocida |
+| Signo de interrogación | posición no resuelta |
+
+La escala usa los límites y los colores de la carta cronoestratigráfica internacional (ICS v2023/09); el color acompaña siempre al rótulo de la unidad. Con esa carta se sitúan también las dataciones que el corpus da como intervalo con nombre («Mesoproterozoico»).
+
+Toda afirmación activa queda en un solo sitio, y la página dice cuál: en el eje, en «por qué no coinciden» (métodos y lo que condiciona una fecha), en la ficha de una marca (lo que se afirma de lo que la marca data) o fuera, con su motivo. Las hipótesis rivales sobre un fósil se leen lado a lado en su ficha y no se dibujan en el eje.
+
 ## Bandas poblacionales · `RETENIDO` para prototipo
 
 Las poblaciones pueden representarse como bandas temporales cuya anchura exprese tamaño efectivo, abundancia relativa, diversidad o incertidumbre.
