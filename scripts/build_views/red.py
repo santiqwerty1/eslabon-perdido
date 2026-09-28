@@ -239,7 +239,10 @@ def seleccionar(libro: Libro, hyps: list[str]) -> tuple[list[dict], dict[str, tu
                                                (libro.r.hypotheses[h].get("excluded_claim_ids") or [])))
         elif not alcance and dims.get("historical_status") in ("historical", "superseded", "rejected"):
             fuera[cid] = ("historica", dims.get("historical_status"))
-        elif pred == "member_of" and (objeto(c) or "").startswith("TAXCONCEPT-"):
+        # Colgar algo de un concepto es clasificación según su fuente, salvo que lo
+        # afirme la hipótesis de la vista: la que enuncia su topología sobre conceptos
+        # (Unikonta y Bikonta) los trata como clados.
+        elif pred == "member_of" and (objeto(c) or "").startswith("TAXCONCEPT-") and not alcance & set(hyps):
             fuera[cid] = ("clasificacion", libro.etiqueta(objeto(c)))
         elif pred not in TOPOLOGIA:
             fuera[cid] = ("no_dibujado", pred)
@@ -469,6 +472,11 @@ def construir_vista(libro: Libro, espec: dict, hyps: list[str]) -> dict:
                 for h in arbol.hijos[n]:
                     if h not in lados:
                         arbol.marcas[h].add("sin_lado")
+                if not any(arbol.hijos.get(x) for x in lados):
+                    hallazgos.append(
+                        f"{a['hipotesis']}: los dos lados de su raíz, {libro.etiqueta(lados[0])} y "
+                        f"{libro.etiqueta(lados[1])}, no tienen miembros declarados; el resto de "
+                        f"{libro.etiqueta(n)} queda sin lado.")
 
     # 5 · verificación --------------------------------------------------------------------------
     principal = arbol.cima(raiz) if raiz in arbol.nodos else raiz

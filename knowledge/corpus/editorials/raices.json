@@ -1,0 +1,46 @@
+{
+  "decision": "DEC-062",
+  "reason": "La red por hipótesis dejaba fuera del árbol a Ancyromonadida y Malawimonadida, que ninguna afirmación situaba en Eukaryota, y dibujaba la raíz de H23 entre dos conceptos sin contenido. C-438 dice qué contenía uno de los dos lados y que el otro era el resto de los eucariotas.",
+  "records": [
+    {
+      "key": "@Ancyromonadida_en_Eukaryota", "file": "claims.jsonl", "section": "SEC-000003", "rows": ["C-511", "C-493"],
+      "reason": "Eukaryota contiene todos los eucariotas vivientes (C-511); C-493 sitúa Ancyromonadida entre ellos, fuera de Amorphea y más lejos de ella que CRuMs.",
+      "record": {"claim_type": "relational", "subject_id": "CLADE-000026", "predicate": "member_of",
+                 "object": {"entity_id": "CLADE-000001"}, "notes": []}
+    },
+    {
+      "key": "@Malawimonadida_en_Eukaryota", "file": "claims.jsonl", "section": "SEC-000003", "rows": ["C-511", "C-494"],
+      "reason": "Eukaryota contiene todos los eucariotas vivientes (C-511); C-494 y C-495 sitúan Malawimonadida entre ellos, con dos posiciones candidatas.",
+      "record": {"claim_type": "relational", "subject_id": "CLADE-000027", "predicate": "member_of",
+                 "object": {"entity_id": "CLADE-000001"}, "notes": []}
+    },
+    {
+      "key": "@Amoebozoa_en_Unikonta", "file": "claims.jsonl", "section": "SEC-000003", "rows": ["C-438"],
+      "reason": "C-438: la división unikonta–bikonta situó la raíz entre un conjunto que incluía Amoebozoa y Opisthokonta y otro conjunto de eucariotas.",
+      "record": {"claim_type": "relational", "subject_id": "CLADE-000008", "predicate": "member_of",
+                 "object": {"entity_id": "TAXCONCEPT-000018"},
+                 "scope": {"hypothesis_ids": ["HYP-000010"]},
+                 "notes": ["El conjunto «incluía» a Amoebozoa y Opisthokonta: no se dice que fueran los únicos."]}
+    },
+    {
+      "key": "@Opisthokonta_en_Unikonta", "file": "claims.jsonl", "section": "SEC-000003", "rows": ["C-438"],
+      "reason": "El otro grupo que C-438 nombra dentro del conjunto unikonta.",
+      "record": {"claim_type": "relational", "subject_id": "CLADE-000002", "predicate": "member_of",
+                 "object": {"entity_id": "TAXCONCEPT-000018"},
+                 "scope": {"hypothesis_ids": ["HYP-000010"]},
+                 "notes": ["El conjunto «incluía» a Amoebozoa y Opisthokonta: no se dice que fueran los únicos."]}
+    }
+  ],
+  "patches": {
+    "EVID-000212": {"reason": "La tabla 1 de S01 sitúa en Eukaryota a Ancyromonadida y a Malawimonadida.",
+                    "add": {"supports_claim_ids": ["@Ancyromonadida_en_Eukaryota", "@Malawimonadida_en_Eukaryota"]}},
+    "EVID-000112": {"reason": "La tesis de S116 que da la raíz unikonta–bikonta es la que pone a Amoebozoa y Opisthokonta en Unikonta.",
+                    "add": {"supports_claim_ids": ["@Amoebozoa_en_Unikonta", "@Opisthokonta_en_Unikonta"]}},
+    "EVID-000113": {"reason": "Como la de S116, la tesis de S118 sostiene la división unikonta–bikonta con Amoebozoa y Opisthokonta en Unikonta.",
+                    "add": {"supports_claim_ids": ["@Amoebozoa_en_Unikonta", "@Opisthokonta_en_Unikonta"]}},
+    "EVID-000114": {"reason": "La clasificación de S89 circunscribe Unikonta con Amoebozoa y Opisthokonta.",
+                    "add": {"supports_claim_ids": ["@Amoebozoa_en_Unikonta", "@Opisthokonta_en_Unikonta"]}},
+    "HYP-000010": {"reason": "Lo que contiene el lado unikonta es parte de la topología de H23 (C-438).",
+                   "add": {"included_claim_ids": ["@Amoebozoa_en_Unikonta", "@Opisthokonta_en_Unikonta"]}}
+  }
+}

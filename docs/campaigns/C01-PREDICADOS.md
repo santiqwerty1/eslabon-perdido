@@ -575,3 +575,10 @@ La primera red por hipótesis (`DEC-061`) encontró lo que esta conversión dej�
 - las diecisiete afirmaciones del tronco que la raíz en Opisthokonta no sostiene, en `excluded_claim_ids` de H27.
 
 Cada afirmación nueva cita la evidencia que ya existía de su fila.
+
+La segunda, `ED-raices` (REV-000011 → REV-000012), da lo que la red siguió sin poder dibujar:
+
+- Ancyromonadida y Malawimonadida dentro de Eukaryota (C-511, con C-493 y C-494);
+- Amoebozoa y Opisthokonta dentro de Unikonta, con alcance de H23 (C-438). El conjunto «incluía» a los dos, así que la afirmación no dice que fueran los únicos.
+
+Las raíces de H24 y H28 y los linajes de H26 no se pueden completar desde aquí: las filas no nombran los miembros.
