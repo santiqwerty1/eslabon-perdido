@@ -458,6 +458,8 @@ def rellenar(r: dict, esq: dict, to: str) -> dict:
                 m.update(mention_type="unresolved", disposition="discarded_with_reason", reason="prueba")
         for f in s["new_rows"].values():
             f["destination"] = "H"
+            for m in (f.get("new_mentions") or {}).values():
+                m.update(mention_type="unresolved", disposition="discarded_with_reason", reason="prueba")
         for mid, m in s["mentions"].items():
             m.update(decision="reanclar" if citadas.get(mid) else "retirar", reason="prueba")
         for x in s["provenance"].values():
@@ -474,12 +476,15 @@ def rellenar(r: dict, esq: dict, to: str) -> dict:
     return esq
 
 
-@unittest.skipUnless(importlib.util.find_spec("jsonschema"), "convertir.py exige jsonschema")
-class Construir(unittest.TestCase):
-    """El delta de absorción: un libro mayor con la sección 0 convertida, frente a corredor-mini-v2.
+class LibroConvertido:
+    """Un libro mayor con la sección 0 de corredor-mini convertida, nuevo en cada prueba.
 
-    Cada prueba parte de un libro mayor nuevo: aplican y revierten.
+    Las pruebas aplican y revierten, así que ninguna hereda el estado de otra.
+    `conversion()` da el fichero de conversión de partida.
     """
+
+    def conversion(self) -> dict:
+        return self.entorno.spec()
 
     def setUp(self):
         self._tmp = tempfile.TemporaryDirectory()
@@ -491,7 +496,7 @@ class Construir(unittest.TestCase):
         with contextlib.redirect_stdout(io.StringIO()):
             assert delta_mod.cmd(deltas / "SEC-000001.json", False, False) == 0
             spec = self.tmp / "corredor-00.json"
-            spec.write_text(json.dumps(self.entorno.spec(), ensure_ascii=False), encoding="utf-8")
+            spec.write_text(json.dumps(self.conversion(), ensure_ascii=False), encoding="utf-8")
             assert convertir.convertir(spec, str(MINI), False) == 0
             assert delta_mod.cmd(deltas / "SEC-000001-conversion.json", False, False) == 0
         (self.tmp / "absorptions").mkdir()
@@ -541,6 +546,12 @@ class Construir(unittest.TestCase):
 
     def activa(self) -> str:
         return json.loads((self.tmp / "dataset.json").read_text(encoding="utf-8"))["corpus_freeze"]["fingerprint"]
+
+
+
+@unittest.skipUnless(importlib.util.find_spec("jsonschema"), "convertir.py exige jsonschema")
+class Construir(LibroConvertido, unittest.TestCase):
+    """El delta de absorción: la sección 0 convertida frente a corredor-mini-v2."""
 
     def test_aplicar_cambia_la_congelacion_y_revertir_deja_todo_como_estaba(self):
         antes = {p.name: p.read_bytes() for p in self.entorno.records.glob("*.jsonl")}
@@ -645,9 +656,9 @@ class Construir(unittest.TestCase):
         self.aplicar(self.construir(self.absorcion(ajustar=lambda e: corregir(e, {"notes": ["revisada"]}))))
         self.assertEqual(self.registro("CLAIM-000001")["notes"], ["revisada"])
 
-    def test_un_parche_no_toca_lo_que_se_deduce_ni_los_enlaces_ni_rompe_el_esquema(self):
+    def test_un_parche_no_toca_lo_que_se_deduce_ni_el_ciclo_de_vida_ni_rompe_el_esquema(self):
         for parche, dice in (({"epistemic_dimensions": {}}, "se deduce"),
-                             ({"subject_id": "CLADE-000002"}, "otro lado del enlace"),
+                             ({"superseded_by": "CLAIM-000001"}, "ciclo de vida"),
                              ({"claim_type": "no-existe"}, "dejaría de validar"),
                              ({"inventado": 1}, "no es un campo")):
             ruta = self.absorcion(ajustar=lambda e, p=parche: e["sections"]["00"]["rows"]["C-001"].update(
@@ -656,16 +667,120 @@ class Construir(unittest.TestCase):
                 absorber.construir(ruta, str(MINI), str(MINI_V2))
             self.assertIn(dice, str(e.exception), parche)
 
-    def test_lo_que_crea_registros_nuevos_se_niega_con_su_motivo(self):
-        ajustes = (lambda e: e["sections"]["00"]["new_rows"]["C-009"].update(destination="A", keys=["@X"]),
-                   lambda e: e["sections"]["00"]["rows"]["C-003"].update(decision="dividir"),
-                   lambda e: e.update(pairing={"C-001": "C-009"}),
-                   lambda e: e["sections"]["00"]["rows"]["C-003"]["new_mentions"]["registro C-003"].update(
-                       disposition="new_entity", targets=["@Nuevo"]))
-        for ajustar in ajustes:
+    def test_lo_que_todavia_no_se_ejecuta_se_niega(self):
+        with self.assertRaises(SystemExit) as e:
+            absorber.construir(self.absorcion(ajustar=lambda e: e.update(pairing={"C-001": "C-009"})),
+                               str(MINI), str(MINI_V2))
+        self.assertIn("todavía no se ejecuta", str(e.exception))
+
+    def fila_c009(self, texto: str) -> Path:
+        """Una copia de v2 cuya fila nueva C-009 dice otra cosa."""
+        filas = self.texto("data/afirmaciones/00.csv").splitlines(keepends=True)
+        filas = [texto + "\n" if l.startswith('"C-009"') else l for l in filas]
+        return self.version({"data/afirmaciones/00.csv": "".join(filas)})
+
+    def test_una_fila_nueva_con_destino_da_sus_registros_y_su_mencion_los_nombra(self):
+        v = self.fila_c009('"C-009","FIX-Beta es el grupo hermano de FIX-Eta.","FIX-Beta","grupo_hermano_de",'
+                           '"FIX-Eta","expresa","S01 discusión","no evaluado","media","Lo dice la discusión.",'
+                           '"resuelta","vigente"')
+
+        def ajustar(e):
+            s = e["sections"]["00"]
+            s["records"] = [
+                {"key": "@Eta", "file": "clades.jsonl", "rows": ["C-009"],
+                 "record": {"preferred_label": "FIX-Eta", "description": "Clado de prueba."}},
+                {"key": "@CL9", "file": "claims.jsonl", "rows": ["C-009"],
+                 "record": {"claim_type": "relational", "subject_id": "CLADE-000002", "predicate": "sister_group_of",
+                            "object": {"entity_id": "@Eta"}}},
+                {"key": "@EV9", "file": "evidence.jsonl", "rows": ["C-009"],
+                 "record": {"evidence_type": "molecular", "description": "Lo dice la discusión.", "source_id": "@S01",
+                            "locator": "discusión", "supports_claim_ids": ["@CL9"], "challenges_claim_ids": []}}]
+            s["new_rows"]["C-009"].update(destination="B", keys=["@CL9", "@EV9", "@Eta"])
+            s["new_rows"]["C-009"]["new_mentions"]["FIX-Eta"].update(
+                mention_type="clade", disposition="new_entity", targets=["@Eta"], reason="clado nuevo")
+
+        self.aplicar(self.construir(self.absorcion(v, ajustar), v))
+        todos = absorber.registros_actuales()
+        [eta] = [rid for rid, (f, r) in todos.items() if r.get("preferred_label") == "FIX-Eta"]
+        [cl9] = [rid for rid, (f, r) in todos.items() if f == "claims.jsonl" and r["subject_id"] == "CLADE-000002"
+                 and r.get("object", {}).get("entity_id") == eta]
+        claim = todos[cl9][1]
+        self.assertEqual(claim["epistemic_dimensions"]["evidence_strength"], "medium")
+        s = corredor.correspondencia()["00"]
+        self.assertEqual(claim["provenance"]["passage_ids"], s["rows"]["C-009"]["passage_ids"])
+        self.assertEqual(s["rows"]["C-009"]["destination"], "B")
+        self.assertTrue({eta, cl9} <= set(s["rows"]["C-009"]["record_ids"]))
+        self.assertIn(cl9, self.registro("CLADE-000002")["claim_ids"])
+        [m] = [r for f, r in todos.values() if f == "mentions.jsonl" and r["original_text"] == "FIX-Eta"]
+        self.assertEqual((m["resolution"]["target_ids"], m["disposition"]), ([eta], "new_entity"))
+        self.assertIn(m["id"], s["rows"]["C-009"]["mention_ids"])
+
+    def test_ampliar_anade_registros_a_una_fila_que_sigue(self):
+        def ajustar(e):
+            e["sections"]["00"]["records"] = [
+                {"key": "@EV1b", "file": "evidence.jsonl", "rows": ["C-001"],
+                 "record": {"evidence_type": "molecular", "description": "Lo confirma la figura 2.", "source_id": "@S01",
+                            "locator": "figura 2", "supports_claim_ids": ["CLAIM-000001"], "challenges_claim_ids": []}}]
+            e["sections"]["00"]["rows"]["C-001"].update(decision="ampliar", keys=["@EV1b"])
+
+        self.aplicar(self.construir(self.absorcion(ajustar=ajustar)))
+        nuevas = [x for x in self.registro("CLAIM-000001")["evidence_ids"] if x != "EVID-000001"]
+        self.assertEqual(len(nuevas), 1)
+        self.assertIn(nuevas[0], corredor.correspondencia()["00"]["rows"]["C-001"]["record_ids"])
+        self.assertEqual(self.registro("EVID-000001")["record_status"], "active")
+
+    def test_reemplazar_sustituye_el_registro_y_un_parche_mueve_su_evidencia(self):
+        def ajustar(e):
+            e["sections"]["00"]["records"] = [
+                {"key": "@CL1b", "file": "claims.jsonl", "rows": ["C-001"],
+                 "record": {"claim_type": "relational", "subject_id": "CLADE-000001", "predicate": "sister_group_of",
+                            "object": {"entity_id": "CLADE-000002"}, "notes": ["Reformulada al absorber."]}}]
+            e["sections"]["00"]["rows"]["C-001"].update(
+                decision="reemplazar", keys=["@CL1b"], replaced_by={"CLAIM-000001": "@CL1b"},
+                patches={"EVID-000001": {"supports_claim_ids": ["@CL1b"]}})
+
+        nombre = self.construir(self.absorcion(ajustar=ajustar))
+        self.aplicar(nombre)
+        vieja = self.registro("CLAIM-000001")
+        nueva = self.registro(vieja["superseded_by"])
+        self.assertEqual(vieja["record_status"], "replaced")
+        self.assertEqual((vieja["evidence_ids"], nueva["evidence_ids"]), ([], ["EVID-000001"]))
+        self.assertEqual(self.registro("EVID-000001")["supports_claim_ids"], [nueva["id"]])
+        self.assertIn(nueva["id"], self.registro("CLADE-000001")["claim_ids"])
+        filas = corredor.correspondencia()["00"]["rows"]["C-001"]["record_ids"]
+        self.assertTrue(nueva["id"] in filas and "CLAIM-000001" not in filas)
+        operaciones = {o["record_id"]: o["operation"] for o in
+                       json.loads((self.tmp / "deltas" / nombre).read_text(encoding="utf-8"))["operations"]}
+        self.assertEqual(operaciones["CLAIM-000001"], "SUPERSEDE_RECORD")
+        self.assertEqual(self.aplicar(nombre, revertir=True), 0)
+        self.assertEqual(self.registro("CLAIM-000001")["record_status"], "active")
+
+    def test_una_fuente_que_cambia_de_clave_se_empareja_y_sus_registros_la_siguen(self):
+        cambios = {r: self.texto(r).replace('"S01",', '"S99",').replace('"S01 ', '"S99 ')
+                   for r in ("data/apendices/A_fuentes.csv", "data/afirmaciones/00.csv", "data/afirmaciones/01.csv")}
+        v = self.version(cambios)
+
+        def ajustar(e):
+            e["sources"]["S01"].update(decision="actualizar", pair_with="S99")
+
+        c = absorber.construir(self.absorcion(v, ajustar), str(MINI), str(v))
+        self.assertFalse([a for a in c["warnings"] if "no salían" in a])
+        self.aplicar(self.construir(self.absorcion(v, ajustar), v))
+        self.assertEqual(self.registro("SRC-000001")["citation_key"], "S99")
+        self.assertEqual(self.registro("CLAIM-000001")["provenance"]["source_ids"], ["SRC-000001"])
+        self.assertFalse([r for f, r in absorber.registros_actuales().values()
+                          if f == "sources.jsonl" and r["id"] != "SRC-000001"])
+
+    def test_una_clave_sin_definir_se_niega(self):
+        for ajustar in (
+                lambda e: e["sections"]["00"]["rows"]["C-001"].update(
+                    decision="reemplazar", replaced_by={"CLAIM-000001": "@NoEsta"}),
+                lambda e: e["sections"]["00"]["rows"]["C-001"].update(decision="ampliar", keys=["@NoEsta"]),
+                lambda e: e["sections"]["00"]["rows"]["C-003"]["new_mentions"]["registro C-003"].update(
+                    disposition="new_entity", targets=["@NoEsta"])):
             with self.assertRaises(SystemExit) as e:
                 absorber.construir(self.absorcion(ajustar=ajustar), str(MINI), str(MINI_V2))
-            self.assertIn("constructor de registros nuevos", str(e.exception))
+            self.assertIn("@NoEsta", str(e.exception))
 
     def test_el_fichero_tiene_que_cubrir_justo_lo_que_pide_el_informe(self):
         for ajustar, dice in (
@@ -734,6 +849,93 @@ class Construir(unittest.TestCase):
         primero = json.loads((self.tmp / "deltas" / nombre).read_text(encoding="utf-8"))
         self.assertEqual(otro["absorption"]["sections"]["00"]["passages"],
                          primero["absorption"]["sections"]["00"]["passages"])
+
+
+@unittest.skipUnless(importlib.util.find_spec("jsonschema"), "convertir.py exige jsonschema")
+class Division(LibroConvertido, unittest.TestCase):
+    """Una fila que se retira por no ser atómica y reparte sus registros entre sus sucesoras.
+
+    En la conversión de partida, C-003 da FIX-Gamma, un rasgo y la afirmación
+    que los une. En corredor-mini-v2 C-003 queda como fila de registro, y sus
+    dos proposiciones pasan a C-007 y C-008.
+    """
+
+    def conversion(self) -> dict:
+        s = self.entorno.spec()
+        s["records"] += [
+            {"key": "@Gamma", "file": "clades.jsonl", "rows": ["C-003"],
+             "record": {"preferred_label": "FIX-Gamma", "description": "Clado de prueba."}},
+            {"key": "@RasgoH", "file": "traits.jsonl", "rows": ["C-003"],
+             "record": {"preferred_label": "rasgo heredado de FIX-Delta", "description": "Rasgo de prueba."}},
+            {"key": "@CL3", "file": "claims.jsonl", "rows": ["C-003"],
+             "record": {"claim_type": "relational", "subject_id": "@Gamma", "predicate": "retains_trait",
+                        "object": {"entity_id": "@RasgoH"}}}]
+        s["rows"]["C-003"] = {"destination": "B", "keys": ["@CL3", "@Gamma", "@RasgoH"]}
+        return s
+
+    def id_de(self, etiqueta: str) -> str:
+        return next(rid for rid, (_, r) in absorber.registros_actuales().items()
+                    if r.get("preferred_label") == etiqueta)
+
+    def dividir(self, e: dict, sucesoras: dict | None = None) -> None:
+        gamma, rasgo = self.id_de("FIX-Gamma"), self.id_de("rasgo heredado de FIX-Delta")
+        cl3 = next(rid for rid, (f, r) in absorber.registros_actuales().items()
+                   if f == "claims.jsonl" and r.get("subject_id") == gamma)
+        s = e["sections"]["00"]
+        s["records"] = [
+            {"key": "@RasgoC", "file": "traits.jsonl", "rows": ["C-007"],
+             "record": {"preferred_label": "rasgo conservado", "description": "Rasgo de prueba."}},
+            {"key": "@Delta", "file": "clades.jsonl", "rows": ["C-008"],
+             "record": {"preferred_label": "FIX-Delta", "description": "Clado de prueba."}},
+            {"key": "@CL8", "file": "claims.jsonl", "rows": ["C-008"],
+             "record": {"claim_type": "relational", "subject_id": gamma, "predicate": "inherits_trait_from",
+                        "object": {"entity_id": "@Delta"}}}]
+        s["rows"]["C-003"].update(
+            decision="dividir", reason="no era atómica",
+            successors=sucesoras if sucesoras is not None else {"C-007": [cl3, gamma], "C-008": []},
+            replaced_by={rasgo: "@RasgoC"}, patches={cl3: {"object": {"entity_id": "@RasgoC"}}})
+        s["new_rows"]["C-007"].update(destination="B", keys=["@RasgoC"])
+        s["new_rows"]["C-008"].update(destination="B", keys=["@CL8", "@Delta"])
+
+    def test_dividir_reasigna_lo_atomico_y_sustituye_lo_demas(self):
+        gamma, rasgo = self.id_de("FIX-Gamma"), self.id_de("rasgo heredado de FIX-Delta")
+        cl3 = next(rid for rid, (f, r) in absorber.registros_actuales().items()
+                   if f == "claims.jsonl" and r.get("subject_id") == gamma)
+        nombre = self.construir(self.absorcion(ajustar=self.dividir))
+        self.aplicar(nombre)
+        conservado = self.id_de("rasgo conservado")
+        s = corredor.correspondencia()["00"]
+        # La afirmación sigue siendo la misma, ahora de C-007: su procedencia y
+        # sus ejes salen de esa fila, y apunta al rasgo nuevo.
+        claim = self.registro(cl3)
+        self.assertEqual(s["record_rows"][cl3], ["C-007"])
+        self.assertEqual(claim["provenance"]["passage_ids"], s["rows"]["C-007"]["passage_ids"])
+        self.assertEqual((claim["epistemic_dimensions"]["evidence_strength"],
+                          claim["epistemic_dimensions"]["evidence_strength_reason"]), ("low", "Una sola fuente."))
+        self.assertEqual(claim["object"], {"entity_id": conservado})
+        # El rasgo que no era atómico queda sustituido, y los enlaces de vuelta
+        # siguen a la afirmación.
+        self.assertEqual((self.registro(rasgo)["record_status"], self.registro(rasgo)["superseded_by"]),
+                         ("replaced", conservado))
+        self.assertEqual((self.registro(rasgo)["claim_ids"], self.registro(conservado)["claim_ids"]), ([], [cl3]))
+        self.assertEqual((s["rows"]["C-003"]["destination"], s["rows"]["C-003"]["record_ids"]), ("H", []))
+        self.assertEqual(set(s["rows"]["C-007"]["record_ids"]), {cl3, gamma, conservado})
+        self.assertEqual(len(s["rows"]["C-008"]["record_ids"]), 2)
+        self.assertEqual(self.aplicar(nombre, revertir=True), 0)
+        self.assertEqual(self.registro(rasgo)["record_status"], "active")
+
+    def test_dividir_exige_repartir_cada_registro(self):
+        with self.assertRaises(SystemExit) as e:
+            absorber.construir(self.absorcion(ajustar=lambda x: self.dividir(x, {"C-007": [], "C-008": []})),
+                               str(MINI), str(MINI_V2))
+        self.assertIn("no se reasigna a ninguna sucesora ni se sustituye", str(e.exception))
+
+    def test_un_parche_de_enlace_se_rehace_en_los_dos_lados(self):
+        alfa, gamma = self.id_de("FIX-Alfa"), self.id_de("FIX-Gamma")
+        self.aplicar(self.construir(self.absorcion(ajustar=lambda e: e["sections"]["00"]["rows"]["C-001"].update(
+            decision="corregir", patches={"CLAIM-000001": {"subject_id": gamma}}))))
+        self.assertNotIn("CLAIM-000001", self.registro(alfa)["claim_ids"])
+        self.assertIn("CLAIM-000001", self.registro(gamma)["claim_ids"])
 
 
 if __name__ == "__main__":
