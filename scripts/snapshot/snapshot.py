@@ -35,7 +35,6 @@ ENTITY_FILES = [
     "populations.jsonl", "specimens.jsonl", "sites.jsonl", "regions.jsonl",
     "occurrences.jsonl", "traits.jsonl", "trait-observations.jsonl", "methods.jsonl", "molecules.jsonl",
 ]
-VIEW_DIR = ROOT / "knowledge" / "views"
 
 
 def count_lines(path: Path) -> int:
@@ -62,7 +61,11 @@ def gather() -> dict:
         if fname:
             counts[key] = count_lines(RECORDS / fname)
     counts["entities"] = sum(count_lines(RECORDS / f) for f in ENTITY_FILES)
-    counts["views"] = len([p for p in VIEW_DIR.rglob("*.json")])
+    # Las vistas son registros de un JSONL por tipo (TAXVIEW, PHYVIEW); un .json
+    # suelto cuenta como una vista.
+    vistas, especificaciones = ROOT / "knowledge" / "views", ROOT / "knowledge" / "view-specs"
+    counts["views"] = (sum(count_lines(p) for p in vistas.rglob("*.jsonl"))
+                       + len([p for p in vistas.rglob("*.json")]))
 
     files = {}
     for p in sorted(RECORDS.glob("*.jsonl")):
@@ -85,6 +88,10 @@ def gather() -> dict:
     # aplicada o revertida pasa de una a otra, y las dos tienen que seguir ahí.
     for p in sorted([*(corpus / "conversions").glob("*.json"), *(corpus / "absorptions").glob("*.json"),
                      *(corpus / "manifests").glob("corredor-*.json")]):
+        files[str(p.relative_to(ROOT))] = digest(p)
+    # Las vistas y la especificación de la que salen (DEC-061): una vista es un
+    # producto editorial fechado, y cambiarla cambia lo que el estado publica.
+    for p in sorted([*vistas.rglob("*.jsonl"), *vistas.rglob("*.json"), *especificaciones.glob("*.json")]):
         files[str(p.relative_to(ROOT))] = digest(p)
     # Los deltas también: los pendientes reservan revisión e identificadores,
     # y cualquiera de ellos dice qué secciones se ingirieron ya.

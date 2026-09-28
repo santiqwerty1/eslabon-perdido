@@ -17,11 +17,11 @@ es una hipótesis, es una conclusión disfrazada. Aquí eso se traduce en avisos
 sobre hipótesis sin oposición registrada, y en errores cuando la evidencia
 enlazada como favorable resulta cuestionar lo que la hipótesis incluye.
 
-Sobre las vistas: §16.2 las sitúa en knowledge/views/, fuera del libro mayor que
-carga validate.py. Esta familia las busca por prefijo dentro de lo que reciba, de
-modo que funciona hoy sobre fixtures y funcionará sobre el repositorio cuando el
-cargador incorpore ese directorio. Si hay hipótesis y no llega ninguna vista, lo
-dice en vez de callar: no comprobado no es correcto.
+Sobre las vistas: §16.2 las sitúa en knowledge/views/, fuera del libro mayor.
+validate.py carga sus JSONL junto con los registros del dataset real, y un
+fixture las trae en su propio directorio; esta familia las busca por prefijo
+dentro de lo que reciba. Si hay hipótesis y no llega ninguna vista, lo dice en
+vez de callar: no comprobado no es correcto.
 """
 
 from __future__ import annotations

@@ -39,6 +39,7 @@ from __future__ import annotations
 import argparse
 import html
 import json
+import re
 import math
 import sys
 from pathlib import Path
@@ -78,7 +79,7 @@ INTERVALOS = {n.lower(): (a, b) for n, a, b, _ in ERAS + PERIODOS}
 # métodos, de sus supuestos y de lo que calibra o limita una fecha.
 METODO = {"limits", "depends_on", "provides_bound", "assumes", "calibrates",
           "incompatible_with", "may_bias"}
-# Los que dibujarían un árbol (los mismos que build_views.py).
+# Los que dibujarían un árbol: esta vista no los dibuja; red.py, sí.
 ESTRUCTURALES = {"member_of", "descends_from", "sister_group_of", "contains",
                  "stem_lineage_of", "crown_group_of"}
 
@@ -129,6 +130,8 @@ def cita_corta(src: dict | None) -> str:
         return "fuente sin ficha"
     autores = src.get("authors") or []
     primero = (autores[0] if autores else src.get("citation_key") or "?").split(",")[0].strip()
+    # «Brown et al.» ya trae el «et al.»: no se repite.
+    primero = re.sub(r"\s+et al\.?$", "", primero)
     if len(autores) > 2 or (autores and "et al" in autores[0]):
         nombre = f"{primero} et al."
     elif len(autores) == 2:
@@ -368,7 +371,7 @@ def construir(base: Path = RECORDS, raiz: Path = ROOT) -> dict:
             "sin_topologia": (
                 f"De {len(r.claims)} afirmaciones activas, {len(estructurales)} "
                 f"{'es estructural' if len(estructurales) == 1 else 'son estructurales'} (topología): "
-                "esta vista es un eje de tiempo y no la dibuja."
+                "esta vista es un eje de tiempo y no la dibuja; la dibuja la red por hipótesis."
             ),
         },
         "escala": {"eras": ERAS, "periodos": PERIODOS, "fuente": ICS_FUENTE},

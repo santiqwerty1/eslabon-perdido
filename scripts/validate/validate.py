@@ -21,6 +21,10 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 RECORDS = ROOT / "knowledge" / "records"
+# Las vistas no son del libro mayor (§16.2), pero se validan con él: su esquema,
+# sus referencias y que no mezclen topologías (§17 paso 9) sólo se comprueban
+# si llegan al conjunto cargado.
+VIEWS = ROOT / "knowledge" / "views"
 SCHEMAS = ROOT / "schemas" / "json-schema"
 MANIFEST = ROOT / "knowledge" / "corpus" / "manifests" / "dataset.json"
 
@@ -159,7 +163,11 @@ def all_records(rep: Report, records_dir: Path | None = None) -> dict[str, list[
     oficial no puede comprobar sus propios casos de prueba.
     """
     base = records_dir or RECORDS
-    return {p.name: load_jsonl(p, rep) for p in sorted(base.glob("*.jsonl"))}
+    data = {p.name: load_jsonl(p, rep) for p in sorted(base.glob("*.jsonl"))}
+    if records_dir is None and VIEWS.is_dir():
+        for p in sorted(VIEWS.glob("*.jsonl")):
+            data.setdefault(p.name, load_jsonl(p, rep))
+    return data
 
 
 # --- familias ---------------------------------------------------------------

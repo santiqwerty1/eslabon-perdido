@@ -420,7 +420,11 @@ def check(data: dict[str, list[dict]], rep) -> None:
     else:
         science_dirs, projection_dirs, game_dirs = SCIENCE_DIRS, PROJECTION_DIRS, GAME_DIRS
 
-    science += _load_dirs(science_dirs, rep)
+    # En el dataset real, validate.py ya carga knowledge/views/*.jsonl con los
+    # registros; aquí sólo se añade lo que no haya llegado, sin duplicarlo.
+    cargados = {rec.get("id") for _, rec in science if isinstance(rec.get("id"), str)}
+    science += [(w, r) for w, r in _load_dirs(science_dirs, rep)
+                if not (isinstance(r.get("id"), str) and r["id"] in cargados)]
     projections = _load_dirs(projection_dirs, rep)
     game = projections + _load_dirs(game_dirs, rep)
 
