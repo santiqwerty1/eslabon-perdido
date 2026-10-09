@@ -5,3 +5,5 @@ venv/
 generated/**
 !generated/**/.gitkeep
 .DS_Store
+/.env
+/.env.local

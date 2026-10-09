@@ -1,0 +1,25 @@
+{
+  "kit_version": "0.1.0",
+  "nombre": "eslabon-perdido",
+  "boveda": "Boveda",
+  "perfil": "tablero",
+  "aplicado": "2026-10-08",
+  "presupuesto_semana_usd": null,
+  "ci": false,
+  "hooks": "plugin",
+  "reglas": {
+    "protegidas": [
+      "Boveda/Sesiones/**",
+      ".posta/eventos/**"
+    ],
+    "secretos": [
+      ".env",
+      ".env.local",
+      "~/.posta/claves/**"
+    ],
+    "con_aprobacion": [
+      "git push *"
+    ],
+    "prohibidos": []
+  }
+}
